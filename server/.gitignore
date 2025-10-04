@@ -1,0 +1,12 @@
+node_modules/
+.env
+*.log
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# MongoDB dumpy, pliki tymczasowe
+dump/
+uploads/

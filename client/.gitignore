@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Vite
+.vite/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Systemowe
+*.suo
+*.sw?
