@@ -5,17 +5,16 @@ Prosty system HR w wersji MVP, zbudowany w stacku **React + Node.js + Express + 
 ---
 
 ## 🖥️ Frontend – `client/` (React + Vite + Tailwind CSS)
-client/ ├── 📂 public/           – favicon, index.html
-├── 📂 src/
-│   ├── 🎨 assets/       – ikony, obrazy, fonty
-│   ├── 🧩 components/   – reużywalne komponenty (Navbar.jsx, Button.jsx)
-│   ├── 📄 pages/        – widoki (Login.jsx, Home.jsx)
-│   ├── 🧠 App.jsx       – główny komponent aplikacji
-│   ├── 🚀 main.jsx      – punkt wejścia
-│   └── 🎯 index.css     – Tailwind + style globalne
-├── 📦 package.json      – zależności frontendow
-
-
+client/
+├── public/           # favicon, index.html
+├── src/
+│   ├── assets/       # ikony, obrazy, fonty
+│   ├── components/   # reużywalne komponenty (Navbar.jsx, Button.jsx)
+│   ├── pages/        # widoki (Login.jsx, Home.jsx)
+│   ├── App.jsx       # główny komponent aplikacji
+│   ├── main.jsx      # punkt wejścia
+│   └── index.css     # Tailwind + style globalne
+├── package.json      # zależności frontendowe
 
 ### 🔧 Technologie
 - [React](https://react.dev/)
@@ -26,11 +25,12 @@ client/ ├── 📂 public/           – favicon, index.html
 ---
 
 ## ⚙️ Backend – `server/` (Node.js + Express + MongoDB)
-server/ ├── 📂 models/           – schematy Mongoose (User.js)
-├── 📂 routes/           – endpointy API (auth.js)
-├── 🧠 server.js         – główny plik Express
-├── 🔐 .env              – zmienne środowiskowe (DB_URI, JWT_SECRET)
-├── 📦 package.json      – zależności backendowe
+server/
+├── models/           # schematy Mongoose (User.js)
+├── routes/           # endpointy API (auth.js)
+├── server.js         # główny plik Express
+├── .env              # zmienne środowiskowe (DB_URI, JWT_SECRET)
+├── package.json      # zależności backendowe
 
 ### 🔧 Technologie
 - [Node.js](https://nodejs.org/)

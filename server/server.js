@@ -32,7 +32,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      res.json({ message: 'Zalogowano pomyślnie', username: user.username });
+      res.json({ message: 'Zalogowano pomyślnie', username: user.username, role: user.role });
     } else {
       res.status(401).json({ message: 'Nieprawidłowe dane logowania' });
     }
