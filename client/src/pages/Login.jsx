@@ -11,6 +11,7 @@ export default function Login() {
       const res = await axios.post('/api/auth/login', data);
       localStorage.setItem('token', res.data.token); // jeśli dodasz JWT
       localStorage.setItem('username', res.data.username); // tymczasowo
+      localStorage.setItem('role', res.data.role); // zapisuje rolę użytkownika
       navigate('/dashboard');
     } catch (err) {
       alert(err.response?.data?.message || 'Błąd logowania');
