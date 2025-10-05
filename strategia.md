@@ -5,6 +5,7 @@ Prosty system HR w wersji MVP, zbudowany w stacku **React + Node.js + Express + 
 ---
 
 ## 🖥️ Frontend – `client/` (React + Vite + Tailwind CSS)
+```txt
 client/
 ├── public/           # favicon, index.html
 ├── src/
@@ -15,6 +16,7 @@ client/
 │   ├── main.jsx      # punkt wejścia
 │   └── index.css     # Tailwind + style globalne
 ├── package.json      # zależności frontendowe
+```
 
 ### 🔧 Technologie
 - [React](https://react.dev/)
@@ -25,12 +27,14 @@ client/
 ---
 
 ## ⚙️ Backend – `server/` (Node.js + Express + MongoDB)
+```txt
 server/
 ├── models/           # schematy Mongoose (User.js)
 ├── routes/           # endpointy API (auth.js)
 ├── server.js         # główny plik Express
 ├── .env              # zmienne środowiskowe (DB_URI, JWT_SECRET)
 ├── package.json      # zależności backendowe
+```
 
 ### 🔧 Technologie
 - [Node.js](https://nodejs.org/)
