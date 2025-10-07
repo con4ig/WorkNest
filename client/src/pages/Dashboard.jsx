@@ -77,43 +77,49 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="flex h-screen">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-lg fixed h-full">
-          <div className="p-6 flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">W</div>
-              <div>
-                <div className="font-semibold">{username}</div>
-                <div className="text-xs text-gray-500">{role}</div>
+        /* Sidebar */
+          <aside className="w-64 bg-white shadow-lg fixed h-full">
+            <div className="p-6 flex flex-col h-full">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">W</div>
+                <div>
+            <div className="font-semibold">{username}</div>
+            <div className="text-xs text-gray-500">{role}</div>
+                </div>
+              </div>
+
+              <nav className="flex-1">
+                <ul className="space-y-2">
+            <li className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 text-emerald-700">
+              <Icon.Dashboard /> <span className="font-medium">Dashboard</span>
+            </li>
+            <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
+              <Icon.Projects /> Projekty
+            </li>
+            <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
+              <Icon.Users /> Zespół
+            </li>
+            <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg> Analytics
+            </li>
+            <li
+              className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors"
+              onClick={() => navigate('/')}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg> Home
+            </li>
+                </ul>
+              </nav>
+
+              <div className="mt-auto">
+                <button onClick={handleLogout} className="w-full text-left px-4 py-3 rounded-lg text-sm bg-red-50 text-red-700 hover:bg-red-100 transition-colors">
+            Wyloguj
+                </button>
               </div>
             </div>
+          </aside>
 
-            <nav className="flex-1">
-              <ul className="space-y-2">
-                <li className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 text-emerald-700">
-                  <Icon.Dashboard /> <span className="font-medium">Dashboard</span>
-                </li>
-                <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
-                  <Icon.Projects /> Projekty
-                </li>
-                <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
-                  <Icon.Users /> Zespół
-                </li>
-                <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg> Analytics
-                </li>
-              </ul>
-            </nav>
-
-            <div className="mt-auto">
-              <button onClick={handleLogout} className="w-full text-left px-4 py-3 rounded-lg text-sm bg-red-50 text-red-700 hover:bg-red-100 transition-colors">
-                Wyloguj
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main content */}
+          {/* Main content */}
         <main className="flex-1 ml-64">
           {/* Topbar */}
           <div className="bg-white shadow-sm sticky top-0 z-10">
