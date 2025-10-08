@@ -1,21 +1,36 @@
+import {useEffect, useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const [username, setUsername] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    const checkAuth = async () => {
+      try {
+        const res = await axios.get('/api/auth/me', { withCredentials: true });
+        setUsername(res.data.username);
+      } catch (err) {
+        console.error('Błąd przy autoryzacji:', err);
+        setUsername(null); // nie zalogowany
+      }
+    };
+
+    checkAuth();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    setIsLoggedIn(false);
-    navigate('/login');
+    const handleLogout = async () => {
+    try {
+      await axios.post('/api/auth/logout', {}, { withCredentials: true });
+      localStorage.clear(); // usuń dane użytkownika
+      navigate('/login');
+    } catch (err) {
+      console.error('Błąd wylogowania:', err);
+    }
   };
+
+
 
   return (
     <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
@@ -38,22 +53,7 @@ export default function Navbar() {
               Home
             </Link>
             
-            {!isLoggedIn ? (
-              <>
-                <Link 
-                  to="/login" 
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-                >
-                  Zaloguj się
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="ml-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"
-                >
-                  Zarejestruj się
-                </Link>
-              </>
-            ) : (
+            {username ? (
               <>
                 <Link 
                   to="/dashboard" 
@@ -67,6 +67,22 @@ export default function Navbar() {
                 >
                   Wyloguj
                 </button>
+              </>
+
+            ) : (
+                            <>
+                <Link 
+                  to="/login" 
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                >
+                  Zaloguj się
+                </Link>
+                <Link 
+                  to="/register" 
+                  className="ml-2 px-4 py-2 rounded-md text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"
+                >
+                  Zarejestruj się
+                </Link>
               </>
             )}
           </div>

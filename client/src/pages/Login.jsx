@@ -6,17 +6,15 @@ export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
 
-  const onSubmit = async () => {
-    try {
-      const res = await axios.get('/api/auth/me', { withCredentials: true });
-      const { username, role } = res.data;
-      localStorage.setItem('username', username);
-      localStorage.setItem('role', role);
-      navigate('/dashboard');
-    } catch (err) {
-      alert(err.response?.data?.message || 'Błąd logowania');
-    }
-  };
+const onSubmit = async (data) => {
+  try {
+    await axios.post('/api/auth/login', data, { withCredentials: true });
+    
+    navigate('/dashboard');
+  } catch (err) {
+    alert(err.response?.data?.message || 'Błąd logowania');
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">

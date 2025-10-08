@@ -45,6 +45,11 @@ app.get('/api/protected', authenticate, (req, res) => {
   res.json({ message: `Witaj ${req.user.username}` });
 });
 
+app.post('/api/auth/logout', (req, res) => { 
+  res.clearCookie('token');
+  res.json({ message: 'Wylogowano pomyślnie' });
+});
+
 app.get('/api/auth/me', (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: 'Brak tokena' });
