@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Icon = {
   Dashboard: () => (
@@ -32,18 +33,35 @@ export default function Dashboard() {
   const [role, setRole] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const u = localStorage.getItem('username');
-    const r = localStorage.getItem('role');
-    if (!u) {
-      navigate('/login');
-      return;
-    }
-    setUsername(u);
-    setRole(r || 'Użytkownik');
-    setMessage(`Witaj, ${u}! Masz szybki przegląd ostatnich projektów.`);
-  }, [navigate]);
+  // useEffect(() => {
+  //   const u = localStorage.getItem('username');
+  //   const r = localStorage.getItem('role');
+  //   if (!u) {
+  //     navigate('/login');
+  //     return;
+  //   }
+  //   setUsername(u);
+  //   setRole(r || 'Użytkownik');
+  //   setMessage(`Witaj, ${u}! Masz szybki przegląd ostatnich projektów.`);
+  // }, [navigate]);
 
+  useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      const res = await axios.get('/api/auth/me', { withCredentials: true });
+      const { username, role } = res.data;
+      setUsername(username);
+      setRole(role || 'Użytkownik');
+      setMessage(`Witaj, ${username}! Masz szybki przegląd ostatnich projektów.`);
+    } catch (err) {
+      console.error('Błąd autoryzacji:', err.response?.data || err.message || err);
+      navigate('/login');
+    }
+  };
+
+  checkAuth();
+}, [navigate]);
+  
   // sample data
   const stats = [
     { id: 1, title: 'Total Projects', value: '24', hint: 'Increased from last month' },
@@ -69,9 +87,14 @@ export default function Dashboard() {
   }, [running]);
 
   function handleLogout() {
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    navigate('/login');
+  axios.post('/api/auth/logout', {}, { withCredentials: true })
+    .then(() => {
+      navigate('/login');
+    })
+    .catch((err) => {
+      console.error('Błąd przy wylogowaniu:', err);
+      navigate('/login'); // awaryjnie
+    });
   }
 
   return (
