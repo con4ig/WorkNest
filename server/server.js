@@ -4,13 +4,18 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
 import User from './models/User.js';
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // adres frontendu
+  credentials: true // pozwala na przesyłanie ciasteczek
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 const PORT = process.env.PORT || 5500;
 
@@ -23,6 +28,36 @@ app.get('/', (req, res) => {
   res.send('API działa!');
 });
 
+const authenticate = (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ message: 'Brak tokena' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(403).json({ message: 'Nieprawidłowy token' });
+  }
+};
+
+app.get('/api/protected', authenticate, (req, res) => {
+  res.json({ message: `Witaj ${req.user.username}` });
+});
+
+app.get('/api/auth/me', (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ message: 'Brak tokena' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ username: decoded.username, role: decoded.role });
+  } catch (err) {
+    res.status(403).json({ message: 'Nieprawidłowy token' });
+  }
+});
+
+
 // Logowanie użytkownika
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
@@ -34,7 +69,13 @@ app.post('/api/auth/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
       const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      res.json({ message: 'Zalogowano pomyślnie', token });
+      res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // tylko HTTPS w produkcji
+      sameSite: 'Strict',
+      maxAge: 3600000 // 1h
+      });
+      res.json({ message: 'Zalogowano pomyślnie' });
     } else {
       res.status(401).json({ message: 'Nieprawidłowe dane logowania' });
     }
