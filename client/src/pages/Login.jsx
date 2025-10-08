@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -10,8 +11,9 @@ export default function Login() {
     try {
       const res = await axios.post('/api/auth/login', data);
       localStorage.setItem('token', res.data.token); // jeśli dodasz JWT
-      localStorage.setItem('username', res.data.username); // tymczasowo
-      localStorage.setItem('role', res.data.role); // zapisuje rolę użytkownika
+      const decoded = jwtDecode(res.data.token);
+      localStorage.setItem('username', decoded.username); // tymczasowo
+      localStorage.setItem('role', decoded.role); // zapisuje rolę użytkownika
       navigate('/dashboard');
     } catch (err) {
       alert(err.response?.data?.message || 'Błąd logowania');
