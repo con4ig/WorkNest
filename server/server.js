@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import User from './models/User.js';
 
 dotenv.config();
@@ -32,7 +33,8 @@ app.post('/api/auth/login', async (req, res) => {
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      res.json({ message: 'Zalogowano pomyślnie', username: user.username, role: user.role });
+      const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      res.json({ message: 'Zalogowano pomyślnie', token });
     } else {
       res.status(401).json({ message: 'Nieprawidłowe dane logowania' });
     }
