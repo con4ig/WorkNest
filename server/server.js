@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import User from './models/User.js';
+import authenticate from './middleware/authenticate.js';
 
 dotenv.config();
 
@@ -24,42 +25,14 @@ mongoose.connect(process.env.DB_URI)
 .then(() => console.log('Połączono z MongoDB 💚'))
 .catch((err) => console.error('Błąd połączenia:', err));
 
-app.get('/', (req, res) => {
-  res.send('API działa!');
-});
-
-const authenticate = (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ message: 'Brak tokena' });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(403).json({ message: 'Nieprawidłowy token' });
-  }
-};
-
-app.get('/api/protected', authenticate, (req, res) => {
-  res.json({ message: `Witaj ${req.user.username}` });
-});
-
 app.post('/api/auth/logout', (req, res) => { 
   res.clearCookie('token');
   res.json({ message: 'Wylogowano pomyślnie' });
 });
 
-app.get('/api/auth/me', (req, res) => {
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ message: 'Brak tokena' });
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    res.json({ username: decoded.username, role: decoded.role });
-  } catch (err) {
-    res.status(403).json({ message: 'Nieprawidłowy token' });
-  }
+app.get('/api/auth/me', authenticate, (req, res) => {
+  res.json({ username: req.user.username, role: req.user.role });
 });
 
 
