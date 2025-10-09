@@ -107,23 +107,12 @@ const onSubmit = async (data) => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 transition-colors"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                  Zapamiętaj mnie
-                </label>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-500">Masz problem z logowaniem?</span>
+                <button type="button" className="text-sm font-medium text-emerald-600 hover:text-emerald-500 transition-colors">
+                  Odzyskaj dostęp do konta
+                </button>
               </div>
-
-              <button type="button" className="text-sm font-medium text-emerald-600 hover:text-emerald-500 transition-colors">
-                Zapomniałeś hasła?
-              </button>
-            </div>
 
             <button
               type="submit"
