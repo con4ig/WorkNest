@@ -83,6 +83,22 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { email, newPassword } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'Użytkownik nie istnieje' });
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+    res.json({ message: 'Hasło zostało zmienione pomyślnie' });
+  } catch (err) {
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Serwer działa na porcie ${PORT}`);
 });

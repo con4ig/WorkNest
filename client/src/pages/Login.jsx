@@ -107,12 +107,16 @@ const onSubmit = async (data) => {
               </div>
             </div>
 
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-500">Masz problem z logowaniem?</span>
-                <button type="button" className="text-sm font-medium text-emerald-600 hover:text-emerald-500 transition-colors">
-                  Odzyskaj dostęp do konta
-                </button>
-              </div>
+<div className="flex justify-between items-center">
+  <span className="text-sm text-gray-500">Masz problem z logowaniem?</span>
+  <Link
+    to="/forgot-password"
+    className="text-sm font-medium text-emerald-600 hover:text-emerald-500 transition-colors"
+  >
+    Odzyskaj dostęp do konta
+  </Link>
+</div>
+
 
             <button
               type="submit"
