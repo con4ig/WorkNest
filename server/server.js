@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import User from './models/User.js';
 import authenticate from './middleware/authenticate.js';
+import emailRoutes from './routes/email.js';
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ const PORT = process.env.PORT || 5500;
 mongoose.connect(process.env.DB_URI)
 .then(() => console.log('Połączono z MongoDB 💚'))
 .catch((err) => console.error('Błąd połączenia:', err));
+
+// Trasy
+app.use('/api/email', emailRoutes);
 
 app.post('/api/auth/logout', (req, res) => { 
   res.clearCookie('token');
