@@ -34,9 +34,19 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ message: 'Wylogowano pomyślnie' });
 });
 
-
-app.get('/api/auth/me', authenticate, (req, res) => {
-  res.json({ username: req.user.username, role: req.user.role });
+app.get('/api/auth/me', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
 });
 
 
