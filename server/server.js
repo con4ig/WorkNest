@@ -34,6 +34,18 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ message: 'Wylogowano pomyślnie' });
 });
 
+// Bezpośrednio w MongoDB Compass albo przez endpoint (tymczasowy):
+app.post('/api/dev/create-test-users', async (req, res) => {
+  const users = [
+    { username: 'Employee Test', email: 'employee@test.com', password: await bcrypt.hash('test123', 10), role: 'employee' },
+    { username: 'HR Test', email: 'hr@test.com', password: await bcrypt.hash('test123', 10), role: 'hr' },
+    { username: 'Admin Test', email: 'admin@test.com', password: await bcrypt.hash('test123', 10), role: 'admin' }
+  ];
+  
+  await User.insertMany(users);
+  res.json({ message: 'Test users created' });
+});
+
 app.get('/api/auth/me', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
