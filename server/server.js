@@ -9,6 +9,7 @@ import User from './models/User.js';
 import authenticate from './middleware/authenticate.js';
 import emailRoutes from './routes/email.js';
 import authRoutes from './routes/auth.js';
+import authorize from './middleware/authorize.js';
 
 dotenv.config();
 
@@ -31,23 +32,13 @@ mongoose.connect(process.env.DB_URI)
 app.use('/api/email', emailRoutes);
 app.use('/api/auth', authRoutes);
 
+// Wylogowanie użytkownika
 app.post('/api/auth/logout', (req, res) => { 
   res.clearCookie('token');
   res.json({ message: 'Wylogowano pomyślnie' });
 });
 
-// Bezpośrednio w MongoDB Compass albo przez endpoint (tymczasowy):
-app.post('/api/dev/create-test-users', async (req, res) => {
-  const users = [
-    { username: 'Employee Test', email: 'employee@test.com', password: await bcrypt.hash('test123', 10), role: 'employee' },
-    { username: 'HR Test', email: 'hr@test.com', password: await bcrypt.hash('test123', 10), role: 'hr' },
-    { username: 'Admin Test', email: 'admin@test.com', password: await bcrypt.hash('test123', 10), role: 'admin' }
-  ];
-  
-  await User.insertMany(users);
-  res.json({ message: 'Test users created' });
-});
-
+// Pobieranie danych zalogowanego użytkownika
 app.get('/api/auth/me', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -59,6 +50,54 @@ app.get('/api/auth/me', authenticate, async (req, res) => {
       createdAt: user.createdAt
     });
   } catch (err) {
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
+// GET /api/users - lista wszystkich pracowników (tylko HR i Admin)
+app.get('/api/users', authenticate, authorize('hr', 'admin'), async (req, res) => {
+  try {
+    // Pobierz wszystkich userów, ale bez hasła
+    const users = await User.find().select('-password');
+    
+    res.json({
+      count: users.length,
+      users: users
+    });
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
+// PATCH /api/users/:id/role - zmiana roli użytkownika (tylko Admin)
+app.patch('/api/users/:id/role', authenticate, authorize('admin'), async (req, res) => {
+  const { role } = req.body;
+  
+  // Walidacja roli
+  if (!['employee', 'hr', 'admin'].includes(role)) {
+    return res.status(400).json({ 
+      message: 'Nieprawidłowa rola. Dozwolone: employee, hr, admin' 
+    });
+  }
+  
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true } // zwróć zaktualizowanego usera
+    ).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'Użytkownik nie znaleziony' });
+    }
+    
+    res.json({ 
+      message: 'Rola zmieniona pomyślnie', 
+      user 
+    });
+  } catch (err) {
+    console.error('Error updating role:', err);
     res.status(500).json({ message: 'Błąd serwera' });
   }
 });
