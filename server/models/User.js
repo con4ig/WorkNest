@@ -16,13 +16,13 @@ const schema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'hr', 'pracownik'],
-        default: 'pracownik',
+        enum: ['admin', 'hr', 'employee'],
+        default: 'employee',
     },
     createdAt: {
         type: Date,
         default: Date.now,
     },
-});
+}, { timestamps: true });
 
 export default mongoose.model('User', schema);

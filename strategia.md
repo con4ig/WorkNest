@@ -53,7 +53,7 @@ server/
 | ✔️        | Landing page z logo i przyciskiem „Zaloguj się” | Strona startowa z brandingiem i prostym CTA |
 | ✔️        | Formularz logowania                       | Autoryzacja użytkownika z walidacją danych |
 | ✔️        | Rejestracja użytkownika                   | Tworzenie konta z rolą domyślną (np. pracownik) |
-| ⬜        | Dashboard pracownika                      | Widok z informacjami o użytkowniku i jego aktywności |
+| ✔️        | Dashboard pracownika                      | Widok z informacjami o użytkowniku i jego aktywności |
 | ⬜        | Role: admin / HR / pracownik              | Różne uprawnienia i dostęp do funkcji w zależności od roli |
 | ⬜        | Historia obecności / urlopów              | Lista obecności i wniosków urlopowych użytkownika |
 | ⬜        | Edycja profilu użytkownika                | Możliwość zmiany danych osobowych i hasła |
