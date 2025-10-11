@@ -228,29 +228,58 @@ app.post('/api/projects', authenticate, authorize('admin', 'hr'), async (req, re
 });
 
 // PATCH /api/projects/:id - aktualizacja projektu (admin/hr)
-app.patch('/api/projects/:id', authenticate, authorize('admin', 'hr'), async (req, res) => {
-  const { name, description, status, priority, startDate, endDate, assignedUsers, progress } = req.body;
-  
+app.patch('/api/projects/:id', authenticate, authorize('admin'), async (req, res) => {
+    try {
+        const projectId = req.params.id;
+        const updates = req.body; // Zawiera name, description, status, priority, progress, startDate, endDate
+
+        // UWAGA: Zabezpiecz aktualizację, aby np. nie można było zmieniać 'createdBy'
+        const result = await Project.findByIdAndUpdate(projectId, updates, { new: true, runValidators: true });
+
+        if (!result) {
+            return res.status(404).json({ message: 'Projekt nie znaleziony.' });
+        }
+
+        res.json({ message: 'Projekt zaktualizowany pomyślnie.', project: result });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.patch('/api/projects/:id/users', authenticate, async (req, res) => {
+  const { userId, action } = req.body;
+  const projectId = req.params.id;
+
   try {
-    const project = await Project.findByIdAndUpdate(
-      req.params.id,
-      { name, description, status, priority, startDate, endDate, assignedUsers, progress },
-      { new: true, runValidators: true }
-    )
-      .populate('assignedUsers', 'username email')
-      .populate('createdBy', 'username');
-    
+    const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: 'Projekt nie znaleziony' });
     }
+
+    if (action === 'add') {
+      if (!project.assignedUsers.includes(userId)) {
+        project.assignedUsers.push(userId);
+      }
+    } else if (action === 'remove') {
+      project.assignedUsers = project.assignedUsers.filter(
+        id => id.toString() !== userId.toString() // Fix comparison
+      );
+    }
+
+    await project.save();
     
+    // Return updated project with populated users
+    const updatedProject = await Project.findById(projectId)
+      .populate('assignedUsers', 'username email role')
+      .populate('createdBy', 'username');
+      
     res.json({ 
-      message: 'Projekt zaktualizowany', 
-      project 
+      message: 'Użytkownicy zaktualizowani pomyślnie',
+      project: updatedProject
     });
   } catch (err) {
-    console.error('Error updating project:', err);
-    res.status(500).json({ message: 'Błąd serwera' });
+    console.error('Error updating project users:', err);
+    res.status(500).json({ message: 'Błąd serwera', error: err.message });
   }
 });
 
