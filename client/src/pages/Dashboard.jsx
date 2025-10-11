@@ -31,31 +31,33 @@ export default function Dashboard() {
   const [message, setMessage] = useState('');
   const [username, setUsername] = useState('');
   const [role, setRole] = useState('');
+  const [stats, setStats] = useState([]);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const u = localStorage.getItem('username');
-  //   const r = localStorage.getItem('role');
-  //   if (!u) {
-  //     navigate('/login');
-  //     return;
-  //   }
-  //   setUsername(u);
-  //   setRole(r || 'Użytkownik');
-  //   setMessage(`Witaj, ${u}! Masz szybki przegląd ostatnich projektów.`);
-  // }, [navigate]);
-
-  useEffect(() => {
+useEffect(() => {
   const checkAuth = async () => {
-    try {
-      const res = await axios.get('/api/auth/me', { withCredentials: true });
-      const { username, role } = res.data;
-      setUsername(username);
-      setRole(role || 'Użytkownik');
-      setMessage(`Witaj, ${username}! Masz szybki przegląd ostatnich projektów.`);
-    } catch (err) {
-      console.error('Błąd autoryzacji:', err.response?.data || err.message || err);
-      navigate('/login');
+    const res = await axios.get('/api/auth/me', { withCredentials: true });
+    const { username, role } = res.data;
+
+    setMessage(`Witaj, ${username}! Masz szybki przegląd ostatnich projektów.`);
+    setUsername(username);
+    setRole(role);
+    
+    // Ustaw różne stats w zależności od roli
+    if (role === 'admin' || role === 'hr') {
+      setStats([
+        { id: 1, title: 'Total Projects', value: '24', hint: 'Increased from last month' },
+        { id: 2, title: 'Ended Projects', value: '10', hint: 'Stable' },
+        { id: 3, title: 'Running Projects', value: '12', hint: 'Growing' },
+        { id: 4, title: 'Pending', value: '2', hint: 'On review' }
+      ]);
+    } else {
+      // Employee widzi tylko swoje
+      setStats([
+        { id: 1, title: 'My Projects', value: '5', hint: 'Assigned to you' },
+        { id: 2, title: 'Completed', value: '3', hint: 'This month' },
+        { id: 3, title: 'In Progress', value: '2', hint: 'Active now' }
+      ]);
     }
   };
 
@@ -63,12 +65,12 @@ export default function Dashboard() {
 }, [navigate]);
   
   // sample data
-  const stats = [
-    { id: 1, title: 'Total Projects', value: '24', hint: 'Increased from last month' },
-    { id: 2, title: 'Ended Projects', value: '10', hint: 'Stable' },
-    { id: 3, title: 'Running Projects', value: '12', hint: 'Growing' },
-    { id: 4, title: 'Pending', value: '2', hint: 'On review' }
-  ];
+  // const stats = [
+  //   { id: 1, title: 'Total Projects', value: '24', hint: 'Increased from last month' },
+  //   { id: 2, title: 'Ended Projects', value: '10', hint: 'Stable' },
+  //   { id: 3, title: 'Running Projects', value: '12', hint: 'Growing' },
+  //   { id: 4, title: 'Pending', value: '2', hint: 'On review' }
+  // ];
 
   const analytics = [40, 55, 75, 60, 80, 50, 30]; // example weekly data
 
@@ -119,9 +121,14 @@ export default function Dashboard() {
             <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
               <Icon.Projects /> Projekty
             </li>
-            <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
-              <Icon.Users /> Zespół
-            </li>
+            {(role === 'hr' || role === 'admin') && (
+              <li 
+                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors"
+                onClick={() => navigate('/employees')}
+              >
+                <Icon.Users /> Zespół
+              </li>
+            )}
             <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg> Analytics
             </li>
@@ -160,9 +167,13 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white px-5 py-2 rounded-lg shadow-sm">
-                  <Icon.Plus /> <span className="text-sm">Add Project</span>
-                </button>
+                {role === 'admin' && (
+                  <button 
+                  onClick={() => navigate('/employees/add')}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white px-5 py-2 rounded-lg shadow-sm">
+                    <Icon.Plus /> <span className="text-sm">Add Project</span>
+                  </button>
+                )}
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
                   <span className="font-medium text-gray-600">A</span>
                 </div>
