@@ -8,7 +8,9 @@ import Dashboard from './pages/Dashboard.jsx'
 import Forgot from './pages/Forgot.jsx'
 import App from './App.jsx'
 import EmployeeList from './pages/EmployeeList.jsx'
-import Add_project from './pages/Add_project.jsx'
+import Addproject from './pages/AddProjectModal.jsx'
+import Projekty from './pages/Projekty.jsx'
+import ProjectDetails from './pages/ProjectDetails.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -20,7 +22,9 @@ createRoot(document.getElementById('root')).render(
         <Route path="/dashboard" element={<Dashboard />} />    
         <Route path="/forgot-password" element={<Forgot />} />   
         <Route path="/employees" element={<EmployeeList />} />  
-        <Route path="/employees/add" element={<Add_project />} />  
+        <Route path="/employees/add" element={<Addproject />} />  
+        <Route path="/projekty" element={<Projekty />} />
+        <Route path="/projects/:id" element={<ProjectDetails />} /> 
       </Routes>
     </Router>
   </StrictMode>

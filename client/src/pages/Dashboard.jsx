@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AddProjectModal from './AddProjectModal.jsx';
 
 const Icon = {
   Dashboard: () => (
@@ -28,11 +29,19 @@ function formatTime(s) {
 }
 
 export default function Dashboard() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [projects, setProjects] = useState([]); // Przykładowy stan listy projektów
   const [message, setMessage] = useState('');
   const [username, setUsername] = useState('');
   const [role, setRole] = useState('');
   const [stats, setStats] = useState([]);
   const navigate = useNavigate();
+
+  const handleProjectAdded = (newProject) => {
+    // Tutaj możesz zaktualizować listę projektów na stronie
+    setProjects((prevProjects) => [newProject, ...prevProjects]);
+    alert(`Projekt "${newProject.name}" został pomyślnie dodany!`);
+  };
 
 useEffect(() => {
   const checkAuth = async () => {
@@ -118,7 +127,9 @@ useEffect(() => {
             <li className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 text-emerald-700">
               <Icon.Dashboard /> <span className="font-medium">Dashboard</span>
             </li>
-            <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
+            <li 
+            onClick={() => navigate("/projekty")}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
               <Icon.Projects /> Projekty
             </li>
             {(role === 'hr' || role === 'admin') && (
@@ -167,9 +178,9 @@ useEffect(() => {
                   </div>
                 </div>
 
-                {role === 'admin' && (
+                {(role === 'admin' || role === 'hr') && (
                   <button 
-                  onClick={() => navigate('/employees/add')}
+                  onClick={() => setIsModalOpen(true)}
                   className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white px-5 py-2 rounded-lg shadow-sm">
                     <Icon.Plus /> <span className="text-sm">Add Project</span>
                   </button>
@@ -307,6 +318,13 @@ useEffect(() => {
           </div>
         </main>
       </div>
+      <AddProjectModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSuccess={handleProjectAdded}
+            />
     </div>
+
+    
   );
 }
