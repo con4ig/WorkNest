@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { LayoutDashboard, FolderKanban, Users, ChartLine, Search, Plus, Home  } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Users, ChartLine, Search, Plus, Home, CalendarCheck  } from 'lucide-react';
 import AddProjectModal from './AddProjectModal.jsx';
 import moment from 'moment';
 import 'moment/locale/pl';
@@ -27,6 +27,9 @@ const Icon = {
   ),
   Home: () => (
     <Home className="w-5 h-5" />
+  ),
+  Check: () => (
+    <CalendarCheck className="w-5 h-5" />
   )
 };
 
@@ -169,6 +172,15 @@ useEffect(() => {
             <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
               <Icon.Analytics /> Analytics
             </li>
+            {(role === 'hr' || role === 'admin') && (
+            <li
+              className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors"
+              onClick={() => navigate('/leave-approvals')}
+            >
+              <Icon.Check />
+              Zatwierdzanie Urlopów
+            </li>
+          )}
             <li
               className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors"
               onClick={() => navigate('/')}
@@ -339,6 +351,7 @@ useEffect(() => {
   ))}
 </ul>
 </div>
+
 
             <footer className="mt-8 pb-8 text-sm text-gray-400 text-center">
               © {new Date().getFullYear()} WorkNest — All rights reserved
