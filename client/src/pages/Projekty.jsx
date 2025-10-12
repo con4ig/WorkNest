@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Search, ListFilter, RefreshCcw} from 'lucide-react';
 
 // Wystarczy zdefiniować ikony, które będą potrzebne na tej stronie
 const Icon = {
     Search: () => (
-        <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" /></svg>
+       <Search className="w-5 h-5 text-gray-400" />
     ),
     Filter: () => (
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M7 12h10M10 18h4" /></svg>
+        <ListFilter className="w-5 h-5 text-gray-400" />
     ),
-    Sort: () => (
-        <svg className="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 16l5-5 5 5" /></svg>
+    Refresh: () => (
+        <RefreshCcw className="w-5 h-5 text-gray-400" />
     )
 };
 
@@ -137,7 +138,7 @@ function Projekty() {
                         onClick={fetchProjects}
                         className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm transition-colors"
                     >
-                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 4v6h-6M1 20v-6h6M3.27 12a9 9 0 0 1 16.96 0" /></svg> Odśwież
+                         <RefreshCcw className="w-4 h-4" /> Odśwież
                     </button>
 
                 </div>
