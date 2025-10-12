@@ -1,23 +1,32 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { LayoutDashboard, FolderKanban, Users, ChartLine, Search, Plus, Home  } from 'lucide-react';
 import AddProjectModal from './AddProjectModal.jsx';
+import moment from 'moment';
+import 'moment/locale/pl';
 
 const Icon = {
   Dashboard: () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 13h8V3H3v10zM3 21h8v-6H3v6zM13 21h8V11h-8v10zM13 3v6h8V3h-8z" /></svg>
+    <LayoutDashboard className="w-5 h-5" />
   ),
   Projects: () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h18M3 12h18M3 17h18" /></svg>
+    <FolderKanban className="w-5 h-5" />
   ),
   Users: () => (
-    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 11c1.657 0 3-1.343 3-3S17.657 5 16 5s-3 1.343-3 3 1.343 3 3 3zM8 11c1.657 0 3-1.343 3-3S9.657 5 8 5 5 6.343 5 8s1.343 3 3 3zM2 21c0-3 3-5 6-5s6 2 6 5" /></svg>
+    <Users className="w-5 h-5" />
+  ),
+  Analytics: () => (
+    <ChartLine className="w-5 h-5" />
   ),
   Search: () => (
-    <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" /></svg>
+    <Search className="w-4 h-4 text-gray-400" />
   ),
   Plus: () => (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" /></svg>
+    <Plus className="w-4 h-4" />
+  ),
+  Home: () => (
+    <Home className="w-5 h-5" />
   )
 };
 
@@ -72,14 +81,31 @@ useEffect(() => {
 
   checkAuth();
 }, [navigate]);
-  
-  // sample data
-  // const stats = [
-  //   { id: 1, title: 'Total Projects', value: '24', hint: 'Increased from last month' },
-  //   { id: 2, title: 'Ended Projects', value: '10', hint: 'Stable' },
-  //   { id: 3, title: 'Running Projects', value: '12', hint: 'Growing' },
-  //   { id: 4, title: 'Pending', value: '2', hint: 'On review' }
-  // ];
+
+useEffect(() => {
+        const fetchRecentProjects = async () => {
+            try {
+                // Wysyłamy zapytanie, aby pobrać listę projektów
+                const response = await axios.get('/api/projects?sortBy=createdAt:desc&limit=5', { 
+    withCredentials: true 
+});
+                
+                
+                // Tutaj zdecydujemy, jak filtrować dane (patrz Krok 2)
+                // Na razie po prostu ustawiamy wszystkie pobrane projekty
+                setProjects(response.data.projects);
+
+            } catch (err) {
+                console.error("Nie udało się pobrać projektów:", err);
+                // Opcjonalnie: przekieruj na logowanie przy błędzie autoryzacji
+                if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+                    navigate('/login');
+                }
+            }
+        };
+
+        fetchRecentProjects();
+    }, [navigate]); // Uruchamiamy efekt tylko raz, przy pierwszym renderowaniu
 
   const analytics = [40, 55, 75, 60, 80, 50, 30]; // example weekly data
 
@@ -141,13 +167,13 @@ useEffect(() => {
               </li>
             )}
             <li className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg> Analytics
+              <Icon.Analytics /> Analytics
             </li>
             <li
               className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors"
               onClick={() => navigate('/')}
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h18M3 6h18M3 18h18"/></svg> Home
+              <Icon.Home /> Home
             </li>
                 </ul>
               </nav>
@@ -289,28 +315,30 @@ useEffect(() => {
             </div>
 
             {/* Bottom area: Recent activity */}
-            <div className="mt-8 bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
-                <div className="font-medium text-lg">Recent Activity</div>
-                <div className="text-sm text-gray-400">Today</div>
-              </div>
-              <ul className="space-y-4">
-                <li className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
-                  <div>
-                    <div className="font-medium">Nowy projekt: Strona główna</div>
-                    <div className="text-sm text-gray-500 mt-1">Przez Anna • 2h temu</div>
-                  </div>
-                  <button className="text-sm text-emerald-600 hover:text-emerald-700 transition-colors">Szczegóły →</button>
-                </li>
-                <li className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors">
-                  <div>
-                    <div className="font-medium">Zadanie ukończone: Backend API</div>
-                    <div className="text-sm text-gray-500 mt-1">Przez Marek • 6h temu</div>
-                  </div>
-                  <button className="text-sm text-emerald-600 hover:text-emerald-700 transition-colors">Szczegóły →</button>
-                </li>
-              </ul>
-            </div>
+{/* Bottom area: Recent activity */}
+<div className="mt-8 bg-white rounded-xl p-6 shadow-sm">
+  <div className="flex items-center justify-between mb-6">
+    <div className="font-medium text-lg">Ostatnio dodane projekty</div>
+    <button onClick={() => navigate("/projekty")} className="text-sm text-emerald-600">Zobacz wszystkie →</button>
+  </div>
+
+<ul className="space-y-4">
+  {projects.map((project) => (
+    <li 
+      key={project._id} 
+      className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+      onClick={() => navigate(`/projects/${project._id}`)}
+    >
+        <div>
+          <div className="font-medium">Nowy projekt: {project.name}</div>
+          <div className="text-sm text-gray-500 mt-1">Dodano {moment(project.createdAt).fromNow()}</div>
+        </div>
+      {/* Przycisk został usunięty. Możesz zostawić strzałkę jako wizualną wskazówkę. */}
+      <span className="text-sm text-gray-400">→</span>
+    </li>
+  ))}
+</ul>
+</div>
 
             <footer className="mt-8 pb-8 text-sm text-gray-400 text-center">
               © {new Date().getFullYear()} WorkNest — All rights reserved
