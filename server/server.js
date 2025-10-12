@@ -106,35 +106,63 @@ app.patch('/api/users/:id/role', authenticate, authorize('admin'), async (req, r
 
 // GET /api/projects - lista wszystkich projektów
 app.get('/api/projects', authenticate, async (req, res) => {
-  try {
-    const { status } = req.query;
-    
-    let query = {};
-    
-    // Jeśli user jest employee - pokaż tylko jego projekty
-    if (req.user.role === 'employee') {
-      query.assignedUsers = req.user.id;
+    try {
+        // 1. POBIERANIE PARAMETRÓW Z URL
+        const { status, sortBy, limit } = req.query;
+        const limitNum = parseInt(limit) || 0; // Przekształcamy limit na liczbę
+        
+        // Zmienna do budowania warunków Mongoose (find)
+        let query = {};
+        
+        // Domyślne opcje sortowania (można je nadpisać)
+        let sortOptions = { createdAt: -1 }; 
+
+        // 2. FILTROWANIE PO ROLI/UŻYTKOWNIKU
+        // Jeśli user jest 'employee', filtrujemy po przypisanych użytkownikach
+        if (req.user.role === 'employee') {
+            // Używamy ID użytkownika do filtrowania projektów, do których jest przypisany
+            query.assignedUsers = req.user.id; 
+        }
+        
+        // 3. FILTROWANIE PO STATUSIE (OPCJONALNE)
+        if (status) {
+            query.status = status;
+        }
+
+        // 4. USTALANIE SORTOWANIA
+        // Na podstawie parametru sortBy (np. ?sortBy=createdAt:desc)
+        if (sortBy === 'createdAt:desc') {
+            sortOptions = { createdAt: -1 };
+        } else if (sortBy === 'name:asc') {
+            // Przykład innego sortowania
+            sortOptions = { name: 1 };
+        }
+        
+        // 5. BUDOWANIE ZAPYTANIA
+        let projectsQuery = Project.find(query)
+            .populate('assignedUsers', 'username email')
+            .populate('createdBy', 'username')
+            .sort(sortOptions); // Zastosowanie dynamicznych opcji sortowania
+
+        // 6. LIMITOWANIE (KLUCZOWY KROK DLA TWOJEGO ZAGADNIENIA)
+        if (limitNum > 0) {
+            // Zastosowanie limitu po sortowaniu
+            projectsQuery = projectsQuery.limit(limitNum);
+        }
+        
+        // 7. WYKONANIE ZAPYTANIA
+        const projects = await projectsQuery.exec();
+        
+        res.json({ 
+            count: projects.length, 
+            projects 
+        });
+    } catch (err) {
+        console.error('Error fetching projects:', err);
+        res.status(500).json({ message: 'Błąd serwera' });
     }
-    
-    // Filter by status (optional)
-    if (status) {
-      query.status = status;
-    }
-    
-    const projects = await Project.find(query)
-      .populate('assignedUsers', 'username email')
-      .populate('createdBy', 'username')
-      .sort({ createdAt: -1 });
-    
-    res.json({ 
-      count: projects.length, 
-      projects 
-    });
-  } catch (err) {
-    console.error('Error fetching projects:', err);
-    res.status(500).json({ message: 'Błąd serwera' });
-  }
 });
+
 
 // GET /api/projects/stats - statystyki projektów (dla dashboard)
 app.get('/api/projects/stats', authenticate, async (req, res) => {
