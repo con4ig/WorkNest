@@ -1,9 +1,9 @@
 import Navbar from './components/Navbar.jsx';
-import demo from './assets/demo.png'; // Import zrzutu ekranu lub wideo demo
+import demo from './assets/demo.png'; 
+import { Link } from 'react-router-dom';
 import { Zap, Users, TrendingUp, CheckCircle, Quote, Rocket, ShieldCheck } from 'lucide-react';
 
 function App() {
-  // Nie zmieniam logiki ani treści
   const features = [
     {
       title: "Zarządzanie Projektami",
@@ -220,9 +220,9 @@ function App() {
         <div className="container mx-auto px-4 text-center text-gray-400">
             <p>&copy; {new Date().getFullYear()} WorkNest. Wszelkie prawa zastrzeżone.</p>
             <div className="mt-2 text-sm">
-                <a href="#" className="hover:text-emerald-400 mx-2">Polityka Prywatności</a>
+                <Link to="/polityka-prywatnosci" className="hover:text-emerald-400 mx-2">Polityka Prywatności</Link>
                 <span className="text-gray-600">|</span>
-                <a href="#" className="hover:text-emerald-400 mx-2">Regulamin</a>
+                <Link to="/regulamin" className="hover:text-emerald-400 mx-2">Regulamin</Link>
             </div>
         </div>
       </footer>
