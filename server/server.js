@@ -58,15 +58,39 @@ app.get('/api/auth/me', authenticate, async (req, res) => {
 });
 
 // GET /api/users - lista wszystkich pracowników (tylko HR `i Admin)
+// app.get('/api/users', authenticate, authorize('hr', 'admin'), async (req, res) => {
+//   try {
+//     // Pobierz wszystkich userów, ale bez hasła
+//     const users = await User.find().select('-password');
+    
+//     res.json({
+//       count: users.length,
+//       users: users
+//     });
+//   } catch (err) {
+//     console.error('Error fetching users:', err);
+//     res.status(500).json({ message: 'Błąd serwera' });
+//   }
+// });
+
 app.get('/api/users', authenticate, authorize('hr', 'admin'), async (req, res) => {
   try {
-    // Pobierz wszystkich userów, ale bez hasła
-    const users = await User.find().select('-password');
+    const { search } = req.query;
     
-    res.json({
-      count: users.length,
-      users: users
-    });
+    let query = {};
+    
+    // Jeśli jest parametr search - filtruj po username lub email
+    if (search && search.trim().length >= 2) {
+      query = {
+        $or: [
+          { username: { $regex: search.trim(), $options: 'i' } }, // case-insensitive
+          { email: { $regex: search.trim(), $options: 'i' } }
+        ]
+      };
+    }
+    
+    const users = await User.find(query).select('-password');
+    res.json({ count: users.length, users: users });
   } catch (err) {
     console.error('Error fetching users:', err);
     res.status(500).json({ message: 'Błąd serwera' });
@@ -101,6 +125,57 @@ app.patch('/api/users/:id/role', authenticate, authorize('admin'), async (req, r
     });
   } catch (err) {
     console.error('Error updating role:', err);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
+// PATCH /api/projects/:id/users - dodaj/usuń użytkownika z projektu
+app.patch('/api/projects/:id/users', authenticate, authorize('admin', 'hr'), async (req, res) => {
+  const { userId, action } = req.body;
+  
+  if (!userId || !action) {
+    return res.status(400).json({ message: 'userId i action są wymagane' });
+  }
+  
+  if (!['add', 'remove'].includes(action)) {
+    return res.status(400).json({ message: 'action musi być "add" lub "remove"' });
+  }
+  
+  try {
+    const project = await Project.findById(req.params.id);
+    
+    if (!project) {
+      return res.status(404).json({ message: 'Projekt nie znaleziony' });
+    }
+    
+    if (action === 'add') {
+      // Dodaj użytkownika (jeśli nie jest już przypisany)
+      if (!project.assignedUsers.includes(userId)) {
+        project.assignedUsers.push(userId);
+      }
+    } else if (action === 'remove') {
+      // Usuń użytkownika (ale nie twórcy projektu)
+      if (project.createdBy.toString() === userId) {
+        return res.status(400).json({ message: 'Nie można usunąć twórcy projektu' });
+      }
+      project.assignedUsers = project.assignedUsers.filter(
+        id => id.toString() !== userId
+      );
+    }
+    
+    await project.save();
+    
+    // Zwróć zaktualizowany projekt z populated users
+    const updatedProject = await Project.findById(project._id)
+      .populate('assignedUsers', 'username email role')
+      .populate('createdBy', 'username');
+    
+    res.json({
+      message: `Użytkownik ${action === 'add' ? 'dodany' : 'usunięty'} pomyślnie`,
+      project: updatedProject
+    });
+  } catch (err) {
+    console.error('Error updating project users:', err);
     res.status(500).json({ message: 'Błąd serwera' });
   }
 });
