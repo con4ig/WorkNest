@@ -46,9 +46,11 @@ export default function Register() {
         <div className="w-full max-w-md space-y-8">
           {/* Logo & Header */}
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg mb-2">
-              <span className="text-white text-3xl font-bold">W</span>
-            </div>
+            <Link to="/" className="inline-flex flex-col items-center group mb-6 transition-transform duration-300 transform hover:scale-105">
+              <div className="inline-flex items-center  shadow-2xl justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 transition-all group-hover:shadow-2xl group-hover:shadow-emerald-500/50">
+                <span className="text-white text-3xl font-bold">W</span>
+              </div>
+            </Link>
             <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
               Zarejestruj się do konta
             </h2>
