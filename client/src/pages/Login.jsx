@@ -1,6 +1,13 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { ArrowRight } from 'lucide-react';
+
+const Icon = {
+ ArrowRight: () => (
+    <ArrowRight className="w-5 h-5" />
+  ),
+};
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -123,9 +130,7 @@ const onSubmit = async (data) => {
               className="w-full flex justify-center items-center gap-2 px-4 py-3.5 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm"
             >
               Zaloguj się
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <Icon.ArrowRight />
             </button>
           </form>
         </div>
