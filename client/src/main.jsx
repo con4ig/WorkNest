@@ -11,6 +11,8 @@ import EmployeeList from './pages/EmployeeList.jsx'
 import Addproject from './pages/AddProjectModal.jsx'
 import Projekty from './pages/Projekty.jsx'
 import ProjectDetails from './pages/ProjectDetails.jsx'
+import MyLeaves from './pages/MyLeaves.jsx'
+import LeaveApprovals from './pages/LeaveApprovals.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -25,6 +27,8 @@ createRoot(document.getElementById('root')).render(
         <Route path="/employees/add" element={<Addproject />} />  
         <Route path="/projekty" element={<Projekty />} />
         <Route path="/projects/:id" element={<ProjectDetails />} /> 
+        <Route path="/test" element={<MyLeaves />} /> 
+        <Route path="/leave-approvals" element={<LeaveApprovals />} />
       </Routes>
     </Router>
   </StrictMode>
