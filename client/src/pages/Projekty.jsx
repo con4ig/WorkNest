@@ -13,7 +13,21 @@ const Icon = {
     ),
     Refresh: () => (
         <RefreshCcw className="w-5 h-5 text-gray-400" />
-    )
+    ),
+    Trash: () => (
+  <svg
+    className="w-4 h-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+)
 };
 
 // Mapowanie statusów na kolory dla spójności wizualnej
@@ -69,7 +83,41 @@ function Projekty() {
         }
     };
 
-    // Pobycie projektów przy pierwszym renderowaniu i zmianie filtru
+    const [role, setRole] = useState(null);
+    useEffect(() => {
+        const checkAuth = async () => {
+        const res = await axios.get('/api/auth/me', { withCredentials: true });
+        const { role } = res.data;
+
+            setRole(role);
+        };
+
+  checkAuth();
+}, [navigate]);
+
+    const handleDelete = async (projectId) => {
+  const confirm = window.confirm('Czy na pewno chcesz usunąć ten projekt?');
+  if (!confirm) return;
+
+  try {
+    const response = await fetch(`/api/projects/${projectId}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      // Odśwież listę projektów lub usuń lokalnie
+      setProjects((prev) => prev.filter((p) => p._id !== projectId));
+    } else {
+      const data = await response.json();
+      alert(`Błąd: ${data.message}`);
+    }
+  } catch (error) {
+    alert('Wystąpił błąd podczas usuwania projektu');
+    console.error(error);
+  }
+};
+
+    // Pobieranie projektów przy pierwszym renderowaniu i zmianie filtru
     useEffect(() => {
         fetchProjects();
     }, [filterStatus]); // Zależność: uruchom ponownie, gdy zmieni się filtr statusu
@@ -164,6 +212,9 @@ function Projekty() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Przypisani
                                     </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Akcje
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -222,7 +273,21 @@ function Projekty() {
                                                     )}
                                                 </div>
                                             </td>
-                                        </tr>
+                                        {(role === 'admin') && (
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // zapobiega przejściu do strony projektu
+                                                        handleDelete(project._id);
+                                                    }}
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Usuń projekt"
+                                                >
+                                                    <Icon.Trash />
+                                                </button>
+                                            </td>
+                                        )}
+                                    </tr>
                                     );
                                 })}
                             </tbody>

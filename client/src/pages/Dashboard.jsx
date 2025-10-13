@@ -139,20 +139,20 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="flex h-screen">
-        /* Sidebar */
-          <aside className="w-64 bg-white shadow-lg fixed h-full">
-            <div className="p-6 flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">W</div>
-                <div>
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 bg-white shadow-lg fixed h-screen z-20">
+          <div className="p-6 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold">W</div>
+              <div>
             <div className="font-semibold">{username}</div>
             <div className="text-xs text-gray-500">{role}</div>
-                </div>
               </div>
+            </div>
 
-              <nav className="flex-1">
-                <ul className="space-y-2">
+            <nav className="flex-1">
+              <ul className="space-y-2">
             <li className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 text-emerald-700">
               <Icon.Dashboard /> <span className="font-medium">Dashboard</span>
             </li>
@@ -181,6 +181,15 @@ useEffect(() => {
               Zatwierdzanie Urlopów
             </li>
           )}
+          {(role === 'employee' || role === 'hr') && (
+            <li
+              className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors"
+              onClick={() => navigate('/myleaves')}
+            >
+              <Icon.Check />
+              Rejestracja Urlopu
+            </li>
+          )}
             <li
               className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer text-gray-600 transition-colors"
               onClick={() => navigate('/')}
@@ -198,135 +207,135 @@ useEffect(() => {
             </div>
           </aside>
 
-          {/* Main content */}
-        <main className="flex-1 ml-64">
-          {/* Topbar */}
-          <div className="bg-white shadow-sm sticky top-0 z-10">
-            <div className="flex items-center justify-between px-8 py-4">
-              <div>
-                <h1 className="text-2xl font-bold">Dashboard</h1>
-                <p className="text-sm text-gray-500">{message}</p>
-              </div>
-
-              <div className="flex items-center gap-6">
-                <div className="relative">
-                  <div className="flex items-center bg-gray-50 rounded-lg px-4 py-2 gap-2">
-                    <Icon.Search />
-                    <input className="bg-transparent outline-none text-sm w-64" placeholder="Search task or project..." />
-                  </div>
+          {/* Main content wrapper */}
+          <div className="flex-1 ml-64">
+            {/* Topbar */}
+            <div className="bg-white shadow-sm w-full sticky top-0 z-10">
+              <div className="flex items-center justify-between px-8 py-4">
+                <div>
+                  <h1 className="text-2xl font-bold">Dashboard</h1>
+                  <p className="text-sm text-gray-500">{message}</p>
                 </div>
 
-                {(role === 'admin' || role === 'hr') && (
-                  <button 
-                  onClick={() => setIsModalOpen(true)}
-                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white px-5 py-2 rounded-lg shadow-sm">
-                    <Icon.Plus /> <span className="text-sm">Add Project</span>
-                  </button>
-                )}
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
-                  <span className="font-medium text-gray-600">A</span>
+                <div className="flex items-center gap-6">
+                  <div className="relative">
+                    <div className="flex items-center bg-gray-50 rounded-lg px-4 py-2 gap-2">
+                      <Icon.Search />
+                      <input className="bg-transparent outline-none text-sm w-64" placeholder="Search task or project..." />
+                    </div>
+                  </div>
+
+                  {(role === 'admin' || role === 'hr') && (
+                    <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white px-5 py-2 rounded-lg shadow-sm">
+                      <Icon.Plus /> <span className="text-sm">Add Project</span>
+                    </button>
+                  )}
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
+                    <span className="font-medium text-gray-600">A</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Content */}
-          <div className="p-8">
-            <div className="grid grid-cols-12 gap-6">
-              {/* Stats big card */}
-              <div className="col-span-8 grid grid-cols-2 gap-4">
-                <div className="col-span-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-xl p-6 flex justify-between items-start shadow-lg">
-                  <div>
-                    <div className="text-sm opacity-90">Total Projects</div>
-                    <div className="text-4xl font-bold mt-2">24</div>
-                    <div className="text-sm mt-2 opacity-90">Increased from last month</div>
+            {/* Page content */}
+            <div className="p-8">
+              <div className="grid grid-cols-12 gap-6">
+                {/* Stats big card */}
+                <div className="col-span-8 grid grid-cols-2 gap-4">
+                  <div className="col-span-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-xl p-6 flex justify-between items-start shadow-lg">
+                    <div>
+                      <div className="text-sm opacity-90">Total Projects</div>
+                      <div className="text-4xl font-bold mt-2">24</div>
+                      <div className="text-sm mt-2 opacity-90">Increased from last month</div>
+                    </div>
+                    <div className="flex flex-col items-end gap-3">
+                      <div className="bg-white/20 rounded-full px-4 py-1 text-sm backdrop-blur-sm">+6%</div>
+                      <svg width="80" height="80" viewBox="0 0 36 36" className="transform -rotate-45">
+                        <path d="M18 2a16 16 0 1 0 16 16A16 16 0 0 0 18 2Z" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="6" />
+                        <path d="M18 2a16 16 0 1 0 9 3" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeDasharray="80 100" />
+                      </svg>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end gap-3">
-                    <div className="bg-white/20 rounded-full px-4 py-1 text-sm backdrop-blur-sm">+6%</div>
-                    <svg width="80" height="80" viewBox="0 0 36 36" className="transform -rotate-45">
-                      <path d="M18 2a16 16 0 1 0 16 16A16 16 0 0 0 18 2Z" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="6" />
-                      <path d="M18 2a16 16 0 1 0 9 3" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeDasharray="80 100" />
-                    </svg>
+
+                  {stats.slice(1).map(s => (
+                    <div key={s.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                      <div className="text-xs text-gray-500">{s.title}</div>
+                      <div className="text-xl font-semibold mt-2">{s.value}</div>
+                      <div className="text-sm text-gray-400 mt-2">{s.hint}</div>
+                    </div>
+                  ))}
+
+                  {/* Project analytics */}
+                  <div className="col-span-2 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="font-medium">Project Analytics</div>
+                      <div className="text-xs text-gray-400">Weekly</div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {analytics.map((v, i) => (
+                        <div key={i} className="flex-1">
+                          <div style={{height: `${(v/100)*80 + 8}px`}} className={`mx-1 bg-emerald-600 rounded-t-md`} />
+                          <div className="text-xs text-center text-gray-400 mt-2">SMTWTFS"[i]"</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {stats.slice(1).map(s => (
-                  <div key={s.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                    <div className="text-xs text-gray-500">{s.title}</div>
-                    <div className="text-xl font-semibold mt-2">{s.value}</div>
-                    <div className="text-sm text-gray-400 mt-2">{s.hint}</div>
+                {/* Right column */}
+                <aside className="col-span-4 space-y-6">
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="font-medium">Reminders</div>
+                      <button className="text-xs text-emerald-600">View all</button>
+                    </div>
+                    <div className="text-sm text-gray-600">Meeting with Arc Company</div>
+                    <div className="text-xs text-gray-400 mt-1">02:00 pm - 04:00 pm</div>
+                    <div className="mt-4">
+                      <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Start Meeting</button>
+                    </div>
                   </div>
-                ))}
 
-                {/* Project analytics */}
-                <div className="col-span-2 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium">Project Analytics</div>
-                    <div className="text-xs text-gray-400">Weekly</div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {analytics.map((v, i) => (
-                      <div key={i} className="flex-1">
-                        <div style={{height: `${(v/100)*80 + 8}px`}} className={`mx-1 bg-emerald-600 rounded-t-md`} />
-                        <div className="text-xs text-center text-gray-400 mt-2">SMTWTFS"[i]"</div>
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="font-medium">Project Progress</div>
+                      <div className="text-sm text-gray-400">Overall</div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <svg width="96" height="96" viewBox="0 0 36 36">
+                        <path d="M18 2a16 16 0 1 0 16 16A16 16 0 0 0 18 2Z" fill="none" stroke="#E6F4EA" strokeWidth="6"/>
+                        <path d="M18 2a16 16 0 1 0 9 3" fill="none" stroke="#10B981" strokeWidth="6" strokeLinecap="round" strokeDasharray="41 100"/>
+                        <text x="18" y="22" fontSize="8" textAnchor="middle" fill="#111827" fontWeight="700">41%</text>
+                      </svg>
+                      <div>
+                        <div className="text-sm text-gray-500">Completed</div>
+                        <div className="text-sm text-gray-500 mt-2">In Progress</div>
+                        <div className="text-sm text-gray-500 mt-2">Pending</div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
+
+                  <div className="bg-gradient-to-r from-emerald-800 to-emerald-600 text-white rounded-xl p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm opacity-90">Time Tracker</div>
+                        <div className="text-2xl font-bold mt-2">{formatTime(seconds)}</div>
+                      </div>
+                      <div className="space-x-2">
+                        <button onClick={() => setRunning(!running)} className={`px-3 py-2 rounded-md text-sm ${running ? 'bg-white/20' : 'bg-white' } ${running ? 'text-white' : 'text-emerald-700'}`}>
+                          {running ? 'Pause' : 'Start'}
+                        </button>
+                        <button onClick={() => { setSeconds(0); setRunning(false); }} className="px-3 py-2 bg-white text-emerald-700 rounded-md text-sm">Reset</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </aside>
               </div>
 
-              {/* Right column */}
-              <aside className="col-span-4 space-y-6">
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium">Reminders</div>
-                    <button className="text-xs text-emerald-600">View all</button>
-                  </div>
-                  <div className="text-sm text-gray-600">Meeting with Arc Company</div>
-                  <div className="text-xs text-gray-400 mt-1">02:00 pm - 04:00 pm</div>
-                  <div className="mt-4">
-                    <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Start Meeting</button>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="font-medium">Project Progress</div>
-                    <div className="text-sm text-gray-400">Overall</div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <svg width="96" height="96" viewBox="0 0 36 36">
-                      <path d="M18 2a16 16 0 1 0 16 16A16 16 0 0 0 18 2Z" fill="none" stroke="#E6F4EA" strokeWidth="6"/>
-                      <path d="M18 2a16 16 0 1 0 9 3" fill="none" stroke="#10B981" strokeWidth="6" strokeLinecap="round" strokeDasharray="41 100"/>
-                      <text x="18" y="22" fontSize="8" textAnchor="middle" fill="#111827" fontWeight="700">41%</text>
-                    </svg>
-                    <div>
-                      <div className="text-sm text-gray-500">Completed</div>
-                      <div className="text-sm text-gray-500 mt-2">In Progress</div>
-                      <div className="text-sm text-gray-500 mt-2">Pending</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-r from-emerald-800 to-emerald-600 text-white rounded-xl p-4 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm opacity-90">Time Tracker</div>
-                      <div className="text-2xl font-bold mt-2">{formatTime(seconds)}</div>
-                    </div>
-                    <div className="space-x-2">
-                      <button onClick={() => setRunning(!running)} className={`px-3 py-2 rounded-md text-sm ${running ? 'bg-white/20' : 'bg-white' } ${running ? 'text-white' : 'text-emerald-700'}`}>
-                        {running ? 'Pause' : 'Start'}
-                      </button>
-                      <button onClick={() => { setSeconds(0); setRunning(false); }} className="px-3 py-2 bg-white text-emerald-700 rounded-md text-sm">Reset</button>
-                    </div>
-                  </div>
-                </div>
-
-              </aside>
-            </div>
-
-            {/* Bottom area: Recent activity */}
+              {/* Bottom area: Recent activity */}
 {/* Bottom area: Recent activity */}
 <div className="mt-8 bg-white rounded-xl p-6 shadow-sm">
   <div className="flex items-center justify-between mb-6">
@@ -357,13 +366,15 @@ useEffect(() => {
               © {new Date().getFullYear()} WorkNest — All rights reserved
             </footer>
           </div>
-        </main>
+        </div>
       </div>
+      
+      {/* Modal stays at the root level */}
       <AddProjectModal
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              onSuccess={handleProjectAdded}
-            />
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleProjectAdded}
+      />
     </div>
 
     
