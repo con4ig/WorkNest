@@ -29,7 +29,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/employees/add" element={<Addproject />} />  
         <Route path="/projekty" element={<Projekty />} />
         <Route path="/projects/:id" element={<ProjectDetails />} /> 
-        <Route path="/test" element={<MyLeaves />} /> 
+        <Route path="/myleaves" element={<MyLeaves />} /> 
         <Route path="/leave-approvals" element={<LeaveApprovals />} />
         <Route path="/regulamin" element={<Regulamin />} />
         <Route path="/polityka-prywatnosci" element={<Polityka />} />

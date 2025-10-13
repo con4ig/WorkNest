@@ -626,6 +626,19 @@ app.delete('/api/leaves/:id', authenticate, async (req, res) => {
   }
 });
 
+app.delete('api/projects/:id', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const deletedProject = await Project.findByIdAndDelete(req.params.id);
+    if (!deletedProject) {
+      return res.status(404).json({ message: 'Projekt nie znaleziony' });
+    }
+    res.status(200).json({ message: 'Projekt usunięty pomyślnie' });
+  } catch (error) {
+    res.status(500).json({ message: 'Błąd serwera', error });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Serwer działa na porcie ${PORT}`);
 });
