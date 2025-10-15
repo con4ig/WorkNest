@@ -135,7 +135,7 @@ export default function ProjectDetails() {
                 startDate: formatDateForInput(res.data.startDate), endDate: formatDateForInput(res.data.endDate),
             });
             setError(null);
-        } catch (err) { setError('Nie udało się załadować danych projektu.'); } 
+        } catch (err) { setError(`Nie udało się załadować danych projektu: ${err.message}`); }
         finally { setLoading(false); }
     }, [id]);
 
@@ -153,7 +153,7 @@ export default function ProjectDetails() {
             await axios.patch(`/api/projects/${id}`, { ...editData, startDate: editData.startDate || null, endDate: editData.endDate || null }, { withCredentials: true });
             await fetchData();
             setIsEditing(false);
-        } catch (err) { alert('Błąd podczas zapisywania zmian.'); } 
+        } catch (err) { alert(`Błąd podczas zapisywania zmian: ${err.message}`); }
         finally { setIsSaving(false); }
     };
 
