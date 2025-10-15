@@ -27,7 +27,12 @@ const Icon = {
     <polyline points="3 6 5 6 21 6" />
     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
   </svg>
-)
+),
+  ArrowLeft: () => (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  )
 };
 
 // Mapowanie statusów na kolory dla spójności wizualnej
@@ -139,11 +144,27 @@ function Projekty() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <header className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Przegląd Projektów 📁</h1>
-                <p className="text-gray-500 mt-1">Lista wszystkich projektów, do których masz dostęp.</p>
-            </header>
+        <div className="min-h-screen bg-gray-100 p-8 ">
+<header className="bg-white shadow-sm sticky top-0 z-10 mb-8 rounded-2xl">
+  <div className="max-w-8xl mx-auto px-8 py-6">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <Icon.ArrowLeft />
+          <span>Dashboard</span>
+        </button>
+        <div className="h-8 w-px bg-gray-200"></div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Przegląd Projektów 📁</h1>
+          <p className="text-sm text-gray-500">Lista wszystkich projektów, do których masz dostęp.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
 
             <div className="bg-white rounded-xl shadow-lg p-6">
                 
