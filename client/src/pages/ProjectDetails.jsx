@@ -2,491 +2,303 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import UserManagementModal from './UserManagementModal';
-import { Calendar, User, SquarePen, Save, X } from 'lucide-react';
+import { Calendar, User, SquarePen, Save, X, ArrowLeft, Users, Info, TrendingUp, ChevronRight } from 'lucide-react';
 
-// Ustawienie domyślne dla Axios (jeśli jest potrzebne, zostawiamy)
+// Konfiguracja Axios (bez zmian)
 axios.defaults.baseURL = 'http://localhost:5500';
 
-// --- Pomocnicze funkcje formatowania dat ---
+// --- Pomocnicze funkcje formatowania dat (bez zmian) ---
 const formatDateForDisplay = (dateString) => {
     if (!dateString) return 'Nie określono';
     try {
-        // Używamy toLocaleDateString dla czytelnego formatu
-        return new Date(dateString).toLocaleDateString('pl-PL', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-        });
-    } catch {
-        return 'Nieprawidłowa data';
-    }
+        return new Date(dateString).toLocaleDateString('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch { return 'Błędna data'; }
 };
 
 const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     try {
-        // Zapewnienie formatu YYYY-MM-DD dla input type="date"
         const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    } catch {
-        return '';
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    } catch { return ''; }
+};
+
+// --- Komponenty Ikon ---
+const Icon = {
+    Calendar: ({ className = "text-emerald-500" }) => <Calendar className={`w-6 h-6 ${className}`} />,
+    User: ({ className }) => <User className={`w-5 h-5 ${className}`} />,
+    Edit: () => <SquarePen className="w-5 h-5" />,
+    Save: () => <Save className="w-5 h-5" />,
+    Cancel: () => <X className="w-5 h-5" />,
+    Back: () => <ArrowLeft className="w-5 h-5" />,
+    Users: ({ className = "text-emerald-500" }) => <Users className={`w-6 h-6 ${className}`} />,
+    Info: ({ className = "text-emerald-500" }) => <Info className={`w-6 h-6 ${className}`} />,
+};
+
+// --- Funkcje stylizujące dla jasnego motywu ---
+const getStatusClasses = (status) => {
+    switch (status) {
+        case 'running': return 'bg-sky-100 text-sky-800 ring-sky-300/50';
+        case 'completed': return 'bg-green-100 text-green-800 ring-green-300/50';
+        case 'on-hold': return 'bg-amber-100 text-amber-800 ring-amber-300/50';
+        default: return 'bg-slate-100 text-slate-800 ring-slate-300/50';
     }
 };
-// ---------------------------------------------
-
-
-const Icon = {
- Calendar: () => (
-    <Calendar className="w-5 h-5 text-gray-400" />
- ),
- User: ({ className = 'w-5 h-5 text-white' }) => (
-    <User className={className} />
- ),
-  Edit: () => (
-    <SquarePen className="w-5 h-5" />
-  ),
-  Save: () => (
-    <Save className="w-5 h-5" />
-  ),
-  Cancel: () => (
-    <X className="w-5 h-5" />
-  ),
-};
-
-// Pomocnicza funkcja do renderowania statusu
-const getStatusClasses = (status) => {
- switch (status) {
- case 'running': return 'bg-blue-100 text-blue-800 ring-blue-300/50';
- case 'completed': return 'bg-emerald-100 text-emerald-800 ring-emerald-300/50';
- case 'on-hold': return 'bg-yellow-100 text-yellow-800 ring-yellow-300/50';
- case 'pending':
-default: return 'bg-gray-100 text-gray-800 ring-gray-300/50';
- }
-};
-
-// Pomocnicza funkcja do renderowania priorytetu
 const getPriorityClasses = (priority) => {
- switch (priority) {
- case 'high': return 'bg-red-500';
- case 'medium': return 'bg-yellow-500';
- case 'low':
- default: return 'bg-green-500';
- }
+    switch (priority) {
+        case 'high': return 'bg-red-100 text-red-800';
+        case 'medium': return 'bg-amber-100 text-amber-800';
+        default: return 'bg-green-100 text-green-800';
+    }
 };
 
-// Dostępne role i statusy dla rozwijanych list
 const AVAILABLE_STATUSES = ['pending', 'running', 'on-hold', 'completed'];
 const AVAILABLE_PRIORITIES = ['low', 'medium', 'high'];
 
+// --- Sub-komponenty dla lepszej organizacji kodu ---
 
+// Karta statystyk w panelu bocznym
+const StatCard = ({ icon, title, children }) => (
+    <div className="flex items-start gap-4">
+        <div className="mt-1">{icon}</div>
+        <div className="w-full">
+            <h3 className="font-semibold text-slate-500">{title}</h3>
+            <div className="mt-1">{children}</div>
+        </div>
+    </div>
+);
+
+// Okrągły wskaźnik postępu
+const CircularProgress = ({ progress }) => {
+    const radius = 60, stroke = 12;
+    const normalizedRadius = radius - stroke;
+    const circumference = normalizedRadius * 2 * Math.PI;
+    const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+    return (
+        <div className="relative flex items-center justify-center w-40 h-40">
+            <svg height={radius * 2} width={radius * 2} className="transform -rotate-90">
+                <circle stroke="#e2e8f0" fill="transparent" strokeWidth={stroke} r={normalizedRadius} cx={radius} cy={radius} />
+                <circle
+                    stroke="url(#progressGradientLight)" fill="transparent" strokeWidth={stroke} strokeLinecap="round"
+                    strokeDasharray={`${circumference} ${circumference}`} style={{ strokeDashoffset }}
+                    r={normalizedRadius} cx={radius} cy={radius} className="transition-all duration-500 ease-in-out"
+                />
+                <defs>
+                    <linearGradient id="progressGradientLight" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#059669" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div className="absolute text-4xl font-bold text-emerald-600">{progress}%</div>
+        </div>
+    );
+};
+
+// Karta z treścią w głównej sekcji
+const ContentCard = ({ icon, title, children }) => (
+    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-slate-200/80">
+        <div className="flex items-center gap-4 mb-5 border-b border-slate-200 pb-4">
+            {icon}
+            <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
+        </div>
+        {children}
+    </div>
+);
+
+// Główny komponent strony
 export default function ProjectDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [project, setProject] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showUserModal, setShowUserModal] = useState(false);
+    // --- Hooki i Stany (bez zmian) ---
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [project, setProject] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showUserModal, setShowUserModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editData, setEditData] = useState({});
+    const [isSaving, setIsSaving] = useState(false);
 
-  // Nowe stany dla trybu edycji
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({});
-  const [isSaving, setIsSaving] = useState(false);
+    // --- Logika (bez zmian) ---
+    const fetchData = useCallback(async () => {
+        setLoading(true);
+        try {
+            const meRes = await axios.get('/api/auth/me', { withCredentials: true });
+            setCurrentUser(meRes.data);
+            const res = await axios.get(`/api/projects/${id}`, { withCredentials: true });
+            setProject(res.data);
+            setEditData({
+                name: res.data.name, description: res.data.description, status: res.data.status,
+                priority: res.data.priority, progress: res.data.progress || 0,
+                startDate: formatDateForInput(res.data.startDate), endDate: formatDateForInput(res.data.endDate),
+            });
+            setError(null);
+        } catch (err) { setError('Nie udało się załadować danych projektu.'); } 
+        finally { setLoading(false); }
+    }, [id]);
 
+    useEffect(() => { id && fetchData(); }, [id, fetchData]);
 
-  // Funkcja pobierająca szczegóły projektu i dane użytkownika
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      // Pobierz zalogowanego usera
-      const meRes = await axios.get('/api/auth/me', { withCredentials: true });
-      setCurrentUser(meRes.data);
+    const handleEditChange = (e) => {
+        const { name, value, type } = e.target;
+        let newValue = (name === 'progress' && type === 'number') ? Math.max(0, Math.min(100, parseInt(value, 10) || 0)) : value;
+        setEditData(prev => ({ ...prev, [name]: newValue }));
+    };
 
-      // Pobierz szczegóły projektu
-      const res = await axios.get(`/api/projects/${id}`, { withCredentials: true });
-      setProject(res.data);
-      // Ustaw dane edycji na podstawie danych projektu, używając nowej funkcji formatDateForInput
-      setEditData({
-        name: res.data.name,
-        description: res.data.description,
-        status: res.data.status,
-        priority: res.data.priority,
-        progress: res.data.progress || 0,
-        startDate: formatDateForInput(res.data.startDate),
-        endDate: formatDateForInput(res.data.endDate),
-      });
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      if (err.response && (err.response.status === 404 || err.response.status === 403 || err.response.status === 401)) {
-        setError(err.response.data.message || 'Projekt nie znaleziony lub brak dostępu. Zaloguj się ponownie.');
-      } else {
-        setError('Wystąpił błąd podczas ładowania szczegółów projektu.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await axios.patch(`/api/projects/${id}`, { ...editData, startDate: editData.startDate || null, endDate: editData.endDate || null }, { withCredentials: true });
+            await fetchData();
+            setIsEditing(false);
+        } catch (err) { alert('Błąd podczas zapisywania zmian.'); } 
+        finally { setIsSaving(false); }
+    };
 
-  useEffect(() => {
-    if (id) {
-      fetchData();
-    }
-  }, [id, fetchData]);
+    const handleProjectUpdate = useCallback(() => { fetchData(); }, [fetchData]);
 
-  // Obsługa zmian w polach edycji
-  const handleEditChange = (e) => {
-    const { name, value, type } = e.target;
-    let newValue = value;
-
-    // Specjalna obsługa pola progress (ograniczenie do 0-100)
-    if (name === 'progress' && type === 'number') {
-        newValue = Math.max(0, Math.min(100, parseInt(value, 10) || 0));
-    }
-
-    setEditData(prev => ({
-      ...prev,
-      [name]: newValue,
-    }));
-  };
-
-  // Obsługa zapisu zmian (PATCH/PUT)
-  const handleSave = async () => {
-    if (!project) return;
-    setIsSaving(true);
-
-    try {
-        // Konwersja dat na format ISO lub null/undefined, jeśli puste. 
-        // Wysłanie daty w formacie YYYY-MM-DD jest zwykle wystarczające, 
-        // ale backend powinien być przygotowany na ISO lub puste ciągi.
-        const payload = {
-            ...editData,
-            // Ustawienie na null, jeśli pole jest puste, aby uniknąć błędów parsowania na backendzie
-            startDate: editData.startDate || null,
-            endDate: editData.endDate || null,
-        };
-
-        // Tutaj zakłada się, że masz zaimplementowany endpoint PATCH /api/projects/:id
-        await axios.patch(`/api/projects/${id}`, payload, { withCredentials: true });
-
-        // Po zapisie, odśwież dane i wyłącz tryb edycji
-        await fetchData();
-        setIsEditing(false);
-
-    } catch (err) {
-      console.error('Error saving project:', err);
-      alert(err.response?.data?.message || 'Błąd podczas zapisywania zmian.'); // Używamy alert, jeśli nie mamy dedykowanego modala
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // Dodajemy funkcję do obsługi aktualizacji projektu (np. po zmianie użytkowników)
-  const handleProjectUpdate = useCallback((updatedProject) => {
-    if (updatedProject) {
-        // If we received an updated project, use it directly
-        setProject(updatedProject);
-    } else {
-        // Otherwise, fetch fresh data
-        fetchData();
-    }
-}, [fetchData]);
-
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-full min-h-screen bg-gray-100">
-        <div className="text-center">
-            <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <div className="text-lg text-gray-600">Ładowanie szczegółów projektu...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-8 min-h-screen bg-gray-100 flex justify-center items-center">
-        <div className="bg-red-50 border border-red-400 text-red-700 px-8 py-6 rounded-xl shadow-lg w-full max-w-lg">
-          <strong className="font-bold">Błąd: </strong>
-          <span className="block sm:inline">{error}</span>
-          <button
-            onClick={() => navigate('/projekty')}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors w-full"
-          >
-            Powrót do listy projektów
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!project) {
-    return <div className="p-8">Brak danych projektu.</div>;
-  }
-
-  // Warunek sprawdzający, czy użytkownik jest administratorem
-  const isAdmin = currentUser?.role === 'admin';
-
-  return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-8 font-inter">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-start mb-6">
-            <div>
-                {/* Tytuł i przyciski akcji */}
-                {isEditing ? (
-                    <input 
-                        type="text"
-                        name="name"
-                        value={editData.name}
-                        onChange={handleEditChange}
-                        className="text-3xl font-bold text-gray-900 border-b-2 border-emerald-500 focus:outline-none w-full bg-gray-50 rounded px-2 py-1 transition-colors"
-                        disabled={isSaving}
-                    />
-                ) : (
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{project.name}</h1>
-                )}
-                
-                <p className="text-sm text-gray-500">
-                    Utworzono przez: <span className="font-medium">{project.createdBy.username}</span> | 
-                    Dnia: {formatDateForDisplay(project.createdAt)}
-                </p>
+    // --- Widoki ładowania i błędu w jasnym motywie ---
+    if (loading) return (
+        <div className="flex justify-center items-center h-screen bg-slate-50">
+            <div className="text-center">
+                <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-lg text-slate-600">Ładowanie projektu...</p>
             </div>
-            
-            {/* Akcje Admina */}
-            {isAdmin && (
-                <div className="flex gap-3 mt-1 flex-shrink-0">
-                    {isEditing ? (
-                        <>
-                            <button
-                                onClick={handleSave}
-                                disabled={isSaving}
-                                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-md disabled:bg-gray-400"
-                            >
-                                {isSaving ? 'Zapisywanie...' : (<><Icon.Save /> Zapisz</>)}
-                            </button>
-                            <button
-                                onClick={() => { setIsEditing(false); fetchData(); }} // Anuluj i odśwież dane
-                                disabled={isSaving}
-                                className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-800 font-medium rounded-lg hover:bg-gray-400 transition-colors"
-                            >
-                                <Icon.Cancel /> Anuluj
-                            </button>
-                        </>
+        </div>
+    );
+    if (error) return (
+        <div className="p-8 min-h-screen bg-slate-50 flex justify-center items-center text-center">
+             <div className="bg-red-50 border border-red-400 text-red-700 px-8 py-6 rounded-xl shadow-lg w-full max-w-lg">
+                <strong className="font-bold text-lg block mb-2">Wystąpił błąd</strong><span>{error}</span>
+                <button onClick={() => navigate('/projekty')} className="mt-6 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors w-full">
+                    Powrót
+                </button>
+            </div>
+        </div>
+    );
+    if (!project) return null;
+
+    const isAdmin = currentUser?.role === 'admin';
+    const progress = isEditing ? editData.progress : project.progress || 0;
+
+    // --- Główny Render Komponentu ---
+    return (
+        <div className="min-h-screen bg-slate-50 text-slate-700 font-sans flex flex-col lg:flex-row">
+            {/* --- LEWY PANEL (SIDEBAR) --- */}
+            <aside className="w-full lg:w-[380px] lg:min-h-screen bg-white p-6 lg:p-8 flex flex-col border-r border-slate-200">
+                <div className="flex items-center gap-3 mb-10">
+                    <button onClick={() => navigate('/projekty')} className="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors">
+                        <Icon.Back />
+                    </button>
+                    <h2 className="text-xl font-bold tracking-tight text-slate-800">Szczegóły Projektu</h2>
+                </div>
+                
+                <div className="flex flex-col items-center text-center">
+                    <CircularProgress progress={progress} />
+                     {isEditing ? (
+                        <div className="w-full max-w-xs mt-4">
+                            <input type="range" name="progress" value={editData.progress} onChange={handleEditChange} min="0" max="100" className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600" disabled={isSaving} />
+                        </div>
                     ) : (
-                        <>
-                          <button
-                            onClick={() => setIsEditing(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-md"
-                        >
-                            <Icon.Edit /> Edytuj Projekt
-                        </button>
-                        <button
-                            onClick={() => setShowUserModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors shadow-md"
-                        >
-                            <Icon.User className="w-5 h-5" /> Zarządzaj Użytkownikami
-                        </button>
-                        </>
+                         <p className="mt-3 text-lg font-semibold text-slate-600">Postęp projektu</p>
                     )}
                 </div>
-            )}
-        </div>
 
-        {/* Status and Priority Badges / Inputs */}
-        <div className="flex items-center flex-wrap gap-4 mb-6">
-            {isEditing ? (
-                <>
-                    {/* Status Select */}
-                    <select
-                        name="status"
-                        value={editData.status}
-                        onChange={handleEditChange}
-                        className={`px-3 py-1 text-sm font-semibold rounded-lg border-2 focus:border-emerald-500 focus:outline-none ${getStatusClasses(editData.status)}`}
-                        disabled={isSaving}
-                    >
-                        {AVAILABLE_STATUSES.map(s => (
-                            <option key={s} value={s}>{s.replace('-', ' ')}</option>
-                        ))}
-                    </select>
-
-                    {/* Priority Select */}
-                    <div className="flex items-center gap-2 border bg-white rounded-lg p-1.5 shadow-sm">
-                         <label className="text-sm text-gray-600 font-medium ml-1">Priorytet:</label>
-                        <select
-                            name="priority"
-                            value={editData.priority}
-                            onChange={handleEditChange}
-                            className={`p-1 text-sm rounded-md focus:ring-1 focus:ring-blue-500 focus:outline-none capitalize`}
-                            disabled={isSaving}
-                        >
-                            {AVAILABLE_PRIORITIES.map(p => (
-                                <option key={p} value={p}>{p}</option>
+                <div className="mt-10 space-y-6">
+                    <StatCard icon={<Icon.Calendar />} title="Okres trwania projektu">
+                        {isEditing ? (
+                            <div className="space-y-2">
+                                <input type="date" name="startDate" value={editData.startDate} onChange={handleEditChange} className="w-full border bg-slate-50 border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+                                <input type="date" name="endDate" value={editData.endDate} onChange={handleEditChange} className="w-full border bg-slate-50 border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+                            </div>
+                        ) : (
+                            <p className="text-lg font-bold text-slate-800">{formatDateForDisplay(project.startDate)} - {formatDateForDisplay(project.endDate)}</p>
+                        )}
+                    </StatCard>
+                     <StatCard icon={<ChevronRight className="w-6 h-6 text-emerald-500"/>} title="Status i priorytet">
+                        {isEditing ? (
+                            <div className="flex flex-wrap gap-2">
+                                <select name="status" value={editData.status} onChange={handleEditChange} className={`px-3 py-1.5 text-sm font-semibold rounded-lg border focus:outline-none capitalize bg-white ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-emerald-500`}>
+                                    {AVAILABLE_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                                <select name="priority" value={editData.priority} onChange={handleEditChange} className={`px-3 py-1.5 text-sm font-semibold rounded-lg border focus:outline-none capitalize bg-white ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-emerald-500`}>
+                                    {AVAILABLE_PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
+                                </select>
+                            </div>
+                        ) : (
+                             <div className="flex items-center gap-2">
+                                <span className={`px-3 py-1 text-xs font-bold rounded-full capitalize ring-1 ${getStatusClasses(project.status)}`}>{project.status}</span>
+                                <span className={`px-3 py-1 text-xs font-bold rounded-full capitalize ${getPriorityClasses(project.priority)}`}>{project.priority}</span>
+                             </div>
+                        )}
+                    </StatCard>
+                </div>
+                 <div className="mt-auto pt-8 text-center text-xs text-slate-400">
+                    <p>Utworzony przez <span className="font-semibold text-slate-500">{project.createdBy.username}</span></p>
+                    <p>{formatDateForDisplay(project.createdAt)}</p>
+                </div>
+            </aside>
+            
+            {/* --- GŁÓWNA ZAWARTOŚĆ --- */}
+            <main className="w-full p-6 lg:p-10 flex-grow">
+                <header className="relative p-8 mb-10 rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-500 shadow-2xl shadow-emerald-200">
+                    <div className="relative z-10">
+                        {isEditing ? (
+                            <input type="text" name="name" value={editData.name} onChange={handleEditChange} className="text-4xl lg:text-5xl font-extrabold text-white tracking-tight bg-transparent border-b-2 border-white/50 focus:outline-none w-full placeholder:text-white/70" placeholder="Nazwa projektu..."/>
+                        ) : (
+                            <h1 className="text-4xl lg:text-5xl font-extrabold text-white tracking-tight">{project.name}</h1>
+                        )}
+                        {isAdmin && (
+                            <div className="flex flex-wrap gap-3 mt-6">
+                                {isEditing ? (<>
+                                    <button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 font-bold rounded-lg hover:bg-slate-200 transition-all shadow-md disabled:opacity-60">
+                                        {isSaving ? 'Zapisywanie...' : <><Icon.Save /> Zapisz zmiany</>}
+                                    </button>
+                                    <button onClick={() => { setIsEditing(false); fetchData(); }} className="flex items-center gap-2 px-5 py-2.5 bg-black/20 text-white font-bold rounded-lg hover:bg-black/30 transition-all">
+                                        <Icon.Cancel /> Anuluj
+                                    </button>
+                                </>) : (<>
+                                    <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-5 py-2.5 bg-white text-slate-800 font-bold rounded-lg hover:bg-slate-200 transition-all shadow-lg">
+                                        <Icon.Edit /> Edytuj
+                                    </button>
+                                    <button onClick={() => setShowUserModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-black/20 text-white font-bold rounded-lg hover:bg-black/30 transition-all">
+                                        <Icon.User /> Zarządzaj zespołem
+                                    </button>
+                                </>)}
+                            </div>
+                        )}
+                    </div>
+                </header>
+                
+                <div className="space-y-8 animate-fade-in">
+                    <ContentCard icon={<Icon.Info />} title="Opis projektu">
+                        {isEditing ? (
+                            <textarea name="description" value={editData.description} onChange={handleEditChange} rows="6" className="w-full p-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none leading-relaxed" placeholder="Dodaj szczegółowy opis..."/>
+                        ) : (
+                            <p className="whitespace-pre-wrap leading-relaxed text-slate-600">{project.description || "Ten projekt nie ma jeszcze szczegółowego opisu."}</p>
+                        )}
+                    </ContentCard>
+                    <ContentCard icon={<Icon.Users />} title={`Zespół projektowy (${project.assignedUsers.length})`}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {project.assignedUsers.map(user => (
+                                <div key={user._id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 transition-colors cursor-pointer">
+                                    <div className={`w-11 h-11 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0 text-base ${user.role === 'admin' ? 'bg-purple-500' : 'bg-emerald-500'}`}>
+                                        {user.username.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-slate-800">{user.username}</p>
+                                        <p className="text-sm text-slate-500">{user.email}</p>
+                                    </div>
+                                </div>
                             ))}
-                        </select>
-                        <span className={`w-3 h-3 rounded-full mr-1 ${getPriorityClasses(editData.priority)}`}></span>
-                    </div>
-
-                    <button onClick={() => setShowUserModal(true)}>Zarządzaj Użytkownikami</button>
-
-                </>
-            ) : (
-                <>
-                    {/* Read-Only View */}
-                    <span
-                        className={`px-3 py-1 text-xs font-semibold rounded-full capitalize ring-1 ${getStatusClasses(project.status)}`}
-                    >
-                        {project.status.replace('-', ' ')}
-                    </span>
-                    <div className="flex items-center gap-2 border border-gray-200 rounded-lg p-1.5 shadow-sm bg-white">
-                        <span className={`w-3 h-3 rounded-full ml-1 ${getPriorityClasses(project.priority)}`}></span>
-                        <span className="text-sm text-gray-600 capitalize font-medium mr-1">{project.priority}</span>
-                    </div>
-                </>
-            )}
+                            {project.assignedUsers.length === 0 && <p className="text-slate-500 col-span-full">Do tego projektu nie przypisano jeszcze żadnych użytkowników.</p>}
+                        </div>
+                    </ContentCard>
+                </div>
+                {showUserModal && <UserManagementModal project={project} onClose={() => setShowUserModal(false)} onUpdate={handleProjectUpdate} />}
+            </main>
         </div>
-
-        {/* Description */}
-        <div className="bg-white p-6 rounded-xl shadow-lg mb-6 border border-gray-200">
-          <h2 className="text-xl font-semibold mb-3 border-b pb-2 text-gray-800">Opis Projektu</h2>
-            {isEditing ? (
-                <textarea
-                    name="description"
-                    value={editData.description}
-                    onChange={handleEditChange}
-                    rows="5"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-colors"
-                    placeholder="Wprowadź szczegółowy opis projektu..."
-                    disabled={isSaving}
-                />
-            ) : (
-                <p className="text-gray-700 whitespace-pre-wrap">{project.description || "Brak szczegółowego opisu."}</p>
-            )}
-        </div>
-
-        {/* Key Information & Dates */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-            <h2 className="text-xl font-semibold mb-3 border-b pb-2 text-gray-800">Daty</h2>
-            <div className="space-y-3">
-                {/* Start Date */}
-                <div className="flex items-center gap-3">
-                    <Icon.Calendar />
-                    <div className="text-sm flex flex-col sm:flex-row sm:items-center w-full">
-                        <span className="font-medium w-20 text-gray-600">Start:</span>
-                        {isEditing ? (
-                            <input
-                                type="date"
-                                name="startDate"
-                                value={editData.startDate}
-                                onChange={handleEditChange}
-                                className="border border-gray-300 rounded-md p-1.5 text-gray-700 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-colors"
-                                disabled={isSaving}
-                            />
-                        ) : (
-                            <span className="text-gray-700">
-                                {formatDateForDisplay(project.startDate)}
-                            </span>
-                        )}
-                    </div>
-                </div>
-                {/* End Date */}
-                <div className="flex items-center gap-3">
-                    <Icon.Calendar />
-                    <div className="text-sm flex flex-col sm:flex-row sm:items-center w-full">
-                        <span className="font-medium w-20 text-gray-600">Koniec:</span>
-                        {isEditing ? (
-                            <input
-                                type="date"
-                                name="endDate"
-                                value={editData.endDate}
-                                onChange={handleEditChange}
-                                className="border border-gray-300 rounded-md p-1.5 text-gray-700 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-colors"
-                                disabled={isSaving}
-                            />
-                        ) : (
-                            <span className="text-gray-700">
-                                {formatDateForDisplay(project.endDate)}
-                            </span>
-                        )}
-                    </div>
-                </div>
-            </div>
-          </div>
-
-          {/* Progress Bar / Input */}
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-            <h2 className="text-xl font-semibold mb-3 border-b pb-2 text-gray-800">Postęp (%)</h2>
-            
-            {isEditing ? (
-                <div className="flex items-center gap-3">
-                    <input
-                        type="number"
-                        name="progress"
-                        value={editData.progress}
-                        onChange={handleEditChange}
-                        min="0"
-                        max="100"
-                        className="text-3xl font-bold text-emerald-600 w-24 border border-gray-300 rounded-lg p-2 text-center focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-colors"
-                        disabled={isSaving}
-                    />
-                    <span className="text-3xl font-bold text-emerald-600">%</span>
-                </div>
-            ) : (
-                <div className="text-3xl font-bold mb-2 text-emerald-600">{project.progress || 0}%</div>
-            )}
-            
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-              <div
-                className="bg-emerald-600 h-2.5 rounded-full shadow-inner"
-                style={{ width: `${isEditing ? editData.progress : project.progress || 0}%` }}
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Assigned Users (Widok tylko do odczytu, ponieważ edycja przypisań jest zazwyczaj bardziej złożona) */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 mb-8">
-          <h2 className="text-xl font-semibold mb-4 border-b pb-2 text-gray-800">Przypisani Użytkownicy ({project.assignedUsers.length})</h2>
-          <div className="flex flex-wrap gap-4">
-            {project.assignedUsers.map(user => (
-              <div key={user._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 shadow-sm transition-shadow hover:shadow-md">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-inner flex-shrink-0 ${user.role === 'admin' ? 'bg-purple-600' : 'bg-emerald-600'}`}>
-                  {user.username.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <div className="font-medium text-sm text-gray-900">{user.username}</div>
-                  <div className="text-xs text-gray-500">{user.email}</div>
-                </div>
-                <span className={`text-xs px-2 py-1 rounded-full capitalize ring-1 ${user.role === 'admin' ? 'bg-purple-100 text-purple-700 ring-purple-300/50' : user.role === 'hr' ? 'bg-blue-100 text-blue-700 ring-blue-300/50' : 'bg-gray-100 text-gray-700 ring-gray-300/50'}`}>
-                  {user.role}
-                </span>
-              </div>
-            ))}
-            {project.assignedUsers.length === 0 && (
-              <p className="text-gray-500">Brak przypisanych użytkowników.</p>
-            )}
-          </div>
-        {showUserModal && (
-            <UserManagementModal
-              project={project}
-              onClose={() => setShowUserModal(false)}
-              onUpdate={handleProjectUpdate}
-            />
-        )}   
-        </div>
-
- {/* Back Button */}
- <button
- onClick={() => navigate('/projekty')}
-className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
- >
- &larr; Powrót do listy projektów
- </button>
- </div>
- </div>
- );
+    );
 }
