@@ -214,18 +214,6 @@ export default function Dashboard() {
                   </li>
                 )}
 
-                {/* Analytics */}
-                <li
-                  onClick={() => navigate('/analytics')}
-                  className={`flex items-center rounded-lg cursor-pointer transition-colors
-    ${isSidebarOpen ? 'gap-3 px-4 justify-start' : 'justify-center px-0'}
-    ${location.pathname.startsWith('/analytics') ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'}
-    py-3`}
-                >
-                  <Icon.Analytics />
-                  {isSidebarOpen && <span className="font-medium">Analytics</span>}
-                </li>
-
                 {/* Zatwierdzanie Urlopów */}
                 {(role === 'hr' || role === 'admin') && (
                   <li
@@ -295,7 +283,7 @@ export default function Dashboard() {
                 <div className="relative">
                   <div className="flex items-center bg-gray-50 rounded-lg px-4 py-2 gap-2">
                     <Icon.Search />
-                    <input className="bg-transparent outline-none text-sm w-64" placeholder="Search task or project..." />
+                    <input className="bg-transparent outline-none text-sm w-64" placeholder="Wyszukaj zadanie lub projekt..." />
                   </div>
                 </div>
 
@@ -306,9 +294,6 @@ export default function Dashboard() {
                     <Icon.Plus /> <span className="text-sm">Add Project</span>
                   </button>
                 )}
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors">
-                  <span className="font-medium text-gray-600">A</span>
-                </div>
               </div>
             </div>
           </div>
