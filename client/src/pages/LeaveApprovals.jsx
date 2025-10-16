@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -27,42 +27,80 @@ const Icon = {
 };
 
 export default function LeaveApprovals() {
+// === Twoje istniejące stany ===
   const [leaves, setLeaves] = useState([]);
-  const [filter, setFilter] = useState('pending'); // pending, approved, rejected, all
-  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('pending');
+  const [loading, setLoading] = useState(true); // Ustawiamy na true, bo zaczynamy od sprawdzania usera
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectNote, setRejectNote] = useState('');
+  const [Error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchLeaves();
-  }, [filter]);
+  // === Nowy stan do przechowywania danych o zalogowanym użytkowniku ===
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const fetchLeaves = async () => {
+  // ==========================================================
+  // KROK 1: Sprawdź kim jest użytkownik ZANIM cokolwiek zrobisz
+  // ==========================================================
+  useEffect(() => {
+    const checkUserAccess = async () => {
+      try {
+        // Zapytaj backend "kim jestem?"
+        const res = await axios.get('/api/auth/me', { withCredentials: true });
+        // Zapisz dane użytkownika w stanie
+        setCurrentUser(res.data); 
+      } catch (err) {
+        console.error('Błąd autoryzacji:', err);
+        // Jeśli nie jesteś zalogowany (błąd 401), przenieś na stronę logowania
+        navigate('/login');
+      }
+    };
+    checkUserAccess();
+  }, [navigate]); // navigate jest zależnością, bo używamy go w środku
+
+  // =====================================================================
+  // KROK 2: Pobierz dane (wnioski) TYLKO WTEDY, gdy użytkownik ma uprawnienia
+  // =====================================================================
+  const fetchLeaves = useCallback(async () => {
     try {
+      setLoading(true); // Ustaw ładowanie przed każdym pobraniem
       const params = filter !== 'all' ? { status: filter } : {};
       const res = await axios.get('/api/leaves', { 
         params, 
         withCredentials: true 
       });
       setLeaves(res.data.leaves);
-      setLoading(false);
     } catch (err) {
       console.error('Error fetching leaves:', err);
-      if (err.response?.status === 401) {
-        navigate('/login');
-      } else if (err.response?.status === 403) {
-        alert('Brak uprawnień do tej strony');
-        navigate('/dashboard');
-      }
-      setLoading(false);
+      // Obsługa błędów, które mogą się zdarzyć nawet adminowi
+      if (err.response?.status === 401) navigate('/login');
+    } finally {
+      setLoading(false); // Zawsze wyłączaj ładowanie po zakończeniu
     }
-  };
+  }, [filter, navigate]); // Ta funkcja zależy od filtra i nawigacji
 
+  useEffect(() => {
+    // Nie rób nic, dopóki nie znamy użytkownika
+    if (!currentUser) {
+      return; 
+    }
+
+    // Sprawdź rolę użytkownika
+    if (currentUser.role === 'admin' || currentUser.role === 'hr') {
+      // Jeśli ma uprawnienia, pobierz wnioski
+      fetchLeaves();
+    } else {
+      // Jeśli to zwykły user, wyrzuć go stąd
+      setError('Brak uprawnień do przeglądania tej strony');     
+ 
+    }
+  }, [currentUser, fetchLeaves]); // Uruchom ten efekt, gdy zmieni się user lub funkcja fetchLeaves
+
+
+  // === Reszta Twojego kodu (bez zmian) ===
   const handleApprove = async (id) => {
     if (!window.confirm('Czy na pewno chcesz zatwierdzić ten wniosek?')) return;
-
     try {
       await axios.patch(`/api/leaves/${id}/approve`, {}, { withCredentials: true });
       fetchLeaves();
@@ -78,7 +116,6 @@ export default function LeaveApprovals() {
       alert('Podaj powód odrzucenia');
       return;
     }
-
     try {
       await axios.patch(
         `/api/leaves/${selectedLeave}/reject`,
@@ -125,6 +162,23 @@ export default function LeaveApprovals() {
     };
     return labels[type] || type;
   };
+
+    if (Error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-8 py-6 rounded-xl shadow-sm">
+          <div className="font-semibold mb-2">Błąd</div>
+          <div>{Error}</div>
+          <button 
+            onClick={() => navigate('/dashboard')}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Powrót do Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
