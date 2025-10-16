@@ -40,6 +40,12 @@ export default function EmployeeList() {
       const meRes = await axios.get('/api/auth/me', { withCredentials: true });
       setCurrentUser(meRes.data);
 
+      if (meRes.data.role !== 'admin') {
+      setError('Brak uprawnień do przeglądania tej strony');
+      setLoading(false);
+      return;
+    }
+
       // Pobierz listę wszystkich userów
       const usersRes = await axios.get('/api/users', { withCredentials: true });
       setUsers(usersRes.data.users);
