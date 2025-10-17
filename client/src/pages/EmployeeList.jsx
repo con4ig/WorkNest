@@ -241,7 +241,7 @@ export default function EmployeeList() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredUsers.map(user => (
-                <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                <tr key={user._id} className="hover:bg-gray-50 transition-colors" onClick={() => navigate(`/employees/${user._id}`)} style={{ cursor: 'pointer' }}>
                   {/* User info */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">

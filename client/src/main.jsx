@@ -15,6 +15,7 @@ import MyLeaves from './pages/MyLeaves.jsx'
 import LeaveApprovals from './pages/LeaveApprovals.jsx'
 import Regulamin from './pages/Regulamin.jsx'
 import Polityka from './pages/Poltyka_prywatnosc.jsx'
+import UserDetails from './pages/UserDetails.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -29,6 +30,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/employees/add" element={<Addproject />} />  
         <Route path="/projekty" element={<Projekty />} />
         <Route path="/projects/:id" element={<ProjectDetails />} /> 
+        <Route path="/employees/:id" element={<UserDetails />} />
         <Route path="/myleaves" element={<MyLeaves />} /> 
         <Route path="/leave-approvals" element={<LeaveApprovals />} />
         <Route path="/regulamin" element={<Regulamin />} />
