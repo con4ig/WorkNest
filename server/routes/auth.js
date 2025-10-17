@@ -1,67 +1,105 @@
+// routes/authRoutes.js (POST /api/auth/login) - NAPRAWIONY
+
 import express from 'express';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import authenticate from '../middleware/authenticate.js';
 
-const app = express.Router();
+const router = express.Router();
 
+// ============================================
+// POST /api/auth/login
 // Logowanie użytkownika
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: 'Użytkownik nie istnieje' });
+// ============================================
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Walidacja
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email i hasło są wymagane' });
+        }
+
+        // Znajdź użytkownika
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Nieprawidłowe dane logowania' });
+        }
+
+        // Sprawdź hasło
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        if (!isValidPassword) {
+            return res.status(401).json({ message: 'Nieprawidłowe dane logowania' });
+        }
+
+        // Utwórz JWT token
+        const token = jwt.sign(
+            { _id: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        // Ustaw cookie z tokenem
+        res.cookie('token', token, {
+            httpOnly: true,           // Nie dostępny z JS (zabezpieczenie XSS)
+            secure: process.env.NODE_ENV === 'production', // HTTPS tylko w produkcji
+            sameSite: 'lax',          // CSRF protection
+            maxAge: 24 * 60 * 60 * 1000 // 24 godziny
+        });
+
+        res.json({
+            message: 'Zalogowano pomyślnie',
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                firstName: user.firstName,
+                lastName: user.lastName
+            }
+        });
+    } catch (err) {
+        console.error('Login error:', err);
+        res.status(500).json({ message: 'Błąd serwera' });
     }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (isMatch) {
-      const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-      res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // tylko HTTPS w produkcji
-      sameSite: 'Strict',
-      maxAge: 3600000 // 1h
-      });
-      res.json({ message: 'Zalogowano pomyślnie' });
-    } else {
-      res.status(401).json({ message: 'Nieprawidłowe dane logowania' });
-    }
-  } catch (err) {
-    res.status(500).json({ message: 'Błąd serwera' });
-  }
 });
 
-// Rejestracja użytkownika
-app.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Użytkownik o tym adresie e-mail już istnieje' });
+// ============================================
+// GET /api/auth/me
+// Pobierz dane aktualnie zalogowanego użytkownika
+// ============================================
+router.get('/me', authenticate, async (req, res) => {
+    try {
+        // req.user jest ustawiony przez middleware authenticate
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ message: 'Nie jesteś zalogowany' });
+        }
+
+        const user = await User.findById(req.user._id).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'Użytkownik nie znaleziony' });
+        }
+
+        res.json(user);
+    } catch (err) {
+        console.error('Get me error:', err);
+        res.status(500).json({ message: 'Błąd serwera' });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
-    await newUser.save();
-    res.status(201).json({ message: 'Użytkownik zarejestrowany pomyślnie' });
-  } catch (err) {
-    res.status(500).json({ message: 'Błąd serwera' });
-  }
 });
 
-app.post('/reset-password', async (req, res) => {
-  const { email, newPassword } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: 'Użytkownik nie istnieje' });
-    }
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
-    res.json({ message: 'Hasło zostało zmienione pomyślnie' });
-  } catch (err) {
-    res.status(500).json({ message: 'Błąd serwera' });
-  }
+// ============================================
+// POST /api/auth/logout
+// Wylogowanie użytkownika
+// ============================================
+router.post('/logout', (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+    });
+
+    res.json({ message: 'Wylogowano pomyślnie' });
 });
 
-export default app;
+export default router;
