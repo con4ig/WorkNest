@@ -6,10 +6,12 @@ import axios from 'axios';
 function Forgot() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
+  // JEDEN hook dla JEDNEGO formularza
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const navigate = useNavigate();
 
-  const onSubmitEmail = async (data) => {
+  // Logika zostaje w oddzielnych funkcjach dla czytelności
+  const handleSendOtp = async (data) => {
     try {
       await axios.post('/api/email/send-otp', { email: data.email });
       setEmail(data.email);
@@ -19,10 +21,10 @@ function Forgot() {
     }
   };
 
-  const onSubmitOtp = async (data) => {
+  const handleVerifyOtp = async (data) => {
     try {
       const response = await axios.post('/api/email/verify-otp', {
-        email: email,
+        email: email, // Używamy email zapisanego w stanie
         code: data.otp
       });
       if (response.data.message === 'Kod poprawny') {
@@ -33,7 +35,7 @@ function Forgot() {
     }
   };
 
-  const onSubmitNewPassword = async (data) => {
+  const handleResetPassword = async (data) => {
     try {
       if (data.newPassword !== data.confirmPassword) {
         alert('Hasła nie są takie same');
@@ -41,7 +43,7 @@ function Forgot() {
       }
       
       await axios.post('/api/auth/reset-password', {
-        email: email,
+        email: email, // Używamy email zapisanego w stanie
         newPassword: data.newPassword
       });
       
@@ -52,9 +54,20 @@ function Forgot() {
     }
   };
 
+  // JEDNA funkcja "master" do obsługi submit
+  const onMasterSubmit = (data) => {
+    if (step === 1) {
+      handleSendOtp(data);
+    } else if (step === 2) {
+      handleVerifyOtp(data);
+    } else if (step === 3) {
+      handleResetPassword(data);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left Panel - bez zmian */}
+      {/* Left Panel - PRZYWRÓCONA TREŚĆ */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-emerald-500 to-teal-600 p-12 relative overflow-hidden">
         <div className="relative z-10 mt-auto">
           <h2 className="text-4xl font-bold text-white mb-6">
@@ -72,6 +85,8 @@ function Forgot() {
       {/* Right Panel */}
       <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
         <div className="w-full max-w-md space-y-8">
+          
+          {/* PRZYWRÓCONE NAGŁÓWKI I LOGO */}
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg mb-2">
               <span className="text-white text-3xl font-bold">W</span>
@@ -88,126 +103,131 @@ function Forgot() {
             </p>
           </div>
 
-          {step === 1 && (
-            <form onSubmit={handleSubmit(onSubmitEmail)} className="mt-8 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Adres email
-                </label>
-                <input
-                  {...register('email', { 
-                    required: 'Email jest wymagany',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Nieprawidłowy format email"
-                    }
-                  })}
-                  className="block w-full px-4 py-3.5 text-gray-900 placeholder:text-gray-400 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
-                  placeholder="jan.kowalski@firma.pl"
-                />
-                {errors.email && 
-                  <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>
-                }
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex justify-center items-center gap-2 px-4 py-3.5 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm"
-              >
-                Wyślij kod weryfikacyjny
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
-            </form>
-          )}
-
-          {step === 2 && (
-            <form onSubmit={handleSubmit(onSubmitOtp)} className="mt-8 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Kod weryfikacyjny
-                </label>
-                <input
-                  {...register('otp', { 
-                    required: 'Kod jest wymagany',
-                    pattern: {
-                      value: /^\d{6}$/,
-                      message: 'Kod powinien mieć 6 cyfr'
-                    }
-                  })}
-                  maxLength={6}
-                  className="block w-full px-4 py-3.5 text-gray-900 text-center text-2xl tracking-widest placeholder:text-gray-400 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
-                  placeholder="000000"
-                />
-                {errors.otp && 
-                  <p className="mt-2 text-sm text-red-600">{errors.otp.message}</p>
-                }
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex justify-center items-center gap-2 px-4 py-3.5 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm"
-              >
-                Zweryfikuj kod
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </button>
-            </form>
-          )}
-
-          {step === 3 && (
-            <form onSubmit={handleSubmit(onSubmitNewPassword)} className="mt-8 space-y-6">
-              <div className="space-y-5">
+          {/* JEDEN FORMULARZ, który owija wszystkie kroki */}
+          <form onSubmit={handleSubmit(onMasterSubmit)} className="mt-8 space-y-6">
+            {step === 1 && (
+              <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Nowe hasło
+                    Adres email
                   </label>
                   <input
-                    type="password"
-                    {...register('newPassword', { 
-                      required: 'Hasło jest wymagane',
-                      minLength: { value: 8, message: 'Hasło musi mieć minimum 8 znaków' }
+                    {...register('email', { 
+                      required: 'Email jest wymagany',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: "Nieprawidłowy format email"
+                      }
                     })}
                     className="block w-full px-4 py-3.5 text-gray-900 placeholder:text-gray-400 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
-                    placeholder="********"
+                    placeholder="jan.kowalski@firma.pl"
                   />
-                  {errors.newPassword && 
-                    <p className="mt-2 text-sm text-red-600">{errors.newPassword.message}</p>
+                  {errors.email && 
+                    <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>
                   }
                 </div>
 
+                <button
+                  type="submit"
+                  className="w-full flex justify-center items-center gap-2 px-4 py-3.5 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm"
+                >
+                  Wyślij kod weryfikacyjny
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Potwierdź nowe hasło
+                    Kod weryfikacyjny
                   </label>
                   <input
-                    type="password"
-                    {...register('confirmPassword', { 
-                      required: 'Potwierdzenie hasła jest wymagane',
-                      validate: value => value === watch('newPassword') || 'Hasła nie są takie same'
+                    {...register('otp', { 
+                      required: 'Kod jest wymagany',
+                      pattern: {
+                        value: /^\d{6}$/,
+                        message: 'Kod powinien mieć 6 cyfr'
+                      }
                     })}
-                    className="block w-full px-4 py-3.5 text-gray-900 placeholder:text-gray-400 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
-                    placeholder="********"
+                    maxLength={6}
+                    className="block w-full px-4 py-3.5 text-gray-900 text-center text-2xl tracking-widest placeholder:text-gray-400 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
+                    placeholder="000000"
                   />
-                  {errors.confirmPassword && 
-                    <p className="mt-2 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                  {errors.otp && 
+                    <p className="mt-2 text-sm text-red-600">{errors.otp.message}</p>
                   }
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                className="w-full flex justify-center items-center gap-2 px-4 py-3.5 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm"
-              >
-                Zmień hasło
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-              </button>
-            </form>
-          )}
+                <button
+                  type="submit"
+                  className="w-full flex justify-center items-center gap-2 px-4 py-3.5 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm"
+                >
+                  Zweryfikuj kod
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {step === 3 && (
+              <div className="space-y-6"> {/* Dodatkowy div dla zachowania space-y-6 z formularza */}
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Nowe hasło
+                    </label>
+                    <input
+                      type="password"
+                      {...register('newPassword', { 
+                        required: 'Hasło jest wymagane',
+                        minLength: { value: 8, message: 'Hasło musi mieć minimum 8 znaków' }
+                      })}
+                      className="block w-full px-4 py-3.5 text-gray-900 placeholder:text-gray-400 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
+                      placeholder="********"
+                    />
+                    {errors.newPassword && 
+                      <p className="mt-2 text-sm text-red-600">{errors.newPassword.message}</p>
+                    }
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Potwierdź nowe hasło
+                    </label>
+                    <input
+                      type="password"
+                      {...register('confirmPassword', { 
+                        required: 'Potwierdzenie hasła jest wymagane',
+                        validate: value => value === watch('newPassword') || 'Hasła nie są takie same'
+                      })}
+                      className="block w-full px-4 py-3.5 text-gray-900 placeholder:text-gray-400 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200"
+                      placeholder="********"
+                    />
+                    {errors.confirmPassword && 
+                      <p className="mt-2 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                    }
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full flex justify-center items-center gap-2 px-4 py-3.5 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 shadow-sm"
+                >
+                  Zmień hasło
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </form> 
+          {/* Koniec JEDNEGO formularza */}
+
 
           <div className="text-center">
             <Link

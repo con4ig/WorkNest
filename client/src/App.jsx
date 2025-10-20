@@ -48,7 +48,7 @@ function App() {
         <main className="relative z-10 container mx-auto px-4 py-16 lg:py-24">
           
           {/* 1. Sekcja Hero - PRZYWRÓCONY DUŻY NAGŁÓWEK */}
-          <div className="max-w-6xl mx-auto text-center mb-24">
+          <div className="max-w-7xl mx-auto text-center mb-24">
             <p className="text-sm font-semibold text-emerald-600 uppercase tracking-widest mb-3">
                 SYSTEM HR NEXT-GEN
             </p>
