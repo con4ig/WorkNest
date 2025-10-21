@@ -72,7 +72,7 @@ router.get('/', authenticate, async (req, res) => {
         // Jeśli user jest 'employee', filtrujemy po przypisanych użytkownikach
         if (req.user.role === 'employee') {
             // Używamy ID użytkownika do filtrowania projektów, do których jest przypisany
-            query.assignedUsers = req.user.id; 
+            query.assignedUsers = req.user._id; 
         }
         
         // 3. FILTROWANIE PO STATUSIE (OPCJONALNE)
@@ -122,7 +122,7 @@ router.get('/stats', authenticate, async (req, res) => {
     
     // Employee widzi tylko swoje projekty
     if (req.user.role === 'employee') {
-      query.assignedUsers = req.user.id;
+      query.assignedUsers = req.user._id;
     }
     
     const total = await Project.countDocuments(query);
@@ -156,7 +156,7 @@ router.get('/:id', authenticate, async (req, res) => {
     // Employee może zobaczyć tylko swoje projekty
     if (req.user.role === 'employee') {
       const isAssigned = project.assignedUsers.some(
-        u => u._id.toString() === req.user.id
+        u => u._id.toString() === req.user._id
       );
       if (!isAssigned) {
         return res.status(403).json({ message: 'Brak dostępu do tego projektu' });
@@ -187,7 +187,7 @@ router.post('/', authenticate, authorize('admin', 'hr'), async (req, res) => {
       startDate,
       endDate,
       assignedUsers: assignedUsers || [],
-      createdBy: req.user.id
+      createdBy: req.user._id
     });
     
     await project.save();

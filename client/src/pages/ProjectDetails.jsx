@@ -197,7 +197,7 @@ export default function ProjectDetails() {
                 
                 <div className="flex flex-col items-center text-center">
                     <CircularProgress progress={progress} />
-                     {isEditing ? (
+                     {isEditing && isAdmin ? (
                         <div className="w-full max-w-xs mt-4">
                             <input type="range" name="progress" value={editData.progress} onChange={handleEditChange} min="0" max="100" className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600" disabled={isSaving} />
                         </div>
@@ -208,7 +208,7 @@ export default function ProjectDetails() {
 
                 <div className="mt-10 space-y-6">
                     <StatCard icon={<Icon.Calendar />} title="Okres trwania projektu">
-                        {isEditing ? (
+                        {isEditing && isAdmin ? (
                             <div className="space-y-2">
                                 <input type="date" name="startDate" value={editData.startDate} onChange={handleEditChange} className="w-full border bg-slate-50 border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
                                 <input type="date" name="endDate" value={editData.endDate} onChange={handleEditChange} className="w-full border bg-slate-50 border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
@@ -218,7 +218,7 @@ export default function ProjectDetails() {
                         )}
                     </StatCard>
                      <StatCard icon={<ChevronRight className="w-6 h-6 text-emerald-500"/>} title="Status i priorytet">
-                        {isEditing ? (
+                        {isEditing && isAdmin ? (
                             <div className="flex flex-wrap gap-2">
                                 <select name="status" value={editData.status} onChange={handleEditChange} className={`px-3 py-1.5 text-sm font-semibold rounded-lg border focus:outline-none capitalize bg-white ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-emerald-500`}>
                                     {AVAILABLE_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -245,14 +245,14 @@ export default function ProjectDetails() {
             <main className="w-full p-6 lg:p-10 flex-grow">
                 <header className="relative p-8 mb-10 rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-500 shadow-2xl shadow-emerald-200">
                     <div className="relative z-10">
-                        {isEditing ? (
+                        {isEditing && isAdmin ? (
                             <input type="text" name="name" value={editData.name} onChange={handleEditChange} className="text-4xl lg:text-5xl font-extrabold text-white tracking-tight bg-transparent border-b-2 border-white/50 focus:outline-none w-full placeholder:text-white/70" placeholder="Nazwa projektu..."/>
                         ) : (
                             <h1 className="text-4xl lg:text-5xl font-extrabold text-white tracking-tight">{project.name}</h1>
                         )}
                         {isAdmin && (
                             <div className="flex flex-wrap gap-3 mt-6">
-                                {isEditing ? (<>
+                                {isEditing && isAdmin ? (<>
                                     <button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 font-bold rounded-lg hover:bg-slate-200 transition-all shadow-md disabled:opacity-60">
                                         {isSaving ? 'Zapisywanie...' : <><Icon.Save /> Zapisz zmiany</>}
                                     </button>
@@ -274,7 +274,7 @@ export default function ProjectDetails() {
                 
                 <div className="space-y-8 animate-fade-in">
                     <ContentCard icon={<Icon.Info />} title="Opis projektu">
-                        {isEditing ? (
+                        {isEditing && isAdmin ? (
                             <textarea name="description" value={editData.description} onChange={handleEditChange} rows="6" className="w-full p-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none leading-relaxed" placeholder="Dodaj szczegółowy opis..."/>
                         ) : (
                             <p className="whitespace-pre-wrap leading-relaxed text-slate-600">{project.description || "Ten projekt nie ma jeszcze szczegółowego opisu."}</p>

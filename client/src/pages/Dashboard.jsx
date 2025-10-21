@@ -447,6 +447,8 @@ export default function Dashboard() {
             </div>
 
             {/* Bottom area: Recent activity */}
+
+          {(role === 'hr' || role === 'admin') && (
             <div className="mt-6 md:mt-8 bg-white rounded-xl p-4 md:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div className="text-base md:text-lg font-medium">Ostatnio dodane projekty</div>
@@ -469,6 +471,7 @@ export default function Dashboard() {
                 ))}
               </ul>
             </div>
+          )}
 
 
             <footer className="mt-6 md:mt-8 pb-6 md:pb-8 text-xs md:text-sm text-gray-400 text-center">

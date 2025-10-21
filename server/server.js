@@ -47,7 +47,7 @@ app.post('/api/auth/logout', (req, res) => {
 // Pobieranie danych zalogowanego użytkownika
 app.get('/api/auth/me', authenticate, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user._id).select('-password');
     res.json({
       id: user._id,
       username: user.username,
