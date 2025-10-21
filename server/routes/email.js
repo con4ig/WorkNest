@@ -1,38 +1,39 @@
-import express from 'express';
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-import Otp from '../models/Otp.js';
+import express from "express";
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+import Otp from "../models/Otp.js";
 
 dotenv.config();
 const router = express.Router();
 
-const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+const generateOtp = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
 
 // Konfiguracja Gmail SMTP
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465, 
-  secure: true, 
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.GMAIL_USER, 
-    pass: process.env.GMAIL_PASS 
-  }
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
 });
 
 // Weryfikacja połączenia przy starcie
 transporter.verify((error, success) => {
   if (error) {
-    console.error('❌ Błąd połączenia z Gmail:', error);
+    console.error("❌ Błąd połączenia z Gmail:", error);
   } else {
-    console.log('✅ Gmail SMTP gotowe do wysyłki maili');
+    console.log("✅ Gmail SMTP gotowe do wysyłki maili");
   }
 });
 
-router.post('/send-otp', async (req, res) => {
+router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
-  
+
   if (!email) {
-    return res.status(400).json({ message: 'Brak adresu email' });
+    return res.status(400).json({ message: "Brak adresu email" });
   }
 
   const otp = generateOtp();
@@ -46,7 +47,7 @@ router.post('/send-otp', async (req, res) => {
     const mailOptions = {
       from: process.env.GMAIL_USER,
       to: email,
-      subject: 'Twój kod OTP - WorkNest',
+      subject: "Twój kod OTP - WorkNest",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
@@ -65,52 +66,52 @@ router.post('/send-otp', async (req, res) => {
           </div>
         </div>
       `,
-      text: `WorkNest - Twój kod weryfikacyjny\n\nTwój kod jednorazowy to: ${otp}\n\nKod jest ważny przez 5 minut.\n\nJeśli nie prosiłeś o ten kod, zignoruj tę wiadomość.`
+      text: `WorkNest - Twój kod weryfikacyjny\n\nTwój kod jednorazowy to: ${otp}\n\nKod jest ważny przez 5 minut.\n\nJeśli nie prosiłeś o ten kod, zignoruj tę wiadomość.`,
     };
     await transporter.sendMail(mailOptions);
 
-    return res.status(200).json({ 
-      message: 'Kod OTP wysłany pomyślnie'
+    return res.status(200).json({
+      message: "Kod OTP wysłany pomyślnie",
     });
   } catch (err) {
-    console.error('❌ Błąd wysyłki lub zapisu:', err);
-    console.error('Szczegóły błędu:', err.message);
+    console.error("❌ Błąd wysyłki lub zapisu:", err);
+    console.error("Szczegóły błędu:", err.message);
     if (err.response) {
-      console.error('Odpowiedź serwera:', err.response);
+      console.error("Odpowiedź serwera:", err.response);
     }
-    return res.status(500).json({ 
-      message: 'Błąd serwera',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    return res.status(500).json({
+      message: "Błąd serwera",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
     });
   }
 });
 
-router.post('/verify-otp', async (req, res) => {
+router.post("/verify-otp", async (req, res) => {
   const { email, code } = req.body;
-  
+
   if (!email || !code) {
-    return res.status(400).json({ message: 'Brak email lub kodu' });
+    return res.status(400).json({ message: "Brak email lub kodu" });
   }
 
   try {
     const record = await Otp.findOne({ email, code });
-    
+
     if (!record) {
-      return res.status(400).json({ message: 'Nieprawidłowy kod' });
+      return res.status(400).json({ message: "Nieprawidłowy kod" });
     }
 
     if (record.expiresAt < new Date()) {
       await Otp.deleteOne({ _id: record._id });
-      return res.status(400).json({ message: 'Kod wygasł' });
+      return res.status(400).json({ message: "Kod wygasł" });
     }
 
     // Usuń OTP po poprawnym użyciu
     await Otp.deleteOne({ _id: record._id });
-    
-    return res.status(200).json({ message: 'Kod poprawny' });
+
+    return res.status(200).json({ message: "Kod poprawny" });
   } catch (err) {
-    console.error('❌ Błąd weryfikacji:', err);
-    return res.status(500).json({ message: 'Błąd serwera' });
+    console.error("❌ Błąd weryfikacji:", err);
+    return res.status(500).json({ message: "Błąd serwera" });
   }
 });
 
