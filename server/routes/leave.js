@@ -11,7 +11,7 @@ router.get('/', authenticate, async (req, res) => {
     
     // Employee widzi tylko swoje
     if (req.user.role === 'employee') {
-      query.user = req.user.id;
+      query.user = req.user._id;
     }
     
     // Optional filters
@@ -37,7 +37,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/leaves/my - moje urlopy (dla employee dashboard)
 router.get('/my', authenticate, async (req, res) => {
   try {
-    const leaves = await Leave.find({ user: req.user.id })
+    const leaves = await Leave.find({ user: req.user._id })
       .populate('reviewedBy', 'username')
       .sort({ createdAt: -1 });
     
@@ -69,7 +69,7 @@ router.get('/:id', authenticate, async (req, res) => {
     }
     
     // Employee może zobaczyć tylko swoje
-    if (req.user.role === 'employee' && leave.user._id.toString() !== req.user.id) {
+    if (req.user.role === 'employee' && leave.user._id.toString() !== req.user._id) {
       return res.status(403).json({ message: 'Brak dostępu' });
     }
     
@@ -103,7 +103,7 @@ router.post('/', authenticate, async (req, res) => {
   
   try {
     const leave = new Leave({
-      user: req.user.id,
+      user: req.user._id,
       leaveType: leaveType || 'vacation',
       startDate,
       endDate,
@@ -133,10 +133,10 @@ router.patch('/:id/approve', authenticate, authorize('hr', 'admin'), async (req,
   
   try {
     const leave = await Leave.findByIdAndUpdate(
-      req.params.id,
+      req.params._id,
       {
         status: 'approved',
-        reviewedBy: req.user.id,
+        reviewedBy: req.user._id,
         reviewedAt: new Date(),
         reviewNote: reviewNote || ''
       },
@@ -174,7 +174,7 @@ router.patch('/:id/reject', authenticate, authorize('hr', 'admin'), async (req, 
       req.params.id,
       {
         status: 'rejected',
-        reviewedBy: req.user.id,
+        reviewedBy: req.user._id,
         reviewedAt: new Date(),
         reviewNote
       },
@@ -207,7 +207,7 @@ router.delete('/:id', authenticate, async (req, res) => {
     }
     
     // Tylko własne wnioski
-    if (leave.user.toString() !== req.user.id) {
+    if (leave.user.toString() !== req.user._id) {
       return res.status(403).json({ message: 'Brak uprawnień' });
     }
     
