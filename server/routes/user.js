@@ -2,6 +2,8 @@ import express from "express";
 import User from "../models/User.js";
 import authenticate from "../middleware/authenticate.js";
 import authorize from "../middleware/authorize.js";
+import multer from 'multer';
+
 
 const router = express.Router();
 
@@ -295,5 +297,91 @@ router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
     res.status(500).json({ message: "Błąd serwera" });
   }
 });
+
+
+// Konfiguracja multer - przechowuj w pamięci, nie na dysku
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
+
+// Endpoint do uploadu zdjęcia profilowego
+router.put('/profile-image', authenticate, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Konwertuj buffer na Base64 string
+    const base64Image = req.file.buffer.toString('base64');
+    const mimeType = req.file.mimetype;
+    
+    // Zapisz jako data URL (łatwiejsze do wyświetlenia w frontendzie)
+    user.profileImage = `data:${mimeType};base64,${base64Image}`;
+    
+    await user.save();
+
+    res.json({
+      message: 'Profile image updated successfully',
+      profileImage: user.profileImage
+    });
+
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: err.message 
+    });
+  }
+});
+
+// Endpoint do pobierania zdjęcia profilowego (opcjonalny)
+router.get('/profile-image', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('profileImage');
+    
+    if (!user || !user.profileImage) {
+      return res.status(404).json({ message: 'No profile image found' });
+    }
+
+    res.json({ profileImage: user.profileImage });
+  } catch (err) {
+    console.error('Get image error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// Endpoint do usunięcia zdjęcia profilowego
+router.delete('/profile-image', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.profileImage = "";
+    await user.save();
+
+    res.json({ message: 'Profile image deleted successfully' });
+  } catch (err) {
+    console.error('Delete image error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 
 export default router;

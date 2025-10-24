@@ -1,4 +1,4 @@
-// routes/authRoutes.js (POST /api/auth/login) - NAPRAWIONY
+// routes/authRoutes.js - NAPRAWIONY z lepszym zwracaniem danych
 
 import express from "express";
 import bcrypt from "bcrypt";
@@ -44,9 +44,9 @@ router.post("/login", async (req, res) => {
 
     // Ustaw cookie z tokenem
     res.cookie("token", token, {
-      httpOnly: true, // Nie dostępny z JS (zabezpieczenie XSS)
-      secure: process.env.NODE_ENV === "production", // HTTPS tylko w produkcji
-      sameSite: "lax", // CSRF protection
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000, // 24 godziny
     });
 
@@ -59,6 +59,7 @@ router.post("/login", async (req, res) => {
         role: user.role,
         firstName: user.firstName,
         lastName: user.lastName,
+        profileImage: user.profileImage || "",
       },
     });
   } catch (err) {
@@ -73,20 +74,44 @@ router.post("/login", async (req, res) => {
 // ============================================
 router.get("/me", authenticate, async (req, res) => {
   try {
+    console.log("🔍 GET /api/auth/me - req.user:", req.user);
+
     // req.user jest ustawiony przez middleware authenticate
     if (!req.user || !req.user._id) {
+      console.log("❌ Brak req.user lub req.user._id");
       return res.status(401).json({ message: "Nie jesteś zalogowany" });
     }
 
     const user = await User.findById(req.user._id).select("-password");
+    
     if (!user) {
+      console.log("❌ Użytkownik nie znaleziony w bazie:", req.user._id);
       return res.status(404).json({ message: "Użytkownik nie znaleziony" });
     }
 
-    res.json(user);
+    console.log("✅ Użytkownik znaleziony:", {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      hasProfileImage: !!user.profileImage
+    });
+
+    // Zwróć dane w czytelnej formie
+    res.json({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profileImage: user.profileImage || "",
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    });
   } catch (err) {
-    console.error("Get me error:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    console.error("❌ Get me error:", err);
+    res.status(500).json({ message: "Błąd serwera", error: err.message });
   }
 });
 
@@ -104,11 +129,13 @@ router.post("/logout", (req, res) => {
   res.json({ message: "Wylogowano pomyślnie" });
 });
 
+// ============================================
+// POST /api/auth/reset-password
+// Resetowanie hasła użytkownika
+// ============================================
 router.post("/reset-password", async (req, res) => {
-  // 1. Odbierz dane z ciała zapytania
   const { email, newPassword } = req.body;
 
-  // 2. Prosta walidacja obecności danych
   if (!email || !newPassword) {
     return res
       .status(400)
@@ -116,24 +143,16 @@ router.post("/reset-password", async (req, res) => {
   }
 
   try {
-    // 3. Znajdź użytkownika po emailu
     const user = await User.findOne({ email });
 
     if (!user) {
-      // W celach bezpieczeństwa, aby nie ujawniać, czy konto istnieje,
-      // można zwrócić ogólny komunikat.
       return res.status(404).json({ message: "Użytkownik nie znaleziony." });
     }
 
-    // 4. Zahashuj nowe hasło
-    // Użyj bcryptjs (lub innej biblioteki) do bezpiecznego hashowania
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-    // 5. Zaktualizuj hasło w bazie danych
     user.password = hashedPassword;
-    await user.save(); // Zapisanie zmian w dokumencie
+    await user.save();
 
-    // 6. Odpowiedź sukcesu
     return res
       .status(200)
       .json({ message: "Hasło zostało pomyślnie zresetowane." });
