@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import User from "./models/User.js";
 import Leave from "./models/Leave.js";
 import authenticate from "./middleware/authenticate.js";
@@ -41,6 +44,9 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/users", userRoutes);
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Wylogowanie użytkownika
 app.post("/api/auth/logout", (req, res) => {
   res.clearCookie("token");
@@ -57,6 +63,7 @@ app.get("/api/auth/me", authenticate, async (req, res) => {
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
+      profileImage: user.profileImage
     });
   } catch (err) {
     res.status(500).json({ message: "Błąd serwera" });

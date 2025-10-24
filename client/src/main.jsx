@@ -16,6 +16,7 @@ import LeaveApprovals from './pages/LeaveApprovals.jsx';
 import Regulamin from './pages/Regulamin.jsx';
 import Polityka from './pages/Poltyka_prywatnosc.jsx';
 import UserDetails from './pages/UserDetails.jsx';
+import Upload from './pages/Upload.jsx';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -35,6 +36,7 @@ createRoot(document.getElementById('root')).render(
                 <Route path="/leave-approvals" element={<LeaveApprovals />} />
                 <Route path="/regulamin" element={<Regulamin />} />
                 <Route path="/polityka-prywatnosci" element={<Polityka />} />
+                <Route path="/upload" element={<Upload />} />
             </Routes>
         </Router>
     </StrictMode>,

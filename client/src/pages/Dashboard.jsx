@@ -50,6 +50,7 @@ export default function Dashboard() {
     const [stats, setStats] = useState([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [profileImage, setProfileImage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -80,13 +81,14 @@ export default function Dashboard() {
             const res = await axios.get('/api/auth/me', {
                 withCredentials: true,
             });
-            const { username, role } = res.data;
+            const { username, role, profileImage } = res.data;
 
             setMessage(
                 `Witaj, ${username}! Masz szybki przegląd ostatnich projektów.`,
             );
             setUsername(username);
             setRole(role);
+            setProfileImage(profileImage);
 
             if (role === 'admin' || role === 'hr') {
                 setStats([
@@ -204,54 +206,77 @@ export default function Dashboard() {
             )}
 
             <div className="flex">
-                {/* Sidebar */}
                 <aside
                     className={`${isSidebarOpen ? 'w-64' : isMobile ? '-translate-x-full' : 'w-20'} ${isMobile ? 'fixed' : 'fixed'} z-20 h-screen overflow-hidden bg-white shadow-lg transition-all duration-300`}
                 >
                     <div className="flex h-full flex-col p-6">
-                        <div
-                            className={`mb-8 flex items-center ${isSidebarOpen ? 'justify-between' : 'justify-center'}`}
-                        >
-                            <div className="flex items-center gap-3">
-                                {isSidebarOpen && (
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 font-bold text-white">
-                                        W
-                                    </div>
-                                )}
-                                {isSidebarOpen && (
-                                    <div>
-                                        <div className="font-semibold">
-                                            {username}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {role}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Strzałka do zwijania/rozwijania - tylko na desktop */}
-                            {!isMobile && (
-                                <button
-                                    onClick={() =>
-                                        setIsSidebarOpen(!isSidebarOpen)
-                                    }
-                                    className="text-gray-500 transition hover:text-gray-700"
-                                    title={
-                                        isSidebarOpen
-                                            ? 'Zwiń menu'
-                                            : 'Rozwiń menu'
-                                    }
-                                >
-                                    {isSidebarOpen ? (
-                                        <Icon.ChevronLeft />
-                                    ) : (
+                        <div className="mb-8">
+                            {!isMobile && !isSidebarOpen ? (
+                                /* Zwinięty sidebar (desktop) - TYLKO strzałka */
+                                <div className="flex justify-center">
+                                    <button
+                                        onClick={() => setIsSidebarOpen(true)}
+                                        className="text-gray-500 transition hover:text-gray-700"
+                                        title="Rozwiń menu"
+                                    >
                                         <Icon.ChevronRight />
+                                    </button>
+                                </div>
+                            ) : (
+                                /* Rozwinięty sidebar - Avatar + username + strzałka */
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        {/* Avatar */}
+                                        {profileImage ? (
+                                            <img
+                                                src={profileImage}
+                                                alt="Avatar"
+                                                className="h-10 w-10 cursor-pointer rounded-full object-cover"
+                                                onClick={() =>
+                                                    navigate('/upload')
+                                                }
+                                            />
+                                        ) : (
+                                            <div
+                                                onClick={() =>
+                                                    navigate('/upload')
+                                                }
+                                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-emerald-600 font-bold text-white"
+                                            >
+                                                {username
+                                                    .charAt(0)
+                                                    .toUpperCase()}
+                                            </div>
+                                        )}
+
+                                        {/* Username i role */}
+                                        <div>
+                                            <div className="font-semibold">
+                                                {username}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                {role}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Strzałka do zwijania - tylko desktop */}
+                                    {!isMobile && (
+                                        <button
+                                            onClick={() =>
+                                                setIsSidebarOpen(false)
+                                            }
+                                            className="text-gray-500 transition hover:text-gray-700"
+                                            title="Zwiń menu"
+                                        >
+                                            <Icon.ChevronLeft />
+                                        </button>
                                     )}
-                                </button>
+                                </div>
                             )}
                         </div>
 
+                        {/* Reszta sidebaru bez zmian... */}
                         <nav className="flex-1">
                             <ul className="space-y-2">
                                 {/* Dashboard */}
