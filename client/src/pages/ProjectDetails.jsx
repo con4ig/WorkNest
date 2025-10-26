@@ -168,7 +168,6 @@ const ContentCard = ({ icon, title, children }) => (
 
 // Główny komponent strony
 export default function ProjectDetails() {
-    // --- Hooki i Stany (bez zmian) ---
     const { id } = useParams();
     const navigate = useNavigate();
     const [project, setProject] = useState(null);
@@ -180,7 +179,6 @@ export default function ProjectDetails() {
     const [editData, setEditData] = useState({});
     const [isSaving, setIsSaving] = useState(false);
 
-    // --- Logika (bez zmian) ---
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {

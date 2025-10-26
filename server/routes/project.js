@@ -310,4 +310,35 @@ router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
   }
 });
 
+// GET /api/projects/:userId/assigned-projects/count
+router.get('/users/:userId/assigned-projects/count', authenticate, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const count = await Project.countDocuments({
+      assignedUsers: userId, // MongoDB sprawdza, czy userId jest w tablicy
+    });
+
+    res.json({ userId, assignedProjectCount: count });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Błąd podczas pobierania danych' });
+  }
+});
+
+router.get(
+  '/stats/total',
+  authenticate,
+  authorize('admin', 'hr'),
+  async (req, res) => {
+    try {
+      const count = await Project.countDocuments();
+      res.json({ totalProjectCount: count });
+    } catch (error) {
+      res.status(500).json({ error: 'Błąd podczas pobierania danych' });
+    }
+  }
+);
+
+
 export default router;
