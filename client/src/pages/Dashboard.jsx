@@ -91,56 +91,56 @@ export default function Dashboard() {
             setProfileImage(profileImage);
 
             if (role === 'admin' || role === 'hr') {
-                const totalProjectCount = await axios.get(
-                    `api/projects/stats/total`,
-                );
-                const assignedCount = totalProjectCount.data.totalProjectCount;
+  const statsRes = await axios.get(`/api/projects/stats/summary`);
+  const { total, running, pending, completed } = statsRes.data;
+
 
                 setStats([
                     {
                         id: 1,
                         title: 'Total Projects',
-                        value: assignedCount.toString(),
+                        value: total.toString(),
                         hint: 'Increased from last month',
                     },
                     {
                         id: 2,
                         title: 'Ended Projects',
-                        value: '10',
+                        value: completed.toString(),
                         hint: 'Stable',
                     },
                     {
                         id: 3,
                         title: 'Running Projects',
-                        value: '12',
+                        value: running.toString(),
                         hint: 'Growing',
                     },
-                    { id: 4, title: 'Pending', value: '2', hint: 'On review' },
+                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
                 ]);
             } else {
                 const assignedRes = await axios.get(
-                    `/api/projects/users/${_id}/assigned-projects/count`,
+                    `/api/projects/users/${_id}/assigned-projects/summary`,
                 );
-                const assignedCount = assignedRes.data.assignedProjectCount;
+                const { assigned, completed, running, pending } = assignedRes.data;
                 setStats([
                     {
                         id: 1,
                         title: 'My Projects',
-                        value: assignedCount.toString(),
+                        value: assigned.toString(),
                         hint: 'Assigned to you',
                     },
                     {
                         id: 2,
                         title: 'Completed',
-                        value: '3',
+                        value: completed.toString(),
                         hint: 'This month',
                     },
                     {
                         id: 3,
                         title: 'In Progress',
-                        value: '2',
+                        value: running.toString(),
                         hint: 'Active now',
                     },
+                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
                 ]);
             }
         };

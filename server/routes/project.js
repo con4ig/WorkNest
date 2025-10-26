@@ -310,32 +310,63 @@ router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
   }
 });
 
-// GET /api/projects/:userId/assigned-projects/count
-router.get('/users/:userId/assigned-projects/count', authenticate, async (req, res) => {
-  try {
-    const { userId } = req.params;
+// GET /api/projects/:userId/assigned-projects/summary - statystyki projektów przypisanych do użytkownika
+router.get(
+  '/users/:userId/assigned-projects/summary',
+  authenticate,
+  async (req, res) => {
+    try {
+      const { userId } = req.params;
 
-    const count = await Project.countDocuments({
-      assignedUsers: userId, // MongoDB sprawdza, czy userId jest w tablicy
-    });
+      // Opcjonalne zabezpieczenie: użytkownik może pobrać tylko swoje dane
+      if (req.user._id.toString() !== userId && req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Brak dostępu do danych innych użytkowników' });
+      }
 
-    res.json({ userId, assignedProjectCount: count });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Błąd podczas pobierania danych' });
+      const [assigned, completed, running, pending] = await Promise.all([
+        Project.countDocuments({ assignedUsers: userId }),
+        Project.countDocuments({ assignedUsers: userId, status: 'completed' }),
+        Project.countDocuments({ assignedUsers: userId, status: 'running' }),
+        Project.countDocuments({ assignedUsers: userId, status: 'pending' }),
+      ]);
+
+      res.json({
+        assigned,
+        completed,
+        running,
+        pending,
+      });
+    } catch (error) {
+      console.error('Błąd podczas pobierania statystyk użytkownika:', error);
+      res.status(500).json({ error: 'Błąd podczas pobierania danych' });
+    }
   }
-});
+);
+
+
 
 router.get(
-  '/stats/total',
+  '/stats/summary',
   authenticate,
   authorize('admin', 'hr'),
   async (req, res) => {
     try {
-      const count = await Project.countDocuments();
-      res.json({ totalProjectCount: count });
+      const [total, running, pending, completed] = await Promise.all([
+        Project.countDocuments(),
+        Project.countDocuments({ status: 'running' }),
+        Project.countDocuments({ status: 'pending' }),
+        Project.countDocuments({ status: 'completed' }),
+      ]);
+
+      res.json({
+        total,
+        running,
+        pending,
+        completed,
+      });
     } catch (error) {
-      res.status(500).json({ error: 'Błąd podczas pobierania danych' });
+      console.error('Błąd podczas pobierania statystyk:', error);
+      res.status(500).json({ error: 'Błąd podczas pobierania statystyk' });
     }
   }
 );
