@@ -81,7 +81,7 @@ export default function Dashboard() {
             const res = await axios.get('/api/auth/me', {
                 withCredentials: true,
             });
-            const { username, role, profileImage } = res.data;
+            const { username, role, profileImage, _id } = res.data;
 
             setMessage(
                 `Witaj, ${username}! Masz szybki przegląd ostatnich projektów.`,
@@ -91,11 +91,16 @@ export default function Dashboard() {
             setProfileImage(profileImage);
 
             if (role === 'admin' || role === 'hr') {
+                const totalProjectCount = await axios.get(
+                    `api/projects/stats/total`,
+                );
+                const assignedCount = totalProjectCount.data.totalProjectCount;
+
                 setStats([
                     {
                         id: 1,
                         title: 'Total Projects',
-                        value: '24',
+                        value: assignedCount.toString(),
                         hint: 'Increased from last month',
                     },
                     {
@@ -113,11 +118,15 @@ export default function Dashboard() {
                     { id: 4, title: 'Pending', value: '2', hint: 'On review' },
                 ]);
             } else {
+                const assignedRes = await axios.get(
+                    `/api/projects/users/${_id}/assigned-projects/count`,
+                );
+                const assignedCount = assignedRes.data.assignedProjectCount;
                 setStats([
                     {
                         id: 1,
                         title: 'My Projects',
-                        value: '5',
+                        value: assignedCount.toString(),
                         hint: 'Assigned to you',
                     },
                     {
@@ -477,7 +486,7 @@ export default function Dashboard() {
                                             Total Projects
                                         </div>
                                         <div className="mt-2 text-3xl font-bold md:text-4xl">
-                                            24
+                                            {stats[0]?.value || '0'}
                                         </div>
                                         <div className="mt-2 text-xs opacity-90 md:text-sm">
                                             Increased from last month
