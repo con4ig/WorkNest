@@ -173,8 +173,6 @@ export default function Dashboard() {
         fetchRecentProjects();
     }, [navigate]);
 
-    const analytics = [40, 55, 75, 60, 80, 50, 30];
-
     // time tracker
     const [running, setRunning] = useState(false);
     const [seconds, setSeconds] = useState(0);
@@ -536,33 +534,6 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                 ))}
-
-                                {/* Project analytics */}
-                                <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm sm:col-span-2 md:p-4">
-                                    <div className="mb-3 flex items-center justify-between">
-                                        <div className="text-sm font-medium md:text-base">
-                                            Project Analytics
-                                        </div>
-                                        <div className="text-xs text-gray-400">
-                                            Weekly
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-1 md:gap-3">
-                                        {analytics.map((v, i) => (
-                                            <div key={i} className="flex-1">
-                                                <div
-                                                    style={{
-                                                        height: `${(v / 100) * 80 + 8}px`,
-                                                    }}
-                                                    className={`mx-0.5 rounded-t-md bg-emerald-600 md:mx-1`}
-                                                />
-                                                <div className="mt-2 text-center text-xs text-gray-400">
-                                                    {'SMTWTFS'[i]}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
                             </div>
 
                             {/* Right column */}
