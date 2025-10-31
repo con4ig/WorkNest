@@ -16,6 +16,8 @@ import projectRoutes from "./routes/project.js";
 import leaveRoutes from "./routes/leave.js";
 import userRoutes from "./routes/user.js";
 import taskRoutes from "./routes/task.js";
+import commentRoutes from "./routes/comment.js";
+import activityRoutes from "./routes/activity.js";
 
 dotenv.config();
 
@@ -44,7 +46,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/tasks", taskRoutes)
+app.use("/api/tasks", taskRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/activities", activityRoutes);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
