@@ -142,7 +142,7 @@ router.patch(
 
     try {
       const leave = await Leave.findByIdAndUpdate(
-        req.params._id,
+        req.params.id,
         {
           status: "approved",
           reviewedBy: req.user._id,
