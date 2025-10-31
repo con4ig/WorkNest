@@ -11,14 +11,26 @@ import {
     ArrowLeft,
     Users,
     Info,
-    TrendingUp,
+    CheckCircle2,
+    Circle,
+    Clock,
+    MessageSquare,
+    Activity as ActivityIcon,
+    Plus,
+    Trash2,
+    Edit3,
+    Send,
+    ChevronDown,
     ChevronRight,
+    ListTodo,
 } from 'lucide-react';
+import moment from 'moment';
+import 'moment/locale/pl';
 
-// Konfiguracja Axios (bez zmian)
+moment.locale('pl');
+
 axios.defaults.baseURL = 'http://localhost:5500';
 
-// --- Pomocnicze funkcje formatowania dat (bez zmian) ---
 const formatDateForDisplay = (dateString) => {
     if (!dateString) return 'Nie określono';
     try {
@@ -42,7 +54,6 @@ const formatDateForInput = (dateString) => {
     }
 };
 
-// --- Komponenty Ikon ---
 const Icon = {
     Calendar: ({ className = 'text-emerald-500' }) => (
         <Calendar className={`h-6 w-6 ${className}`} />
@@ -58,21 +69,36 @@ const Icon = {
     Info: ({ className = 'text-emerald-500' }) => (
         <Info className={`h-6 w-6 ${className}`} />
     ),
+    CheckCircle: ({ className }) => <CheckCircle2 className={`h-5 w-5 ${className}`} />,
+    Circle: ({ className }) => <Circle className={`h-5 w-5 ${className}`} />,
+    Clock: ({ className }) => <Clock className={`h-5 w-5 ${className}`} />,
+    Message: ({ className = 'text-emerald-500' }) => <MessageSquare className={`h-6 w-6 ${className}`} />,
+    Activity: ({ className = 'text-emerald-500' }) => <ActivityIcon className={`h-6 w-6 ${className}`} />,
+    Plus: () => <Plus className="h-4 w-4" />,
+    Trash: () => <Trash2 className="h-4 w-4" />,
+    Edit3: () => <Edit3 className="h-4 w-4" />,
+    Send: () => <Send className="h-4 w-4" />,
+    ChevronDown: () => <ChevronDown className="h-4 w-4" />,
+    ChevronRight: () => <ChevronRight className="h-4 w-4" />,
+    ListTodo: ({ className = 'text-emerald-500' }) => <ListTodo className={`h-6 w-6 ${className}`} />,
 };
 
-// --- Funkcje stylizujące dla jasnego motywu ---
 const getStatusClasses = (status) => {
     switch (status) {
         case 'running':
+        case 'in-progress':
             return 'bg-sky-100 text-sky-800 ring-sky-300/50';
         case 'completed':
             return 'bg-green-100 text-green-800 ring-green-300/50';
         case 'on-hold':
             return 'bg-amber-100 text-amber-800 ring-amber-300/50';
+        case 'todo':
+            return 'bg-slate-100 text-slate-800 ring-slate-300/50';
         default:
             return 'bg-slate-100 text-slate-800 ring-slate-300/50';
     }
 };
+
 const getPriorityClasses = (priority) => {
     switch (priority) {
         case 'high':
@@ -86,21 +112,18 @@ const getPriorityClasses = (priority) => {
 
 const AVAILABLE_STATUSES = ['pending', 'running', 'on-hold', 'completed'];
 const AVAILABLE_PRIORITIES = ['low', 'medium', 'high'];
+const TASK_STATUSES = ['todo', 'in-progress', 'completed'];
 
-// --- Sub-komponenty dla lepszej organizacji kodu ---
-
-// Karta statystyk w panelu bocznym
 const StatCard = ({ icon, title, children }) => (
     <div className="flex items-start gap-4">
         <div className="mt-1">{icon}</div>
         <div className="w-full">
-            <h3 className="font-semibold text-slate-500">{title}</h3>
+            <h3 className="font-semibold text-gray-500">{title}</h3>
             <div className="mt-1">{children}</div>
         </div>
     </div>
 );
 
-// Okrągły wskaźnik postępu
 const CircularProgress = ({ progress }) => {
     const radius = 60,
         stroke = 12;
@@ -155,18 +178,334 @@ const CircularProgress = ({ progress }) => {
     );
 };
 
-// Karta z treścią w głównej sekcji
-const ContentCard = ({ icon, title, children }) => (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg sm:p-8">
-        <div className="mb-5 flex items-center gap-4 border-b border-slate-200 pb-4">
-            {icon}
-            <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
+const ContentCard = ({ icon, title, children, actions }) => (
+    <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-md sm:p-8">
+        <div className="mb-5 flex items-center justify-between border-b border-gray-200 pb-4">
+            <div className="flex items-center gap-4">
+                {icon}
+                <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+            </div>
+            {actions && <div className="flex gap-2">{actions}</div>}
         </div>
         {children}
     </div>
 );
 
-// Główny komponent strony
+// Komponent Zadania
+const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editData, setEditData] = useState({
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        assignedTo: task.assignedTo?._id || '',
+        dueDate: formatDateForInput(task.dueDate),
+    });
+
+    const handleSave = async () => {
+        // Stwórz obiekt payloadu do wysłania
+        const payload = {
+            ...editData,
+            // Konwertuj pusty string (z opcji "Nie przypisano") na 'null'
+            // Mongoose zrozumie 'null', ale nie zrozumie '""' dla pola ObjectId
+            assignedTo: editData.assignedTo || null,
+        };
+
+        try {
+            // Wyślij 'payload' zamiast 'editData'
+            await axios.patch(`/api/tasks/${task._id}`, payload, {
+                withCredentials: true,
+            });
+            setIsEditing(false);
+            onUpdate();
+        } catch (err) {
+            alert(`Błąd: ${err.message}`);
+        }
+    };
+
+    const toggleStatus = async () => {
+        const statuses = ['todo', 'in-progress', 'completed'];
+        const currentIndex = statuses.indexOf(task.status);
+        const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+
+        try {
+            await axios.patch(
+                `/api/tasks/${task._id}`,
+                { status: nextStatus },
+                { withCredentials: true }
+            );
+            onUpdate();
+        } catch (err) {
+            alert(`Błąd: ${err.message}`);
+        }
+    };
+
+    const StatusIcon = () => {
+        switch (task.status) {
+            case 'completed':
+                return <Icon.CheckCircle className="text-green-600" />;
+            case 'in-progress':
+                return <Icon.Clock className="text-sky-600" />;
+            default:
+                return <Icon.Circle className="text-slate-400" />;
+        }
+    };
+
+    if (isEditing) {
+        return (
+            <div className="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-4">
+                <input
+                    type="text"
+                    value={editData.title}
+                    onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                    className="mb-2 w-full rounded border border-gray-300 p-2"
+                    placeholder="Tytuł zadania"
+                />
+                <textarea
+                    value={editData.description}
+                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                    className="mb-2 w-full rounded border border-gray-300 p-2"
+                    rows="2"
+                    placeholder="Opis zadania"
+                />
+                <div className="mb-2 flex gap-2">
+                    <select
+                        value={editData.status}
+                        onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+                        className="rounded border border-gray-300 p-2"
+                    >
+                        {TASK_STATUSES.map((s) => (
+                            <option key={s} value={s}>
+                                {s}
+                            </option>
+                        ))}
+                    </select>
+                    <select
+                        value={editData.priority}
+                        onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
+                        className="rounded border border-gray-300 p-2"
+                    >
+                        {AVAILABLE_PRIORITIES.map((p) => (
+                            <option key={p} value={p}>
+                                {p}
+                            </option>
+                        ))}
+                    </select>
+                                            <select
+                                                value={editData.assignedTo}
+                                                onChange={(e) => setEditData({ ...editData, assignedTo: e.target.value })}
+                                                className="flex-1 rounded border border-gray-300 p-2"
+                                            >
+                                                <option value="">Nie przypisano</option>                        {projectUsers.map((user) => (
+                            <option key={user._id} value={user._id}>
+                                {user.username}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <input
+                    type="date"
+                    value={editData.dueDate}
+                    onChange={(e) => setEditData({ ...editData, dueDate: e.target.value })}
+                    className="mb-2 w-full rounded border border-gray-300 p-2"
+                />
+                <div className="flex gap-2">
+                    <button
+                        onClick={handleSave}
+                        className="flex items-center gap-1 rounded bg-emerald-600 px-3 py-1 text-sm text-white hover:bg-emerald-700"
+                    >
+                        <Icon.Save /> Zapisz
+                    </button>
+                    <button
+                        onClick={() => setIsEditing(false)}
+                        className="flex items-center gap-1 rounded bg-gray-300 px-3 py-1 text-sm hover:bg-gray-400"
+                    >
+                        <Icon.Cancel /> Anuluj
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="group flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 ease-in-out hover:border-emerald-300 hover:shadow-lg hover:scale-[1.01]">
+            <button
+                onClick={toggleStatus}
+                className="mt-0.5 transition-transform hover:scale-110"
+            >
+                <StatusIcon />
+            </button>
+            <div className="flex-1">
+                <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                        <h4
+                            className={`font-semibold ${task.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-800'}`}
+                        >
+                            {task.title}
+                        </h4>
+                        {task.description && (
+                            <p className="mt-1 text-sm text-gray-600">{task.description}</p>
+                        )}
+                        <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                            <span
+                                className={`rounded-full px-2 py-1 ${getStatusClasses(task.status)}`}
+                            >
+                                {task.status}
+                            </span>
+                            <span
+                                className={`rounded-full px-2 py-1 ${getPriorityClasses(task.priority)}`}
+                            >
+                                {task.priority}
+                            </span>
+                            {task.assignedTo && (
+                                <span className="rounded-full bg-gray-100 px-2 py-1 text-gray-700">
+                                    👤 {task.assignedTo.username}
+                                </span>
+                            )}
+                            {task.dueDate && (
+                                <span className="rounded-full bg-gray-100 px-2 py-1 text-gray-700">
+                                    📅 {moment(task.dueDate).format('DD MMM YYYY')}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    {isAdmin && (
+                        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-emerald-600"
+                            >
+                                <Icon.Edit3 />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm('Czy na pewno usunąć to zadanie?')) {
+                                        onDelete(task._id);
+                                    }
+                                }}
+                                className="rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
+                            >
+                                <Icon.Trash />
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Komponent Komentarza
+const CommentItem = ({ comment, onDelete, onReply, currentUserId, isAdmin }) => {
+    const [showReplies, setShowReplies] = useState(false);
+    const [replyText, setReplyText] = useState('');
+    const [isReplying, setIsReplying] = useState(false);
+
+    const canDelete = comment.author._id === currentUserId || isAdmin;
+
+    const handleReply = async () => {
+        if (!replyText.trim()) return;
+        await onReply(comment._id, replyText);
+        setReplyText('');
+        setIsReplying(false);
+        setShowReplies(true);
+    };
+
+    return (
+        <div className="border-l-2 border-gray-200 pl-4">
+            <div className="mb-3 flex gap-3">
+                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                    {comment.author.username.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1">
+                    <div className="rounded-lg bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:shadow-sm hover:scale-[1.005]">
+                        <div className="mb-1 flex items-center justify-between">
+                            <span className="font-semibold text-gray-800">
+                                {comment.author.username}
+                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-400">
+                                    {moment(comment.createdAt).fromNow()}
+                                </span>
+                                {canDelete && (
+                                    <button
+                                        onClick={() => onDelete(comment._id)}
+                                        className="text-slate-400 hover:text-red-600"
+                                    >
+                                        <Icon.Trash />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        <p className="text-slate-700 whitespace-pre-wrap">{comment.content}</p>
+                    </div>
+                    <div className="mt-2 flex gap-3 text-sm">
+                        <button
+                            onClick={() => setIsReplying(!isReplying)}
+                            className="text-emerald-600 hover:text-emerald-700"
+                        >
+                            Odpowiedz
+                        </button>
+                        {comment.replies && comment.replies.length > 0 && (
+                            <button
+                                onClick={() => setShowReplies(!showReplies)}
+                                className="flex items-center gap-1 text-slate-600 hover:text-slate-700"
+                            >
+                                {showReplies ? <Icon.ChevronDown /> : <Icon.ChevronRight />}
+                                {comment.replies.length} {comment.replies.length === 1 ? 'odpowiedź' : 'odpowiedzi'}
+                            </button>
+                        )}
+                    </div>
+
+                    {isReplying && (
+                        <div className="mt-3 flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={replyText}
+                                                    onChange={(e) => setReplyText(e.target.value)}
+                                                    onKeyPress={(e) => e.key === 'Enter' && handleReply()}
+                                                    placeholder="Napisz odpowiedź..."
+                                                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                                                />                            <button
+                                onClick={handleReply}
+                                className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+                            >
+                                <Icon.Send />
+                            </button>
+                        </div>
+                    )}
+
+                    {showReplies && comment.replies && comment.replies.length > 0 && (
+                        <div className="mt-3 space-y-3">
+                            {comment.replies.map((reply) => (
+                                <div key={reply._id} className="flex gap-2">
+                                    <div className="h-8 w-8 flex-shrink-0 rounded-full bg-slate-400 flex items-center justify-center text-white text-sm font-bold">
+                                        {reply.author.username.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="flex-1">
+                                                                        <div className="rounded-lg bg-white border border-gray-200 p-2">
+                                                                            <div className="mb-1 flex items-center justify-between">
+                                                                                <span className="text-sm font-semibold text-gray-800">
+                                                                                    {reply.author.username}
+                                                                                </span>
+                                                                                <span className="text-xs text-gray-400">
+                                                                                    {moment(reply.createdAt).fromNow()}
+                                                                                </span>
+                                                                            </div>
+                                                                            <p className="text-sm text-gray-700">{reply.content}</p>
+                                                                        </div>                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Główny komponent
 export default function ProjectDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -179,6 +518,26 @@ export default function ProjectDetails() {
     const [editData, setEditData] = useState({});
     const [isSaving, setIsSaving] = useState(false);
 
+    // States dla zadań
+    const [tasks, setTasks] = useState([]);
+    const [showAddTask, setShowAddTask] = useState(false);
+    const [isAddingTask, setIsAddingTask] = useState(false);
+    const [newTask, setNewTask] = useState({
+        title: '',
+        description: '',
+        priority: 'medium',
+        assignedTo: '',
+        dueDate: '',
+    });
+
+    // States dla komentarzy
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
+
+    // States dla aktywności
+    const [activities, setActivities] = useState([]);
+    const [showActivities, setShowActivities] = useState(false);
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -186,6 +545,7 @@ export default function ProjectDetails() {
                 withCredentials: true,
             });
             setCurrentUser(meRes.data);
+            
             const res = await axios.get(`/api/projects/${id}`, {
                 withCredentials: true,
             });
@@ -207,9 +567,47 @@ export default function ProjectDetails() {
         }
     }, [id]);
 
+    const fetchTasks = useCallback(async () => {
+        try {
+            const res = await axios.get(`/api/tasks/project/${id}`, {
+                withCredentials: true,
+            });
+            setTasks(res.data);
+        } catch (err) {
+            console.error('Błąd pobierania zadań:', err);
+        }
+    }, [id]);
+
+    const fetchComments = useCallback(async () => {
+        try {
+            const res = await axios.get(`/api/comments/project/${id}`, {
+                withCredentials: true,
+            });
+            setComments(res.data);
+        } catch (err) {
+            console.error('Błąd pobierania komentarzy:', err);
+        }
+    }, [id]);
+
+    const fetchActivities = useCallback(async () => {
+        try {
+            const res = await axios.get(`/api/activities/project/${id}`, {
+                withCredentials: true,
+            });
+            setActivities(res.data.activities);
+        } catch (err) {
+            console.error('Błąd pobierania aktywności:', err);
+        }
+    }, [id]);
+
     useEffect(() => {
-        id && fetchData();
-    }, [id, fetchData]);
+        if (id) {
+            fetchData();
+            fetchTasks();
+            fetchComments();
+            fetchActivities();
+        }
+    }, [id, fetchData, fetchTasks, fetchComments, fetchActivities]);
 
     const handleEditChange = (e) => {
         const { name, value, type } = e.target;
@@ -233,6 +631,7 @@ export default function ProjectDetails() {
                 { withCredentials: true },
             );
             await fetchData();
+            await fetchActivities();
             setIsEditing(false);
         } catch (err) {
             alert(`Błąd podczas zapisywania zmian: ${err.message}`);
@@ -241,11 +640,107 @@ export default function ProjectDetails() {
         }
     };
 
+    const handleAddTask = async () => {
+        if (!newTask.title.trim()) {
+            alert('Tytuł zadania jest wymagany');
+            return;
+        }
+
+        setIsAddingTask(true);
+        try {
+            await axios.post(
+                '/api/tasks',
+                {
+                    ...newTask,
+                    project: id,
+                },
+                { withCredentials: true }
+            );
+            setNewTask({
+                title: '',
+                description: '',
+                priority: 'medium',
+                assignedTo: '',
+                dueDate: '',
+            });
+            setShowAddTask(false);
+            fetchTasks();
+            fetchActivities();
+        } catch (err) {
+            alert(`Błąd: ${err.message}`);
+        } finally {
+            setIsAddingTask(false);
+        }
+    };
+
+    const handleDeleteTask = async (taskId) => {
+        try {
+            await axios.delete(`/api/tasks/${taskId}`, {
+                withCredentials: true,
+            });
+            fetchTasks();
+            fetchActivities();
+        } catch (err) {
+            alert(`Błąd: ${err.message}`);
+        }
+    };
+
+    const handleAddComment = async () => {
+        if (!newComment.trim()) return;
+
+        try {
+            await axios.post(
+                '/api/comments',
+                {
+                    content: newComment,
+                    project: id,
+                },
+                { withCredentials: true }
+            );
+            setNewComment('');
+            fetchComments();
+            fetchActivities();
+        } catch (err) {
+            alert(`Błąd: ${err.message}`);
+        }
+    };
+
+    const handleReplyComment = async (parentId, content) => {
+        try {
+            await axios.post(
+                '/api/comments',
+                {
+                    content,
+                    project: id,
+                    parentComment: parentId,
+                },
+                { withCredentials: true }
+            );
+            fetchComments();
+        } catch (err) {
+            alert(`Błąd: ${err.message}`);
+        }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        if (!window.confirm('Czy na pewno usunąć ten komentarz?')) return;
+
+        try {
+            await axios.delete(`/api/comments/${commentId}`, {
+                withCredentials: true,
+            });
+            fetchComments();
+            fetchActivities();
+        } catch (err) {
+            alert(`Błąd: ${err.message}`);
+        }
+    };
+
     const handleProjectUpdate = useCallback(() => {
         fetchData();
-    }, [fetchData]);
+        fetchActivities();
+    }, [fetchData, fetchActivities]);
 
-    // --- Widoki ładowania i błędu w jasnym motywie ---
     if (loading)
         return (
             <div className="flex h-screen items-center justify-center bg-slate-50">
@@ -276,14 +771,20 @@ export default function ProjectDetails() {
         );
     if (!project) return null;
 
-    const isAdmin = currentUser?.role === 'admin';
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'hr';
     const progress = isEditing ? editData.progress : project.progress || 0;
 
-    // --- Główny Render Komponentu ---
+    const taskStats = {
+        total: tasks.length,
+        completed: tasks.filter(t => t.status === 'completed').length,
+        inProgress: tasks.filter(t => t.status === 'in-progress').length,
+        todo: tasks.filter(t => t.status === 'todo').length,
+    };
+
     return (
-        <div className="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-700 lg:flex-row">
-            {/* --- LEWY PANEL (SIDEBAR) --- */}
-            <aside className="flex w-full flex-col border-r border-slate-200 bg-white p-6 lg:min-h-screen lg:w-[380px] lg:p-8">
+        <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-800 lg:flex-row">
+            {/* LEWY PANEL (SIDEBAR) */}
+            <aside className="flex w-full flex-col border-r border-gray-200 bg-white p-6 lg:min-h-screen lg:w-[380px] lg:p-8">
                 <div className="mb-10 flex items-center gap-3">
                     <button
                         onClick={() => navigate('/projekty')}
@@ -330,18 +831,18 @@ export default function ProjectDetails() {
                                     name="startDate"
                                     value={editData.startDate}
                                     onChange={handleEditChange}
-                                    className="w-full rounded-md border border-slate-300 bg-slate-50 p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="w-full rounded-md border border-gray-300 bg-gray-50 p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 />
                                 <input
                                     type="date"
                                     name="endDate"
                                     value={editData.endDate}
                                     onChange={handleEditChange}
-                                    className="w-full rounded-md border border-slate-300 bg-slate-50 p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="w-full rounded-md border border-gray-300 bg-gray-50 p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 />
                             </div>
                         ) : (
-                            <p className="text-lg font-bold text-slate-800">
+                            <p className="text-lg font-bold text-gray-800">
                                 {formatDateForDisplay(project.startDate)} -{' '}
                                 {formatDateForDisplay(project.endDate)}
                             </p>
@@ -395,11 +896,36 @@ export default function ProjectDetails() {
                             </div>
                         )}
                     </StatCard>
+
+                    {/* Statystyki zadań */}
+                    <StatCard
+                        icon={<Icon.ListTodo />}
+                        title="Statystyki zadań"
+                    >
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Wszystkie:</span>
+                                <span className="font-bold">{taskStats.total}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Ukończone:</span>
+                                <span className="font-bold text-green-600">{taskStats.completed}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">W trakcie:</span>
+                                <span className="font-bold text-sky-600">{taskStats.inProgress}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Do zrobienia:</span>
+                                <span className="font-bold text-gray-600">{taskStats.todo}</span>
+                            </div>
+                        </div>
+                    </StatCard>
                 </div>
-                <div className="mt-auto pt-8 text-center text-xs text-slate-400">
+                <div className="mt-auto pt-8 text-center text-xs text-gray-400">
                     <p>
                         Utworzony przez{' '}
-                        <span className="font-semibold text-slate-500">
+                        <span className="font-semibold text-gray-500">
                             {project.createdBy.username}
                         </span>
                     </p>
@@ -407,9 +933,9 @@ export default function ProjectDetails() {
                 </div>
             </aside>
 
-            {/* --- GŁÓWNA ZAWARTOŚĆ --- */}
+            {/* GŁÓWNA ZAWARTOŚĆ */}
             <main className="w-full flex-grow p-6 lg:p-10">
-                <header className="relative mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 p-8 shadow-2xl shadow-emerald-200">
+                <header className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-500 p-8 shadow-xl shadow-emerald-300/50">
                     <div className="relative z-10">
                         {isEditing && isAdmin ? (
                             <input
@@ -432,7 +958,7 @@ export default function ProjectDetails() {
                                         <button
                                             onClick={handleSave}
                                             disabled={isSaving}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-emerald-700 shadow-md transition-all hover:bg-slate-200 disabled:opacity-60"
+                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-emerald-700 shadow-md transition-all duration-200 ease-in-out hover:bg-gray-200 hover:scale-[1.02] disabled:opacity-60"
                                         >
                                             {isSaving ? (
                                                 'Zapisywanie...'
@@ -447,7 +973,7 @@ export default function ProjectDetails() {
                                                 setIsEditing(false);
                                                 fetchData();
                                             }}
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all hover:bg-black/30"
+                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all duration-200 ease-in-out hover:bg-black/30 hover:scale-[1.02]"
                                         >
                                             <Icon.Cancel /> Anuluj
                                         </button>
@@ -476,6 +1002,7 @@ export default function ProjectDetails() {
                 </header>
 
                 <div className="animate-fade-in space-y-8">
+                    {/* OPIS PROJEKTU */}
                     <ContentCard icon={<Icon.Info />} title="Opis projektu">
                         {isEditing && isAdmin ? (
                             <textarea
@@ -483,16 +1010,140 @@ export default function ProjectDetails() {
                                 value={editData.description}
                                 onChange={handleEditChange}
                                 rows="6"
-                                className="w-full rounded-lg border border-slate-300 bg-slate-50 p-3 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500"
                                 placeholder="Dodaj szczegółowy opis..."
                             />
                         ) : (
-                            <p className="whitespace-pre-wrap leading-relaxed text-slate-600">
+                            <p className="whitespace-pre-wrap leading-relaxed text-gray-600">
                                 {project.description ||
                                     'Ten projekt nie ma jeszcze szczegółowego opisu.'}
                             </p>
                         )}
                     </ContentCard>
+
+                    {/* ZADANIA */}
+                    <ContentCard
+                        icon={<Icon.ListTodo />}
+                        title={`Zadania (${tasks.length})`}
+                        actions={
+                            isAdmin && (
+                                <button
+                                    onClick={() => setShowAddTask(!showAddTask)}
+                                    className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white hover:bg-emerald-700"
+                                >
+                                    <Icon.Plus /> Dodaj zadanie
+                                </button>
+                            )
+                        }
+                    >
+                        {showAddTask && (
+                            <div className="mb-6 rounded-lg border-2 border-emerald-300 bg-emerald-50 p-4">
+                                <input
+                                    type="text"
+                                    value={newTask.title}
+                                    onChange={(e) =>
+                                        setNewTask({ ...newTask, title: e.target.value })
+                                    }
+                                    placeholder="Tytuł zadania"
+                                    className="mb-2 w-full rounded border border-gray-300 p-2"
+                                />
+                                <textarea
+                                    value={newTask.description}
+                                    onChange={(e) =>
+                                        setNewTask({ ...newTask, description: e.target.value })
+                                    }
+                                    placeholder="Opis zadania (opcjonalnie)"
+                                    className="mb-2 w-full rounded border border-gray-300 p-2"
+                                    rows="2"
+                                />
+                                <div className="mb-2 flex gap-2">
+                                    <select
+                                        value={newTask.priority}
+                                        onChange={(e) =>
+                                            setNewTask({ ...newTask, priority: e.target.value })
+                                        }
+                                        className="rounded border border-gray-300 p-2"
+                                    >
+                                        {AVAILABLE_PRIORITIES.map((p) => (
+                                            <option key={p} value={p}>
+                                                {p}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        value={newTask.assignedTo}
+                                        onChange={(e) =>
+                                            setNewTask({ ...newTask, assignedTo: e.target.value })
+                                        }
+                                        className="flex-1 rounded border border-gray-300 p-2"
+                                    >
+                                        <option value="">Nie przypisano</option>
+                                        {project.assignedUsers.map((user) => (
+                                            <option key={user._id} value={user._id}>
+                                                {user.username}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <input
+                                        type="date"
+                                        value={newTask.dueDate}
+                                        onChange={(e) =>
+                                            setNewTask({ ...newTask, dueDate: e.target.value })
+                                        }
+                                        className="rounded border border-gray-300 p-2"
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleAddTask}
+                                        disabled={isAddingTask}
+                                        className="flex items-center gap-1 rounded bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isAddingTask ? (
+                                            <>
+                                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Dodawanie...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Icon.Plus /> Dodaj
+                                            </>
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={() => setShowAddTask(false)}
+                                        className="flex items-center gap-1 rounded bg-gray-300 px-4 py-2 text-sm hover:bg-gray-400"
+                                    >
+                                        <Icon.Cancel /> Anuluj
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-3">
+                            {tasks.length === 0 ? (
+                                <p className="text-center text-gray-500 py-8">
+                                    Nie ma jeszcze żadnych zadań. {isAdmin && 'Kliknij "Dodaj zadanie" aby utworzyć pierwsze.'}
+                                </p>
+                            ) : (
+                                tasks.map((task) => (
+                                    <TaskItem
+                                        key={task._id}
+                                        task={task}
+                                        onUpdate={fetchTasks}
+                                        onDelete={handleDeleteTask}
+                                        projectUsers={project.assignedUsers}
+                                        isAdmin={isAdmin}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </ContentCard>
+
+                    {/* ZESPÓŁ PROJEKTOWY */}
                     <ContentCard
                         icon={<Icon.Users />}
                         title={`Zespół projektowy (${project.assignedUsers.length})`}
@@ -501,7 +1152,7 @@ export default function ProjectDetails() {
                             {project.assignedUsers.map((user) => (
                                 <div
                                     key={user._id}
-                                    className="flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
+                                    className="flex cursor-pointer items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
                                 >
                                     <div
                                         className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-base font-bold text-white ${user.role === 'admin' ? 'bg-purple-500' : 'bg-emerald-500'}`}
@@ -509,22 +1160,113 @@ export default function ProjectDetails() {
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-slate-800">
+                                        <p className="font-semibold text-gray-800">
                                             {user.username}
                                         </p>
-                                        <p className="text-sm text-slate-500">
+                                        <p className="text-sm text-gray-500">
                                             {user.email}
                                         </p>
                                     </div>
                                 </div>
                             ))}
                             {project.assignedUsers.length === 0 && (
-                                <p className="col-span-full text-slate-500">
+                                <p className="col-span-full text-gray-500">
                                     Do tego projektu nie przypisano jeszcze
                                     żadnych użytkowników.
                                 </p>
                             )}
                         </div>
+                    </ContentCard>
+
+                    {/* KOMENTARZE */}
+                    <ContentCard
+                        icon={<Icon.Message />}
+                        title={`Komentarze (${comments.length})`}
+                    >
+                        <div className="mb-6">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                                    placeholder="Dodaj komentarz..."
+                                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+                                />
+                                <button
+                                    onClick={handleAddComment}
+                                    className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+                                >
+                                    <Icon.Send />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {comments.length === 0 ? (
+                                <p className="text-center text-gray-500 py-8">
+                                    Brak komentarzy. Bądź pierwszy!
+                                </p>
+                            ) : (
+                                comments.map((comment) => (
+                                    <CommentItem
+                                        key={comment._id}
+                                        comment={comment}
+                                        onDelete={handleDeleteComment}
+                                        onReply={handleReplyComment}
+                                        currentUserId={currentUser._id}
+                                        isAdmin={isAdmin}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </ContentCard>
+
+                    {/* HISTORIA AKTYWNOŚCI */}
+                    <ContentCard
+                        icon={<Icon.Activity />}
+                        title={`Historia aktywności (${activities.length})`}
+                        actions={
+                            <button
+                                onClick={() => setShowActivities(!showActivities)}
+                                className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
+                            >
+                                {showActivities ? 'Ukryj' : 'Pokaż'}
+                                {showActivities ? <Icon.ChevronDown /> : <Icon.ChevronRight />}
+                            </button>
+                        }
+                    >
+                        {showActivities && (
+                            <div className="space-y-3">
+                                {activities.length === 0 ? (
+                                                                    <p className="text-center text-gray-500 py-4">
+                                                                        Brak aktywności
+                                                                    </p>
+                                                                ) : (
+                                                                    activities.map((activity) => (
+                                                                                                            <div
+                                                                                                                key={activity._id}
+                                                                                                                className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:shadow-sm hover:scale-[1.005]"
+                                                                                                            >                                                                            <div className="h-8 w-8 flex-shrink-0 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                                                <span className="text-emerald-600 text-xs font-bold">
+                                                                                    {activity.user.username.charAt(0).toUpperCase()}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="flex-1">
+                                                                                <p className="text-sm text-gray-700">
+                                                                                    <span className="font-semibold">
+                                                                                        {activity.user.username}
+                                                                                    </span>{' '}
+                                                                                    {activity.description}
+                                                                                </p>
+                                                                                <p className="text-xs text-gray-400 mt-1">
+                                                                                    {moment(activity.createdAt).fromNow()}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))                                )}
+                            </div>
+                        )}
                     </ContentCard>
                 </div>
                 {showUserModal && (
