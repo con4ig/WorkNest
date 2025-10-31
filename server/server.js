@@ -15,6 +15,7 @@ import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
 import leaveRoutes from "./routes/leave.js";
 import userRoutes from "./routes/user.js";
+import taskRoutes from "./routes/task.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/tasks", taskRoutes)
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
