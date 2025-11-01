@@ -41,47 +41,41 @@ router.get("/my", authenticate, async (req, res) => {
       .populate("reviewedBy", "username")
       .sort({ createdAt: -1 });
 
+    const leavesWithDays = leaves.map((l) => ({
+      ...l.toObject(),
+      days: getWorkingDays(l.startDate, l.endDate),
+    }));
+
     const stats = {
       pending: leaves.filter((l) => l.status === "pending").length,
       approved: leaves.filter((l) => l.status === "approved").length,
       rejected: leaves.filter((l) => l.status === "rejected").length,
       totalDays: leaves
         .filter((l) => l.status === "approved")
-        .reduce((sum, l) => sum + l.days, 0),
+        .reduce((sum, l) => sum + getWorkingDays(l.startDate, l.endDate), 0),
     };
 
-    res.json({ leaves, stats });
+    res.json({ leaves: leavesWithDays, stats });
   } catch (err) {
     console.error("Error fetching my leaves:", err);
     res.status(500).json({ message: "Błąd serwera" });
   }
 });
 
-// GET /api/leaves/:id - szczegóły urlopu
-router.get("/:id", authenticate, async (req, res) => {
-  try {
-    const leave = await Leave.findById(req.params.id)
-      .populate("user", "username email")
-      .populate("reviewedBy", "username");
+const getWorkingDays = (start, end) => {
+  let count = 0;
+  const current = new Date(start);
+  const endDate = new Date(end);
 
-    if (!leave) {
-      return res.status(404).json({ message: "Wniosek nie znaleziony" });
+  while (current <= endDate) {
+    const day = current.getDay();
+    if (day !== 0 && day !== 6) {
+      count++;
     }
-
-    // Employee może zobaczyć tylko swoje
-    if (
-      req.user.role === "employee" &&
-      leave.user._id.toString() !== req.user._id
-    ) {
-      return res.status(403).json({ message: "Brak dostępu" });
-    }
-
-    res.json(leave);
-  } catch (err) {
-    console.error("Error fetching leave:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    current.setDate(current.getDate() + 1);
   }
-});
+  return count;
+};
 
 // POST /api/leaves - utworzenie wniosku urlopowego
 router.post("/", authenticate, async (req, res) => {
@@ -96,7 +90,7 @@ router.post("/", authenticate, async (req, res) => {
   // Oblicz liczbę dni
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+  const days = getWorkingDays(start, end);
 
   if (days <= 0) {
     return res.status(400).json({
