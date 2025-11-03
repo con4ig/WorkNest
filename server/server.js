@@ -46,7 +46,7 @@ mongoose
   .catch((err) => console.error("Błąd połączenia:", err));
 
 // Trasy
-app.use("/api/email", emailRoutes);
+// app.use("/api/email", emailRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/leaves", leaveRoutes);
