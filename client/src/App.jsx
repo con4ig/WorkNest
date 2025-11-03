@@ -49,7 +49,6 @@ function App() {
             <Navbar />
 
             <div className="relative overflow-hidden pt-12">
-                {/* Bajeranckie Tło (Green/Teal) */}
                 <div className="absolute inset-0 z-0 opacity-50">
                     <div className="absolute right-0 top-0 h-[450px] w-[450px] -translate-y-1/3 translate-x-1/3 transform rounded-full bg-emerald-200/50 blur-[150px]" />
                     <div className="absolute bottom-0 left-0 h-[550px] w-[550px] -translate-x-1/2 translate-y-1/2 transform rounded-full bg-teal-200/50 blur-[180px]" />

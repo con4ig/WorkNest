@@ -3,11 +3,8 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+import rateLimit from "express-rate-limit";
 import User from "./models/User.js";
-import Leave from "./models/Leave.js";
 import authenticate from "./middleware/authenticate.js";
 import authorize from "./middleware/authorize.js";
 import emailRoutes from "./routes/email.js";
@@ -31,6 +28,14 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  })
+);
 
 const PORT = process.env.PORT || 5500;
 
@@ -50,30 +55,10 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/activities", activityRoutes);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // Wylogowanie użytkownika
 app.post("/api/auth/logout", (req, res) => {
   res.clearCookie("token");
   res.json({ message: "Wylogowano pomyślnie" });
-});
-
-// Pobieranie danych zalogowanego użytkownika
-app.get("/api/auth/me", authenticate, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select("-password");
-    res.json({
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-      profileImage: user.profileImage
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Błąd serwera" });
-  }
 });
 
 app.listen(PORT, () => {
