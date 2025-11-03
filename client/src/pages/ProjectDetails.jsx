@@ -29,8 +29,6 @@ import 'moment/locale/pl';
 
 moment.locale('pl');
 
-axios.defaults.baseURL = 'http://localhost:5500';
-
 const formatDateForDisplay = (dateString) => {
     if (!dateString) return 'Nie określono';
     try {

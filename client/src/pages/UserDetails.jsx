@@ -16,9 +16,6 @@ import {
     Badge,
 } from 'lucide-react';
 
-// Konfiguracja Axios
-axios.defaults.baseURL = 'http://localhost:5500';
-
 // --- Pomocnicze funkcje formatowania ---
 const formatDateForDisplay = (dateString) => {
     if (!dateString) return 'Nie określono';

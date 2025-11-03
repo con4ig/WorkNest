@@ -11,10 +11,6 @@ import {
     MoreVertical,
 } from 'lucide-react'; // Dodano MoreVertical dla menu akcji na mobilnych
 
-const API_BASE_URL = 'http://localhost:5500/api';
-axios.defaults.baseURL = API_BASE_URL;
-axios.defaults.withCredentials = true;
-
 // --- Style i dane pomocnicze (bez zmian) ---
 const statusStyles = {
     pending: {
