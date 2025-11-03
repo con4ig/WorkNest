@@ -28,6 +28,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.set('trust proxy', 1);
 app.use(
   rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
