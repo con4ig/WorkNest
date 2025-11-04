@@ -17,6 +17,9 @@ import Regulamin from './pages/Regulamin.jsx';
 import Polityka from './pages/Poltyka_prywatnosc.jsx';
 import UserDetails from './pages/UserDetails.jsx';
 import Upload from './pages/Upload.jsx';
+import axios from 'axios';
+
+axios.defaults.baseURL = 'https://worknest-qpsw.onrender.com';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
