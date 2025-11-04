@@ -19,7 +19,8 @@ import UserDetails from './pages/UserDetails.jsx';
 import Upload from './pages/Upload.jsx';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'https://worknest-qpsw.onrender.com';
+axios.defaults.baseURL = import.meta.env.PROD ? 'https://worknest-qpsw.onrender.com' : 'http://localhost:5500';
+axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

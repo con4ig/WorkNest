@@ -10,10 +10,14 @@ export default function Navbar() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get('/api/auth/me', { withCredentials: true });
+        const res = await axios.get('/api/auth/me');
         setUsername(res.data.username);
       } catch (err) {
-        console.error('Błąd przy autoryzacji:', err);
+        if (err.response && err.response.status === 401) {
+          // Oczekiwany błąd, gdy użytkownik nie jest zalogowany - nie trzeba go logować.
+        } else {
+          console.error('Błąd przy sprawdzaniu autoryzacji:', err);
+        }
         setUsername(null); // nie zalogowany
       }
     };
