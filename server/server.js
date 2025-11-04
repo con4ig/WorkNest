@@ -21,7 +21,7 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "http://localhost:5173", // adres frontendu
+    origin: ["http://localhost:5173", "https://worknesthr.ct.ws"], // adres frontendu
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
