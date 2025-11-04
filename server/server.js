@@ -19,9 +19,17 @@ import activityRoutes from "./routes/activity.js";
 dotenv.config();
 
 const app = express();
+const allowedOrigins = ['http://localhost:5173', 'https://worknesthr.ct.ws'];
+
 app.use(
   cors({
-    origin: ['*'], // adres frontendu
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS blocked: origin not allowed'));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
