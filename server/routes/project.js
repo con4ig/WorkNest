@@ -69,12 +69,15 @@ router.patch(
 // GET /api/projects - lista wszystkich projektów
 router.get("/", authenticate, async (req, res) => {
   try {
-    // 1. POBIERANIE PARAMETRÓW Z URL
-    const { status, sortBy, limit } = req.query;
-    const limitNum = parseInt(limit) || 0; // Przekształcamy limit na liczbę
+    const { status, sortBy, limit, name } = req.query; // Dodano `name`
+    const limitNum = parseInt(limit) || 0;
 
-    // Zmienna do budowania warunków Mongoose (find)
     let query = {};
+
+    // Nowość: Filtrowanie po nazwie projektu (jeśli podano)
+    if (name) {
+      query.name = { $regex: name, $options: "i" }; 
+    }
 
     // Domyślne opcje sortowania (można je nadpisać)
     let sortOptions = { createdAt: -1 };
