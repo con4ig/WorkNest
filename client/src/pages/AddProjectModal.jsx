@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Icon = {
     X: () => (
@@ -16,6 +17,9 @@ const Icon = {
 };
 
 export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
+    const { user } = useAuth();
+    const companyId = user?.company?._id;
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -31,14 +35,15 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && companyId) {
             fetchUsers();
         }
-    }, [isOpen]);
+    }, [isOpen, companyId]);
 
     const fetchUsers = async () => {
         try {
             const res = await axios.get('/api/users', {
+                params: { company: companyId },
                 withCredentials: true,
             });
             setUsers(res.data.users);
@@ -69,20 +74,18 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            // Krok 1: ODBIERZ ODPOWIEDŹ Z SERWERA
-            const response = await axios.post('/api/projects', formData, {
-                withCredentials: true,
-            });
+            const response = await axios.post(
+                '/api/projects',
+                { ...formData, company: companyId },
+                {
+                    withCredentials: true,
+                },
+            );
 
-            // Krok 2: WYDOBYJ OBIEKT PROJEKTU Z ODPOWIEDZI
-            // Upewnij się, że to odpowiada strukturze odpowiedzi z server.js!
             const newProject = response.data.project;
 
-            // Krok 3: Wywołanie onSuccess z DANYMI PROJEKTU
-            onSuccess(newProject); // 👈 TUTAJ PRAWDOPODOBNIE JEST PROBLEM
+            onSuccess(newProject);
 
-            // Reset i zamknięcie
-            // ... reset form data ...
             onClose();
         } catch (err) {
             console.error('Error creating project:', err);

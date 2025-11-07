@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import RequestLeaveModal from '../components/RequestLeaveModal';
+import { useAuth } from '../context/AuthContext';
 
 const Icon = {
     ArrowLeft: () => (
@@ -67,15 +68,20 @@ export default function MyLeaves() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     useEffect(() => {
-        fetchLeaves();
-    }, []);
+        if (user && user.company) {
+            fetchLeaves();
+        }
+    }, [user]);
 
     const fetchLeaves = async () => {
+        if (!user || !user.company) return;
         try {
             const res = await axios.get('/api/leaves/my', {
                 withCredentials: true,
+                params: { company: user.company._id },
             });
             setLeaves(res.data.leaves);
             setStats(res.data.stats);
@@ -91,9 +97,13 @@ export default function MyLeaves() {
 
     const handleDelete = async (id) => {
         if (!window.confirm('Czy na pewno chcesz usunąć ten wniosek?')) return;
+        if (!user || !user.company) return;
 
         try {
-            await axios.delete(`/api/leaves/${id}`, { withCredentials: true });
+            await axios.delete(`/api/leaves/${id}`, {
+                withCredentials: true,
+                params: { company: user.company._id },
+            });
             fetchLeaves();
         } catch (err) {
             console.error('Error deleting leave:', err);

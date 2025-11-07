@@ -9,7 +9,8 @@ import {
     ArrowLeft,
     FolderKanban,
     MoreVertical,
-} from 'lucide-react'; 
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 // --- Style i dane pomocnicze (bez zmian) ---
 const statusStyles = {
@@ -35,8 +36,8 @@ const formatDate = (dateString) => {
     });
 };
 
-// --- Custom Hook (bez zmian) ---
-const useProjects = () => {
+// --- Custom Hook ---
+const useProjects = (companyId) => {
     const [projects, setProjects] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -44,10 +45,16 @@ const useProjects = () => {
 
     const fetchProjects = useCallback(
         async (params = {}) => {
+            if (!companyId) {
+                setIsLoading(false);
+                return; // Nie pobieraj projektów, jeśli companyId nie jest dostępne
+            }
             setIsLoading(true);
             setError(null);
             try {
-                const response = await axios.get('/api/projects', { params });
+                const response = await axios.get('/api/projects', {
+                    params: { ...params, company: companyId },
+                });
                 setProjects(response.data.projects);
             } catch (err) {
                 console.error('Błąd ładowania projektów:', err);
@@ -63,7 +70,7 @@ const useProjects = () => {
                 setIsLoading(false);
             }
         },
-        [navigate],
+        [navigate, companyId],
     );
 
     return { projects, setProjects, isLoading, error, fetchProjects };
@@ -372,32 +379,29 @@ const ProjectTableSkeleton = () =>
 
 // --- Główny komponent strony (ZREFRAKTORYZOWANY) ---
 export default function Projekty() {
+    const { user, loading: authLoading } = useAuth();
+    const companyId = user?.company?._id;
+    const currentUserRole = user?.role;
+
     const { projects, setProjects, isLoading, error, fetchProjects } =
-        useProjects();
+        useProjects(companyId);
     const navigate = useNavigate();
     const [filters, setFilters] = useState({ name: '', status: '' });
-    const [currentUserRole, setCurrentUserRole] = useState(null);
 
     useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await axios.get('/api/auth/me');
-                setCurrentUserRole(res.data.role);
-            } catch (e) {
-                console.error(`Błąd autoryzacji: ${e.message}`);
-            }
-        };
-        checkAuth();
-    }, []);
-
-    useEffect(() => {
-        fetchProjects(filters);
-    }, [filters, fetchProjects]);
+        if (companyId) {
+            fetchProjects(filters);
+        }
+    }, [filters, fetchProjects, companyId]);
 
     const handleDelete = async (projectId) => {
         if (!window.confirm('Czy na pewno chcesz usunąć ten projekt?')) return;
+        if (!companyId) return;
         try {
-            await axios.delete(`/api/projects/${projectId}`);
+            await axios.delete(`/api/projects/${projectId}`, {
+                withCredentials: true,
+                params: { company: companyId },
+            });
             setProjects((prev) => prev.filter((p) => p._id !== projectId));
         } catch (error) {
             alert('Wystąpił błąd podczas usuwania projektu.');
@@ -411,21 +415,7 @@ export default function Projekty() {
 
     // Funkcja renderująca zawartość w zależności od stanu (ładowanie, błąd, dane)
     const renderContent = () => {
-        if (error) {
-            return (
-                <div className="py-10 text-center text-red-600">{error}</div>
-            );
-        }
-        if (projects.length === 0 && !isLoading) {
-            return (
-                <div className="py-10 text-center text-slate-500">
-                    Nie znaleziono projektów.
-                </div>
-            );
-        }
-
-        // ZMIANA: Renderowanie odpowiedniego Skeleto na podstawie widoku
-        if (isLoading) {
+        if (authLoading || isLoading) {
             return (
                 <>
                     {/* Skeleton dla widoku tabeli (desktop) */}
@@ -439,6 +429,19 @@ export default function Projekty() {
                         <ProjectCardSkeleton />
                     </div>
                 </>
+            );
+        }
+
+        if (error) {
+            return (
+                <div className="py-10 text-center text-red-600">{error}</div>
+            );
+        }
+        if (projects.length === 0 && !isLoading) {
+            return (
+                <div className="py-10 text-center text-slate-500">
+                    Nie znaleziono projektów.
+                </div>
             );
         }
 

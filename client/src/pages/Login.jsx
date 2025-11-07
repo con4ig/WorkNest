@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -14,13 +14,11 @@ export default function Login() {
         formState: { errors },
     } = useForm();
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const onSubmit = async (data) => {
         try {
-            await axios.post('/api/auth/login', data, {
-                withCredentials: true,
-            });
-
+            await login(data.email, data.password);
             navigate('/dashboard');
         } catch (err) {
             alert(err.response?.data?.message || 'Błąd logowania');

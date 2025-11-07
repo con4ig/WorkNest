@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Icon = {
     X: () => (
@@ -25,6 +26,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const { user } = useAuth();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -72,13 +74,18 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
             return;
         }
 
+        if (!user || !user.company) {
+            setError('Brak danych firmy dla bieżącego użytkownika.');
+            return;
+        }
+
         setLoading(true);
         setError('');
 
         try {
             await axios.post(
                 '/api/leaves',
-                { ...formData, days },
+                { ...formData, days, company: user.company._id },
                 { withCredentials: true },
             );
 

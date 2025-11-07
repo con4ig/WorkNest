@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Icon = {
     Close: () => (
@@ -50,6 +51,9 @@ const Icon = {
 };
 
 export default function UserManagementModal({ project, onClose, onUpdate }) {
+    const { user } = useAuth();
+    const companyId = user?.company?._id;
+
     const [searchTerm, setSearchTerm] = useState('');
     const [availableUsers, setAvailableUsers] = useState([]);
     const [loadingSearch, setLoadingSearch] = useState(false);
@@ -58,6 +62,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
 
     // Funkcja do wyszukiwania użytkowników
     const handleSearch = async (term) => {
+        if (!companyId) return; // Nie wyszukuj, jeśli companyId nie jest dostępne
         if (term.trim().length < 2) {
             setAvailableUsers([]);
             return;
@@ -96,10 +101,11 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         }, 500); // 500ms delay
 
         return () => clearTimeout(timer);
-    }, [searchTerm, project.assignedUsers]); // WAŻNE: dodaj project.assignedUsers jako dependency
+    }, [searchTerm, project.assignedUsers, companyId]); // WAŻNE: dodaj companyId jako dependency
 
     // Funkcja do dodawania/usuwania użytkownika
     const handleToggleUser = async (userId, action) => {
+        if (!companyId) return; // Nie wykonuj akcji, jeśli companyId nie jest dostępne
         setIsUpdating(true);
         try {
             const response = await axios.patch(

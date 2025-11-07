@@ -23,7 +23,21 @@ router.patch(
     }
 
     try {
-      const project = await Project.findById(req.params.id);
+      let query = { _id: req.params.id };
+
+      // Company isolation: Only allow modifying projects from the same company
+      if (req.user.role !== "superadmin") {
+        if (!req.user.company) {
+          return res
+            .status(403)
+            .json({
+              message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            });
+        }
+        query.company = req.user.company._id;
+      }
+
+      const project = await Project.findOne(query);
 
       if (!project) {
         return res.status(404).json({ message: "Projekt nie znaleziony" });
@@ -69,14 +83,18 @@ router.patch(
 // GET /api/projects - lista wszystkich projektów
 router.get("/", authenticate, async (req, res) => {
   try {
-    const { status, sortBy, limit, name } = req.query; 
-    const limitNum = parseInt(limit) || 0;
+    const { status, sortBy, limit, name } = req.query;
 
     let query = {};
 
+    // Company isolation
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
     // Nowość: Filtrowanie po nazwie projektu (jeśli podano)
     if (name) {
-      query.name = { $regex: name, $options: "i" }; 
+      query.name = { $regex: name, $options: "i" };
     }
 
     // Domyślne opcje sortowania (można je nadpisać)
@@ -110,9 +128,9 @@ router.get("/", authenticate, async (req, res) => {
       .sort(sortOptions); // Zastosowanie dynamicznych opcji sortowania
 
     // 6. LIMITOWANIE (KLUCZOWY KROK DLA TWOJEGO ZAGADNIENIA)
-    if (limitNum > 0) {
+    if (limit && parseInt(limit) > 0) {
       // Zastosowanie limitu po sortowaniu
-      projectsQuery = projectsQuery.limit(limitNum);
+      projectsQuery = projectsQuery.limit(parseInt(limit));
     }
 
     // 7. WYKONANIE ZAPYTANIA
@@ -133,7 +151,10 @@ router.get("/stats", authenticate, async (req, res) => {
   try {
     let query = {};
 
-    // Employee widzi tylko swoje projekty
+    // Company isolation
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
     if (req.user.role === "employee") {
       query.assignedUsers = req.user._id;
     }
@@ -167,7 +188,21 @@ router.get("/stats", authenticate, async (req, res) => {
 // GET /api/projects/:id - szczegóły projektu
 router.get("/:id", authenticate, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id)
+    let query = { _id: req.params.id };
+
+    // Company isolation: Only allow fetching projects from the same company
+    if (req.user.role !== "superadmin") {
+      if (!req.user.company) {
+        return res
+          .status(403)
+          .json({
+            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+          });
+      }
+      query.company = req.user.company._id;
+    }
+
+    const project = await Project.findOne(query)
       .populate("assignedUsers", "username email role")
       .populate("createdBy", "username");
 
@@ -220,6 +255,7 @@ router.post("/", authenticate, authorize("admin", "hr"), async (req, res) => {
       endDate,
       assignedUsers: assignedUsers || [],
       createdBy: req.user._id,
+      company: req.user.company,
     });
 
     await project.save();
@@ -242,10 +278,14 @@ router.post("/", authenticate, authorize("admin", "hr"), async (req, res) => {
 router.patch("/:id", authenticate, authorize("admin"), async (req, res) => {
   try {
     const projectId = req.params.id;
-    const updates = req.body; // Zawiera name, description, status, priority, progress, startDate, endDate
+    const updates = req.body;
 
-    // UWAGA: Zabezpiecz aktualizację, aby np. nie można było zmieniać 'createdBy'
-    const result = await Project.findByIdAndUpdate(projectId, updates, {
+    const query = { _id: projectId };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    const result = await Project.findOneAndUpdate(query, updates, {
       new: true,
       runValidators: true,
     });
@@ -260,47 +300,15 @@ router.patch("/:id", authenticate, authorize("admin"), async (req, res) => {
   }
 });
 
-router.patch("/:id/users", authenticate, async (req, res) => {
-  const { userId, action } = req.body;
-  const projectId = req.params.id;
-
-  try {
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Projekt nie znaleziony" });
-    }
-
-    if (action === "add") {
-      if (!project.assignedUsers.includes(userId)) {
-        project.assignedUsers.push(userId);
-      }
-    } else if (action === "remove") {
-      project.assignedUsers = project.assignedUsers.filter(
-        (id) => id.toString() !== userId.toString() // Fix comparison
-      );
-    }
-
-    await project.save();
-
-    // Return updated project with populated users
-    const updatedProject = await Project.findById(projectId)
-      .populate("assignedUsers", "username email role")
-      .populate("createdBy", "username");
-
-    res.json({
-      message: "Użytkownicy zaktualizowani pomyślnie",
-      project: updatedProject,
-    });
-  } catch (err) {
-    console.error("Error updating project users:", err);
-    res.status(500).json({ message: "Błąd serwera", error: err.message });
-  }
-});
-
 // DELETE /api/projects/:id - usunięcie projektu (tylko admin)
 router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
   try {
-    const project = await Project.findByIdAndDelete(req.params.id);
+    const query = { _id: req.params.id };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    const project = await Project.findOneAndDelete(query);
 
     if (!project) {
       return res.status(404).json({ message: "Projekt nie znaleziony" });
@@ -315,22 +323,41 @@ router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
 
 // GET /api/projects/:userId/assigned-projects/summary - statystyki projektów przypisanych do użytkownika
 router.get(
-  '/users/:userId/assigned-projects/summary',
+  "/users/:userId/assigned-projects/summary",
   authenticate,
   async (req, res) => {
     try {
       const { userId } = req.params;
 
       // Opcjonalne zabezpieczenie: użytkownik może pobrać tylko swoje dane
-      if (req.user._id.toString() !== userId && req.user.role !== 'admin') {
-        return res.status(403).json({ error: 'Brak dostępu do danych innych użytkowników' });
+      if (req.user._id.toString() !== userId && req.user.role !== "admin") {
+        return res
+          .status(403)
+          .json({ error: "Brak dostępu do danych innych użytkowników" });
+      }
+
+      const companyQuery = {};
+      if (req.user.role !== "superadmin") {
+        companyQuery.company = req.user.company;
       }
 
       const [assigned, completed, running, pending] = await Promise.all([
-        Project.countDocuments({ assignedUsers: userId }),
-        Project.countDocuments({ assignedUsers: userId, status: 'completed' }),
-        Project.countDocuments({ assignedUsers: userId, status: 'running' }),
-        Project.countDocuments({ assignedUsers: userId, status: 'pending' }),
+        Project.countDocuments({ assignedUsers: userId, ...companyQuery }),
+        Project.countDocuments({
+          assignedUsers: userId,
+          status: "completed",
+          ...companyQuery,
+        }),
+        Project.countDocuments({
+          assignedUsers: userId,
+          status: "running",
+          ...companyQuery,
+        }),
+        Project.countDocuments({
+          assignedUsers: userId,
+          status: "pending",
+          ...companyQuery,
+        }),
       ]);
 
       res.json({
@@ -340,25 +367,28 @@ router.get(
         pending,
       });
     } catch (error) {
-      console.error('Błąd podczas pobierania statystyk użytkownika:', error);
-      res.status(500).json({ error: 'Błąd podczas pobierania danych' });
+      console.error("Błąd podczas pobierania statystyk użytkownika:", error);
+      res.status(500).json({ error: "Błąd podczas pobierania danych" });
     }
   }
 );
 
-
-
 router.get(
-  '/stats/summary',
+  "/stats/summary",
   authenticate,
-  authorize('admin', 'hr'),
+  authorize("admin", "hr"),
   async (req, res) => {
     try {
+      const query = {};
+      if (req.user.role !== "superadmin") {
+        query.company = req.user.company;
+      }
+
       const [total, running, pending, completed] = await Promise.all([
-        Project.countDocuments(),
-        Project.countDocuments({ status: 'running' }),
-        Project.countDocuments({ status: 'pending' }),
-        Project.countDocuments({ status: 'completed' }),
+        Project.countDocuments(query),
+        Project.countDocuments({ ...query, status: "running" }),
+        Project.countDocuments({ ...query, status: "pending" }),
+        Project.countDocuments({ ...query, status: "completed" }),
       ]);
 
       res.json({
@@ -368,11 +398,10 @@ router.get(
         completed,
       });
     } catch (error) {
-      console.error('Błąd podczas pobierania statystyk:', error);
-      res.status(500).json({ error: 'Błąd podczas pobierania statystyk' });
+      console.error("Błąd podczas pobierania statystyk:", error);
+      res.status(500).json({ error: "Błąd podczas pobierania statystyk" });
     }
   }
 );
-
 
 export default router;

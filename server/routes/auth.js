@@ -3,12 +3,121 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import User from "../models/User.js";
+import Company from "../models/Company.js";
 import authenticate from "../middleware/authenticate.js";
 
 const router = express.Router();
-
 const saltRounds = 10;
+
+// ============================================
+// POST /api/auth/register
+// Rejestracja użytkownika i obsługa firm
+// ============================================
+router.post("/register", async (req, res) => {
+  const { username, email, password, role, companyName, invitationCode } =
+    req.body;
+
+  if (!username || !email || !password || !role) {
+    return res.status(400).json({ message: "Wszystkie pola są wymagane" });
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ message: "Użytkownik o tym adresie email już istnieje" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    let companyId;
+
+    if (role === "admin") {
+      if (!companyName) {
+        return res
+          .status(400)
+          .json({ message: "Nazwa firmy jest wymagana dla administratora" });
+      }
+
+      // 1. Stwórz najpierw użytkownika (jeszcze bez firmy)
+      const newUser = new User({
+        username,
+        email,
+        password: hashedPassword,
+        role: "admin",
+      });
+      const savedUser = await newUser.save();
+
+      // 2. Stwórz firmę, używając ID nowo utworzonego użytkownika jako właściciela
+      const newCompany = new Company({
+        name: companyName,
+        owner: savedUser._id, // Od razu przypisz właściciela
+        invitationCode: crypto.randomBytes(8).toString("hex"),
+      });
+      const savedCompany = await newCompany.save();
+
+      // 3. Zaktualizuj użytkownika, dodając ID firmy
+      savedUser.company = savedCompany._id;
+      await savedUser.save();
+
+      return res.status(201).json({
+        message: "Firma i administrator zostali pomyślnie zarejestrowani",
+        user: {
+          _id: savedUser._id,
+          username: savedUser.username,
+          role: savedUser.role,
+        },
+        company: {
+          _id: savedCompany._id,
+          name: savedCompany.name,
+          invitationCode: savedCompany.invitationCode,
+        },
+      });
+    } else if (role === "employee") {
+      if (!invitationCode) {
+        return res
+          .status(400)
+          .json({ message: "Kod zaproszenia jest wymagany dla pracownika" });
+      }
+
+      const company = await Company.findOne({ invitationCode });
+      if (!company) {
+        return res
+          .status(404)
+          .json({ message: "Nieprawidłowy kod zaproszenia" });
+      }
+      companyId = company._id;
+
+      const newUser = new User({
+        username,
+        email,
+        password: hashedPassword,
+        role: "employee",
+        company: companyId,
+      });
+
+      const savedUser = await newUser.save();
+
+      return res.status(201).json({
+        message: "Pracownik został pomyślnie zarejestrowany",
+        user: {
+          _id: savedUser._id,
+          username: savedUser.username,
+          role: savedUser.role,
+        },
+      });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Nieprawidłowa rola użytkownika" });
+    }
+  } catch (err) {
+    console.error("Registration error:", err);
+    res.status(500).json({ message: "Błąd serwera podczas rejestracji" });
+  }
+});
 
 // ============================================
 // POST /api/auth/login
@@ -18,36 +127,36 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Walidacja
     if (!email || !password) {
       return res.status(400).json({ message: "Email i hasło są wymagane" });
     }
 
-    // Znajdź użytkownika
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("company", "name");
     if (!user) {
       return res.status(401).json({ message: "Nieprawidłowe dane logowania" });
     }
 
-    // Sprawdź hasło
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ message: "Nieprawidłowe dane logowania" });
     }
 
-    // Utwórz JWT token
-    const token = jwt.sign(
-      { _id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
+    const tokenPayload = {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      company: user.company ? user.company._id : null,
+    };
 
-    // Ustaw cookie z tokenem
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 24 godziny
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.json({
@@ -57,8 +166,7 @@ router.post("/login", async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        company: user.company,
         profileImage: user.profileImage || "",
       },
     });
@@ -74,43 +182,14 @@ router.post("/login", async (req, res) => {
 // ============================================
 router.get("/me", authenticate, async (req, res) => {
   try {
-    console.log("🔍 GET /api/auth/me - req.user:", req.user);
-
-    // req.user jest ustawiony przez middleware authenticate
-    if (!req.user || !req.user._id) {
-      console.log("❌ Brak req.user lub req.user._id");
+    // req.user jest już w pełni załadowany przez middleware authenticate
+    if (!req.user) {
       return res.status(401).json({ message: "Nie jesteś zalogowany" });
     }
 
-    const user = await User.findById(req.user._id).select("-password");
-    
-    if (!user) {
-      console.log("❌ Użytkownik nie znaleziony w bazie:", req.user._id);
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
-    }
-
-    console.log("✅ Użytkownik znaleziony:", {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      hasProfileImage: !!user.profileImage
-    });
-
-    // Zwróć dane w czytelnej formie
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      profileImage: user.profileImage || "",
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    });
+    res.json(req.user); // Zwróć cały obiekt użytkownika
   } catch (err) {
-    console.error("❌ Get me error:", err);
+    console.error("Get me error:", err);
     res.status(500).json({ message: "Błąd serwera", error: err.message });
   }
 });
@@ -127,42 +206,6 @@ router.post("/logout", (req, res) => {
   });
 
   res.json({ message: "Wylogowano pomyślnie" });
-});
-
-// ============================================
-// POST /api/auth/reset-password
-// Resetowanie hasła użytkownika
-// ============================================
-router.post("/reset-password", async (req, res) => {
-  const { email, newPassword } = req.body;
-
-  if (!email || !newPassword) {
-    return res
-      .status(400)
-      .json({ message: "Brak adresu email lub nowego hasła." });
-  }
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony." });
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-    user.password = hashedPassword;
-    await user.save();
-
-    return res
-      .status(200)
-      .json({ message: "Hasło zostało pomyślnie zresetowane." });
-  } catch (err) {
-    console.error("❌ Błąd resetowania hasła:", err);
-    return res.status(500).json({
-      message: "Wystąpił błąd serwera podczas zmiany hasła.",
-      error: process.env.NODE_ENV === "development" ? err.message : undefined,
-    });
-  }
 });
 
 export default router;

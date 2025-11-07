@@ -89,10 +89,10 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
-schema.pre('save', function(next) {
+schema.pre("save", function (next) {
   if (this.profileImage && this.profileImage.length > 10 * 1024 * 1024) {
     // 10MB jako string (Base64 jest ~33% większy niż oryginalny plik)
-    return next(new Error('Profile image is too large (max 10MB as Base64)'));
+    return next(new Error("Profile image is too large (max 10MB as Base64)"));
   }
   next();
 });

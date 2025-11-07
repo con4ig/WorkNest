@@ -2,14 +2,13 @@ import express from "express";
 import User from "../models/User.js";
 import authenticate from "../middleware/authenticate.js";
 import authorize from "../middleware/authorize.js";
-import multer from 'multer';
-
+import multer from "multer";
 
 const router = express.Router();
 
 // ============================================
 // GET /api/users
-// Lista wszystkich pracowników (HR i Admin)
+// Lista wszystkich pracowników (HR i Admin) - POPRAWIONY
 // ============================================
 router.get("/", authenticate, authorize("hr", "admin"), async (req, res) => {
   try {
@@ -17,9 +16,20 @@ router.get("/", authenticate, authorize("hr", "admin"), async (req, res) => {
 
     let query = {};
 
+    // Company isolation - pobierz ID firmy bezpiecznie
+    if (req.user.role !== "superadmin") {
+      const userCompanyId = req.user.company?._id || req.user.company;
+
+      if (!userCompanyId) {
+        return res.status(403).json({ message: "Brak przypisanej firmy" });
+      }
+
+      query.company = userCompanyId;
+    }
+
     // Jeśli jest parametr search - filtruj po username, email, firstName lub lastName
     if (search && search.trim().length >= 2) {
-      query = {
+      const searchQuery = {
         $or: [
           { username: { $regex: search.trim(), $options: "i" } },
           { email: { $regex: search.trim(), $options: "i" } },
@@ -27,6 +37,7 @@ router.get("/", authenticate, authorize("hr", "admin"), async (req, res) => {
           { lastName: { $regex: search.trim(), $options: "i" } },
         ],
       };
+      query = { $and: [query, searchQuery] };
     }
 
     const users = await User.find(query).select("-password");
@@ -51,7 +62,21 @@ router.get("/:id", authenticate, async (req, res) => {
       return res.status(401).json({ message: "Nie jesteś zalogowany" });
     }
 
-    const user = await User.findById(req.params.id).select("-password");
+    let query = { _id: req.params.id };
+
+    // Company isolation: Only allow fetching users from the same company
+    if (req.user.role !== "superadmin") {
+      if (!req.user.company) {
+        return res
+          .status(403)
+          .json({
+            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+          });
+      }
+      query.company = req.user.company._id;
+    }
+
+    const user = await User.findOne(query);
 
     if (!user) {
       return res.status(404).json({ message: "Użytkownik nie znaleziony" });
@@ -97,9 +122,7 @@ router.get("/:id", authenticate, async (req, res) => {
 
 // ============================================
 // PATCH /api/users/:id
-// Aktualizacja danych pracownika
-// - User może edytować swoje dane (bez roli)
-// - HR/Admin mogą edytować wszystko (w tym rolę)
+// Aktualizacja danych pracownika - POPRAWIONY
 // ============================================
 router.patch("/:id", authenticate, async (req, res) => {
   try {
@@ -173,17 +196,36 @@ router.patch("/:id", authenticate, async (req, res) => {
     if (!isAdmin && role) {
       return res
         .status(403)
-        .json({ message: "Nie możesz zmieniać swoją rolę" });
+        .json({ message: "Nie możesz zmieniać swojej roli" });
     }
 
     if (salary !== undefined && salary < 0) {
       return res.status(400).json({ message: "Pensja nie może być ujemna" });
     }
 
-    // Sprawdzenie czy użytkownik istnieje
+    // ✅ NAJPIERW POBIERZ UŻYTKOWNIKA
     const existingUser = await User.findById(userId);
     if (!existingUser) {
       return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+    }
+
+    // ✅ TERAZ SPRAWDŹ COMPANY ISOLATION
+    if (req.user.role !== "superadmin") {
+      // Pobierz ID firmy z obiektu lub bezpośrednio
+      const userCompanyId = req.user.company?._id || req.user.company;
+      const existingUserCompanyId =
+        existingUser.company?._id || existingUser.company;
+
+      if (!userCompanyId) {
+        return res.status(403).json({ message: "Brak przypisanej firmy" });
+      }
+
+      if (userCompanyId.toString() !== existingUserCompanyId.toString()) {
+        return res.status(403).json({
+          message:
+            "Nie masz uprawnień do edycji danych użytkownika z innej firmy",
+        });
+      }
     }
 
     // Sprawdzenie czy email już istnieje (jeśli zmienia się email)
@@ -208,7 +250,7 @@ router.patch("/:id", authenticate, async (req, res) => {
     if (salary !== undefined) updateData.salary = salary;
     if (status !== undefined) updateData.status = status;
     if (contractType !== undefined) updateData.contractType = contractType;
-    if (role !== undefined && isAdmin) updateData.role = role; // Tylko Admin może zmieniać rolę
+    if (role !== undefined && isAdmin) updateData.role = role;
     if (address !== undefined) updateData.address = address;
     if (city !== undefined) updateData.city = city;
     if (peselOrId !== undefined) updateData.peselOrId = peselOrId;
@@ -234,7 +276,7 @@ router.patch("/:id", authenticate, async (req, res) => {
 
 // ============================================
 // PATCH /api/users/:id/role
-// Zmiana roli użytkownika (tylko Admin)
+// Zmiana roli użytkownika (tylko Admin) - POPRAWIONY
 // ============================================
 router.patch(
   "/:id/role",
@@ -251,19 +293,43 @@ router.patch(
     }
 
     try {
-      const user = await User.findByIdAndUpdate(
-        req.params.id,
-        { role },
-        { new: true }
-      ).select("-password");
+      // ✅ NAJPIERW POBIERZ UŻYTKOWNIKA
+      const userToUpdate = await User.findById(req.params.id);
 
-      if (!user) {
+      if (!userToUpdate) {
         return res.status(404).json({ message: "Użytkownik nie znaleziony" });
       }
 
+      // ✅ TERAZ SPRAWDŹ COMPANY ISOLATION
+      if (req.user.role !== "superadmin") {
+        // Pobierz ID firmy z obiektu lub bezpośrednio
+        const adminCompanyId = req.user.company?._id || req.user.company;
+        const userCompanyId = userToUpdate.company?._id || userToUpdate.company;
+
+        if (!adminCompanyId) {
+          return res.status(403).json({ message: "Brak przypisanej firmy" });
+        }
+
+        if (adminCompanyId.toString() !== userCompanyId.toString()) {
+          return res.status(403).json({
+            message:
+              "Nie masz uprawnień do zmiany roli użytkownika z innej firmy",
+          });
+        }
+      }
+
+      // ✅ Zmień rolę
+      userToUpdate.role = role;
+      const updatedUser = await userToUpdate.save();
+
       res.json({
         message: "Rola zmieniona pomyślnie",
-        user,
+        user: {
+          _id: updatedUser._id,
+          username: updatedUser.username,
+          email: updatedUser.email,
+          role: updatedUser.role,
+        },
       });
     } catch (err) {
       console.error("Error updating role:", err);
@@ -272,116 +338,92 @@ router.patch(
   }
 );
 
-// ============================================
-// DELETE /api/users/:id
-// Usunięcie pracownika (tylko Admin)
-// ============================================
-router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
-  try {
-    // Nie pozwól usunąć samego siebie
-    if (req.user._id.toString() === req.params.id) {
-      return res
-        .status(400)
-        .json({ message: "Nie możesz usunąć własnego konta" });
-    }
-
-    const user = await User.findByIdAndDelete(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
-    }
-
-    res.json({ message: "Użytkownik usunięty pomyślnie" });
-  } catch (err) {
-    console.error("Error deleting user:", err);
-    res.status(500).json({ message: "Błąd serwera" });
-  }
-});
-
-
 // Konfiguracja multer - przechowuj w pamięci, nie na dysku
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype.startsWith("image/")) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files are allowed'));
+      cb(new Error("Only image files are allowed"));
     }
-  }
+  },
 });
 
 // Endpoint do uploadu zdjęcia profilowego
-router.put('/profile-image', authenticate, upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+router.put(
+  "/profile-image",
+  authenticate,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Konwertuj buffer na Base64 string
+      const base64Image = req.file.buffer.toString("base64");
+      const mimeType = req.file.mimetype;
+
+      // Zapisz jako data URL (łatwiejsze do wyświetlenia w frontendzie)
+      user.profileImage = `data:${mimeType};base64,${base64Image}`;
+
+      await user.save();
+
+      res.json({
+        message: "Profile image updated successfully",
+        profileImage: user.profileImage,
+      });
+    } catch (err) {
+      console.error("Upload error:", err);
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
     }
-
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Konwertuj buffer na Base64 string
-    const base64Image = req.file.buffer.toString('base64');
-    const mimeType = req.file.mimetype;
-    
-    // Zapisz jako data URL (łatwiejsze do wyświetlenia w frontendzie)
-    user.profileImage = `data:${mimeType};base64,${base64Image}`;
-    
-    await user.save();
-
-    res.json({
-      message: 'Profile image updated successfully',
-      profileImage: user.profileImage
-    });
-
-  } catch (err) {
-    console.error('Upload error:', err);
-    res.status(500).json({ 
-      message: 'Server error', 
-      error: err.message 
-    });
   }
-});
+);
 
 // Endpoint do pobierania zdjęcia profilowego (opcjonalny)
-router.get('/profile-image', authenticate, async (req, res) => {
+router.get("/profile-image", authenticate, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('profileImage');
-    
+    const user = await User.findById(req.user.id).select("profileImage");
+
     if (!user || !user.profileImage) {
-      return res.status(404).json({ message: 'No profile image found' });
+      return res.status(404).json({ message: "No profile image found" });
     }
 
     res.json({ profileImage: user.profileImage });
   } catch (err) {
-    console.error('Get image error:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error("Get image error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
 // Endpoint do usunięcia zdjęcia profilowego
-router.delete('/profile-image', authenticate, async (req, res) => {
+router.delete("/profile-image", authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     user.profileImage = "";
     await user.save();
 
-    res.json({ message: 'Profile image deleted successfully' });
+    res.json({ message: "Profile image deleted successfully" });
   } catch (err) {
-    console.error('Delete image error:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error("Delete image error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
-
 
 export default router;

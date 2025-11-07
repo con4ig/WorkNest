@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import 'moment/locale/pl';
+import { useAuth } from '../context/AuthContext';
 
 moment.locale('pl');
 
@@ -67,18 +68,26 @@ const Icon = {
     Info: ({ className = 'text-emerald-500' }) => (
         <Info className={`h-6 w-6 ${className}`} />
     ),
-    CheckCircle: ({ className }) => <CheckCircle2 className={`h-5 w-5 ${className}`} />,
+    CheckCircle: ({ className }) => (
+        <CheckCircle2 className={`h-5 w-5 ${className}`} />
+    ),
     Circle: ({ className }) => <Circle className={`h-5 w-5 ${className}`} />,
     Clock: ({ className }) => <Clock className={`h-5 w-5 ${className}`} />,
-    Message: ({ className = 'text-emerald-500' }) => <MessageSquare className={`h-6 w-6 ${className}`} />,
-    Activity: ({ className = 'text-emerald-500' }) => <ActivityIcon className={`h-6 w-6 ${className}`} />,
+    Message: ({ className = 'text-emerald-500' }) => (
+        <MessageSquare className={`h-6 w-6 ${className}`} />
+    ),
+    Activity: ({ className = 'text-emerald-500' }) => (
+        <ActivityIcon className={`h-6 w-6 ${className}`} />
+    ),
     Plus: () => <Plus className="h-4 w-4" />,
     Trash: () => <Trash2 className="h-4 w-4" />,
     Edit3: () => <Edit3 className="h-4 w-4" />,
     Send: () => <Send className="h-4 w-4" />,
     ChevronDown: () => <ChevronDown className="h-4 w-4" />,
     ChevronRight: () => <ChevronRight className="h-4 w-4" />,
-    ListTodo: ({ className = 'text-emerald-500' }) => <ListTodo className={`h-6 w-6 ${className}`} />,
+    ListTodo: ({ className = 'text-emerald-500' }) => (
+        <ListTodo className={`h-6 w-6 ${className}`} />
+    ),
 };
 
 const getStatusClasses = (status) => {
@@ -231,7 +240,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
             await axios.patch(
                 `/api/tasks/${task._id}`,
                 { status: nextStatus },
-                { withCredentials: true }
+                { withCredentials: true },
             );
             onUpdate();
         } catch (err) {
@@ -256,13 +265,20 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                 <input
                     type="text"
                     value={editData.title}
-                    onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                    onChange={(e) =>
+                        setEditData({ ...editData, title: e.target.value })
+                    }
                     className="mb-2 w-full rounded border border-gray-300 p-2"
                     placeholder="Tytuł zadania"
                 />
                 <textarea
                     value={editData.description}
-                    onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                    onChange={(e) =>
+                        setEditData({
+                            ...editData,
+                            description: e.target.value,
+                        })
+                    }
                     className="mb-2 w-full rounded border border-gray-300 p-2"
                     rows="2"
                     placeholder="Opis zadania"
@@ -270,7 +286,9 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                 <div className="mb-2 flex gap-2">
                     <select
                         value={editData.status}
-                        onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+                        onChange={(e) =>
+                            setEditData({ ...editData, status: e.target.value })
+                        }
                         className="rounded border border-gray-300 p-2"
                     >
                         {TASK_STATUSES.map((s) => (
@@ -281,7 +299,12 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                     </select>
                     <select
                         value={editData.priority}
-                        onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
+                        onChange={(e) =>
+                            setEditData({
+                                ...editData,
+                                priority: e.target.value,
+                            })
+                        }
                         className="rounded border border-gray-300 p-2"
                     >
                         {AVAILABLE_PRIORITIES.map((p) => (
@@ -290,12 +313,18 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                             </option>
                         ))}
                     </select>
-                                            <select
-                                                value={editData.assignedTo}
-                                                onChange={(e) => setEditData({ ...editData, assignedTo: e.target.value })}
-                                                className="flex-1 rounded border border-gray-300 p-2"
-                                            >
-                                                <option value="">Nie przypisano</option>                        {projectUsers.map((user) => (
+                    <select
+                        value={editData.assignedTo}
+                        onChange={(e) =>
+                            setEditData({
+                                ...editData,
+                                assignedTo: e.target.value,
+                            })
+                        }
+                        className="flex-1 rounded border border-gray-300 p-2"
+                    >
+                        <option value="">Nie przypisano</option>{' '}
+                        {projectUsers.map((user) => (
                             <option key={user._id} value={user._id}>
                                 {user.username}
                             </option>
@@ -305,7 +334,9 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                 <input
                     type="date"
                     value={editData.dueDate}
-                    onChange={(e) => setEditData({ ...editData, dueDate: e.target.value })}
+                    onChange={(e) =>
+                        setEditData({ ...editData, dueDate: e.target.value })
+                    }
                     className="mb-2 w-full rounded border border-gray-300 p-2"
                 />
                 <div className="flex gap-2">
@@ -327,7 +358,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
     }
 
     return (
-        <div className="group flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 ease-in-out hover:border-emerald-300 hover:shadow-lg hover:scale-[1.01]">
+        <div className="group flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 ease-in-out hover:scale-[1.01] hover:border-emerald-300 hover:shadow-lg">
             <button
                 onClick={toggleStatus}
                 className="mt-0.5 transition-transform hover:scale-110"
@@ -343,7 +374,9 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                             {task.title}
                         </h4>
                         {task.description && (
-                            <p className="mt-1 text-sm text-gray-600">{task.description}</p>
+                            <p className="mt-1 text-sm text-gray-600">
+                                {task.description}
+                            </p>
                         )}
                         <div className="mt-2 flex flex-wrap gap-2 text-xs">
                             <span
@@ -363,7 +396,8 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                             )}
                             {task.dueDate && (
                                 <span className="rounded-full bg-gray-100 px-2 py-1 text-gray-700">
-                                    📅 {moment(task.dueDate).format('DD MMM YYYY')}
+                                    📅{' '}
+                                    {moment(task.dueDate).format('DD MMM YYYY')}
                                 </span>
                             )}
                         </div>
@@ -378,7 +412,11 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                             </button>
                             <button
                                 onClick={() => {
-                                    if (window.confirm('Czy na pewno usunąć to zadanie?')) {
+                                    if (
+                                        window.confirm(
+                                            'Czy na pewno usunąć to zadanie?',
+                                        )
+                                    ) {
                                         onDelete(task._id);
                                     }
                                 }}
@@ -395,7 +433,13 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
 };
 
 // Komponent Komentarza
-const CommentItem = ({ comment, onDelete, onReply, currentUserId, isAdmin }) => {
+const CommentItem = ({
+    comment,
+    onDelete,
+    onReply,
+    currentUserId,
+    isAdmin,
+}) => {
     const [showReplies, setShowReplies] = useState(false);
     const [replyText, setReplyText] = useState('');
     const [isReplying, setIsReplying] = useState(false);
@@ -413,11 +457,11 @@ const CommentItem = ({ comment, onDelete, onReply, currentUserId, isAdmin }) => 
     return (
         <div className="border-l-2 border-gray-200 pl-4">
             <div className="mb-3 flex gap-3">
-                <div className="h-10 w-10 flex-shrink-0 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 font-bold text-white">
                     {comment.author.username.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
-                    <div className="rounded-lg bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:shadow-sm hover:scale-[1.005]">
+                    <div className="rounded-lg bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:scale-[1.005] hover:shadow-sm">
                         <div className="mb-1 flex items-center justify-between">
                             <span className="font-semibold text-gray-800">
                                 {comment.author.username}
@@ -436,7 +480,9 @@ const CommentItem = ({ comment, onDelete, onReply, currentUserId, isAdmin }) => 
                                 )}
                             </div>
                         </div>
-                        <p className="text-slate-700 whitespace-pre-wrap">{comment.content}</p>
+                        <p className="whitespace-pre-wrap text-slate-700">
+                            {comment.content}
+                        </p>
                     </div>
                     <div className="mt-2 flex gap-3 text-sm">
                         <button
@@ -450,22 +496,32 @@ const CommentItem = ({ comment, onDelete, onReply, currentUserId, isAdmin }) => 
                                 onClick={() => setShowReplies(!showReplies)}
                                 className="flex items-center gap-1 text-slate-600 hover:text-slate-700"
                             >
-                                {showReplies ? <Icon.ChevronDown /> : <Icon.ChevronRight />}
-                                {comment.replies.length} {comment.replies.length === 1 ? 'odpowiedź' : 'odpowiedzi'}
+                                {showReplies ? (
+                                    <Icon.ChevronDown />
+                                ) : (
+                                    <Icon.ChevronRight />
+                                )}
+                                {comment.replies.length}{' '}
+                                {comment.replies.length === 1
+                                    ? 'odpowiedź'
+                                    : 'odpowiedzi'}
                             </button>
                         )}
                     </div>
 
                     {isReplying && (
                         <div className="mt-3 flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={replyText}
-                                                    onChange={(e) => setReplyText(e.target.value)}
-                                                    onKeyPress={(e) => e.key === 'Enter' && handleReply()}
-                                                    placeholder="Napisz odpowiedź..."
-                                                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-                                                />                            <button
+                            <input
+                                type="text"
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                onKeyPress={(e) =>
+                                    e.key === 'Enter' && handleReply()
+                                }
+                                placeholder="Napisz odpowiedź..."
+                                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                            />{' '}
+                            <button
                                 onClick={handleReply}
                                 className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
                             >
@@ -474,29 +530,38 @@ const CommentItem = ({ comment, onDelete, onReply, currentUserId, isAdmin }) => 
                         </div>
                     )}
 
-                    {showReplies && comment.replies && comment.replies.length > 0 && (
-                        <div className="mt-3 space-y-3">
-                            {comment.replies.map((reply) => (
-                                <div key={reply._id} className="flex gap-2">
-                                    <div className="h-8 w-8 flex-shrink-0 rounded-full bg-slate-400 flex items-center justify-center text-white text-sm font-bold">
-                                        {reply.author.username.charAt(0).toUpperCase()}
+                    {showReplies &&
+                        comment.replies &&
+                        comment.replies.length > 0 && (
+                            <div className="mt-3 space-y-3">
+                                {comment.replies.map((reply) => (
+                                    <div key={reply._id} className="flex gap-2">
+                                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-400 text-sm font-bold text-white">
+                                            {reply.author.username
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="rounded-lg border border-gray-200 bg-white p-2">
+                                                <div className="mb-1 flex items-center justify-between">
+                                                    <span className="text-sm font-semibold text-gray-800">
+                                                        {reply.author.username}
+                                                    </span>
+                                                    <span className="text-xs text-gray-400">
+                                                        {moment(
+                                                            reply.createdAt,
+                                                        ).fromNow()}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-700">
+                                                    {reply.content}
+                                                </p>
+                                            </div>{' '}
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                                                        <div className="rounded-lg bg-white border border-gray-200 p-2">
-                                                                            <div className="mb-1 flex items-center justify-between">
-                                                                                <span className="text-sm font-semibold text-gray-800">
-                                                                                    {reply.author.username}
-                                                                                </span>
-                                                                                <span className="text-xs text-gray-400">
-                                                                                    {moment(reply.createdAt).fromNow()}
-                                                                                </span>
-                                                                            </div>
-                                                                            <p className="text-sm text-gray-700">{reply.content}</p>
-                                                                        </div>                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
                 </div>
             </div>
         </div>
@@ -508,7 +573,7 @@ export default function ProjectDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [project, setProject] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
+    const { user: currentUser } = useAuth(); // Use currentUser from AuthContext
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showUserModal, setShowUserModal] = useState(false);
@@ -539,11 +604,6 @@ export default function ProjectDetails() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const meRes = await axios.get('/api/auth/me', {
-                withCredentials: true,
-            });
-            setCurrentUser(meRes.data);
-            
             const res = await axios.get(`/api/projects/${id}`, {
                 withCredentials: true,
             });
@@ -559,7 +619,10 @@ export default function ProjectDetails() {
             });
             setError(null);
         } catch (err) {
-            setError(`Nie udało się załadować danych projektu: ${err.message}`);
+            console.error('Błąd pobierania projektu:', err);
+            setError(
+                `Nie udało się załadować danych projektu: ${err.response?.data?.message || err.message}`,
+            );
         } finally {
             setLoading(false);
         }
@@ -599,13 +662,20 @@ export default function ProjectDetails() {
     }, [id]);
 
     useEffect(() => {
-        if (id) {
+        if (id && currentUser) {
             fetchData();
             fetchTasks();
             fetchComments();
             fetchActivities();
         }
-    }, [id, fetchData, fetchTasks, fetchComments, fetchActivities]);
+    }, [
+        id,
+        currentUser,
+        fetchData,
+        fetchTasks,
+        fetchComments,
+        fetchActivities,
+    ]);
 
     const handleEditChange = (e) => {
         const { name, value, type } = e.target;
@@ -625,6 +695,7 @@ export default function ProjectDetails() {
                     ...editData,
                     startDate: editData.startDate || null,
                     endDate: editData.endDate || null,
+                    company: currentUser.company._id,
                 },
                 { withCredentials: true },
             );
@@ -652,7 +723,7 @@ export default function ProjectDetails() {
                     ...newTask,
                     project: id,
                 },
-                { withCredentials: true }
+                { withCredentials: true },
             );
             setNewTask({
                 title: '',
@@ -675,6 +746,7 @@ export default function ProjectDetails() {
         try {
             await axios.delete(`/api/tasks/${taskId}`, {
                 withCredentials: true,
+                params: { company: currentUser?.company?._id },
             });
             fetchTasks();
             fetchActivities();
@@ -693,7 +765,7 @@ export default function ProjectDetails() {
                     content: newComment,
                     project: id,
                 },
-                { withCredentials: true }
+                { withCredentials: true },
             );
             setNewComment('');
             fetchComments();
@@ -712,7 +784,7 @@ export default function ProjectDetails() {
                     project: id,
                     parentComment: parentId,
                 },
-                { withCredentials: true }
+                { withCredentials: true },
             );
             fetchComments();
         } catch (err) {
@@ -739,7 +811,7 @@ export default function ProjectDetails() {
         fetchActivities();
     }, [fetchData, fetchActivities]);
 
-    if (loading)
+    if (loading || !currentUser) {
         return (
             <div className="flex h-screen items-center justify-center bg-slate-50">
                 <div className="text-center">
@@ -750,34 +822,27 @@ export default function ProjectDetails() {
                 </div>
             </div>
         );
-    if (error)
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-50 p-8 text-center">
-                <div className="w-full max-w-lg rounded-xl border border-red-400 bg-red-50 px-8 py-6 text-red-700 shadow-lg">
-                    <strong className="mb-2 block text-lg font-bold">
-                        Wystąpił błąd
-                    </strong>
-                    <span>{error}</span>
-                    <button
-                        onClick={() => navigate('/projekty')}
-                        className="mt-6 w-full rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700"
-                    >
-                        Powrót
-                    </button>
-                </div>
-            </div>
-        );
-    if (!project) return null;
+    }
 
-    const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'hr';
-    const progress = isEditing ? editData.progress : project.progress || 0;
+    // Calculate task statistics
+    const taskStats = tasks.reduce(
+        (acc, task) => {
+            acc.total++;
+            if (task.status === 'completed') acc.completed++;
+            if (task.status === 'in-progress') acc.inProgress++;
+            if (task.status === 'todo') acc.todo++;
+            return acc;
+        },
+        { total: 0, completed: 0, inProgress: 0, todo: 0 },
+    );
 
-    const taskStats = {
-        total: tasks.length,
-        completed: tasks.filter(t => t.status === 'completed').length,
-        inProgress: tasks.filter(t => t.status === 'in-progress').length,
-        todo: tasks.filter(t => t.status === 'todo').length,
-    };
+    const progress = project?.progress || 0;
+    const isAdmin =
+        currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
+
+    if (error) {
+        return <div className="py-10 text-center text-red-600">{error}</div>;
+    }
 
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-800 lg:flex-row">
@@ -796,7 +861,9 @@ export default function ProjectDetails() {
                 </div>
 
                 <div className="flex flex-col items-center text-center">
-                    <CircularProgress progress={progress} />
+                    <CircularProgress
+                        progress={isEditing ? editData.progress : progress || 0}
+                    />
                     {isEditing && isAdmin ? (
                         <div className="mt-4 w-full max-w-xs">
                             <input
@@ -896,26 +963,39 @@ export default function ProjectDetails() {
                     </StatCard>
 
                     {/* Statystyki zadań */}
-                    <StatCard
-                        icon={<Icon.ListTodo />}
-                        title="Statystyki zadań"
-                    >
+                    <StatCard icon={<Icon.ListTodo />} title="Statystyki zadań">
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Wszystkie:</span>
-                                <span className="font-bold">{taskStats.total}</span>
+                                <span className="text-gray-600">
+                                    Wszystkie:
+                                </span>
+                                <span className="font-bold">
+                                    {taskStats.total}
+                                </span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Ukończone:</span>
-                                <span className="font-bold text-green-600">{taskStats.completed}</span>
+                                <span className="text-gray-600">
+                                    Ukończone:
+                                </span>
+                                <span className="font-bold text-green-600">
+                                    {taskStats.completed}
+                                </span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">W trakcie:</span>
-                                <span className="font-bold text-sky-600">{taskStats.inProgress}</span>
+                                <span className="text-gray-600">
+                                    W trakcie:
+                                </span>
+                                <span className="font-bold text-sky-600">
+                                    {taskStats.inProgress}
+                                </span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Do zrobienia:</span>
-                                <span className="font-bold text-gray-600">{taskStats.todo}</span>
+                                <span className="text-gray-600">
+                                    Do zrobienia:
+                                </span>
+                                <span className="font-bold text-gray-600">
+                                    {taskStats.todo}
+                                </span>
                             </div>
                         </div>
                     </StatCard>
@@ -956,7 +1036,7 @@ export default function ProjectDetails() {
                                         <button
                                             onClick={handleSave}
                                             disabled={isSaving}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-emerald-700 shadow-md transition-all duration-200 ease-in-out hover:bg-gray-200 hover:scale-[1.02] disabled:opacity-60"
+                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-emerald-700 shadow-md transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-gray-200 disabled:opacity-60"
                                         >
                                             {isSaving ? (
                                                 'Zapisywanie...'
@@ -971,7 +1051,7 @@ export default function ProjectDetails() {
                                                 setIsEditing(false);
                                                 fetchData();
                                             }}
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all duration-200 ease-in-out hover:bg-black/30 hover:scale-[1.02]"
+                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-black/30"
                                         >
                                             <Icon.Cancel /> Anuluj
                                         </button>
@@ -1040,7 +1120,10 @@ export default function ProjectDetails() {
                                     type="text"
                                     value={newTask.title}
                                     onChange={(e) =>
-                                        setNewTask({ ...newTask, title: e.target.value })
+                                        setNewTask({
+                                            ...newTask,
+                                            title: e.target.value,
+                                        })
                                     }
                                     placeholder="Tytuł zadania"
                                     className="mb-2 w-full rounded border border-gray-300 p-2"
@@ -1048,7 +1131,10 @@ export default function ProjectDetails() {
                                 <textarea
                                     value={newTask.description}
                                     onChange={(e) =>
-                                        setNewTask({ ...newTask, description: e.target.value })
+                                        setNewTask({
+                                            ...newTask,
+                                            description: e.target.value,
+                                        })
                                     }
                                     placeholder="Opis zadania (opcjonalnie)"
                                     className="mb-2 w-full rounded border border-gray-300 p-2"
@@ -1058,7 +1144,10 @@ export default function ProjectDetails() {
                                     <select
                                         value={newTask.priority}
                                         onChange={(e) =>
-                                            setNewTask({ ...newTask, priority: e.target.value })
+                                            setNewTask({
+                                                ...newTask,
+                                                priority: e.target.value,
+                                            })
                                         }
                                         className="rounded border border-gray-300 p-2"
                                     >
@@ -1071,13 +1160,19 @@ export default function ProjectDetails() {
                                     <select
                                         value={newTask.assignedTo}
                                         onChange={(e) =>
-                                            setNewTask({ ...newTask, assignedTo: e.target.value })
+                                            setNewTask({
+                                                ...newTask,
+                                                assignedTo: e.target.value,
+                                            })
                                         }
                                         className="flex-1 rounded border border-gray-300 p-2"
                                     >
                                         <option value="">Nie przypisano</option>
                                         {project.assignedUsers.map((user) => (
-                                            <option key={user._id} value={user._id}>
+                                            <option
+                                                key={user._id}
+                                                value={user._id}
+                                            >
                                                 {user.username}
                                             </option>
                                         ))}
@@ -1086,7 +1181,10 @@ export default function ProjectDetails() {
                                         type="date"
                                         value={newTask.dueDate}
                                         onChange={(e) =>
-                                            setNewTask({ ...newTask, dueDate: e.target.value })
+                                            setNewTask({
+                                                ...newTask,
+                                                dueDate: e.target.value,
+                                            })
                                         }
                                         className="rounded border border-gray-300 p-2"
                                     />
@@ -1095,13 +1193,29 @@ export default function ProjectDetails() {
                                     <button
                                         onClick={handleAddTask}
                                         disabled={isAddingTask}
-                                        className="flex items-center gap-1 rounded bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="flex items-center gap-1 rounded bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                                     >
                                         {isAddingTask ? (
                                             <>
-                                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                <svg
+                                                    className="h-4 w-4 animate-spin text-white"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                    ></circle>
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
                                                 </svg>
                                                 Dodawanie...
                                             </>
@@ -1123,8 +1237,10 @@ export default function ProjectDetails() {
 
                         <div className="space-y-3">
                             {tasks.length === 0 ? (
-                                <p className="text-center text-gray-500 py-8">
-                                    Nie ma jeszcze żadnych zadań. {isAdmin && 'Kliknij "Dodaj zadanie" aby utworzyć pierwsze.'}
+                                <p className="py-8 text-center text-gray-500">
+                                    Nie ma jeszcze żadnych zadań.{' '}
+                                    {isAdmin &&
+                                        'Kliknij "Dodaj zadanie" aby utworzyć pierwsze.'}
                                 </p>
                             ) : (
                                 tasks.map((task) => (
@@ -1186,8 +1302,12 @@ export default function ProjectDetails() {
                                 <input
                                     type="text"
                                     value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                                    onChange={(e) =>
+                                        setNewComment(e.target.value)
+                                    }
+                                    onKeyPress={(e) =>
+                                        e.key === 'Enter' && handleAddComment()
+                                    }
                                     placeholder="Dodaj komentarz..."
                                     className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none"
                                 />
@@ -1202,7 +1322,7 @@ export default function ProjectDetails() {
 
                         <div className="space-y-4">
                             {comments.length === 0 ? (
-                                <p className="text-center text-gray-500 py-8">
+                                <p className="py-8 text-center text-gray-500">
                                     Brak komentarzy. Bądź pierwszy!
                                 </p>
                             ) : (
@@ -1226,43 +1346,56 @@ export default function ProjectDetails() {
                         title={`Historia aktywności (${activities.length})`}
                         actions={
                             <button
-                                onClick={() => setShowActivities(!showActivities)}
+                                onClick={() =>
+                                    setShowActivities(!showActivities)
+                                }
                                 className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
                             >
                                 {showActivities ? 'Ukryj' : 'Pokaż'}
-                                {showActivities ? <Icon.ChevronDown /> : <Icon.ChevronRight />}
+                                {showActivities ? (
+                                    <Icon.ChevronDown />
+                                ) : (
+                                    <Icon.ChevronRight />
+                                )}
                             </button>
                         }
                     >
                         {showActivities && (
                             <div className="space-y-3">
                                 {activities.length === 0 ? (
-                                                                    <p className="text-center text-gray-500 py-4">
-                                                                        Brak aktywności
-                                                                    </p>
-                                                                ) : (
-                                                                    activities.map((activity) => (
-                                                                                                            <div
-                                                                                                                key={activity._id}
-                                                                                                                className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:shadow-sm hover:scale-[1.005]"
-                                                                                                            >                                                                            <div className="h-8 w-8 flex-shrink-0 rounded-full bg-emerald-100 flex items-center justify-center">
-                                                                                <span className="text-emerald-600 text-xs font-bold">
-                                                                                    {activity.user.username.charAt(0).toUpperCase()}
-                                                                                </span>
-                                                                            </div>
-                                                                            <div className="flex-1">
-                                                                                <p className="text-sm text-gray-700">
-                                                                                    <span className="font-semibold">
-                                                                                        {activity.user.username}
-                                                                                    </span>{' '}
-                                                                                    {activity.description}
-                                                                                </p>
-                                                                                <p className="text-xs text-gray-400 mt-1">
-                                                                                    {moment(activity.createdAt).fromNow()}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))                                )}
+                                    <p className="py-4 text-center text-gray-500">
+                                        Brak aktywności
+                                    </p>
+                                ) : (
+                                    activities.map((activity) => (
+                                        <div
+                                            key={activity._id}
+                                            className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:scale-[1.005] hover:shadow-sm"
+                                        >
+                                            {' '}
+                                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
+                                                <span className="text-xs font-bold text-emerald-600">
+                                                    {activity.user.username
+                                                        .charAt(0)
+                                                        .toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="text-sm text-gray-700">
+                                                    <span className="font-semibold">
+                                                        {activity.user.username}
+                                                    </span>{' '}
+                                                    {activity.description}
+                                                </p>
+                                                <p className="mt-1 text-xs text-gray-400">
+                                                    {moment(
+                                                        activity.createdAt,
+                                                    ).fromNow()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         )}
                     </ContentCard>

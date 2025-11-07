@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowRight } from 'lucide-react';
+import { useState } from 'react';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -14,11 +15,36 @@ export default function Register() {
         formState: { errors },
     } = useForm();
     const navigate = useNavigate();
+    const [isRegisteringCompany, setIsRegisteringCompany] = useState(true);
 
     const onSubmit = async (data) => {
         try {
-            await axios.post('/api/auth/register', data);
-            alert('Rejestracja zakończona sukcesem!');
+            const registrationData = {
+                email: data.email,
+                username: data.username,
+                password: data.password,
+            };
+
+            if (isRegisteringCompany) {
+                registrationData.role = 'admin';
+                registrationData.companyName = data.companyName;
+            } else {
+                registrationData.role = 'employee';
+                registrationData.invitationCode = data.invitationCode;
+            }
+
+            const response = await axios.post(
+                '/api/auth/register',
+                registrationData,
+            );
+
+            if (isRegisteringCompany && response.data.company?.invitationCode) {
+                alert(
+                    `Rejestracja firmy zakończona sukcesem!\n\nTwój kod zaproszenia dla pracowników to: ${response.data.company.invitationCode}\n\nZapisz go! Zostaniesz teraz przeniesiony do strony logowania.`,
+                );
+            } else {
+                alert('Rejestracja zakończona sukcesem!');
+            }
             navigate('/login');
         } catch (err) {
             alert(err.response?.data?.message || 'Błąd rejestracji');
@@ -179,6 +205,96 @@ export default function Register() {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Company Registration / Invitation Code Toggle */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <input
+                                        id="register-company"
+                                        name="register-company"
+                                        type="checkbox"
+                                        checked={isRegisteringCompany}
+                                        onChange={() =>
+                                            setIsRegisteringCompany(
+                                                !isRegisteringCompany,
+                                            )
+                                        }
+                                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                    />
+                                    <label
+                                        htmlFor="register-company"
+                                        className="ml-2 block text-sm text-gray-900"
+                                    >
+                                        Rejestruję nową firmę
+                                    </label>
+                                </div>
+                            </div>
+
+                            {isRegisteringCompany ? (
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        Nazwa firmy
+                                    </label>
+                                    <div className="group relative">
+                                        <input
+                                            {...register('companyName', {
+                                                required: isRegisteringCompany
+                                                    ? 'Nazwa firmy jest wymagana'
+                                                    : false,
+                                            })}
+                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            placeholder="Nazwa Twojej firmy"
+                                        />
+                                        {errors.companyName && (
+                                            <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
+                                                <svg
+                                                    className="h-4 w-4"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    />
+                                                </svg>
+                                                {errors.companyName.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        Kod zaproszenia
+                                    </label>
+                                    <div className="group relative">
+                                        <input
+                                            {...register('invitationCode', {
+                                                required: !isRegisteringCompany
+                                                    ? 'Kod zaproszenia jest wymagany'
+                                                    : false,
+                                            })}
+                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            placeholder="Wprowadź kod zaproszenia"
+                                        />
+                                        {errors.invitationCode && (
+                                            <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
+                                                <svg
+                                                    className="h-4 w-4"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    />
+                                                </svg>
+                                                {errors.invitationCode.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <button

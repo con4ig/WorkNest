@@ -217,6 +217,7 @@ export default function UserDetails() {
                 withCredentials: true,
             });
             setCurrentUser(meRes.data);
+
             const res = await axios.get(`/api/users/${id}`, {
                 withCredentials: true,
             });
