@@ -18,8 +18,12 @@ const schema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "hr", "employee"],
+      enum: ["admin", "hr", "employee", "superadmin"],
       default: "employee",
+    },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
     },
     // Dane HR
     firstName: {

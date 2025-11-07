@@ -69,7 +69,7 @@ router.patch(
 // GET /api/projects - lista wszystkich projektów
 router.get("/", authenticate, async (req, res) => {
   try {
-    const { status, sortBy, limit, name } = req.query; // Dodano `name`
+    const { status, sortBy, limit, name } = req.query; 
     const limitNum = parseInt(limit) || 0;
 
     let query = {};
