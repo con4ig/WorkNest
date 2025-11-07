@@ -9,7 +9,7 @@ import {
     ArrowLeft,
     FolderKanban,
     MoreVertical,
-} from 'lucide-react'; // Dodano MoreVertical dla menu akcji na mobilnych
+} from 'lucide-react'; 
 
 // --- Style i dane pomocnicze (bez zmian) ---
 const statusStyles = {
