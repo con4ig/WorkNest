@@ -9,6 +9,11 @@ router.get("/", authenticate, async (req, res) => {
   try {
     let query = {};
 
+    // Company isolation
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
     // Employee widzi tylko swoje
     if (req.user.role === "employee") {
       query.user = req.user._id;
@@ -101,6 +106,7 @@ router.post("/", authenticate, async (req, res) => {
   try {
     const leave = new Leave({
       user: req.user._id,
+      company: req.user.company,
       leaveType: leaveType || "vacation",
       startDate,
       endDate,
@@ -135,8 +141,13 @@ router.patch(
     const { reviewNote } = req.body;
 
     try {
-      const leave = await Leave.findByIdAndUpdate(
-        req.params.id,
+      const query = { _id: req.params.id };
+      if (req.user.role !== "superadmin") {
+        query.company = req.user.company;
+      }
+
+      const leave = await Leave.findOneAndUpdate(
+        query,
         {
           status: "approved",
           reviewedBy: req.user._id,
@@ -178,8 +189,13 @@ router.patch(
     }
 
     try {
-      const leave = await Leave.findByIdAndUpdate(
-        req.params.id,
+      const query = { _id: req.params.id };
+      if (req.user.role !== "superadmin") {
+        query.company = req.user.company;
+      }
+
+      const leave = await Leave.findOneAndUpdate(
+        query,
         {
           status: "rejected",
           reviewedBy: req.user._id,
@@ -209,7 +225,12 @@ router.patch(
 // DELETE /api/leaves/:id - usunięcie wniosku (tylko swoje, tylko pending)
 router.delete("/:id", authenticate, async (req, res) => {
   try {
-    const leave = await Leave.findById(req.params.id);
+    const query = { _id: req.params.id };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    const leave = await Leave.findOne(query);
 
     if (!leave) {
       return res.status(404).json({ message: "Wniosek nie znaleziony" });
@@ -227,7 +248,7 @@ router.delete("/:id", authenticate, async (req, res) => {
       });
     }
 
-    await Leave.findByIdAndDelete(req.params.id);
+    await leave.deleteOne();
 
     res.json({ message: "Wniosek usunięty" });
   } catch (err) {

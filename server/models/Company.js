@@ -6,6 +6,11 @@ const companySchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   invitationCode: {
     type: String,
     required: true,

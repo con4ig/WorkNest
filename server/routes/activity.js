@@ -8,14 +8,40 @@ const router = express.Router();
 router.get("/project/:projectId", Authenticate, async (req, res) => {
   try {
     const { limit = 50, page = 1 } = req.query;
-    
-    const activities = await Activity.find({ project: req.params.projectId })
+    const { projectId } = req.params;
+
+    let projectQuery = { _id: projectId };
+    if (req.user.role !== "superadmin") {
+      if (!req.user.company) {
+        return res
+          .status(403)
+          .json({
+            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+          });
+      }
+      projectQuery.company = req.user.company._id;
+    }
+    const project = await Project.findOne(projectQuery);
+    if (!project) {
+      return res
+        .status(404)
+        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+    }
+
+    const query = { project: projectId };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    const activities = await Activity.find(query)
       .populate("user", "username email profileImage")
       .sort({ createdAt: -1 })
       .limit(parseInt(limit))
       .skip((parseInt(page) - 1) * parseInt(limit));
 
-    const total = await Activity.countDocuments({ project: req.params.projectId });
+    const total = await Activity.countDocuments({
+      project: req.params.projectId,
+    });
 
     res.json({
       activities,
@@ -36,12 +62,31 @@ router.post("/", Authenticate, async (req, res) => {
   try {
     const { project, action, description, metadata } = req.body;
 
+    let projectQuery = { _id: project };
+    if (req.user.role !== "superadmin") {
+      if (!req.user.company) {
+        return res
+          .status(403)
+          .json({
+            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+          });
+      }
+      projectQuery.company = req.user.company._id;
+    }
+    const projectDoc = await Project.findOne(projectQuery);
+    if (!projectDoc) {
+      return res
+        .status(404)
+        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+    }
+
     const activity = new Activity({
       project,
       user: req.user._id,
       action,
       description,
       metadata: metadata || {},
+      company: projectDoc.company,
     });
 
     const savedActivity = await activity.save();

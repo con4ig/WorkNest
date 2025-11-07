@@ -16,6 +16,7 @@ import {
 import AddProjectModal from './AddProjectModal.jsx';
 import moment from 'moment';
 import 'moment/locale/pl';
+import { useAuth } from '../context/AuthContext';
 
 const Icon = {
     Dashboard: () => <LayoutDashboard className="h-5 w-5" />,
@@ -53,6 +54,7 @@ export default function Dashboard() {
     const [profileImage, setProfileImage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
 
     // Wykrywanie rozmiaru ekranu
     useEffect(() => {
@@ -90,10 +92,15 @@ export default function Dashboard() {
             setRole(role);
             setProfileImage(profileImage);
 
-            if (role === 'admin' || role === 'hr') {
-  const statsRes = await axios.get(`/api/projects/stats/summary`);
-  const { total, running, pending, completed } = statsRes.data;
-
+            if (role === 'admin' || role === 'hr' || role === 'superadmin') {
+                const statsRes = await axios.get(
+                    `/api/projects/stats/summary`,
+                    {
+                        withCredentials: true,
+                        params: { company: user?.company?._id },
+                    },
+                );
+                const { total, running, pending, completed } = statsRes.data;
 
                 setStats([
                     {
@@ -114,13 +121,23 @@ export default function Dashboard() {
                         value: running.toString(),
                         hint: 'Growing',
                     },
-                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
+                    {
+                        id: 4,
+                        title: 'Pending',
+                        value: pending.toString(),
+                        hint: 'On review',
+                    },
                 ]);
             } else {
                 const assignedRes = await axios.get(
                     `/api/projects/users/${_id}/assigned-projects/summary`,
+                    {
+                        withCredentials: true,
+                        params: { company: user?.company?._id },
+                    },
                 );
-                const { assigned, completed, running, pending } = assignedRes.data;
+                const { assigned, completed, running, pending } =
+                    assignedRes.data;
                 setStats([
                     {
                         id: 1,
@@ -140,7 +157,12 @@ export default function Dashboard() {
                         value: running.toString(),
                         hint: 'Active now',
                     },
-                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
+                    {
+                        id: 4,
+                        title: 'Pending',
+                        value: pending.toString(),
+                        hint: 'On review',
+                    },
                 ]);
             }
         };
@@ -155,6 +177,7 @@ export default function Dashboard() {
                     '/api/projects?sortBy=createdAt:desc&limit=5',
                     {
                         withCredentials: true,
+                        params: { company: user?.company?._id },
                     },
                 );
 

@@ -18,7 +18,9 @@ function PrivacyPolicy() {
                         <h1 className="mb-4 text-4xl font-extrabold text-gray-900 lg:text-5xl">
                             Polityka Prywatności
                         </h1>
-                        <p className="text-lg text-gray-600">Obowiązuje od: 5.11.2025r.</p>
+                        <p className="text-lg text-gray-600">
+                            Obowiązuje od: 5.11.2025r.
+                        </p>
                     </div>
                 </div>
 
@@ -66,17 +68,20 @@ function PrivacyPolicy() {
                             II. Cele i Podstawy Przetwarzania Danych
                         </h2>
                         <p className="mb-6 leading-relaxed text-gray-700">
-                            Twoje dane osobowe przetwarzane są w następujących celach:
+                            Twoje dane osobowe przetwarzane są w następujących
+                            celach:
                         </p>
 
                         <ul className="space-y-4">
                             <li className="rounded-lg border-l-4 border-teal-500 bg-white p-4 shadow-md">
                                 <strong className="text-gray-900">
-                                    Rejestracja i prowadzenie konta w serwisie WorkNest
+                                    Rejestracja i prowadzenie konta w serwisie
+                                    WorkNest
                                 </strong>
                                 <p className="mt-1 text-sm text-gray-600">
                                     Podstawa prawna: Art. 6 ust. 1 lit. b) RODO
-                                    (niezbędność do wykonania umowy o świadczenie usług drogą elektroniczną).
+                                    (niezbędność do wykonania umowy o
+                                    świadczenie usług drogą elektroniczną).
                                 </p>
                             </li>
                             <li className="rounded-lg border-l-4 border-teal-500 bg-white p-4 shadow-md">
@@ -85,7 +90,8 @@ function PrivacyPolicy() {
                                 </strong>
                                 <p className="mt-1 text-sm text-gray-600">
                                     Podstawa prawna: Art. 6 ust. 1 lit. f) RODO
-                                    (prawnie uzasadniony interes administratora, polegający na komunikacji z użytkownikami).
+                                    (prawnie uzasadniony interes administratora,
+                                    polegający na komunikacji z użytkownikami).
                                 </p>
                             </li>
                         </ul>
@@ -114,13 +120,15 @@ function PrivacyPolicy() {
                                 Wniesienia skargi do organu nadzorczego (Prezes
                                 Urzędu Ochrony Danych Osobowych – PUODO).
                             </li>
-                             <li>
-                                Cofnięcia zgody na przetwarzanie danych w dowolnym momencie, jeśli przetwarzanie odbywa się na podstawie zgody.
+                            <li>
+                                Cofnięcia zgody na przetwarzanie danych w
+                                dowolnym momencie, jeśli przetwarzanie odbywa
+                                się na podstawie zgody.
                             </li>
                         </ul>
                         <p className="mt-4 text-gray-700">
-                            Wnioski dotyczące Twoich praw prosimy kierować na adres
-                            e-mail Administratora:{' '}
+                            Wnioski dotyczące Twoich praw prosimy kierować na
+                            adres e-mail Administratora:{' '}
                             <a
                                 href={`mailto:${administrator.email}`}
                                 className="font-medium text-teal-600"
@@ -137,27 +145,35 @@ function PrivacyPolicy() {
                             IV. Pliki Cookies
                         </h2>
                         <p className="mb-4 leading-relaxed text-gray-700">
-                           Serwis WorkNest wykorzystuje pliki cookies (ciasteczka) wyłącznie w celu zapewnienia prawidłowego działania strony (logowanie, utrzymanie sesji).
-                           Pliki cookies to małe pliki tekstowe,
-                           przechowywane na Twoim urządzeniu końcowym (np. komputerze, tablecie, smartfonie).
+                            Serwis WorkNest wykorzystuje pliki cookies
+                            (ciasteczka) wyłącznie w celu zapewnienia
+                            prawidłowego działania strony (logowanie, utrzymanie
+                            sesji). Pliki cookies to małe pliki tekstowe,
+                            przechowywane na Twoim urządzeniu końcowym (np.
+                            komputerze, tablecie, smartfonie).
                         </p>
                         <div className="flex items-start rounded-lg border border-teal-200 bg-teal-50 p-4">
                             <Mail className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-teal-600" />
                             <p className="text-sm text-gray-700">
-                                Możesz zarządzać plikami cookies z poziomu ustawień swojej przeglądarki internetowej.
-                                Pamiętaj, że ograniczenie stosowania plików cookies może wpłynąć na niektóre funkcjonalności dostępne w serwisie.
+                                Możesz zarządzać plikami cookies z poziomu
+                                ustawień swojej przeglądarki internetowej.
+                                Pamiętaj, że ograniczenie stosowania plików
+                                cookies może wpłynąć na niektóre funkcjonalności
+                                dostępne w serwisie.
                             </p>
                         </div>
                     </section>
-                     {/* Sekcja V: Postanowienia końcowe */}
+                    {/* Sekcja V: Postanowienia końcowe */}
                     <section className="mb-12">
                         <h2 className="mb-6 border-l-4 border-emerald-500 pl-3 text-3xl font-bold text-gray-900">
                             V. Postanowienia Końcowe
                         </h2>
                         <p className="mb-4 leading-relaxed text-gray-700">
-                            Zastrzegamy sobie prawo do wprowadzania zmian w Polityce Prywatności.
-                            O wszelkich zmianach będziemy informować poprzez publikację nowej treści Polityki Prywatności na tej stronie.
-                            Zmiany wchodzą w życie z dniem ich publikacji.
+                            Zastrzegamy sobie prawo do wprowadzania zmian w
+                            Polityce Prywatności. O wszelkich zmianach będziemy
+                            informować poprzez publikację nowej treści Polityki
+                            Prywatności na tej stronie. Zmiany wchodzą w życie z
+                            dniem ich publikacji.
                         </p>
                     </section>
                 </div>

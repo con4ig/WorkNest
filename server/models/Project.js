@@ -42,6 +42,11 @@ const projectSchema = new mongoose.Schema(
       min: 0,
       max: 100,
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+    },
   },
   { timestamps: true }
 );

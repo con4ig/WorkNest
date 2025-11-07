@@ -18,30 +18,52 @@ import Polityka from './pages/Poltyka_prywatnosc.jsx';
 import UserDetails from './pages/UserDetails.jsx';
 import Upload from './pages/Upload.jsx';
 import axios from 'axios';
+import { AuthProvider } from './context/AuthContext.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
-axios.defaults.baseURL = import.meta.env.PROD ? 'https://worknest-qpsw.onrender.com' : 'http://localhost:5500';
+axios.defaults.baseURL = import.meta.env.PROD
+    ? 'https://worknest-qpsw.onrender.com'
+    : 'http://localhost:5500';
 axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
-        <Router>
-            <Routes>
-                <Route path="/" element={<App />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/forgot-password" element={<Forgot />} />
-                <Route path="/employees" element={<EmployeeList />} />
-                <Route path="/employees/add" element={<Addproject />} />
-                <Route path="/projekty" element={<Projekty />} />
-                <Route path="/projects/:id" element={<ProjectDetails />} />
-                <Route path="/employees/:id" element={<UserDetails />} />
-                <Route path="/myleaves" element={<MyLeaves />} />
-                <Route path="/leave-approvals" element={<LeaveApprovals />} />
-                <Route path="/regulamin" element={<Regulamin />} />
-                <Route path="/polityka-prywatnosci" element={<Polityka />} />
-                <Route path="/upload" element={<Upload />} />
-            </Routes>
-        </Router>
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<App />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<Forgot />} />
+                    <Route path="/regulamin" element={<Regulamin />} />
+                    <Route
+                        path="/polityka-prywatnosci"
+                        element={<Polityka />}
+                    />
+
+                    {/* Protected Routes */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/employees" element={<EmployeeList />} />
+                        <Route path="/employees/add" element={<Addproject />} />
+                        <Route path="/projekty" element={<Projekty />} />
+                        <Route
+                            path="/projects/:id"
+                            element={<ProjectDetails />}
+                        />
+                        <Route
+                            path="/employees/:id"
+                            element={<UserDetails />}
+                        />
+                        <Route path="/myleaves" element={<MyLeaves />} />
+                        <Route
+                            path="/leave-approvals"
+                            element={<LeaveApprovals />}
+                        />
+                        <Route path="/upload" element={<Upload />} />
+                    </Route>
+                </Routes>
+            </Router>
+        </AuthProvider>
     </StrictMode>,
 );

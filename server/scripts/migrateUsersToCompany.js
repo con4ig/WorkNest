@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
-import User from '../models/User.js';
-import Company from '../models/Company.js';
-import dotenv from 'dotenv';
+import mongoose from "mongoose";
+import User from "../models/User.js";
+import Company from "../models/Company.js";
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -14,24 +14,24 @@ const migrateUsers = async () => {
       useUnifiedTopology: true,
     });
 
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
 
-    let defaultCompany = await Company.findOne({ name: 'Default Company' });
+    let defaultCompany = await Company.findOne({ name: "Default Company" });
 
     if (!defaultCompany) {
-      console.log('Default company not found, creating one...');
+      console.log("Default company not found, creating one...");
       defaultCompany = new Company({
-        name: 'Default Company',
+        name: "Default Company",
         invitationCode: Math.random().toString(36).substring(2, 15),
       });
       await defaultCompany.save();
-      console.log('Default company created');
+      console.log("Default company created");
     }
 
     const usersToMigrate = await User.find({ company: { $exists: false } });
 
     if (usersToMigrate.length === 0) {
-      console.log('No users to migrate.');
+      console.log("No users to migrate.");
       return;
     }
 
@@ -43,12 +43,12 @@ const migrateUsers = async () => {
       console.log(`Migrated user ${user.username} to default company.`);
     }
 
-    console.log('Migration completed successfully.');
+    console.log("Migration completed successfully.");
   } catch (error) {
-    console.error('Error during migration:', error);
+    console.error("Error during migration:", error);
   } finally {
     await mongoose.disconnect();
-    console.log('Disconnected from MongoDB');
+    console.log("Disconnected from MongoDB");
   }
 };
 

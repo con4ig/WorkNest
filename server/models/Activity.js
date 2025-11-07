@@ -7,6 +7,11 @@ const activitySchema = new mongoose.Schema(
       ref: "Project",
       required: true,
     },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
