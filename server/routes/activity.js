@@ -1,5 +1,6 @@
 import express from "express";
 import Activity from "../models/Activity.js";
+import Project from "../models/Project.js";
 import Authenticate from "../middleware/authenticate.js";
 
 const router = express.Router();
