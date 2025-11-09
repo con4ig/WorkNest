@@ -32,7 +32,14 @@ export default function Register() {
                 invitationCode: data.invitationCode,
             };
 
-            const response = await axios.post(
+            // Oczyszczanie danych przed wysłaniem
+            if (registrationData.role === 'admin') {
+                delete registrationData.invitationCode;
+            } else if (registrationData.role === 'employee') {
+                delete registrationData.companyName;
+            }
+
+            await axios.post(
                 '/api/auth/register',
                 registrationData,
             );
