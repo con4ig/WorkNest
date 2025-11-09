@@ -1,41 +1,22 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Briefcase, LogOut, UserPlus, LogIn, LayoutDashboard, Menu } from 'lucide-react';
+import { useAuth } from '../context/AuthContext'; // Importujemy hooka
+import { Briefcase, LogOut, UserPlus, LogIn, LayoutDashboard } from 'lucide-react';
 
 export default function Navbar() {
+  // Pobieramy dane z kontekstu, a nie przez axios!
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get('/api/auth/me');
-        setUsername(res.data.username);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          // Oczekiwany błąd, gdy użytkownik nie jest zalogowany - nie trzeba go logować.
-        } else {
-          console.error('Błąd przy sprawdzaniu autoryzacji:', err);
-        }
-        setUsername(null); // nie zalogowany
-      }
-    };
-
-    checkAuth();
-  }, []);
 
   const handleLogout = async () => {
     try {
-      await axios.post('/api/auth/logout', {}, { withCredentials: true });
-      localStorage.clear(); // usuń dane użytkownika
+      await logout();
       navigate('/login');
     } catch (err) {
       console.error('Błąd wylogowania:', err);
     }
   };
 
-  // Klasy w nowym stylu (Emerald/Teal)
   const navItemClass = "flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300";
   const buttonPrimaryClass = "ml-3 px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/50 transition-all duration-300 transform hover:scale-[1.02]";
   const buttonSecondaryClass = "ml-3 px-5 py-2.5 rounded-full text-sm font-bold text-emerald-600 border border-emerald-200 bg-white hover:bg-emerald-50 transition-all duration-300";
@@ -63,7 +44,11 @@ export default function Navbar() {
               Home
             </Link>
 
-            {username ? (
+            {loading ? (
+              // Skeleton UI na czas ładowania
+              <div className="h-10 w-48 animate-pulse rounded-full bg-gray-200"></div>
+            ) : user ? (
+              // Widok dla zalogowanego użytkownika
               <>
                 <Link
                   to="/dashboard"
@@ -81,7 +66,7 @@ export default function Navbar() {
                 </button>
               </>
 
-            ) : (
+            ) : ( // Widok dla gościa
               <>
                 <Link
                   to="/login"
