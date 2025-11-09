@@ -2,7 +2,8 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState } from 'react'; // useState jest już importowany, ale upewnijmy się
+import toast from 'react-hot-toast'; // Załóżmy, że masz zainstalowane react-hot-toast
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -13,41 +14,35 @@ export default function Register() {
         register,
         handleSubmit,
         formState: { errors },
+        watch,
     } = useForm();
     const navigate = useNavigate();
-    const [isRegisteringCompany, setIsRegisteringCompany] = useState(true);
+    const selectedRole = watch('role', 'admin');
+    const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (data) => {
+        setIsLoading(true);
         try {
             const registrationData = {
                 email: data.email,
                 username: data.username,
                 password: data.password,
+                role: data.role,
+                companyName: data.companyName,
+                invitationCode: data.invitationCode,
             };
-
-            if (isRegisteringCompany) {
-                registrationData.role = 'admin';
-                registrationData.companyName = data.companyName;
-            } else {
-                registrationData.role = 'employee';
-                registrationData.invitationCode = data.invitationCode;
-            }
 
             const response = await axios.post(
                 '/api/auth/register',
                 registrationData,
             );
 
-            if (isRegisteringCompany && response.data.company?.invitationCode) {
-                alert(
-                    `Rejestracja firmy zakończona sukcesem!\n\nTwój kod zaproszenia dla pracowników to: ${response.data.company.invitationCode}\n\nZapisz go! Zostaniesz teraz przeniesiony do strony logowania.`,
-                );
-            } else {
-                alert('Rejestracja zakończona sukcesem!');
-            }
+            toast.success('Rejestracja zakończona sukcesem!');
             navigate('/login');
         } catch (err) {
-            alert(err.response?.data?.message || 'Błąd rejestracji');
+            toast.error(err.response?.data?.message || 'Błąd rejestracji');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -206,31 +201,25 @@ export default function Register() {
                                 </div>
                             </div>
 
-                            {/* Company Registration / Invitation Code Toggle */}
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <input
-                                        id="register-company"
-                                        name="register-company"
-                                        type="checkbox"
-                                        checked={isRegisteringCompany}
-                                        onChange={() =>
-                                            setIsRegisteringCompany(
-                                                !isRegisteringCompany,
-                                            )
-                                        }
-                                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                                    />
-                                    <label
-                                        htmlFor="register-company"
-                                        className="ml-2 block text-sm text-gray-900"
-                                    >
-                                        Rejestruję nową firmę
-                                    </label>
-                                </div>
+                            {/* Role Selection */}
+                            <div>
+                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    Kim jesteś?
+                                </label>
+                                <select
+                                    {...register('role')}
+                                    className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                >
+                                    <option value="admin">
+                                        Zakładam konto dla mojej firmy
+                                    </option>
+                                    <option value="employee">
+                                        Dołączam do istniejącej firmy
+                                    </option>
+                                </select>
                             </div>
 
-                            {isRegisteringCompany ? (
+                            {selectedRole === 'admin' ? (
                                 <div>
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700">
                                         Nazwa firmy
@@ -238,7 +227,7 @@ export default function Register() {
                                     <div className="group relative">
                                         <input
                                             {...register('companyName', {
-                                                required: isRegisteringCompany
+                                                required: selectedRole === 'admin'
                                                     ? 'Nazwa firmy jest wymagana'
                                                     : false,
                                             })}
@@ -270,7 +259,7 @@ export default function Register() {
                                     <div className="group relative">
                                         <input
                                             {...register('invitationCode', {
-                                                required: !isRegisteringCompany
+                                                required: selectedRole === 'employee'
                                                     ? 'Kod zaproszenia jest wymagany'
                                                     : false,
                                             })}
@@ -299,10 +288,11 @@ export default function Register() {
 
                         <button
                             type="submit"
+                            disabled={isLoading}
                             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                         >
-                            Zarejestruj się
-                            <Icon.ArrowRight />
+                            {isLoading ? 'Rejestrowanie...' : 'Zarejestruj się'}
+                            {!isLoading && <Icon.ArrowRight />}
                         </button>
                     </form>
                 </div>

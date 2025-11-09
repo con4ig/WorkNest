@@ -1,12 +1,8 @@
 import Navbar from '../components/Navbar';
 import { Shield, Mail, Zap } from 'lucide-react';
+import { siteConfig } from '../config'; // Importuj konfigurację
 
 function PrivacyPolicy() {
-    const administrator = {
-        nazwa: 'Szymon Wira',
-        email: 's.szymon11@interia.pl',
-    };
-
     return (
         <>
             <Navbar />
@@ -19,7 +15,7 @@ function PrivacyPolicy() {
                             Polityka Prywatności
                         </h1>
                         <p className="text-lg text-gray-600">
-                            Obowiązuje od: 5.11.2025r.
+                            Obowiązuje od: {siteConfig.effectiveDate}
                         </p>
                     </div>
                 </div>
@@ -37,7 +33,7 @@ function PrivacyPolicy() {
                             od Użytkowników w związku z korzystaniem z serwisu
                             internetowego WorkNest, działającego pod adresem{' '}
                             <a href="#" className="font-medium text-teal-600">
-                                worknesthr.ct.ws
+                                {siteConfig.siteUrl}
                             </a>
                             .
                         </p>
@@ -49,14 +45,14 @@ function PrivacyPolicy() {
                             <p className="text-gray-700">
                                 Administratorem Twoich danych osobowych jest:
                                 <br />
-                                **{administrator.nazwa}**
+                                **{siteConfig.administratorName}**
                                 <br />
                                 Kontakt e-mail w sprawach RODO:{' '}
                                 <a
-                                    href={`mailto:${administrator.email}`}
+                                    href={`mailto:${siteConfig.administratorEmail}`}
                                     className="font-medium text-teal-600"
                                 >
-                                    {administrator.email}
+                                    {siteConfig.administratorEmail}
                                 </a>
                             </p>
                         </div>
@@ -130,10 +126,10 @@ function PrivacyPolicy() {
                             Wnioski dotyczące Twoich praw prosimy kierować na
                             adres e-mail Administratora:{' '}
                             <a
-                                href={`mailto:${administrator.email}`}
+                                href={`mailto:${siteConfig.administratorEmail}`}
                                 className="font-medium text-teal-600"
                             >
-                                {administrator.email}
+                                {siteConfig.administratorEmail}
                             </a>
                             .
                         </p>
