@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/User.js";
+import Invitation from "../models/Invitation.js";
 import authenticate from "../middleware/authenticate.js";
 import authorize from "../middleware/authorize.js";
 import multer from "multer";
@@ -236,25 +237,24 @@ router.patch("/:id", authenticate, async (req, res) => {
       }
     }
 
-    // Przygotowanie obiektu do aktualizacji (tylko niepuste pola)
+    // Przygotowanie obiektu do aktualizacji w sposób dynamiczny
     const updateData = {};
-    if (username !== undefined) updateData.username = username;
-    if (email !== undefined) updateData.email = email;
-    if (firstName !== undefined) updateData.firstName = firstName;
-    if (lastName !== undefined) updateData.lastName = lastName;
-    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
-    if (position !== undefined) updateData.position = position;
-    if (department !== undefined) updateData.department = department;
-    if (hireDate !== undefined)
-      updateData.hireDate = hireDate ? new Date(hireDate) : null;
-    if (salary !== undefined) updateData.salary = salary;
-    if (status !== undefined) updateData.status = status;
-    if (contractType !== undefined) updateData.contractType = contractType;
-    if (role !== undefined && isAdmin) updateData.role = role;
-    if (address !== undefined) updateData.address = address;
-    if (city !== undefined) updateData.city = city;
-    if (peselOrId !== undefined) updateData.peselOrId = peselOrId;
-    if (notes !== undefined) updateData.notes = notes;
+    const allowedFields = [
+      "username", "email", "firstName", "lastName", "phoneNumber",
+      "position", "department", "hireDate", "salary", "status",
+      "contractType", "address", "city", "peselOrId", "notes"
+    ];
+
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    // Specjalna obsługa dla roli (tylko admin)
+    if (isAdmin && req.body.role !== undefined) {
+      updateData.role = req.body.role;
+    }
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
@@ -425,5 +425,38 @@ router.delete("/profile-image", authenticate, async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
+router.post(
+  "/generate-invitation",
+  authenticate,
+  authorize("admin"),
+  async (req, res) => {
+    try {
+      const companyId = req.user.company?._id || req.user.company;
+
+      if (!companyId) {
+        return res
+          .status(400)
+          .json({ message: "User is not assigned to a company." });
+      }
+
+      const newInvitation = new Invitation({
+        company: companyId,
+        createdBy: req.user._id,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+      });
+
+      await newInvitation.save();
+
+      res.status(201).json({
+        message: "Invitation code generated successfully.",
+        invitationCode: newInvitation.code,
+      });
+    } catch (err) {
+      console.error("Error generating invitation code:", err);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
 
 export default router;

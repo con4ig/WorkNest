@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
             {},
             {
                 withCredentials: true,
-            },
+            }
         );
         setUser(null);
     };

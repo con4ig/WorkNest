@@ -1,11 +1,11 @@
-// routes/authRoutes.js - NAPRAWIONY z lepszym zwracaniem danych
-
 import express from "express";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import User from "../models/User.js";
 import Company from "../models/Company.js";
+import Invitation from "../models/Invitation.js";
 import authenticate from "../middleware/authenticate.js";
 
 const router = express.Router();
@@ -31,6 +31,9 @@ router.post("/register", async (req, res) => {
         .json({ message: "Użytkownik o tym adresie email już istnieje" });
     }
 
+    // Rozpocznij sesję dla transakcji
+    const session = await mongoose.startSession();
+
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     let companyId;
 
@@ -41,26 +44,39 @@ router.post("/register", async (req, res) => {
           .json({ message: "Nazwa firmy jest wymagana dla administratora" });
       }
 
-      // 1. Stwórz najpierw użytkownika (jeszcze bez firmy)
-      const newUser = new User({
-        username,
-        email,
-        password: hashedPassword,
-        role: "admin",
-      });
-      const savedUser = await newUser.save();
+      let savedUser, savedCompany;
 
-      // 2. Stwórz firmę, używając ID nowo utworzonego użytkownika jako właściciela
-      const newCompany = new Company({
-        name: companyName,
-        owner: savedUser._id, // Od razu przypisz właściciela
-        invitationCode: crypto.randomBytes(8).toString("hex"),
-      });
-      const savedCompany = await newCompany.save();
+      try {
+        await session.withTransaction(async () => {
+          // 1. Stwórz nową firmę
+          const newCompany = new Company({
+            name: companyName,
+            owner: null, // Zostanie ustawiony po utworzeniu użytkownika
+          });
 
-      // 3. Zaktualizuj użytkownika, dodając ID firmy
-      savedUser.company = savedCompany._id;
-      await savedUser.save();
+          // 2. Stwórz użytkownika (administratora)
+          const newUser = new User({
+            username,
+            email,
+            password: hashedPassword,
+            role: "admin",
+            company: newCompany._id, // Przypisz ID firmy do użytkownika
+          });
+
+          // Zapisz użytkownika w ramach sesji
+          const userResult = await newUser.save({ session });
+
+          // 3. Ustaw właściciela firmy i zapisz firmę
+          newCompany.owner = userResult._id;
+          const companyResult = await newCompany.save({ session });
+
+          savedUser = userResult;
+          savedCompany = companyResult;
+        });
+      } finally {
+        // Zakończ sesję
+        session.endSession();
+      }
 
       return res.status(201).json({
         message: "Firma i administrator zostali pomyślnie zarejestrowani",
@@ -68,11 +84,11 @@ router.post("/register", async (req, res) => {
           _id: savedUser._id,
           username: savedUser.username,
           role: savedUser.role,
+          company: savedCompany._id,
         },
         company: {
           _id: savedCompany._id,
           name: savedCompany.name,
-          invitationCode: savedCompany.invitationCode,
         },
       });
     } else if (role === "employee") {
@@ -82,13 +98,23 @@ router.post("/register", async (req, res) => {
           .json({ message: "Kod zaproszenia jest wymagany dla pracownika" });
       }
 
-      const company = await Company.findOne({ invitationCode });
-      if (!company) {
+      // Znajdź zaproszenie, które pasuje do kodu i nie wygasło
+      const invitation = await Invitation.findOne({
+        code: invitationCode,
+        expiresAt: { $gt: new Date() },
+      });
+
+      if (!invitation) {
         return res
           .status(404)
-          .json({ message: "Nieprawidłowy kod zaproszenia" });
+          .json({ message: "Nieprawidłowy lub wygasły kod zaproszenia" });
       }
-      companyId = company._id;
+
+      // Pobierz ID firmy z zaproszenia
+      companyId = invitation.company;
+
+      // Opcjonalnie: usuń zaproszenie po użyciu, aby zapobiec ponownemu wykorzystaniu
+      await Invitation.findByIdAndDelete(invitation._id);
 
       const newUser = new User({
         username,

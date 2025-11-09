@@ -11,11 +11,6 @@ const companySchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  invitationCode: {
-    type: String,
-    required: true,
-    unique: true,
-  },
 });
 
 export default mongoose.model("Company", companySchema);

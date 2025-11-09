@@ -12,6 +12,7 @@ import {
     CalendarCheck,
     ChevronRight,
     ChevronLeft,
+    Key,
 } from 'lucide-react';
 import AddProjectModal from './AddProjectModal.jsx';
 import moment from 'moment';
@@ -29,6 +30,7 @@ const Icon = {
     Check: () => <CalendarCheck className="h-5 w-5" />,
     ChevronRight: () => <ChevronRight className="h-5 w-5" />,
     ChevronLeft: () => <ChevronLeft className="h-5 w-5" />,
+    Key: () => <Key className="h-4 w-4" />,
 };
 
 function formatTime(s) {
@@ -470,29 +472,46 @@ export default function Dashboard() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 md:gap-6">
-                                <div className="relative hidden sm:block">
-                                    <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2">
-                                        <Icon.Search />
-                                        <input
-                                            className="w-32 bg-transparent text-sm outline-none md:w-64"
-                                            placeholder="Wyszukaj..."
-                                        />
+                                <div className="flex items-center gap-3 md:gap-6">
+                                    <div className="relative hidden sm:block">
+                                        <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2">
+                                            <Icon.Search />
+                                            <input
+                                                className="w-32 bg-transparent text-sm outline-none md:w-64"
+                                                placeholder="Wyszukaj..."
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        {(role === 'admin' || role === 'hr') && (
+                                            <button
+                                                onClick={() =>
+                                                    setIsModalOpen(true)
+                                                }
+                                                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-emerald-700 md:px-5"
+                                            >
+                                                <Icon.Plus />
+                                                <span className="hidden text-sm sm:inline">
+                                                    Add Project
+                                                </span>
+                                            </button>
+                                        )}
+                                        {role === 'admin' && (
+                                            <button
+                                                onClick={() =>
+                                                    navigate('/generate-code')
+                                                }
+                                                className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-blue-700 md:px-5"
+                                            >
+                                                <Icon.Key />
+                                                <span className="hidden text-sm sm:inline">
+                                                    Generate Code
+                                                </span>
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
-
-                                {(role === 'admin' || role === 'hr') && (
-                                    <button
-                                        onClick={() => setIsModalOpen(true)}
-                                        className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-emerald-700 md:px-5"
-                                    >
-                                        <Icon.Plus />
-                                        <span className="hidden text-sm sm:inline">
-                                            Add Project
-                                        </span>
-                                    </button>
-                                )}
-                            </div>
                         </div>
                     </div>
 
