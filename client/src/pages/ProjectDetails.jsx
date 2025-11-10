@@ -31,14 +31,16 @@ import { useAuth } from '../context/AuthContext';
 moment.locale('pl');
 
 const formatDateForDisplay = (dateString) => {
-    if (!dateString) return 'Nie określono';
+    if (!dateString) return null;
     try {
         return new Date(dateString).toLocaleDateString('pl-PL', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
         });
-    } catch {
+    } catch (e) {
+        console.error("Error formatting date", e);
+
         return 'Błędna data';
     }
 };
@@ -908,9 +910,11 @@ export default function ProjectDetails() {
                             </div>
                         ) : (
                             <p className="text-lg font-bold text-gray-800">
-                                {formatDateForDisplay(project.startDate)} -{' '}
-                                {formatDateForDisplay(project.endDate)}
+                                {formatDateForDisplay(project.startDate) && formatDateForDisplay(project.endDate) ?
+                                    `${formatDateForDisplay(project.startDate)} - ${formatDateForDisplay(project.endDate)}`
+                                    : 'Nieokreślono'}
                             </p>
+
                         )}
                     </StatCard>
                     <StatCard

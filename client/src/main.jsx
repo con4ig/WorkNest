@@ -29,10 +29,12 @@ axios.defaults.baseURL = import.meta.env.PROD
 axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById('root')).render(
+
     <StrictMode>
         <AuthProvider>
             <Router>
                 <Toaster
+                    containerStyle={{ zIndex: 9999 }}
                     position="top-center"
                     reverseOrder={false}
                     toastOptions={{
@@ -73,7 +75,9 @@ createRoot(document.getElementById('root')).render(
                         <Route path="/upload" element={<Upload />} />
                         <Route path="/generate-code" element={<GenerateCode />} />
                     </Route>
+
                 </Routes>
+
             </Router>
         </AuthProvider>
     </StrictMode>,

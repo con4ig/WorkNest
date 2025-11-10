@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowRight } from 'lucide-react';
 import { useState } from 'react'; // useState jest już importowany, ale upewnijmy się
-import toast from 'react-hot-toast'; // Załóżmy, że masz zainstalowane react-hot-toast
+import toast from 'react-hot-toast'; 
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
