@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import LoadingScreen from '../components/LoadingScreen';
 import { useAuth } from '../context/AuthContext';
 
 const Icon = {
@@ -189,14 +190,7 @@ export default function EmployeeList() {
     };
 
     if (loading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-100">
-                <div className="text-center">
-                    <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                    <div className="text-lg text-gray-600">Ładowanie...</div>
-                </div>
-            </div>
-        );
+        return <LoadingScreen message="Ładowanie listy pracowników..." />;
     }
 
     if (error) {

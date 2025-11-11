@@ -27,6 +27,7 @@ import {
 import moment from 'moment';
 import 'moment/locale/pl';
 import { useAuth } from '../context/AuthContext';
+import LoadingScreen from '../components/LoadingScreen.jsx';
 
 moment.locale('pl');
 
@@ -814,16 +815,7 @@ export default function ProjectDetails() {
     }, [fetchData, fetchActivities]);
 
     if (loading || !currentUser) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-slate-50">
-                <div className="text-center">
-                    <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                    <p className="text-lg text-slate-600">
-                        Ładowanie projektu...
-                    </p>
-                </div>
-            </div>
-        );
+        return <LoadingScreen message="Ładowanie projektu..." />;
     }
 
     // Calculate task statistics

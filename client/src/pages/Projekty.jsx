@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -10,6 +10,7 @@ import {
     FolderKanban,
     MoreVertical,
 } from 'lucide-react';
+import LoadingScreen from '../components/LoadingScreen';
 import { useAuth } from '../context/AuthContext';
 
 // --- Style i dane pomocnicze (bez zmian) ---
@@ -36,45 +37,7 @@ const formatDate = (dateString) => {
     });
 };
 
-// --- Custom Hook ---
-const useProjects = (companyId) => {
-    const [projects, setProjects] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
 
-    const fetchProjects = useCallback(
-        async (params = {}) => {
-            if (!companyId) {
-                setIsLoading(false);
-                return; // Nie pobieraj projektów, jeśli companyId nie jest dostępne
-            }
-            setIsLoading(true);
-            setError(null);
-            try {
-                const response = await axios.get('/api/projects', {
-                    params: { ...params, company: companyId },
-                });
-                setProjects(response.data.projects);
-            } catch (err) {
-                console.error('Błąd ładowania projektów:', err);
-                if (
-                    err.response?.status === 401 ||
-                    err.response?.status === 403
-                ) {
-                    navigate('/login');
-                } else {
-                    setError('Nie udało się załadować listy projektów.');
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        },
-        [navigate, companyId],
-    );
-
-    return { projects, setProjects, isLoading, error, fetchProjects };
-};
 
 // --- Komponenty UI (Zaktualizowane o responsywność) ---
 
@@ -117,12 +80,22 @@ const FilterControls = ({ onFilterChange, onRefresh }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [status, setStatus] = useState('');
 
+    // 1. Dodaj ref do śledzenia pierwszego renderowania
+    const isMounted = useRef(false);
+
     useEffect(() => {
-        const handler = setTimeout(() => {
-            onFilterChange({ name: searchTerm, status });
-        }, 500);
-        return () => clearTimeout(handler);
-    }, [searchTerm, status, onFilterChange]);
+        // 2. Sprawdź, czy to pierwsze renderowanie
+        if (isMounted.current) {
+            // Jeśli to NIE jest pierwsze renderowanie, uruchom debounce
+            const handler = setTimeout(() => {
+                onFilterChange({ name: searchTerm, status });
+            }, 500);
+            return () => clearTimeout(handler);
+        } else {
+            // 3. Jeśli to JEST pierwsze renderowanie, tylko ustaw ref na true
+            isMounted.current = true;
+        }
+    }, [searchTerm, status, onFilterChange]); // Zależności pozostają bez zmian
 
     return (
         // ZMIANA: Kontrolki układają się w kolumnie na mobile, w wierszu na desktopie
@@ -163,7 +136,6 @@ const FilterControls = ({ onFilterChange, onRefresh }) => {
     );
 };
 
-// NOWY KOMPONENT: Karta projektu dla widoku mobilnego
 const ProjectCard = ({ project, currentUserRole, onDelete, onCardClick }) => {
     const statusInfo = statusStyles[project.status] || statusStyles['pending'];
 
@@ -239,38 +211,6 @@ const ProjectCard = ({ project, currentUserRole, onDelete, onCardClick }) => {
         </div>
     );
 };
-
-// NOWY KOMPONENT: Skeleton dla widoku kart
-const ProjectCardSkeleton = () =>
-    [...Array(3)].map((_, i) => (
-        <div
-            key={i}
-            className="animate-pulse rounded-lg border border-slate-200 bg-white p-4 shadow-md"
-        >
-            <div className="mb-4 flex items-start justify-between">
-                <div>
-                    <div className="mb-2 h-4 w-32 rounded bg-slate-200"></div>
-                    <div className="h-3 w-48 rounded bg-slate-200"></div>
-                </div>
-                <div className="h-6 w-6 rounded-full bg-slate-200"></div>
-            </div>
-            <div className="mb-4 h-5 w-24 rounded-full bg-slate-200"></div>
-            <div className="mb-4 h-2 w-full rounded-full bg-slate-200"></div>
-            <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4">
-                <div>
-                    <div className="mb-2 h-3 w-16 rounded bg-slate-200"></div>
-                    <div className="h-4 w-24 rounded bg-slate-200"></div>
-                </div>
-                <div>
-                    <div className="mb-2 h-3 w-20 rounded bg-slate-200"></div>
-                    <div className="flex -space-x-2">
-                        <div className="h-7 w-7 rounded-full border-2 border-white bg-slate-200"></div>
-                        <div className="h-7 w-7 rounded-full border-2 border-white bg-slate-200"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    ));
 
 const AssignedUsersAvatarGroup = ({ users }) => (
     <div className="flex -space-x-2">
@@ -350,49 +290,50 @@ const ProjectRow = ({ project, currentUserRole, onDelete, onRowClick }) => {
     );
 };
 
-const ProjectTableSkeleton = () =>
-    [...Array(5)].map((_, i) => (
-        <tr key={i} className="animate-pulse">
-            <td className="px-6 py-4">
-                <div className="h-4 w-3/4 rounded bg-slate-200"></div>
-            </td>
-            <td className="px-6 py-4">
-                <div className="h-6 w-24 rounded-full bg-slate-200"></div>
-            </td>
-            <td className="px-6 py-4">
-                <div className="h-4 w-1/2 rounded bg-slate-200"></div>
-            </td>
-            <td className="px-6 py-4">
-                <div className="h-4 w-20 rounded bg-slate-200"></div>
-            </td>
-            <td className="px-6 py-4">
-                <div className="flex -space-x-2">
-                    <div className="h-7 w-7 rounded-full border-2 border-white bg-slate-200"></div>
-                    <div className="h-7 w-7 rounded-full border-2 border-white bg-slate-200"></div>
-                </div>
-            </td>
-            <td className="px-6 py-4">
-                <div className="h-8 w-8 rounded-lg bg-slate-200"></div>
-            </td>
-        </tr>
-    ));
-
 // --- Główny komponent strony (ZREFRAKTORYZOWANY) ---
 export default function Projekty() {
     const { user, loading: authLoading } = useAuth();
     const companyId = user?.company?._id;
     const currentUserRole = user?.role;
-
-    const { projects, setProjects, isLoading, error, fetchProjects } =
-        useProjects(companyId);
     const navigate = useNavigate();
+
+    const [projects, setProjects] = useState([]);
+    const [isLoading, setIsLoading] = useState(true); // Start with true for initial load
+    const [error, setError] = useState(null);
     const [filters, setFilters] = useState({ name: '', status: '' });
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const fetchProjects = useCallback(async () => {
+        if (!companyId) {
+            setProjects([]);
+            setIsLoading(false);
+            return;
+        }
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await axios.get('/api/projects', {
+                params: { ...filters, company: companyId },
+                withCredentials: true,
+            });
+            setProjects(response.data.projects);
+        } catch (err) {
+            console.error('Błąd ładowania projektów:', err);
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                navigate('/login');
+            } else {
+                setError('Nie udało się załadować listy projektów.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [companyId, navigate, filters.name, filters.status]);
 
     useEffect(() => {
-        if (companyId) {
-            fetchProjects(filters);
+        if (!authLoading) {
+            fetchProjects();
         }
-    }, [filters, fetchProjects, companyId]);
+    }, [authLoading, fetchProjects, refreshKey]); 
 
     const handleDelete = async (projectId) => {
         if (!window.confirm('Czy na pewno chcesz usunąć ten projekt?')) return;
@@ -413,109 +354,92 @@ export default function Projekty() {
         navigate(`/projects/${projectId}`);
     };
 
-    // Funkcja renderująca zawartość w zależności od stanu (ładowanie, błąd, dane)
-    const renderContent = () => {
-        if (authLoading || isLoading) {
-            return (
-                <>
-                    {/* Skeleton dla widoku tabeli (desktop) */}
-                    <table className="hidden min-w-full lg:table">
-                        <tbody className="divide-y divide-slate-200">
-                            <ProjectTableSkeleton />
-                        </tbody>
-                    </table>
-                    {/* Skeleton dla widoku kart (mobile/tablet) */}
-                    <div className="block space-y-4 lg:hidden">
-                        <ProjectCardSkeleton />
-                    </div>
-                </>
-            );
-        }
+    if (isLoading || authLoading) {
+        return <LoadingScreen message="Ładowanie projektów..." />;
+    }
 
-        if (error) {
-            return (
-                <div className="py-10 text-center text-red-600">{error}</div>
-            );
-        }
-        if (projects.length === 0 && !isLoading) {
-            return (
-                <div className="py-10 text-center text-slate-500">
-                    Nie znaleziono projektów.
-                </div>
-            );
-        }
+    if (authLoading) {
+        return <LoadingScreen message="Uwierzytelnianie..." />;
+    }
 
+    if (error) {
         return (
-            <>
-                {/* Widok tabeli na desktopie */}
-                <div className="hidden overflow-x-auto lg:block">
-                    <table className="min-w-full divide-y divide-slate-200">
-                        <thead className="bg-slate-50">
-                            <tr>
-                                {[
-                                    'Nazwa Projektu',
-                                    'Status',
-                                    'Postęp',
-                                    'Termin',
-                                    'Przypisani',
-                                    'Akcje',
-                                ].map((header) => (
-                                    <th
-                                        key={header}
-                                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500"
-                                    >
-                                        {header}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200 bg-white">
+            <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+                <div className="w-full max-w-md rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-red-700 shadow-sm">
+                    <div className="mb-2 text-lg font-semibold">Błąd</div>
+                    <div className="text-sm">{error}</div>
+                    <button onClick={() => navigate('/dashboard')} className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto">
+                        Powrót do Dashboard
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!companyId && !authLoading) { // check after auth is done
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+                <div className="w-full max-w-md rounded-xl border border-yellow-200 bg-yellow-50 px-6 py-6 text-yellow-700 shadow-sm">
+                    <div className="mb-2 text-lg font-semibold">Brak przypisanej firmy</div>
+                    <div className="text-sm">Nie jesteś przypisany do żadnej firmy. Skontaktuj się z administratorem.</div>
+                    <button onClick={() => navigate('/dashboard')} className="mt-4 w-full rounded-lg bg-yellow-600 px-4 py-2 text-white transition-colors hover:bg-yellow-700 sm:w-auto">
+                        Powrót do Dashboard
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-slate-50 p-2 sm:p-4 md:p-8">
+            <ProjectListHeader />
+            <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
+                <FilterControls
+                    onFilterChange={setFilters}
+                    onRefresh={() => setRefreshKey((k) => k + 1)}
+                />
+                {projects.length === 0 ? <div className="py-10 text-center text-slate-500">Nie znaleziono projektów.</div> : <>
+                    <>
+                        <div className="hidden overflow-x-auto lg:block">
+                            <table className="min-w-full divide-y divide-slate-200">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        {['Nazwa Projektu', 'Status', 'Postęp', 'Termin', 'Przypisani', 'Akcje'].map((header) => (
+                                            <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                                                {header}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-200 bg-white">
+                                    {projects.map((project) => (
+                                        <ProjectRow
+                                            key={project._id}
+                                            project={project}
+                                            currentUserRole={currentUserRole}
+                                            onDelete={handleDelete}
+                                            onRowClick={handleRowClick}
+                                        />
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="block space-y-4 lg:hidden">
                             {projects.map((project) => (
-                                <ProjectRow
+                                <ProjectCard
                                     key={project._id}
                                     project={project}
                                     currentUserRole={currentUserRole}
                                     onDelete={handleDelete}
-                                    onRowClick={handleRowClick}
+                                    onCardClick={handleRowClick}
                                 />
                             ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Widok kart na mobile/tablet */}
-                <div className="block space-y-4 lg:hidden">
-                    {projects.map((project) => (
-                        <ProjectCard
-                            key={project._id}
-                            project={project}
-                            currentUserRole={currentUserRole}
-                            onDelete={handleDelete}
-                            onCardClick={handleRowClick}
-                        />
-                    ))}
-                </div>
-            </>
-        );
-    };
-
-    return (
-        // ZMIANA: Responsywne paddingi dla całej strony
-        <div className="min-h-screen bg-slate-50 p-2 sm:p-4 md:p-8">
-            <ProjectListHeader />
-
-            <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
-                <FilterControls
-                    onFilterChange={setFilters}
-                    onRefresh={() => fetchProjects(filters)}
-                />
-
-                {renderContent()}
+                        </div>
+                    </>
+                </>}
             </div>
-
             <footer className="mt-8 text-center text-sm text-slate-400">
-                © {new Date().getFullYear()} WorkNest — Wszelkie prawa
-                zastrzeżone
+                © {new Date().getFullYear()} WorkNest — Wszelkie prawa zastrzeżone
             </footer>
         </div>
     );

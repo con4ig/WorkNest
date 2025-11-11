@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Key, ArrowLeft, RefreshCw, Copy, Check, Sparkles, Lock } from 'lucide-react';
+import LoadingScreen from '../components/LoadingScreen.jsx';
 
 export default function GenerateCode() {
     const [invitationCode, setInvitationCode] = useState(null);
     const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // Do ładowania przycisku
+    const [pageLoading, setPageLoading] = useState(true); // Do ładowania strony
     const [isCopied, setIsCopied] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Symulacja ładowania strony
+        const timer = setTimeout(() => {
+            setPageLoading(false);
+        }, 500); // 0.5 sekundy opóźnienia
+        return () => clearTimeout(timer);
+    }, []);
 
     const generateCode = async () => {
         setIsLoading(true);
@@ -61,6 +71,10 @@ export default function GenerateCode() {
             console.log('invitationCode is null');
         }
     };
+
+    if (pageLoading) {
+        return <LoadingScreen message="Ładowanie..." />;
+    }
 
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-4">

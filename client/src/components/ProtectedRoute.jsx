@@ -1,15 +1,21 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import LoadingScreen from './LoadingScreen'; // Importujemy nowy komponent
 
 const ProtectedRoute = () => {
     const { user, loading } = useAuth();
 
+    // Jeśli trwa weryfikacja autoryzacji, pokaż ekran ładowania
     if (loading) {
-        return <div>Loading...</div>; // Or a more sophisticated loading spinner
+        return <LoadingScreen message="Weryfikacja dostępu..." />;
     }
 
-    return user ? <Outlet /> : <Navigate to="/login" replace />;
+    if (!loading && !user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return <Outlet />;
 };
 
 export default ProtectedRoute;

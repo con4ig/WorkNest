@@ -16,6 +16,7 @@ import {
     Badge,
 } from 'lucide-react';
 
+import LoadingScreen from '../components/LoadingScreen';
 // --- Pomocnicze funkcje formatowania ---
 const formatDateForDisplay = (dateString) => {
     if (!dateString) return 'Nie określono';
@@ -287,17 +288,7 @@ export default function UserDetails() {
         }
     };
 
-    if (loading)
-        return (
-            <div className="flex h-screen items-center justify-center bg-slate-50">
-                <div className="text-center">
-                    <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                    <p className="text-lg text-slate-600">
-                        Ładowanie danych pracownika...
-                    </p>
-                </div>
-            </div>
-        );
+    if (loading) return <LoadingScreen message="Ładowanie danych pracownika..." />;
 
     if (error)
         return (
