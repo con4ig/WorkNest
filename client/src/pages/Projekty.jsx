@@ -8,12 +8,10 @@ import {
     Trash2,
     ArrowLeft,
     FolderKanban,
-    MoreVertical,
 } from 'lucide-react';
 import LoadingScreen from '../components/LoadingScreen';
 import { useAuth } from '../context/AuthContext';
 
-// --- Style i dane pomocnicze (bez zmian) ---
 const statusStyles = {
     pending: {
         text: 'text-yellow-800',
@@ -28,6 +26,7 @@ const statusStyles = {
     },
     'on-hold': { text: 'text-red-800', bg: 'bg-red-100', label: 'Wstrzymany' },
 };
+
 const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('pl-PL', {
@@ -37,14 +36,11 @@ const formatDate = (dateString) => {
     });
 };
 
-
-
-// --- Komponenty UI (Zaktualizowane o responsywność) ---
+// --- Komponenty UI ---
 
 const ProjectListHeader = () => {
     const navigate = useNavigate();
     return (
-        // ZMIANA: Dodano responsywne paddingi i układ
         <header className="sticky top-0 z-10 mb-6 rounded-2xl bg-white shadow-sm md:mb-8">
             <div className="max-w-8xl mx-auto px-4 py-4 md:px-8 md:py-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -54,19 +50,16 @@ const ProjectListHeader = () => {
                             className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100"
                         >
                             <ArrowLeft className="h-5 w-5" />
-                            {/* ZMIANA: Tekst chowany na najmniejszych ekranach */}
                             <span className="hidden sm:inline">Dashboard</span>
                         </button>
                         <div className="hidden h-8 w-px bg-slate-200 sm:block"></div>
                         <div>
-                            {/* ZMIANA: Responsywna typografia */}
                             <h1 className="flex items-center gap-3 text-xl font-bold text-slate-800 sm:text-2xl">
                                 <FolderKanban className="text-emerald-600" />{' '}
                                 Przegląd Projektów
                             </h1>
                             <p className="hidden text-sm text-slate-500 md:block">
-                                Zarządzaj wszystkimi projektami w jednym
-                                miejscu.
+                                Zarządzaj wszystkimi projektami w jednym miejscu.
                             </p>
                         </div>
                     </div>
@@ -76,29 +69,23 @@ const ProjectListHeader = () => {
     );
 };
 
-const FilterControls = ({ onFilterChange, onRefresh }) => {
+const FilterControls = ({ onFilterChange, onRefresh, isFiltering }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [status, setStatus] = useState('');
-
-    // 1. Dodaj ref do śledzenia pierwszego renderowania
     const isMounted = useRef(false);
 
     useEffect(() => {
-        // 2. Sprawdź, czy to pierwsze renderowanie
         if (isMounted.current) {
-            // Jeśli to NIE jest pierwsze renderowanie, uruchom debounce
             const handler = setTimeout(() => {
                 onFilterChange({ name: searchTerm, status });
             }, 500);
             return () => clearTimeout(handler);
         } else {
-            // 3. Jeśli to JEST pierwsze renderowanie, tylko ustaw ref na true
             isMounted.current = true;
         }
-    }, [searchTerm, status, onFilterChange]); // Zależności pozostają bez zmian
+    }, [searchTerm, status, onFilterChange]);
 
     return (
-        // ZMIANA: Kontrolki układają się w kolumnie na mobile, w wierszu na desktopie
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:flex-wrap md:items-center md:justify-between">
             <div className="relative w-full md:max-w-sm md:flex-grow">
                 <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
@@ -108,8 +95,12 @@ const FilterControls = ({ onFilterChange, onRefresh }) => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                {isFiltering && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-600"></div>
+                    </div>
+                )}
             </div>
-            {/* ZMIANA: Grupowanie kontrolek i responsywny układ */}
             <div className="flex w-full flex-col items-stretch gap-4 sm:flex-row sm:items-center md:w-auto">
                 <div className="flex w-full items-center gap-2 text-sm text-slate-600">
                     <ListFilter className="h-5 w-5" />
@@ -144,7 +135,6 @@ const ProjectCard = ({ project, currentUserRole, onDelete, onCardClick }) => {
             className="cursor-pointer rounded-lg border border-slate-200 bg-white p-4 shadow-md transition-shadow hover:shadow-lg"
             onClick={() => onCardClick(project._id)}
         >
-            {/* Nagłówek karty */}
             <div className="mb-4 flex items-start justify-between">
                 <div>
                     <h3 className="text-base font-bold text-slate-800">
@@ -168,7 +158,6 @@ const ProjectCard = ({ project, currentUserRole, onDelete, onCardClick }) => {
                 )}
             </div>
 
-            {/* Status i Postęp */}
             <div className="mb-4">
                 <div className="mb-1 text-xs text-slate-500">Status</div>
                 <span
@@ -193,7 +182,6 @@ const ProjectCard = ({ project, currentUserRole, onDelete, onCardClick }) => {
                 </div>
             </div>
 
-            {/* Szczegóły - siatka */}
             <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4">
                 <div>
                     <div className="mb-1 text-xs text-slate-500">Termin</div>
@@ -202,9 +190,7 @@ const ProjectCard = ({ project, currentUserRole, onDelete, onCardClick }) => {
                     </div>
                 </div>
                 <div>
-                    <div className="mb-1 text-xs text-slate-500">
-                        Przypisani
-                    </div>
+                    <div className="mb-1 text-xs text-slate-500">Przypisani</div>
                     <AssignedUsersAvatarGroup users={project.assignedUsers} />
                 </div>
             </div>
@@ -290,7 +276,7 @@ const ProjectRow = ({ project, currentUserRole, onDelete, onRowClick }) => {
     );
 };
 
-// --- Główny komponent strony (ZREFRAKTORYZOWANY) ---
+// --- Główny komponent strony (POPRAWIONY) ---
 export default function Projekty() {
     const { user, loading: authLoading } = useAuth();
     const companyId = user?.company?._id;
@@ -298,22 +284,31 @@ export default function Projekty() {
     const navigate = useNavigate();
 
     const [projects, setProjects] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // Start with true for initial load
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isFiltering, setIsFiltering] = useState(false);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({ name: '', status: '' });
     const [refreshKey, setRefreshKey] = useState(0);
 
-    const fetchProjects = useCallback(async () => {
+    const fetchProjects = useCallback(async (showFullLoader = false, currentFilters = filters) => {
         if (!companyId) {
             setProjects([]);
-            setIsLoading(false);
+            setIsInitialLoading(false);
             return;
         }
-        setIsLoading(true);
+        
+        // Używamy pełnego loadera tylko przy pierwszym ładowaniu lub odświeżaniu
+        if (showFullLoader) {
+            setIsInitialLoading(true);
+        } else {
+            setIsFiltering(true);
+        }
+        
         setError(null);
+        
         try {
             const response = await axios.get('/api/projects', {
-                params: { ...filters, company: companyId },
+                params: { ...currentFilters, company: companyId },
                 withCredentials: true,
             });
             setProjects(response.data.projects);
@@ -325,15 +320,27 @@ export default function Projekty() {
                 setError('Nie udało się załadować listy projektów.');
             }
         } finally {
-            setIsLoading(false);
+            setIsInitialLoading(false);
+            setIsFiltering(false);
         }
-    }, [companyId, navigate, filters.name, filters.status]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [companyId, navigate]);
 
+    // Pierwsze załadowanie (z pełnym loaderem) - tylko przy wejściu i odświeżaniu
     useEffect(() => {
-        if (!authLoading) {
-            fetchProjects();
+        if (!authLoading && companyId) {
+            fetchProjects(true, filters);
         }
-    }, [authLoading, fetchProjects, refreshKey]); 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authLoading, companyId, refreshKey]); // celowo BEZ filters i fetchProjects
+
+    // Filtrowanie (tylko spinner w polu wyszukiwania)
+    useEffect(() => {
+        if (!authLoading && companyId && !isInitialLoading) {
+            fetchProjects(false, filters);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filters]);
 
     const handleDelete = async (projectId) => {
         if (!window.confirm('Czy na pewno chcesz usunąć ten projekt?')) return;
@@ -354,12 +361,13 @@ export default function Projekty() {
         navigate(`/projects/${projectId}`);
     };
 
-    if (isLoading || authLoading) {
-        return <LoadingScreen message="Ładowanie projektów..." />;
-    }
+    const handleRefresh = () => {
+        setFilters({ name: '', status: '' });
+        setRefreshKey((k) => k + 1);
+    };
 
-    if (authLoading) {
-        return <LoadingScreen message="Uwierzytelnianie..." />;
+    if (isInitialLoading || authLoading) {
+        return <LoadingScreen message="Ładowanie projektów..." />;
     }
 
     if (error) {
@@ -368,7 +376,10 @@ export default function Projekty() {
                 <div className="w-full max-w-md rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-red-700 shadow-sm">
                     <div className="mb-2 text-lg font-semibold">Błąd</div>
                     <div className="text-sm">{error}</div>
-                    <button onClick={() => navigate('/dashboard')} className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto">
+                    <button 
+                        onClick={() => navigate('/dashboard')} 
+                        className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto"
+                    >
                         Powrót do Dashboard
                     </button>
                 </div>
@@ -376,13 +387,16 @@ export default function Projekty() {
         );
     }
 
-    if (!companyId && !authLoading) { // check after auth is done
+    if (!companyId) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
                 <div className="w-full max-w-md rounded-xl border border-yellow-200 bg-yellow-50 px-6 py-6 text-yellow-700 shadow-sm">
                     <div className="mb-2 text-lg font-semibold">Brak przypisanej firmy</div>
                     <div className="text-sm">Nie jesteś przypisany do żadnej firmy. Skontaktuj się z administratorem.</div>
-                    <button onClick={() => navigate('/dashboard')} className="mt-4 w-full rounded-lg bg-yellow-600 px-4 py-2 text-white transition-colors hover:bg-yellow-700 sm:w-auto">
+                    <button 
+                        onClick={() => navigate('/dashboard')} 
+                        className="mt-4 w-full rounded-lg bg-yellow-600 px-4 py-2 text-white transition-colors hover:bg-yellow-700 sm:w-auto"
+                    >
                         Powrót do Dashboard
                     </button>
                 </div>
@@ -396,16 +410,24 @@ export default function Projekty() {
             <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
                 <FilterControls
                     onFilterChange={setFilters}
-                    onRefresh={() => setRefreshKey((k) => k + 1)}
+                    onRefresh={handleRefresh}
+                    isFiltering={isFiltering}
                 />
-                {projects.length === 0 ? <div className="py-10 text-center text-slate-500">Nie znaleziono projektów.</div> : <>
+                {projects.length === 0 ? (
+                    <div className="py-10 text-center text-slate-500">
+                        Nie znaleziono projektów.
+                    </div>
+                ) : (
                     <>
                         <div className="hidden overflow-x-auto lg:block">
                             <table className="min-w-full divide-y divide-slate-200">
                                 <thead className="bg-slate-50">
                                     <tr>
                                         {['Nazwa Projektu', 'Status', 'Postęp', 'Termin', 'Przypisani', 'Akcje'].map((header) => (
-                                            <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                                            <th 
+                                                key={header} 
+                                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500"
+                                            >
                                                 {header}
                                             </th>
                                         ))}
@@ -436,7 +458,7 @@ export default function Projekty() {
                             ))}
                         </div>
                     </>
-                </>}
+                )}
             </div>
             <footer className="mt-8 text-center text-sm text-slate-400">
                 © {new Date().getFullYear()} WorkNest — Wszelkie prawa zastrzeżone

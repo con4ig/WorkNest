@@ -51,21 +51,12 @@ const PORT = process.env.PORT || 5500;
 // Połączenie z MongoDB
 const connectDB = async () => {
   try {
-    // Użyj zmiennej środowiskowej MONGODB_URI
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      // Opcje, które mogą pomóc w stabilności połączenia
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
 
-    // Log, który powie Ci, że połączenie się udało!
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
 
   } catch (error) {
-    // Log, który pokaże DOKŁADNY błąd połączenia
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    
-    // Wyjdź z procesu z błędem, aby Render wiedział, że aplikacja nie uruchomiła się poprawnie
     process.exit(1);
   }
 };

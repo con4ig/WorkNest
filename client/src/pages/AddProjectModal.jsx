@@ -38,6 +38,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         if (isOpen && companyId) {
             fetchUsers();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, companyId]);
 
     const fetchUsers = async () => {
