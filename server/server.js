@@ -7,7 +7,7 @@ import rateLimit from "express-rate-limit";
 import User from "./models/User.js";
 import authenticate from "./middleware/authenticate.js";
 import authorize from "./middleware/authorize.js";
-import emailRoutes from "./routes/email.js";
+// import emailRoutes from "./routes/email.js";
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
 import leaveRoutes from "./routes/leave.js";
