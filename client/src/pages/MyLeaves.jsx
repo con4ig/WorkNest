@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import RequestLeaveModal from '../components/RequestLeaveModal';
 import { useAuth } from '../context/AuthContext';
+import LoadingScreen from '../components/LoadingScreen.jsx';
 
 const Icon = {
     ArrowLeft: () => (
@@ -144,14 +145,7 @@ export default function MyLeaves() {
     };
 
     if (loading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-100">
-                <div className="text-center">
-                    <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                    <div className="text-lg text-gray-600">Ładowanie...</div>
-                </div>
-            </div>
-        );
+        return <LoadingScreen message="Ładowanie wniosków..." />;
     }
 
     return (

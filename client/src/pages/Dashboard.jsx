@@ -17,6 +17,7 @@ import {
 import AddProjectModal from './AddProjectModal.jsx';
 import moment from 'moment';
 import 'moment/locale/pl';
+import LoadingScreen from '../components/LoadingScreen.jsx';
 import { useAuth } from '../context/AuthContext';
 
 const Icon = {
@@ -55,6 +56,7 @@ export default function Dashboard() {
     const [isMobile, setIsMobile] = useState(false);
     const [profileImage, setProfileImage] = useState('');
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true); // Główny stan ładowania strony
     const location = useLocation();
     const { user } = useAuth();
 
@@ -75,128 +77,75 @@ export default function Dashboard() {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Połączona funkcja do pobierania wszystkich danych
+    const fetchDashboardData = async () => {
+        if (!user) return; // Czekaj na załadowanie użytkownika z kontekstu
+
+        setLoading(true);
+        try {
+            // Pobierz dane użytkownika
+            const userRes = await axios.get('/api/auth/me', { withCredentials: true });
+            const { username: fetchedUsername, role: fetchedRole, profileImage: fetchedProfileImage, _id } = userRes.data;
+
+            setMessage(`Witaj, ${fetchedUsername}! Masz szybki przegląd ostatnich projektów.`);
+            setUsername(fetchedUsername);
+            setRole(fetchedRole);
+            setProfileImage(fetchedProfileImage);
+
+            // Pobierz statystyki w zależności od roli
+            if (fetchedRole === 'admin' || fetchedRole === 'hr' || fetchedRole === 'superadmin') {
+                const statsRes = await axios.get(`/api/projects/stats/summary`, {
+                    withCredentials: true,
+                    params: { company: user.company?._id },
+                });
+                const { total, running, pending, completed } = statsRes.data;
+                setStats([
+                    { id: 1, title: 'Total Projects', value: total.toString(), hint: 'Increased from last month' },
+                    { id: 2, title: 'Ended Projects', value: completed.toString(), hint: 'Stable' },
+                    { id: 3, title: 'Running Projects', value: running.toString(), hint: 'Growing' },
+                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
+                ]);
+            } else {
+                const assignedRes = await axios.get(`/api/projects/users/${_id}/assigned-projects/summary`, {
+                    withCredentials: true,
+                    params: { company: user.company?._id },
+                });
+                const { assigned, completed, running, pending } = assignedRes.data;
+                setStats([
+                    { id: 1, title: 'My Projects', value: assigned.toString(), hint: 'Assigned to you' },
+                    { id: 2, title: 'Completed', value: completed.toString(), hint: 'This month' },
+                    { id: 3, title: 'In Progress', value: running.toString(), hint: 'Active now' },
+                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
+                ]);
+            }
+
+            // Pobierz ostatnie projekty
+            const projectsRes = await axios.get('/api/projects?sortBy=createdAt:desc&limit=5', {
+                withCredentials: true,
+                params: { company: user.company?._id },
+            });
+            setProjects(projectsRes.data.projects);
+
+        } catch (err) {
+            console.error('Błąd ładowania danych dashboardu:', err);
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                navigate('/login');
+            }
+        } finally {
+            setLoading(false); // Zakończ ładowanie po wszystkich operacjach
+        }
+    };
+
     const handleProjectAdded = (newProject) => {
         setProjects((prevProjects) => [newProject, ...prevProjects]);
         alert(`Projekt "${newProject.name}" został pomyślnie dodany!`);
     };
 
     useEffect(() => {
-        const checkAuth = async () => {
-            const res = await axios.get('/api/auth/me', {
-                withCredentials: true,
-            });
-            const { username, role, profileImage, _id } = res.data;
-
-            setMessage(
-                `Witaj, ${username}! Masz szybki przegląd ostatnich projektów.`,
-            );
-            setUsername(username);
-            setRole(role);
-            setProfileImage(profileImage);
-
-            if (role === 'admin' || role === 'hr' || role === 'superadmin') {
-                const statsRes = await axios.get(
-                    `/api/projects/stats/summary`,
-                    {
-                        withCredentials: true,
-                        params: { company: user?.company?._id },
-                    },
-                );
-                const { total, running, pending, completed } = statsRes.data;
-
-                setStats([
-                    {
-                        id: 1,
-                        title: 'Total Projects',
-                        value: total.toString(),
-                        hint: 'Increased from last month',
-                    },
-                    {
-                        id: 2,
-                        title: 'Ended Projects',
-                        value: completed.toString(),
-                        hint: 'Stable',
-                    },
-                    {
-                        id: 3,
-                        title: 'Running Projects',
-                        value: running.toString(),
-                        hint: 'Growing',
-                    },
-                    {
-                        id: 4,
-                        title: 'Pending',
-                        value: pending.toString(),
-                        hint: 'On review',
-                    },
-                ]);
-            } else {
-                const assignedRes = await axios.get(
-                    `/api/projects/users/${_id}/assigned-projects/summary`,
-                    {
-                        withCredentials: true,
-                        params: { company: user?.company?._id },
-                    },
-                );
-                const { assigned, completed, running, pending } =
-                    assignedRes.data;
-                setStats([
-                    {
-                        id: 1,
-                        title: 'My Projects',
-                        value: assigned.toString(),
-                        hint: 'Assigned to you',
-                    },
-                    {
-                        id: 2,
-                        title: 'Completed',
-                        value: completed.toString(),
-                        hint: 'This month',
-                    },
-                    {
-                        id: 3,
-                        title: 'In Progress',
-                        value: running.toString(),
-                        hint: 'Active now',
-                    },
-                    {
-                        id: 4,
-                        title: 'Pending',
-                        value: pending.toString(),
-                        hint: 'On review',
-                    },
-                ]);
-            }
-        };
-
-        checkAuth();
-    }, [navigate]);
-
-    useEffect(() => {
-        const fetchRecentProjects = async () => {
-            try {
-                const response = await axios.get(
-                    '/api/projects?sortBy=createdAt:desc&limit=5',
-                    {
-                        withCredentials: true,
-                        params: { company: user?.company?._id },
-                    },
-                );
-
-                setProjects(response.data.projects);
-            } catch (err) {
-                console.error('Nie udało się pobrać projektów:', err);
-                if (
-                    err.response &&
-                    (err.response.status === 401 || err.response.status === 403)
-                ) {
-                    navigate('/login');
-                }
-            }
-        };
-
-        fetchRecentProjects();
-    }, [navigate]);
+        if (user) { // Uruchom pobieranie danych dopiero, gdy użytkownik jest dostępny
+            fetchDashboardData();
+        }
+    }, [user, navigate]); // Uruchom ponownie, gdy zmieni się użytkownik
 
     // time tracker
     const [running, setRunning] = useState(false);
@@ -225,6 +174,10 @@ export default function Dashboard() {
                 console.error('Błąd przy wylogowaniu:', err);
                 navigate('/login');
             });
+    }
+
+    if (loading) {
+        return <LoadingScreen message="Przygotowujemy Twój pulpit..." />;
     }
 
     return (
@@ -525,7 +478,7 @@ export default function Dashboard() {
                                         <div className="text-xs opacity-90 md:text-sm">
                                             Total Projects
                                         </div>
-                                        <div className="mt-2 text-3xl font-bold md:text-4xl">
+                                        <div className="mt-2 text-3xl font-bold md:text-4xl min-h-[48px]">
                                             {stats[0]?.value || '0'}
                                         </div>
                                         <div className="mt-2 text-xs opacity-90 md:text-sm">
@@ -568,7 +521,7 @@ export default function Dashboard() {
                                         <div className="text-xs text-gray-500">
                                             {s.title}
                                         </div>
-                                        <div className="mt-2 text-lg font-semibold md:text-xl">
+                                        <div className="mt-2 text-lg font-semibold md:text-xl min-h-[28px]">
                                             {s.value}
                                         </div>
                                         <div className="mt-2 text-xs text-gray-400 md:text-sm">
