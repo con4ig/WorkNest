@@ -145,6 +145,7 @@ export default function Dashboard() {
         if (user) { // Uruchom pobieranie danych dopiero, gdy użytkownik jest dostępny
             fetchDashboardData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, navigate]); // Uruchom ponownie, gdy zmieni się użytkownik
 
     // time tracker
@@ -426,15 +427,6 @@ export default function Dashboard() {
                             </div>
 
                                 <div className="flex items-center gap-3 md:gap-6">
-                                    <div className="relative hidden sm:block">
-                                        <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2">
-                                            <Icon.Search />
-                                            <input
-                                                className="w-32 bg-transparent text-sm outline-none md:w-64"
-                                                placeholder="Wyszukaj..."
-                                            />
-                                        </div>
-                                    </div>
 
                                     <div className="flex gap-2">
                                         {(role === 'admin' || role === 'hr') && (
