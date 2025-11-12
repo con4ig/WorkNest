@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUser = useCallback(async () => {
         try {
-            const res = await axios.get('/api/auth/me');
+            const res = await axios.get('/api/auth/me', { withCredentials: true });
             setUser(res.data);
         } catch {
             // Poprawka: Usunięto nieużywaną zmienną 'err'
