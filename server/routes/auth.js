@@ -178,12 +178,17 @@ router.post("/login", async (req, res) => {
       expiresIn: "24h",
     });
 
-    res.cookie("token", token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
-    });
+    };
+
+    console.log('NODE_ENV:', process.env.NODE_ENV);
+    console.log('Cookie Options:', cookieOptions);
+
+    res.cookie("token", token, cookieOptions);
 
     res.json({
       message: "Zalogowano pomyślnie",
