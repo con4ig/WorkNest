@@ -23,13 +23,7 @@ const allowedOrigins = ['http://localhost:5173', 'https://worknesthr.ct.ws'];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('CORS blocked: origin not allowed'));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   })
@@ -72,12 +66,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/activities", activityRoutes);
-
-// Wylogowanie użytkownika
-app.post("/api/auth/logout", (req, res) => {
-  res.clearCookie("token");
-  res.json({ message: "Wylogowano pomyślnie" });
-});
 
 app.listen(PORT, () => {
   console.log(`Serwer działa na porcie ${PORT}`);

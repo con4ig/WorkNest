@@ -28,15 +28,12 @@ export const AuthProvider = ({ children }) => {
     }, [fetchUser]);
 
     const login = useCallback(async (email, password) => {
-        const res = await axios.post(
-            '/api/auth/login',
-            { email, password },
-            { withCredentials: true },
-        );
-        // Po zalogowaniu, odśwież dane użytkownika z serwera
-        await fetchUser();
+        const res = await axios.post('/api/auth/login', { email, password });
+        if (res.data && res.data.user) {
+            setUser(res.data.user);
+        }
         return res.data;
-    }, [fetchUser]);
+    }, []);
 
     const logout = useCallback(async () => {
         try {
