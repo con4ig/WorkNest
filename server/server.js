@@ -19,7 +19,7 @@ import activityRoutes from "./routes/activity.js";
 dotenv.config();
 
 const app = express();
-const allowedOrigins = ['http://localhost:5173', 'https://worknest.totalh.net'];
+const allowedOrigins = ['http://localhost:5173', 'https://worknest.totalh.net', "https://worknest-1.onrender.com/"];
 
 app.use(
   cors({
