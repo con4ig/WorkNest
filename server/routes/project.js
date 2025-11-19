@@ -87,6 +87,11 @@ router.get("/", authenticate, async (req, res) => {
 
     let query = {};
 
+    // ✅ KRYTYCZNE ZABEZPIECZENIE: Sprawdź, czy middleware zadziałało
+    if (!req.user) {
+      return res.status(401).json({ message: "Brak autoryzacji - req.user nie jest zdefiniowany." });
+    }
+
     // Company isolation
     if (req.user.role !== "superadmin") {
       query.company = req.user.company;
@@ -381,7 +386,19 @@ router.get(
     try {
       const query = {};
       if (req.user.role !== "superadmin") {
-        query.company = req.user.company;
+        // Pobierz ID firmy z zapytania lub od zalogowanego użytkownika
+        const requestedCompanyId = req.query.company;
+        const userCompanyId = req.user.company?._id.toString();
+
+        // Sprawdź, czy admin/hr ma prawo dostępu do żądanej firmy
+        if (requestedCompanyId && requestedCompanyId !== userCompanyId) {
+          return res.status(403).json({ message: "Brak uprawnień do danych tej firmy." });
+        }
+
+        if (!userCompanyId) {
+            return res.status(403).json({ message: "Użytkownik nie jest przypisany do firmy." });
+        }
+        query.company = userCompanyId;
       }
 
       const [total, running, pending, completed] = await Promise.all([

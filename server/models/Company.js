@@ -11,6 +11,15 @@ const companySchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  invitationCode: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.model("Company", companySchema);
