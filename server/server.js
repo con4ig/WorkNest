@@ -22,13 +22,21 @@ dotenv.config();
 const app = express();
 const allowedOrigins = ['http://localhost:5173', 'https://worknest.totalh.net', "https://worknest-1.onrender.com"];
 
-app.use(helmet({ crossOriginEmbedderPolicy: false }));
+// app.use(helmet());
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Zezwalaj na żądania bez 'origin' (np. z Postmana lub mobilnych aplikacji)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'] // WAŻNE: Dodano 'Authorization'
   })
 );
 app.use(express.json());
