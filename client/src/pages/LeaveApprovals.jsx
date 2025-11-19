@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 
 const Icon = {
@@ -77,9 +77,7 @@ export default function LeaveApprovals() {
     useEffect(() => {
         const checkUserAccess = async () => {
             try {
-                const res = await axios.get('/api/auth/me', {
-                    withCredentials: true,
-                });
+                const res = await api.get('/users/me');
                 setCurrentUser(res.data);
             } catch (err) {
                 console.error('Błąd autoryzacji:', err);
@@ -97,10 +95,7 @@ export default function LeaveApprovals() {
                 filter !== 'all'
                     ? { status: filter, company: currentUser.company._id }
                     : { company: currentUser.company._id };
-            const res = await axios.get('/api/leaves', {
-                params,
-                withCredentials: true,
-            });
+            const res = await api.get('/leaves', { params });
             setLeaves(res.data.leaves);
         } catch (err) {
             console.error('Error fetching leaves:', err);
@@ -123,11 +118,7 @@ export default function LeaveApprovals() {
         if (!window.confirm('Czy na pewno chcesz zatwierdzić ten wniosek?'))
             return;
         try {
-            await axios.patch(
-                `/api/leaves/${id}/approve`,
-                { company: currentUser.company._id },
-                { withCredentials: true },
-            );
+            await api.patch(`/leaves/${id}/approve`, { company: currentUser.company._id });
             fetchLeaves();
             alert('Wniosek zatwierdzony pomyślnie');
         } catch (err) {
@@ -142,11 +133,7 @@ export default function LeaveApprovals() {
             return;
         }
         try {
-            await axios.patch(
-                `/api/leaves/${selectedLeave}/reject`,
-                { reviewNote: rejectNote, company: currentUser.company._id },
-                { withCredentials: true },
-            );
+            await api.patch(`/leaves/${selectedLeave}/reject`, { reviewNote: rejectNote, company: currentUser.company._id });
             fetchLeaves();
             setShowRejectModal(false);
             setRejectNote('');

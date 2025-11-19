@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import axios from 'axios';
+import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
 import { useNavigate } from 'react-router-dom';
 import {
     Search,
@@ -307,9 +307,8 @@ export default function Projekty() {
         setError(null);
         
         try {
-            const response = await axios.get('/api/projects', {
-                params: { ...currentFilters, company: companyId },
-                withCredentials: true,
+            const response = await api.get('/projects', { // ZMIANA: Używamy 'api' i usuwamy '/api' z URL
+                params: { ...currentFilters, company: companyId }
             });
             setProjects(response.data.projects);
         } catch (err) {
@@ -345,9 +344,8 @@ export default function Projekty() {
     const handleDelete = async (projectId) => {
         if (!window.confirm('Czy na pewno chcesz usunąć ten projekt?')) return;
         if (!companyId) return;
-        try {
-            await axios.delete(`/api/projects/${projectId}`, {
-                withCredentials: true,
+        try { 
+            await api.delete(`/projects/${projectId}`, { // ZMIANA: Używamy 'api' i usuwamy '/api' z URL
                 params: { company: companyId },
             });
             setProjects((prev) => prev.filter((p) => p._id !== projectId));

@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './styles/index.css';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -18,18 +18,14 @@ import Polityka from './pages/Poltyka_prywatnosc.jsx';
 import UserDetails from './pages/UserDetails.jsx';
 import Upload from './pages/Upload.jsx';
 import GenerateCode from './pages/GenerateCode.jsx';
-import axios from 'axios';
 import { AuthProvider } from './context/AuthContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
 
-axios.defaults.baseURL = import.meta.env.PROD
-    ? 'https://worknest-qpsw.onrender.com'
-    : 'http://localhost:5500';
-axios.defaults.withCredentials = true;
-
+// ====================================================================
+// Główny komponent aplikacji
+// ====================================================================
 createRoot(document.getElementById('root')).render(
-
     <StrictMode>
         <AuthProvider>
             <Router>
@@ -48,37 +44,22 @@ createRoot(document.getElementById('root')).render(
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<Forgot />} />
                     <Route path="/regulamin" element={<Regulamin />} />
-                    <Route
-                        path="/polityka-prywatnosci"
-                        element={<Polityka />}
-                    />
+                    <Route path="/polityka-prywatnosci" element={<Polityka />} />
 
-                    {/* Protected Routes */}
                     <Route element={<ProtectedRoute />}>
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/employees" element={<EmployeeList />} />
-                        <Route path="/employees/add" element={<Addproject />} />
                         <Route path="/projekty" element={<Projekty />} />
-                        <Route
-                            path="/projects/:id"
-                            element={<ProjectDetails />}
-                        />
-                        <Route
-                            path="/employees/:id"
-                            element={<UserDetails />}
-                        />
+                        
+                        <Route path="/projects/:id" element={<ProjectDetails />} />
+                        <Route path="/employees/:id" element={<UserDetails />} />
                         <Route path="/myleaves" element={<MyLeaves />} />
-                        <Route
-                            path="/leave-approvals"
-                            element={<LeaveApprovals />}
-                        />
+                        <Route path="/leave-approvals" element={<LeaveApprovals />} />
                         <Route path="/upload" element={<Upload />} />
                         <Route path="/generate-code" element={<GenerateCode />} />
                     </Route>
-
                 </Routes>
-
             </Router>
         </AuthProvider>
-    </StrictMode>,
+    </StrictMode>
 );

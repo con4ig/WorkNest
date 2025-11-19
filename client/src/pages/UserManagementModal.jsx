@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext';
 
 const Icon = {
@@ -72,10 +72,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         setSearchError(null);
 
         try {
-            const res = await axios.get('/api/users', {
-                params: { search: term.trim() },
-                withCredentials: true,
-            });
+            const res = await api.get('/users', { params: { search: term.trim() } });
 
             // Filtruj użytkowników już przypisanych
             const assignedIds = project.assignedUsers.map((u) => u._id);
@@ -108,11 +105,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         if (!companyId) return; // Nie wykonuj akcji, jeśli companyId nie jest dostępne
         setIsUpdating(true);
         try {
-            const response = await axios.patch(
-                `/api/projects/${project._id}/users`,
-                { userId, action },
-                { withCredentials: true },
-            );
+            const response = await api.patch(`/projects/${project._id}/users`, { userId, action });
 
             // Aktualizuj projekt
             if (response.data.project) {

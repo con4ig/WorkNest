@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js'; // ZMIANA
 import UserManagementModal from './UserManagementModal';
 import {
     Calendar,
@@ -224,9 +224,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
 
         try {
             // Wyślij 'payload' zamiast 'editData'
-            await axios.patch(`/api/tasks/${task._id}`, payload, {
-                withCredentials: true,
-            });
+            await api.patch(`/tasks/${task._id}`, payload); // ZMIANA
             setIsEditing(false);
             onUpdate();
         } catch (err) {
@@ -240,11 +238,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
         const nextStatus = statuses[(currentIndex + 1) % statuses.length];
 
         try {
-            await axios.patch(
-                `/api/tasks/${task._id}`,
-                { status: nextStatus },
-                { withCredentials: true },
-            );
+            await api.patch(`/tasks/${task._id}`, { status: nextStatus }); // ZMIANA
             onUpdate();
         } catch (err) {
             alert(`Błąd: ${err.message}`);
@@ -607,9 +601,7 @@ export default function ProjectDetails() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await axios.get(`/api/projects/${id}`, {
-                withCredentials: true,
-            });
+            const res = await api.get(`/projects/${id}`); // ZMIANA
             setProject(res.data);
             setEditData({
                 name: res.data.name,
@@ -633,9 +625,7 @@ export default function ProjectDetails() {
 
     const fetchTasks = useCallback(async () => {
         try {
-            const res = await axios.get(`/api/tasks/project/${id}`, {
-                withCredentials: true,
-            });
+            const res = await api.get(`/tasks/project/${id}`); // ZMIANA
             setTasks(res.data);
         } catch (err) {
             console.error('Błąd pobierania zadań:', err);
@@ -644,9 +634,7 @@ export default function ProjectDetails() {
 
     const fetchComments = useCallback(async () => {
         try {
-            const res = await axios.get(`/api/comments/project/${id}`, {
-                withCredentials: true,
-            });
+            const res = await api.get(`/comments/project/${id}`); // ZMIANA
             setComments(res.data);
         } catch (err) {
             console.error('Błąd pobierania komentarzy:', err);
@@ -655,9 +643,7 @@ export default function ProjectDetails() {
 
     const fetchActivities = useCallback(async () => {
         try {
-            const res = await axios.get(`/api/activities/project/${id}`, {
-                withCredentials: true,
-            });
+            const res = await api.get(`/activities/project/${id}`); // ZMIANA
             setActivities(res.data.activities);
         } catch (err) {
             console.error('Błąd pobierania aktywności:', err);
@@ -692,15 +678,13 @@ export default function ProjectDetails() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await axios.patch(
-                `/api/projects/${id}`,
+            await api.patch(`/projects/${id}`, // ZMIANA
                 {
                     ...editData,
                     startDate: editData.startDate || null,
                     endDate: editData.endDate || null,
                     company: currentUser.company._id,
-                },
-                { withCredentials: true },
+                }
             );
             await fetchData();
             await fetchActivities();
@@ -720,13 +704,11 @@ export default function ProjectDetails() {
 
         setIsAddingTask(true);
         try {
-            await axios.post(
-                '/api/tasks',
+            await api.post('/tasks', // ZMIANA
                 {
                     ...newTask,
                     project: id,
-                },
-                { withCredentials: true },
+                }
             );
             setNewTask({
                 title: '',
@@ -747,10 +729,7 @@ export default function ProjectDetails() {
 
     const handleDeleteTask = async (taskId) => {
         try {
-            await axios.delete(`/api/tasks/${taskId}`, {
-                withCredentials: true,
-                params: { company: currentUser?.company?._id },
-            });
+            await api.delete(`/tasks/${taskId}`, { params: { company: currentUser?.company?._id } }); // ZMIANA
             fetchTasks();
             fetchActivities();
         } catch (err) {
@@ -762,13 +741,11 @@ export default function ProjectDetails() {
         if (!newComment.trim()) return;
 
         try {
-            await axios.post(
-                '/api/comments',
+            await api.post('/comments', // ZMIANA
                 {
                     content: newComment,
                     project: id,
-                },
-                { withCredentials: true },
+                }
             );
             setNewComment('');
             fetchComments();
@@ -780,14 +757,12 @@ export default function ProjectDetails() {
 
     const handleReplyComment = async (parentId, content) => {
         try {
-            await axios.post(
-                '/api/comments',
+            await api.post('/comments', // ZMIANA
                 {
                     content,
                     project: id,
                     parentComment: parentId,
-                },
-                { withCredentials: true },
+                }
             );
             fetchComments();
         } catch (err) {
@@ -799,9 +774,7 @@ export default function ProjectDetails() {
         if (!window.confirm('Czy na pewno usunąć ten komentarz?')) return;
 
         try {
-            await axios.delete(`/api/comments/${commentId}`, {
-                withCredentials: true,
-            });
+            await api.delete(`/comments/${commentId}`); // ZMIANA
             fetchComments();
             fetchActivities();
         } catch (err) {

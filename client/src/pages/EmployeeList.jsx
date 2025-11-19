@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js'; // ZMIANA
 import LoadingScreen from '../components/LoadingScreen';
 import { useAuth } from '../context/AuthContext';
 
@@ -196,9 +196,7 @@ export default function EmployeeList() {
                 return;
             }
 
-            const usersRes = await axios.get('/api/users', {
-                withCredentials: true,
-            });
+            const usersRes = await api.get('/users'); // ZMIANA
             setUsers(usersRes.data.users);
             setFilteredUsers(usersRes.data.users);
             setLoading(false);
@@ -240,11 +238,7 @@ export default function EmployeeList() {
         
         setChangingRole(selectedUser._id);
         try {
-            await axios.patch(
-                `/api/users/${selectedUser._id}/role`,
-                { role: newRole },
-                { withCredentials: true },
-            );
+            await api.patch(`/users/${selectedUser._id}/role`, { role: newRole }); // ZMIANA
             await fetchData();
             setModalOpen(false);
             setToast({ message: 'Rola została pomyślnie zmieniona', type: 'success' });

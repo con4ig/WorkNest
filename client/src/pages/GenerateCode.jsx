@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api.js';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Key, ArrowLeft, RefreshCw, Copy, Check, Sparkles, Lock } from 'lucide-react';
@@ -29,8 +29,8 @@ export default function GenerateCode() {
         setShowConfetti(false);
         
         try {
-            const response = await axios.post(
-                '/api/users/generate-invitation',
+            const response = await api.post(
+                '/users/generate-invitation',
                 {},
             );
             console.log('Generated code response:', response.data.invitationCode);

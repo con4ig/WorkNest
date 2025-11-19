@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
 import { useAuth } from '../context/AuthContext';
 
 const Icon = {
@@ -43,11 +43,8 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get('/api/users', {
-                params: { company: companyId },
-                withCredentials: true,
-            });
-            setUsers(res.data.users);
+            const res = await api.get('/users', { params: { company: companyId } }); // ZMIANA: Używamy 'api'
+            setUsers(res.data.users || []); // ZABEZPIECZENIE: Upewnij się, że users jest zawsze tablicą
         } catch (err) {
             console.error('Error fetching users:', err);
         }
@@ -75,12 +72,8 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            const response = await axios.post(
-                '/api/projects',
-                { ...formData, company: companyId },
-                {
-                    withCredentials: true,
-                },
+            const response = await api.post( // ZMIANA: Używamy 'api'
+                '/projects', { ...formData, company: companyId }
             );
 
             const newProject = response.data.project;

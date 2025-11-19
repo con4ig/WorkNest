@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import {
     Mail,
     Phone,
@@ -214,14 +214,10 @@ export default function UserDetails() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const meRes = await axios.get('/api/auth/me', {
-                withCredentials: true,
-            });
+            const meRes = await api.get('/users/me');
             setCurrentUser(meRes.data);
 
-            const res = await axios.get(`/api/users/${id}`, {
-                withCredentials: true,
-            });
+            const res = await api.get(`/users/${id}`);
 
             // Ustaw domyślne wartości dla pól HR jeśli ich nie ma
             const userData = {
@@ -270,15 +266,11 @@ export default function UserDetails() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await axios.patch(
-                `/api/users/${id}`,
-                {
-                    ...editData,
-                    hireDate: editData.hireDate || null,
-                    salary: editData.salary || 0,
-                },
-                { withCredentials: true },
-            );
+            await api.patch(`/users/${id}`, {
+                ...editData,
+                hireDate: editData.hireDate || null,
+                salary: editData.salary || 0,
+            });
             await fetchData();
             setIsEditing(false);
         } catch (err) {

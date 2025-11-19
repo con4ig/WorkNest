@@ -1,66 +1,61 @@
-import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
-import axios from 'axios';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+// 1. ZMIEŃ IMPORT: Importujemy naszą skonfigurowaną instancję `api`
+import api from '../services/api'; // Upewnij się, że ścieżka jest poprawna!
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
-// Poprawka dla ESLint: Dodanie displayName dla lepszego debugowania w React DevTools
-AuthContext.displayName = 'AuthContext';
-
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); // Start with loading true
-
-    const fetchUser = useCallback(async () => {
-        try {
-            const res = await axios.get('/api/auth/me', { withCredentials: true });
-            setUser(res.data);
-        } catch {
-            // Poprawka: Usunięto nieużywaną zmienną 'err'
-            console.log('Failed to fetch user, likely not logged in.');
-            setUser(null);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
-
-    const login = useCallback(async (email, password) => {
-        const res = await axios.post('/api/auth/login', { email, password });
-        if (res.data && res.data.user) {
-            setUser(res.data.user);
-        }
-        return res.data;
-    }, []);
-
-    const logout = useCallback(async () => {
-        try {
-            await axios.post('/api/auth/logout');
-        } catch (error) {
-            console.error("Logout failed, but clearing user state anyway.", error);
-        } finally {
-            setUser(null);
-        }
-    }, []);
-
-    // Memoizuj obiekt wartości, aby zapobiec niepotrzebnym re-renderom
-    const value = useMemo(() => ({
-        user,
-        setUser,
-        loading,
-        login,
-        logout,
-    }), [user, loading, login, logout]);
-
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
-    );
+// Dodaj ten hook, aby ułatwić dostęp do kontekstu
+export const useAuth = () => {
+  return useContext(AuthContext);
 };
 
-export const useAuth = () => {
-    return useContext(AuthContext); 
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Sprawdzanie stanu zalogowania przy starcie aplikacji
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        try {
+          // 2. UŻYJ `api` ZAMIAST `axios`
+          const { data } = await api.get('/users/me'); // POPRAWNY ENDPOINT: /users/me
+          setUser(data);
+        } catch (error) {
+          console.error("Sesja wygasła lub błąd tokenu", error);
+          localStorage.removeItem('accessToken'); // Czyścimy zły token
+        }
+      }
+      setLoading(false);
+    };
+    checkLoggedIn();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      // 3. UŻYJ `api` ZAMIAST `axios`
+      const { data } = await api.post('/auth/login', { email, password });
+      localStorage.setItem('accessToken', data.accessToken);
+      setUser(data.user);
+    } catch (error) {
+      console.error("Błąd logowania:", error);
+      throw error; // Rzuć błąd dalej, aby komponent logowania mógł go obsłużyć
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('accessToken');
+    setUser(null);
+    // Opcjonalnie wywołanie endpointu wylogowującego na backendzie
+    // api.post('/auth/logout');
+  };
+
+  const value = { user, loading, login, logout };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };

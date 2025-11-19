@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Camera, Upload, X, Check, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api.js';
 
 function ProfileImageUpload() {
     const [image, setImage] = useState(null);
@@ -52,10 +52,7 @@ function ProfileImageUpload() {
         formData.append('image', image);
 
         try {
-            const res = await axios.put('/api/users/profile-image', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-                withCredentials: true,
-            });
+            const res = await api.put('/users/profile-image', formData);
 
             console.log('Sukces:', res.data);
 
