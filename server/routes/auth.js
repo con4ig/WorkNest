@@ -185,13 +185,13 @@ router.post("/login", async (req, res) => {
     const refreshToken = generateRefreshToken(user);
 
     // Ustaw refresh token w HttpOnly cookie
-const cookieOptions = {
-  httpOnly: true,
-  secure: false, // false dla localhost
-  sameSite: "lax", // lax dla localhost
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-  path: "/",
-};
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+    };
 
     res.cookie("refreshToken", refreshToken, cookieOptions);
 
@@ -255,8 +255,8 @@ router.post("/refresh", async (req, res) => {
     // Czyść cookie jeśli refresh token jest zły
 res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: false, // false dla localhost
-    sameSite: "lax", // lax dla localhost
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: "/",
 }); 
     return res.status(403).json({ message: "Nieprawidłowy lub wygasły refresh token" });
@@ -267,20 +267,15 @@ res.clearCookie("refreshToken", {
 // POST /api/auth/logout
 // ============================================
 router.post("/logout", (req, res) => {
-res.clearCookie("refreshToken", {
-  httpOnly: true,
-  secure: false, // false dla localhost
-  sameSite: "lax", // lax dla localhost
-  path: "/",
-});
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: "/",
+  };
 
-  // Opcjonalnie można też wyczyścić stary token, jeśli istnieje
-res.clearCookie("token", {
-  httpOnly: true,
-  secure: false, // false dla localhost
-  sameSite: "lax", // lax dla localhost
-  path: "/",
-});
+  res.clearCookie("refreshToken", cookieOptions);
+  res.clearCookie("token", cookieOptions);
 
   res.json({ message: "Wylogowano pomyślnie" });
 });
