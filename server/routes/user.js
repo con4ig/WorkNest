@@ -50,6 +50,21 @@ router.get("/", authenticate, authorize("hr", "admin"), async (req, res) => {
 });
 
 // ============================================
+// GET /api/users/me
+// Pobieranie danych zalogowanego użytkownika
+// ============================================
+router.get("/me", authenticate, async (req, res) => {
+  try {
+    // req.user jest już dostępne dzięki middleware 'authenticate'
+    // i zawiera dane z populate('company')
+    res.json(req.user);
+  } catch (err) {
+    console.error("Error fetching current user:", err);
+    res.status(500).json({ message: "Błąd serwera" });
+  }
+});
+
+// ============================================
 // GET /api/users/:id
 // Pobieranie danych konkretnego pracownika
 // ============================================

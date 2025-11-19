@@ -2,29 +2,30 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const authenticate = async (req, res, next) => {
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.status(401).json({ message: "Brak tokena, autoryzacja odrzucona" });
-  }
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Pobierz pełne dane użytkownika z bazy, włącznie z firmą
-    const user = await User.findById(decoded._id).select("-password").populate("company");
-
-    if (!user) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ message: "Brak tokenu lub nieprawidłowy format." });
     }
 
-    req.user = user; // Przypisz cały obiekt użytkownika
-    
-    console.log("✅ Token OK, user uwierzytelniony:", req.user._id);
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Znajdź użytkownika i dołącz dane firmy
+    const user = await User.findById(decoded._id)
+      .populate("company") // KLUCZOWA ZMIANA: Zawsze dołączaj pełne dane firmy
+      .select("-password");
+
+    if (!user) {
+      return res.status(401).json({ message: "Użytkownik nie znaleziony" });
+    }
+
+    req.user = user;
     next();
   } catch (err) {
-    console.error("❌ Błąd tokena:", err.message);
-    res.status(401).json({ message: "Nieprawidłowy token" });
+    return res.status(401).json({ message: "Token jest nieprawidłowy lub wygasł." });
   }
 };
 

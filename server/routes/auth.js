@@ -6,14 +6,35 @@ import crypto from "crypto";
 import User from "../models/User.js";
 import Company from "../models/Company.js";
 import Invitation from "../models/Invitation.js";
-import authenticate from "../middleware/authenticate.js";
 
 const router = express.Router();
 const saltRounds = 10;
 
+// Pomocnicze funkcje do generowania tokenów
+const generateAccessToken = (user) => {
+  return jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      company: user.company ? user.company._id : null,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" } // Krótki czas życia - 15 minut
+  );
+};
+
+const generateRefreshToken = (user) => {
+  return jwt.sign(
+    { _id: user._id },
+    process.env.JWT_REFRESH_SECRET, // Osobny secret dla refresh token
+    { expiresIn: "7d" } // Długi czas życia - 7 dni
+  );
+};
+
 // ============================================
 // POST /api/auth/register
-// Rejestracja użytkownika i obsługa firm
+// (Bez zmian, pozostaje jak było)
 // ============================================
 router.post("/register", async (req, res) => {
   const { username, email, password, role, companyName, invitationCode } =
@@ -31,9 +52,7 @@ router.post("/register", async (req, res) => {
         .json({ message: "Użytkownik o tym adresie email już istnieje" });
     }
 
-    // Rozpocznij sesję dla transakcji
     const session = await mongoose.startSession();
-
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     let companyId;
 
@@ -48,25 +67,23 @@ router.post("/register", async (req, res) => {
 
       try {
         await session.withTransaction(async () => {
-          // 1. Stwórz nową firmę
+          const invitationCode = crypto.randomBytes(8).toString("hex");
+
           const newCompany = new Company({
             name: companyName,
-            owner: null, // Zostanie ustawiony po utworzeniu użytkownika
+            owner: null,
+            invitationCode,
           });
 
-          // 2. Stwórz użytkownika (administratora)
           const newUser = new User({
             username,
             email,
             password: hashedPassword,
             role: "admin",
-            company: newCompany._id, // Przypisz ID firmy do użytkownika
+            company: newCompany._id,
           });
 
-          // Zapisz użytkownika w ramach sesji
           const userResult = await newUser.save({ session });
-
-          // 3. Ustaw właściciela firmy i zapisz firmę
           newCompany.owner = userResult._id;
           const companyResult = await newCompany.save({ session });
 
@@ -74,7 +91,6 @@ router.post("/register", async (req, res) => {
           savedCompany = companyResult;
         });
       } finally {
-        // Zakończ sesję
         session.endSession();
       }
 
@@ -91,14 +107,13 @@ router.post("/register", async (req, res) => {
           name: savedCompany.name,
         },
       });
-    } else if (role === "employee") {
+    } else if (role === "employee" || role === "hr") {
       if (!invitationCode) {
         return res
           .status(400)
-          .json({ message: "Kod zaproszenia jest wymagany dla pracownika" });
+          .json({ message: "Kod zaproszenia jest wymagany" });
       }
 
-      // Znajdź zaproszenie, które pasuje do kodu i nie wygasło
       const invitation = await Invitation.findOne({
         code: invitationCode,
         expiresAt: { $gt: new Date() },
@@ -110,24 +125,21 @@ router.post("/register", async (req, res) => {
           .json({ message: "Nieprawidłowy lub wygasły kod zaproszenia" });
       }
 
-      // Pobierz ID firmy z zaproszenia
       companyId = invitation.company;
-
-      // Opcjonalnie: usuń zaproszenie po użyciu, aby zapobiec ponownemu wykorzystaniu
       await Invitation.findByIdAndDelete(invitation._id);
 
       const newUser = new User({
         username,
         email,
         password: hashedPassword,
-        role: "employee",
+        role: invitation.role, // Użyj roli z zaproszenia
         company: companyId,
       });
 
       const savedUser = await newUser.save();
 
       return res.status(201).json({
-        message: "Pracownik został pomyślnie zarejestrowany",
+        message: "Użytkownik został pomyślnie zarejestrowany",
         user: {
           _id: savedUser._id,
           username: savedUser.username,
@@ -145,9 +157,10 @@ router.post("/register", async (req, res) => {
   }
 });
 
+
 // ============================================
 // POST /api/auth/login
-// Logowanie użytkownika
+// Zwraca access token w body, refresh token w HttpOnly cookie
 // ============================================
 router.post("/login", async (req, res) => {
   try {
@@ -167,31 +180,25 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Nieprawidłowe dane logowania" });
     }
 
-    const tokenPayload = {
-      _id: user._id,
-      email: user.email,
-      role: user.role,
-      company: user.company ? user.company._id : null,
-    };
+    // Generuj oba tokeny
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
+    // Ustaw refresh token w HttpOnly cookie
+const cookieOptions = {
+  httpOnly: true,
+  secure: false, // false dla localhost
+  sameSite: "lax", // lax dla localhost
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: "/",
+};
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    };
+    res.cookie("refreshToken", refreshToken, cookieOptions);
 
-    console.log('NODE_ENV:', process.env.NODE_ENV);
-    console.log('Cookie Options:', cookieOptions);
-
-    res.cookie("token", token, cookieOptions);
-
+    // Zwróć access token w body (będzie przechowywany w pamięci React)
     res.json({
       message: "Zalogowano pomyślnie",
+      accessToken, // Krótki token do pamięci
       user: {
         _id: user._id,
         username: user.username,
@@ -208,33 +215,72 @@ router.post("/login", async (req, res) => {
 });
 
 // ============================================
-// GET /api/auth/me
-// Pobierz dane aktualnie zalogowanego użytkownika
+// POST /api/auth/refresh
+// Odświeża access token używając refresh token z cookie
 // ============================================
-router.get("/me", authenticate, async (req, res) => {
+router.post("/refresh", async (req, res) => {
   try {
-    // req.user jest już w pełni załadowany przez middleware authenticate
-    if (!req.user) {
-      return res.status(401).json({ message: "Nie jesteś zalogowany" });
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Brak refresh tokena" });
     }
 
-    res.json(req.user); // Zwróć cały obiekt użytkownika
+    // Weryfikuj refresh token
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    // Pobierz użytkownika
+    const user = await User.findById(decoded._id).populate("company", "name");
+
+    if (!user) {
+      return res.status(401).json({ message: "Użytkownik nie znaleziony" });
+    }
+
+    // Wygeneruj nowy access token
+    const newAccessToken = generateAccessToken(user);
+
+    res.json({
+      accessToken: newAccessToken,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        company: user.company,
+        profileImage: user.profileImage || "",
+      },
+    });
   } catch (err) {
-    console.error("Get me error:", err);
-    res.status(500).json({ message: "Błąd serwera", error: err.message });
+    console.error("Refresh token error:", err);
+    // Czyść cookie jeśli refresh token jest zły
+res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false, // false dla localhost
+    sameSite: "lax", // lax dla localhost
+    path: "/",
+}); 
+    return res.status(403).json({ message: "Nieprawidłowy lub wygasły refresh token" });
   }
 });
 
 // ============================================
 // POST /api/auth/logout
-// Wylogowanie użytkownika
 // ============================================
 router.post("/logout", (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  });
+res.clearCookie("refreshToken", {
+  httpOnly: true,
+  secure: false, // false dla localhost
+  sameSite: "lax", // lax dla localhost
+  path: "/",
+});
+
+  // Opcjonalnie można też wyczyścić stary token, jeśli istnieje
+res.clearCookie("token", {
+  httpOnly: true,
+  secure: false, // false dla localhost
+  sameSite: "lax", // lax dla localhost
+  path: "/",
+});
 
   res.json({ message: "Wylogowano pomyślnie" });
 });
