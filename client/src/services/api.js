@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Pobierz URL API ze zmiennych środowiskowych lub użyj wartości domyślnej
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5500/api';
+const API_URL = import.meta.env.PROD ? 'https://worknest-qpsw.onrender.com/api' : 'http://localhost:5500/api';
 
 const api = axios.create({
   baseURL: API_URL,
