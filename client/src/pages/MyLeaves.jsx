@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import RequestLeaveModal from '../components/RequestLeaveModal';
 import { useAuth } from '../context/AuthContext';
 import LoadingScreen from '../components/LoadingScreen.jsx';
@@ -80,10 +80,7 @@ export default function MyLeaves() {
     const fetchLeaves = async () => {
         if (!user || !user.company) return;
         try {
-            const res = await axios.get('/api/leaves/my', {
-                withCredentials: true,
-                params: { company: user.company._id },
-            });
+            const res = await api.get('/leaves/my', { params: { company: user.company._id } });
             setLeaves(res.data.leaves);
             setStats(res.data.stats);
             setLoading(false);
@@ -101,10 +98,7 @@ export default function MyLeaves() {
         if (!user || !user.company) return;
 
         try {
-            await axios.delete(`/api/leaves/${id}`, {
-                withCredentials: true,
-                params: { company: user.company._id },
-            });
+            await api.delete(`/leaves/${id}`, { params: { company: user.company._id } });
             fetchLeaves();
         } catch (err) {
             console.error('Error deleting leave:', err);

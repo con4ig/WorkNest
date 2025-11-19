@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import {
     LayoutDashboard,
     FolderKanban,
@@ -58,7 +58,7 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // Główny stan ładowania strony
     const location = useLocation();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
 
     // Wykrywanie rozmiaru ekranu
     useEffect(() => {
@@ -83,32 +83,34 @@ export default function Dashboard() {
 
         setLoading(true);
         try {
-            // Pobierz dane użytkownika
-            const userRes = await axios.get('/api/auth/me', { withCredentials: true });
-            const { username: fetchedUsername, role: fetchedRole, profileImage: fetchedProfileImage, _id } = userRes.data;
-
-            setMessage(`Witaj, ${fetchedUsername}! Masz szybki przegląd ostatnich projektów.`);
-            setUsername(fetchedUsername);
-            setRole(fetchedRole);
-            setProfileImage(fetchedProfileImage);
+            // Dane użytkownika są już w 'user' z AuthContext
+            setMessage(`Witaj, ${user.username}! Masz szybki przegląd ostatnich projektów.`);
+            setUsername(user.username);
+            setRole(user.role);
+            setProfileImage(user.profileImage);
 
             // Pobierz statystyki w zależności od roli
-            if (fetchedRole === 'admin' || fetchedRole === 'hr' || fetchedRole === 'superadmin') {
-                const statsRes = await axios.get(`/api/projects/stats/summary`, {
-                    withCredentials: true,
-                    params: { company: user.company?._id },
+            const companyId = user.company?._id;
+            if (!companyId) {
+                console.error("Brak ID firmy dla użytkownika.");
+                setLoading(false);
+                return;
+            }
+
+            if (user.role === 'admin' || user.role === 'hr' || user.role === 'superadmin') {
+                const statsRes = await api.get(`/projects/stats/summary`, {
+                    params: { company: companyId },
                 });
                 const { total, running, pending, completed } = statsRes.data;
                 setStats([
                     { id: 1, title: 'Total Projects', value: total.toString(), hint: 'Increased from last month' },
-                    { id: 2, title: 'Ended Projects', value: completed.toString(), hint: 'Stable' },
-                    { id: 3, title: 'Running Projects', value: running.toString(), hint: 'Growing' },
+                    { id: 2, title: 'Ended Projects', value: completed.toString(), hint: 'Stable' }, // Zmieniono z 'Ended' na 'Completed' dla spójności
+                    { id: 3, title: 'Running Projects', value: running.toString(), hint: 'Growing' }, // Zmieniono z 'Running' na 'In Progress' dla spójności
                     { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
                 ]);
             } else {
-                const assignedRes = await axios.get(`/api/projects/users/${_id}/assigned-projects/summary`, {
-                    withCredentials: true,
-                    params: { company: user.company?._id },
+                const assignedRes = await api.get(`/projects/users/${user._id}/assigned-projects/summary`, {
+                    params: { company: companyId },
                 });
                 const { assigned, completed, running, pending } = assignedRes.data;
                 setStats([
@@ -120,19 +122,20 @@ export default function Dashboard() {
             }
 
             // Pobierz ostatnie projekty
-            const projectsRes = await axios.get('/api/projects?sortBy=createdAt:desc&limit=5', {
-                withCredentials: true,
-                params: { company: user.company?._id },
+            const projectsRes = await api.get('/projects', {
+                params: { 
+                    sortBy: 'createdAt:desc',
+                    limit: 5,
+                    company: companyId 
+                },
             });
             setProjects(projectsRes.data.projects);
 
         } catch (err) {
             console.error('Błąd ładowania danych dashboardu:', err);
-            if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate('/login');
-            }
+            // Nie ma potrzeby ręcznej nawigacji, interceptor to obsłuży
         } finally {
-            setLoading(false); // Zakończ ładowanie po wszystkich operacjach
+            setLoading(false);
         }
     };
 
@@ -146,7 +149,7 @@ export default function Dashboard() {
             fetchDashboardData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user, navigate]); // Uruchom ponownie, gdy zmieni się użytkownik
+    }, [user]); // Uruchom ponownie, gdy zmieni się użytkownik z kontekstu
 
     // time tracker
     const [running, setRunning] = useState(false);
@@ -165,17 +168,11 @@ export default function Dashboard() {
         return () => clearInterval(intervalRef.current);
     }, [running]);
 
-    function handleLogout() {
-        axios
-            .post('/api/auth/logout', {}, { withCredentials: true })
-            .then(() => {
-                navigate('/login');
-            })
-            .catch((err) => {
-                console.error('Błąd przy wylogowaniu:', err);
-                navigate('/login');
-            });
-    }
+    // Użyj funkcji logout z AuthContext
+    const handleLogout = () => {
+        logout();
+        // Nawigacja do /login jest obsługiwana przez ProtectedRoute i AuthContext
+    };
 
     if (loading) {
         return <LoadingScreen message="Przygotowujemy Twój pulpit..." />;

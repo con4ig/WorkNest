@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext';
 
 const Icon = {
@@ -83,11 +83,8 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            await axios.post(
-                '/api/leaves',
-                { ...formData, days, company: user.company._id },
-                { withCredentials: true },
-            );
+            // ZMIANA: Usunięto /api z URL i zbędny obiekt withCredentials
+            await api.post('/leaves', { ...formData, days, company: user.company._id });
 
             setFormData({
                 leaveType: 'vacation',

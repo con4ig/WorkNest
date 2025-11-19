@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import { ArrowRight } from 'lucide-react';
 import { useState } from 'react'; // useState jest już importowany, ale upewnijmy się
 import toast from 'react-hot-toast'; 
@@ -39,10 +39,7 @@ export default function Register() {
                 delete registrationData.companyName;
             }
 
-            await axios.post(
-                '/api/auth/register',
-                registrationData,
-            );
+            await api.post('/auth/register', registrationData);
 
             toast.success('Rejestracja zakończona sukcesem!');
             navigate('/login');
