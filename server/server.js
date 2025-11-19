@@ -23,7 +23,6 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173', 
   'https://worknest.totalh.net',
-  'https://twoja-domena.infinityfree.app' // <-- ZAMIEŃ NA SWOJĄ DOMENĘ
 ];
 
 app.use(helmet());
