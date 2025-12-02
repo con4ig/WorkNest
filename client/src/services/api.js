@@ -17,7 +17,7 @@ api.interceptors.request.use(
     if (token && config.url !== '/auth/refresh') {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    console.log(`🔑 Dodawanie tokena do żądania: ${config.url}`);
+    // console.log(`🔑 Dodawanie tokena do żądania: ${config.url}`);
     return config;
   },
   (error) => {
