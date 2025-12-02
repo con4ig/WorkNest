@@ -218,7 +218,7 @@ router.get("/:id", authenticate, async (req, res) => {
     // Employee może zobaczyć tylko swoje projekty
     if (req.user.role === "employee") {
       const isAssigned = project.assignedUsers.some(
-        (u) => u._id.toString() === req.user._id
+        (u) => u._id.toString() === req.user._id.toString()
       );
       if (!isAssigned) {
         return res

@@ -11,7 +11,6 @@ const router = express.Router();
 router.get(
   "/project/:projectId",
   authenticate,
-  authorize("admin", "hr"),
   async (req, res) => {
     try {
       const { projectId } = req.params;
@@ -113,7 +112,6 @@ router.post("/", authenticate, authorize("admin", "hr"), async (req, res) => {
 router.patch(
   "/:id",
   authenticate,
-  authorize("admin", "hr"),
   async (req, res) => {
     try {
       let taskQuery = { _id: req.params.id };
