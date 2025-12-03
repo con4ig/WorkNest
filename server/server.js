@@ -6,9 +6,6 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 import helmet from "helmet";
-import User from "./models/User.js";
-import authenticate from "./middleware/authenticate.js";
-import authorize from "./middleware/authorize.js";
 // import emailRoutes from "./routes/email.js";
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
@@ -27,7 +24,14 @@ const allowedOrigins = [
   "https://worknest-1.onrender.com",
 ];
 
-// app.use(helmet());
+// Helmet configuration for mobile compatibility (Safari/Chrome on iOS/Android)
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Disable CSP to avoid blocking resources on mobile
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin requests
+    crossOriginEmbedderPolicy: false, // Disable for better mobile compatibility
+  })
+);
 app.use(morgan("dev"));
 app.use(
   cors({
