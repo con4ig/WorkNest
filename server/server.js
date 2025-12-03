@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import morgan from "morgan";
 import helmet from "helmet";
 import User from "./models/User.js";
 import authenticate from "./middleware/authenticate.js";
@@ -20,28 +21,34 @@ import activityRoutes from "./routes/activity.js";
 dotenv.config();
 
 const app = express();
-const allowedOrigins = ['http://localhost:5173', 'https://worknest.totalh.net', "https://worknest-1.onrender.com"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://worknest.totalh.net",
+  "https://worknest-1.onrender.com",
+];
 
 // app.use(helmet());
+app.use(morgan("dev"));
 app.use(
   cors({
     origin: (origin, callback) => {
       // Zezwalaj na żądania bez 'origin' (np. z Postmana lub mobilnych aplikacji)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
         return callback(new Error(msg), false);
       }
       return callback(null, true);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ['Content-Type', 'Authorization'] // WAŻNE: Dodano 'Authorization'
+    allowedHeaders: ["Content-Type", "Authorization"], // WAŻNE: Dodano 'Authorization'
   })
 );
 app.use(express.json());
 app.use(cookieParser());
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 app.use(
   rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
@@ -59,7 +66,6 @@ const connectDB = async () => {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-
   } catch (error) {
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
     process.exit(1);
