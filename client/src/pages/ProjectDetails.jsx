@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api.js'; // ZMIANA
-import UserManagementModal from './UserManagementModal';
+import UserManagementModal from '../components/UserManagementModal.jsx';
 import {
     Calendar,
     User,

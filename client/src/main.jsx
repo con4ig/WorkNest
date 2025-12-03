@@ -8,7 +8,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import Forgot from './pages/Forgot.jsx';
 import App from './App.jsx';
 import EmployeeList from './pages/EmployeeList.jsx';
-import Addproject from './pages/AddProjectModal.jsx';
+import Addproject from './components/AddProjectModal.jsx';
 import Projekty from './pages/Projekty.jsx';
 import ProjectDetails from './pages/ProjectDetails.jsx';
 import MyLeaves from './pages/MyLeaves.jsx';

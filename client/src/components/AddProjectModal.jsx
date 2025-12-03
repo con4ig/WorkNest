@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Icon = {
     X: () => (
