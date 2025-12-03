@@ -14,7 +14,7 @@ import {
     ChevronLeft,
     Key,
 } from 'lucide-react';
-import AddProjectModal from './AddProjectModal.jsx';
+import AddProjectModal from '../components/AddProjectModal.jsx';
 import moment from 'moment';
 import 'moment/locale/pl';
 import LoadingScreen from '../components/LoadingScreen.jsx';
