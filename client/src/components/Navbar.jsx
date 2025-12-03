@@ -45,10 +45,6 @@ export default function Navbar() {
 
                     {/* Desktop Navigation - Full Menu */}
                     <div className="hidden items-center gap-1 md:flex">
-                        <Link to="/" className={navItemClass}>
-                            Home
-                        </Link>
-
                         {loading ? (
                             <div className="h-10 w-48 animate-pulse rounded-full bg-gray-200"></div>
                         ) : user ? (
