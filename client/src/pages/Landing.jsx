@@ -57,43 +57,44 @@ function Landing() {
                 {/* Główna zawartość */}
                 <main className="container relative z-10 mx-auto px-4 py-16 lg:py-24">
                     {/* 1. Sekcja Hero - PRZYWRÓCONY DUŻY NAGŁÓWEK */}
-                    <div className="mx-auto mb-24 max-w-7xl text-center">
-                        <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-emerald-600">
+                    <div className="mx-auto mb-16 max-w-7xl px-4 text-center md:mb-24">
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-600 md:text-sm">
                             SYSTEM HR NEXT-GEN
                         </p>
-                        {/* PRZYWRÓCONO: text-7xl lg:text-8xl */}
-                        <h1 className="mb-8 text-7xl font-extrabold leading-tight tracking-tighter text-gray-900 lg:text-8xl">
+                        <h1 className="mb-6 text-4xl font-extrabold leading-tight tracking-tighter text-gray-900 sm:text-5xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl">
                             Odkryj nowy wymiar
                             <span className="block bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                                 efektywności w Twoim HR
                             </span>
                         </h1>
-                        <p className="mx-auto mb-10 max-w-3xl text-xl font-light text-gray-600 lg:text-2xl">
+                        <p className="mx-auto mb-8 max-w-3xl px-4 text-base font-light text-gray-600 sm:text-lg md:mb-10 md:text-xl lg:text-2xl">
                             Zarządzaj zespołem, automatyzuj procesy i osiągaj
                             cele strategiczne — kompleksowe narzędzie, które
                             rewolucjonizuje pracę w Twojej organizacji.
                         </p>
-                        <div className="flex justify-center gap-6">
-                            <button className="transform rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-10 py-4 text-lg font-bold text-white shadow-2xl shadow-emerald-500/50 transition-all duration-300 hover:scale-[1.03] hover:from-emerald-700 hover:to-teal-700">
-                                <CheckCircle className="mr-2 inline-block h-5 w-5" />
+                        <div className="flex flex-col justify-center gap-4 px-4 sm:flex-row md:gap-6">
+                            <button className="transform rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-emerald-500/50 transition-all duration-300 hover:scale-[1.03] hover:from-emerald-700 hover:to-teal-700 md:px-10 md:py-4 md:text-lg">
+                                <CheckCircle className="mr-2 inline-block h-4 w-4 md:h-5 md:w-5" />
                                 Rozpocznij Bezpłatny Okres Próbny
                             </button>
-                            <button className="rounded-xl border-2 border-emerald-200 bg-white px-10 py-4 text-lg font-bold text-emerald-600 shadow-lg transition-colors duration-300 hover:bg-emerald-50">
+                            <button className="rounded-xl border-2 border-emerald-200 bg-white px-6 py-3 text-base font-bold text-emerald-600 shadow-lg transition-colors duration-300 hover:bg-emerald-50 md:px-10 md:py-4 md:text-lg">
                                 Zobacz demo
                             </button>
                         </div>
                     </div>
 
-                    {/* 2. Sekcja Statystyk - PRZYWRÓCONE DUŻE CYFRY */}
-                    <div className="mb-32 rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 p-9 shadow-2xl shadow-emerald-600/40">
-                        <div className="grid gap-8 divide-x divide-emerald-500 text-center md:grid-cols-3">
+                    {/* 2. Sekcja Statystyk */}
+                    <div className="mx-4 mb-16 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 p-6 shadow-2xl shadow-emerald-600/40 md:mb-32 md:rounded-3xl md:p-9">
+                        <div className="grid gap-6 divide-y divide-emerald-500 text-center md:grid-cols-3 md:gap-8 md:divide-x md:divide-y-0">
                             {stats.map((stat, index) => (
-                                <div key={index} className="px-6">
-                                    {/* PRZYWRÓCONO: text-6xl */}
-                                    <div className="mb-2 text-3xl font-extrabold tracking-tighter text-white">
+                                <div
+                                    key={index}
+                                    className="px-4 py-4 md:px-6 md:py-0"
+                                >
+                                    <div className="mb-2 text-3xl font-extrabold tracking-tighter text-white md:text-4xl lg:text-5xl">
                                         {stat.value}
                                     </div>
-                                    <div className="text-lg font-medium text-emerald-200">
+                                    <div className="text-sm font-medium text-emerald-200 md:text-base lg:text-lg">
                                         {stat.label}
                                     </div>
                                 </div>
@@ -226,17 +227,17 @@ function Landing() {
                     </div>
 
                     {/* 6. Sekcja Końcowego Wezwania do Akcji (Final CTA) */}
-                    <div className="rounded-3xl border-4 border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-teal-50 py-20 text-center shadow-2xl shadow-emerald-200/50">
-                        <Rocket className="mx-auto mb-6 h-12 w-12 text-emerald-600" />
-                        <h2 className="mb-4 text-5xl font-extrabold text-gray-900">
+                    <div className="mx-4 rounded-2xl border-2 border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-12 text-center shadow-2xl shadow-emerald-200/50 md:rounded-3xl md:border-4 md:py-20">
+                        <Rocket className="mx-auto mb-4 h-8 w-8 text-emerald-600 md:mb-6 md:h-12 md:w-12" />
+                        <h2 className="mb-4 px-4 text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
                             Gotowy na rewolucję w zarządzaniu HR?
                         </h2>
-                        <p className="mx-auto mb-10 max-w-3xl text-xl text-gray-600">
+                        <p className="mx-auto mb-8 max-w-3xl px-4 text-base text-gray-600 md:mb-10 md:text-lg lg:text-xl">
                             Dołącz do tysięcy firm, które już dziś zwiększają
                             swoją efektywność z WorkNest.
                         </p>
-                        <button className={finalCtaButton}>
-                            <CheckCircle className="mr-2 inline-block h-6 w-6" />
+                        <button className="transform rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-3 text-lg font-bold text-white shadow-2xl shadow-emerald-500/50 transition-all duration-300 hover:scale-[1.03] hover:from-emerald-600 hover:to-teal-600 md:px-12 md:py-4 md:text-xl">
+                            <CheckCircle className="mr-2 inline-block h-5 w-5 md:h-6 md:w-6" />
                             Rozpocznij Test Już Teraz!
                         </button>
                     </div>
