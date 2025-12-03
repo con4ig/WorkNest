@@ -24,14 +24,35 @@ const allowedOrigins = [
   "https://worknest-1.onrender.com",
 ];
 
-// Helmet configuration for mobile compatibility (Safari/Chrome on iOS/Android)
+// Helmet configuration with specific security headers
 app.use(
   helmet({
-    contentSecurityPolicy: false, // Disable CSP to avoid blocking resources on mobile
-    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin requests
-    crossOriginEmbedderPolicy: false, // Disable for better mobile compatibility
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", ...allowedOrigins],
+        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginEmbedderPolicy: false,
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    xFrameOptions: { action: "sameorigin" },
   })
 );
+
+// Add Permissions-Policy header
+app.use((req, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "geolocation=(), microphone=(), camera=()"
+  );
+  next();
+});
 app.use(morgan("dev"));
 app.use(
   cors({
