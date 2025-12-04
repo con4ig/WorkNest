@@ -26,6 +26,11 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import 'moment/locale/pl';
+import {
+    translateProjectStatus,
+    translateTaskStatus,
+    translatePriority,
+} from '../utils/translations';
 import { useAuth } from '../context/AuthContext';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 
@@ -290,7 +295,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                     >
                         {TASK_STATUSES.map((s) => (
                             <option key={s} value={s}>
-                                {s}
+                                {translateTaskStatus(s)}
                             </option>
                         ))}
                     </select>
@@ -306,7 +311,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                     >
                         {AVAILABLE_PRIORITIES.map((p) => (
                             <option key={p} value={p}>
-                                {p}
+                                {translatePriority(p)}
                             </option>
                         ))}
                     </select>
@@ -379,12 +384,12 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                             <span
                                 className={`rounded-full px-2 py-1 ${getStatusClasses(task.status)}`}
                             >
-                                {task.status}
+                                {translateTaskStatus(task.status)}
                             </span>
                             <span
                                 className={`rounded-full px-2 py-1 ${getPriorityClasses(task.priority)}`}
                             >
-                                {task.priority}
+                                {translatePriority(task.priority)}
                             </span>
                             {task.assignedTo && (
                                 <span className="rounded-full bg-gray-100 px-2 py-1 text-gray-700">
@@ -898,7 +903,7 @@ export default function ProjectDetails() {
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
-                                            {s}
+                                            {translateProjectStatus(s)}
                                         </option>
                                     ))}
                                 </select>
@@ -910,7 +915,7 @@ export default function ProjectDetails() {
                                 >
                                     {AVAILABLE_PRIORITIES.map((p) => (
                                         <option key={p} value={p}>
-                                            {p}
+                                            {translatePriority(p)}
                                         </option>
                                     ))}
                                 </select>
@@ -920,12 +925,12 @@ export default function ProjectDetails() {
                                 <span
                                     className={`rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(project.status)}`}
                                 >
-                                    {project.status}
+                                    {translateProjectStatus(project.status)}
                                 </span>
                                 <span
                                     className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${getPriorityClasses(project.priority)}`}
                                 >
-                                    {project.priority}
+                                    {translatePriority(project.priority)}
                                 </span>
                             </div>
                         )}
@@ -1122,7 +1127,7 @@ export default function ProjectDetails() {
                                     >
                                         {AVAILABLE_PRIORITIES.map((p) => (
                                             <option key={p} value={p}>
-                                                {p}
+                                                {translatePriority(p)}
                                             </option>
                                         ))}
                                     </select>

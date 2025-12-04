@@ -161,7 +161,7 @@ export default function Dashboard() {
                     },
                     {
                         id: 3,
-                        title: 'W Trakcie Projekty',
+                        title: 'W trakcie',
                         value: running.toString(),
                     },
                     {
@@ -427,7 +427,7 @@ export default function Dashboard() {
                                     <Icon.Home />
                                     {isSidebarOpen && (
                                         <span className="font-medium">
-                                            Home
+                                            Strona główna
                                         </span>
                                     )}
                                 </li>
@@ -555,7 +555,7 @@ export default function Dashboard() {
                                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
                                             {stats[2]?.title ||
-                                                'W Trakcie Projekty'}
+                                                'W trakcie'}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
                                             {stats[2]?.value || '0'}
@@ -750,8 +750,8 @@ export default function Dashboard() {
                         </div>
                     </main>
                     <footer className="flex-shrink-0 p-3 text-center text-xs text-gray-400 md:text-sm">
-                        © {new Date().getFullYear()} WorkNest — All rights
-                        reserved
+                        © {new Date().getFullYear()} WorkNest — Wszelkie prawa
+                        zastrzeżone
                     </footer>
                 </div>
             </div>

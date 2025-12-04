@@ -15,6 +15,11 @@ import {
     Building2,
     Badge,
 } from 'lucide-react';
+import {
+    translateStatus,
+    translateContractType,
+    translateRole,
+} from '../utils/translations.js';
 
 import LoadingScreen from '../components/LoadingScreen';
 // --- Pomocnicze funkcje formatowania ---
@@ -173,7 +178,7 @@ const EditableField = ({
                 <option value="">-- Wybierz --</option>
                 {options.map((opt) => (
                     <option key={opt} value={opt}>
-                        {opt}
+                        {name === 'role' ? translateRole(opt) : opt}
                     </option>
                 ))}
             </select>
@@ -336,7 +341,7 @@ export default function UserDetails() {
                 </div>
 
                 <div className="space-y-6">
-                    <StatCard icon={<Icon.Badge />} title="Status i umowa">
+                    <StatCard icon={<Icon.Badge />} title="Status i Umowa">
                         {isEditing ? (
                             <div className="space-y-3">
                                 <select
@@ -347,7 +352,7 @@ export default function UserDetails() {
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
-                                            {s}
+                                            {translateStatus(s)}
                                         </option>
                                     ))}
                                 </select>
@@ -359,7 +364,7 @@ export default function UserDetails() {
                                 >
                                     {AVAILABLE_CONTRACT_TYPES.map((c) => (
                                         <option key={c} value={c}>
-                                            {c}
+                                            {translateContractType(c)}
                                         </option>
                                     ))}
                                 </select>
@@ -369,12 +374,12 @@ export default function UserDetails() {
                                 <span
                                     className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(user.status)}`}
                                 >
-                                    {user.status}
+                                    {translateStatus(user.status)}
                                 </span>
                                 <span
                                     className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${getContractClasses(user.contractType)}`}
                                 >
-                                    {user.contractType}
+                                    {translateContractType(user.contractType)}
                                 </span>
                             </div>
                         )}
@@ -584,7 +589,7 @@ export default function UserDetails() {
                                             Rola
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {user.role}
+                                            {translateRole(user.role)}
                                         </p>
                                     </div>
                                     <div>

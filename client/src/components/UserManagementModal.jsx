@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { translateRole } from '../utils/translations.js';
 
 const Icon = {
     Close: () => (
@@ -201,7 +202,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                         )}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
-                                                        {user.email}
+                                                        {user.email} - {translateRole(user.role)}
                                                     </div>
                                                 </div>
                                             </div>
@@ -298,7 +299,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                         {user.username}
                                                     </div>
                                                     <div className="text-xs text-gray-500">
-                                                        {user.email}
+                                                        {user.email} - {translateRole(user.role)}
                                                     </div>
                                                 </div>
                                             </div>

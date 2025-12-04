@@ -123,7 +123,7 @@ const RoleChangeModal = ({
         },
         {
             value: 'hr',
-            label: 'HR Manager',
+            label: 'Menedżer HR',
             icon: <Icon.Users />,
             color: 'blue',
             description: 'Zarządzanie pracownikami i urlopami',
@@ -379,7 +379,7 @@ export default function EmployeeList() {
             case 'admin':
                 return 'Administrator';
             case 'hr':
-                return 'HR Manager';
+                return 'Menedżer HR';
             case 'employee':
                 return 'Pracownik';
             default:
@@ -485,7 +485,7 @@ export default function EmployeeList() {
                             {users.filter((u) => u.role === 'hr').length}
                         </div>
                         <div className="mt-1 text-sm font-medium text-slate-500">
-                            HR Managers
+                            Menedżerowie HR
                         </div>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
