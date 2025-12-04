@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api.js';
 import {
@@ -497,7 +497,7 @@ export default function Dashboard() {
                                         >
                                             <Icon.Plus />
                                             <span className="hidden text-sm sm:inline">
-                                                Add Project
+                                                Dodaj Projekt
                                             </span>
                                         </button>
                                     )}
@@ -510,7 +510,7 @@ export default function Dashboard() {
                                         >
                                             <Icon.Key />
                                             <span className="hidden text-sm sm:inline">
-                                                Generate Code
+                                                Generuj Kod
                                             </span>
                                         </button>
                                     )}
