@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
 import { useAuth } from '../context/AuthContext.jsx';
+import { translateRole } from '../utils/translations.js';
 
 const Icon = {
     X: () => (
@@ -243,7 +244,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                         </div>
                                     </div>
                                     <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                                        {user.role}
+                                        {translateRole(user.role)}
                                     </span>
                                 </label>
                             ))}
