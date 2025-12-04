@@ -84,7 +84,9 @@ export default function Dashboard() {
         setLoading(true);
         try {
             // Dane użytkownika są już w 'user' z AuthContext
-            setMessage(`Witaj, ${user.username}! Masz szybki przegląd ostatnich projektów.`);
+            setMessage(
+                `Witaj, ${user.username}! Masz szybki przegląd ostatnich projektów.`,
+            );
             setUsername(user.username);
             setRole(user.role);
             setProfileImage(user.profileImage);
@@ -92,45 +94,92 @@ export default function Dashboard() {
             // Pobierz statystyki w zależności od roli
             const companyId = user.company?._id;
             if (!companyId) {
-                console.error("Brak ID firmy dla użytkownika.");
+                console.error('Brak ID firmy dla użytkownika.');
                 setLoading(false);
                 return;
             }
 
-            if (user.role === 'admin' || user.role === 'hr' || user.role === 'superadmin') {
+            if (
+                user.role === 'admin' ||
+                user.role === 'hr' ||
+                user.role === 'superadmin'
+            ) {
                 const statsRes = await api.get(`/projects/stats/summary`, {
                     params: { company: companyId },
                 });
                 const { total, running, pending, completed } = statsRes.data;
                 setStats([
-                    { id: 1, title: 'Total Projects', value: total.toString(), hint: 'Increased from last month' },
-                    { id: 2, title: 'Ended Projects', value: completed.toString(), hint: 'Stable' }, // Zmieniono z 'Ended' na 'Completed' dla spójności
-                    { id: 3, title: 'Running Projects', value: running.toString(), hint: 'Growing' }, // Zmieniono z 'Running' na 'In Progress' dla spójności
-                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
+                    {
+                        id: 1,
+                        title: 'Wszystkie Projekty',
+                        value: total.toString(),
+                        hint: 'Increased from last month',
+                    },
+                    {
+                        id: 2,
+                        title: 'Zakończone Projekty',
+                        value: completed.toString(),
+                        hint: 'Stable',
+                    }, // Zmieniono z 'Ended' na 'Completed' dla spójności
+                    {
+                        id: 3,
+                        title: 'W Trakcie Projekty',
+                        value: running.toString(),
+                        hint: 'Growing',
+                    }, // Zmieniono z 'Running' na 'In Progress' dla spójności
+                    {
+                        id: 4,
+                        title: 'Oczekujące',
+                        value: pending.toString(),
+                        hint: 'On review',
+                    },
                 ]);
             } else {
-                const assignedRes = await api.get(`/projects/users/${user._id}/assigned-projects/summary`, {
-                    params: { company: companyId },
-                });
-                const { assigned, completed, running, pending } = assignedRes.data;
+                const assignedRes = await api.get(
+                    `/projects/users/${user._id}/assigned-projects/summary`,
+                    {
+                        params: { company: companyId },
+                    },
+                );
+                const { assigned, completed, running, pending } =
+                    assignedRes.data;
                 setStats([
-                    { id: 1, title: 'My Projects', value: assigned.toString(), hint: 'Assigned to you' },
-                    { id: 2, title: 'Completed', value: completed.toString(), hint: 'This month' },
-                    { id: 3, title: 'In Progress', value: running.toString(), hint: 'Active now' },
-                    { id: 4, title: 'Pending', value: pending.toString(), hint: 'On review' },
+                    {
+                        id: 1,
+                        title: 'My Projects',
+                        value: assigned.toString(),
+                        hint: 'Assigned to you',
+                    },
+                    {
+                        id: 2,
+                        title: 'Completed',
+                        value: completed.toString(),
+                        hint: 'This month',
+                    },
+                    {
+                        id: 3,
+                        title: 'In Progress',
+                        value: running.toString(),
+                        hint: 'Active now',
+                    },
+                    {
+                        id: 4,
+                        title: 'Pending',
+                        value: pending.toString(),
+                        hint: 'On review',
+                    },
                 ]);
             }
 
             // Pobierz ostatnie projekty
             const projectsRes = await api.get('/projects', {
-                params: { 
+                params: {
                     sortBy: 'createdAt:desc',
                     limit: 5,
-                    company: companyId 
+                    company: companyId,
                 },
             });
             setProjects(projectsRes.data.projects);
-
         } catch (err) {
             console.error('Błąd ładowania danych dashboardu:', err);
             // Nie ma potrzeby ręcznej nawigacji, interceptor to obsłuży
@@ -145,7 +194,8 @@ export default function Dashboard() {
     };
 
     useEffect(() => {
-        if (user) { // Uruchom pobieranie danych dopiero, gdy użytkownik jest dostępny
+        if (user) {
+            // Uruchom pobieranie danych dopiero, gdy użytkownik jest dostępny
             fetchDashboardData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -423,37 +473,34 @@ export default function Dashboard() {
                                 </div>
                             </div>
 
-                                <div className="flex items-center gap-3 md:gap-6">
-
-                                    <div className="flex gap-2">
-                                        {(role === 'admin' || role === 'hr') && (
-                                            <button
-                                                onClick={() =>
-                                                    setIsModalOpen(true)
-                                                }
-                                                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-emerald-700 md:px-5"
-                                            >
-                                                <Icon.Plus />
-                                                <span className="hidden text-sm sm:inline">
-                                                    Add Project
-                                                </span>
-                                            </button>
-                                        )}
-                                        {role === 'admin' && (
-                                            <button
-                                                onClick={() =>
-                                                    navigate('/generate-code')
-                                                }
-                                                className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-blue-700 md:px-5"
-                                            >
-                                                <Icon.Key />
-                                                <span className="hidden text-sm sm:inline">
-                                                    Generate Code
-                                                </span>
-                                            </button>
-                                        )}
-                                    </div>
+                            <div className="flex items-center gap-3 md:gap-6">
+                                <div className="flex gap-2">
+                                    {(role === 'admin' || role === 'hr') && (
+                                        <button
+                                            onClick={() => setIsModalOpen(true)}
+                                            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-emerald-700 md:px-5"
+                                        >
+                                            <Icon.Plus />
+                                            <span className="hidden text-sm sm:inline">
+                                                Add Project
+                                            </span>
+                                        </button>
+                                    )}
+                                    {role === 'admin' && (
+                                        <button
+                                            onClick={() =>
+                                                navigate('/generate-code')
+                                            }
+                                            className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-blue-700 md:px-5"
+                                        >
+                                            <Icon.Key />
+                                            <span className="hidden text-sm sm:inline">
+                                                Generate Code
+                                            </span>
+                                        </button>
+                                    )}
                                 </div>
+                            </div>
                         </div>
                     </div>
 
@@ -465,9 +512,9 @@ export default function Dashboard() {
                                 <div className="flex items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg sm:col-span-2 md:p-6">
                                     <div>
                                         <div className="text-xs opacity-90 md:text-sm">
-                                            Total Projects
+                                            Wszystkie Projekty
                                         </div>
-                                        <div className="mt-2 text-3xl font-bold md:text-4xl min-h-[48px]">
+                                        <div className="mt-2 min-h-[48px] text-3xl font-bold md:text-4xl">
                                             {stats[0]?.value || '0'}
                                         </div>
                                         <div className="mt-2 text-xs opacity-90 md:text-sm">
@@ -510,7 +557,7 @@ export default function Dashboard() {
                                         <div className="text-xs text-gray-500">
                                             {s.title}
                                         </div>
-                                        <div className="mt-2 text-lg font-semibold md:text-xl min-h-[28px]">
+                                        <div className="mt-2 min-h-[28px] text-lg font-semibold md:text-xl">
                                             {s.value}
                                         </div>
                                         <div className="mt-2 text-xs text-gray-400 md:text-sm">
