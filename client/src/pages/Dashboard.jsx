@@ -6,15 +6,13 @@ import {
     FolderKanban,
     Users,
     ChartLine,
-    Search,
-    Plus,
     Home,
     CalendarCheck,
     ChevronRight,
     ChevronLeft,
     Key,
 } from 'lucide-react';
-import AddProjectModal from '../components/AddProjectModal.jsx';
+
 import moment from 'moment';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import { useAuth } from '../context/AuthContext';
@@ -76,8 +74,6 @@ const Icon = {
     Projects: () => <FolderKanban className="h-5 w-5" />,
     Users: () => <Users className="h-5 w-5" />,
     Analytics: () => <ChartLine className="h-5 w-5" />,
-    Search: () => <Search className="h-4 w-4 text-gray-400" />,
-    Plus: () => <Plus className="h-4 w-4" />,
     Home: () => <Home className="h-5 w-5" />,
     Check: () => <CalendarCheck className="h-5 w-5" />,
     ChevronRight: () => <ChevronRight className="h-5 w-5" />,
@@ -86,7 +82,6 @@ const Icon = {
 };
 
 export default function Dashboard() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState([]);
     const [message, setMessage] = useState('');
     const [username, setUsername] = useState('');
@@ -218,11 +213,6 @@ export default function Dashboard() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleProjectAdded = (newProject) => {
-        setProjects((prevProjects) => [newProject, ...prevProjects]);
-        alert(`Projekt "${newProject.name}" został pomyślnie dodany!`);
     };
 
     useEffect(() => {
@@ -489,32 +479,19 @@ export default function Dashboard() {
                             </div>
 
                             <div className="flex items-center gap-3 md:gap-6">
-                                <div className="flex gap-2">
-                                    {(role === 'admin' || role === 'hr') && (
-                                        <button
-                                            onClick={() => setIsModalOpen(true)}
-                                            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-emerald-700 md:px-5"
-                                        >
-                                            <Icon.Plus />
-                                            <span className="hidden text-sm sm:inline">
-                                                Dodaj Projekt
-                                            </span>
-                                        </button>
-                                    )}
-                                    {role === 'admin' && (
-                                        <button
-                                            onClick={() =>
-                                                navigate('/generate-code')
-                                            }
-                                            className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-blue-700 md:px-5"
-                                        >
-                                            <Icon.Key />
-                                            <span className="hidden text-sm sm:inline">
-                                                Generuj Kod
-                                            </span>
-                                        </button>
-                                    )}
-                                </div>
+                                {role === 'admin' && (
+                                    <button
+                                        onClick={() =>
+                                            navigate('/generate-code')
+                                        }
+                                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-blue-700 md:px-5"
+                                    >
+                                        <Icon.Key />
+                                        <span className="hidden text-sm sm:inline">
+                                            Generuj Kod
+                                        </span>
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -523,7 +500,7 @@ export default function Dashboard() {
                     <main className="flex-grow overflow-y-auto">
                         <div className="grid grid-cols-1 gap-4 p-4 md:gap-4 md:p-6 lg:grid-cols-12">
                             {/* Stats big card */}
-                            <div className="flex flex-col gap-4 lg:col-span-8 md:gap-4">
+                            <div className="flex flex-col gap-4 md:gap-4 lg:col-span-8">
                                 <div className="flex max-h-36 items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg md:p-6">
                                     <div>
                                         <div className="text-xs opacity-90 md:text-sm">
@@ -554,8 +531,7 @@ export default function Dashboard() {
                                     {/* Stat 3 */}
                                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
-                                            {stats[2]?.title ||
-                                                'W trakcie'}
+                                            {stats[2]?.title || 'W trakcie'}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
                                             {stats[2]?.value || '0'}
@@ -755,13 +731,6 @@ export default function Dashboard() {
                     </footer>
                 </div>
             </div>
-
-            {/* Modal stays at the root level */}
-            <AddProjectModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSuccess={handleProjectAdded}
-            />
         </div>
     );
 }
