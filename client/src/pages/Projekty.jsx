@@ -8,8 +8,10 @@ import {
     Trash2,
     ArrowLeft,
     FolderKanban,
+    Plus,
 } from 'lucide-react';
 import LoadingScreen from '../components/LoadingScreen';
+import AddProjectModal from '../components/AddProjectModal.jsx';
 import { useAuth } from '../context/AuthContext';
 
 const statusStyles = {
@@ -38,7 +40,7 @@ const formatDate = (dateString) => {
 
 // --- Komponenty UI ---
 
-const ProjectListHeader = () => {
+const ProjectListHeader = ({ onAddProject, currentUserRole }) => {
     const navigate = useNavigate();
     return (
         <header className="sticky top-0 z-10 mb-6 rounded-2xl bg-white shadow-sm md:mb-8">
@@ -59,10 +61,21 @@ const ProjectListHeader = () => {
                                 Przegląd Projektów
                             </h1>
                             <p className="hidden text-sm text-slate-500 md:block">
-                                Zarządzaj wszystkimi projektami w jednym miejscu.
+                                Zarządzaj wszystkimi projektami w jednym
+                                miejscu.
                             </p>
                         </div>
                     </div>
+                    {(currentUserRole === 'admin' ||
+                        currentUserRole === 'hr') && (
+                        <button
+                            onClick={onAddProject}
+                            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-white shadow-sm transition-colors hover:bg-emerald-700"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span className="text-sm">Dodaj Projekt</span>
+                        </button>
+                    )}
                 </div>
             </div>
         </header>
@@ -190,7 +203,9 @@ const ProjectCard = ({ project, currentUserRole, onDelete, onCardClick }) => {
                     </div>
                 </div>
                 <div>
-                    <div className="mb-1 text-xs text-slate-500">Przypisani</div>
+                    <div className="mb-1 text-xs text-slate-500">
+                        Przypisani
+                    </div>
                     <AssignedUsersAvatarGroup users={project.assignedUsers} />
                 </div>
             </div>
@@ -289,41 +304,49 @@ export default function Projekty() {
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({ name: '', status: '' });
     const [refreshKey, setRefreshKey] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const fetchProjects = useCallback(async (showFullLoader = false, currentFilters = filters) => {
-        if (!companyId) {
-            setProjects([]);
-            setIsInitialLoading(false);
-            return;
-        }
-        
-        // Używamy pełnego loadera tylko przy pierwszym ładowaniu lub odświeżaniu
-        if (showFullLoader) {
-            setIsInitialLoading(true);
-        } else {
-            setIsFiltering(true);
-        }
-        
-        setError(null);
-        
-        try {
-            const response = await api.get('/projects', { // ZMIANA: Używamy 'api' i usuwamy '/api' z URL
-                params: { ...currentFilters, company: companyId }
-            });
-            setProjects(response.data.projects);
-        } catch (err) {
-            console.error('Błąd ładowania projektów:', err);
-            if (err.response?.status === 401 || err.response?.status === 403) {
-                navigate('/login');
-            } else {
-                setError('Nie udało się załadować listy projektów.');
+    const fetchProjects = useCallback(
+        async (showFullLoader = false, currentFilters = filters) => {
+            if (!companyId) {
+                setProjects([]);
+                setIsInitialLoading(false);
+                return;
             }
-        } finally {
-            setIsInitialLoading(false);
-            setIsFiltering(false);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [companyId, navigate]);
+
+            // Używamy pełnego loadera tylko przy pierwszym ładowaniu lub odświeżaniu
+            if (showFullLoader) {
+                setIsInitialLoading(true);
+            } else {
+                setIsFiltering(true);
+            }
+
+            setError(null);
+
+            try {
+                const response = await api.get('/projects', {
+                    // ZMIANA: Używamy 'api' i usuwamy '/api' z URL
+                    params: { ...currentFilters, company: companyId },
+                });
+                setProjects(response.data.projects);
+            } catch (err) {
+                console.error('Błąd ładowania projektów:', err);
+                if (
+                    err.response?.status === 401 ||
+                    err.response?.status === 403
+                ) {
+                    navigate('/login');
+                } else {
+                    setError('Nie udało się załadować listy projektów.');
+                }
+            } finally {
+                setIsInitialLoading(false);
+                setIsFiltering(false);
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        },
+        [companyId, navigate],
+    );
 
     // Pierwsze załadowanie (z pełnym loaderem) - tylko przy wejściu i odświeżaniu
     useEffect(() => {
@@ -344,8 +367,9 @@ export default function Projekty() {
     const handleDelete = async (projectId) => {
         if (!window.confirm('Czy na pewno chcesz usunąć ten projekt?')) return;
         if (!companyId) return;
-        try { 
-            await api.delete(`/projects/${projectId}`, { // ZMIANA: Używamy 'api' i usuwamy '/api' z URL
+        try {
+            await api.delete(`/projects/${projectId}`, {
+                // ZMIANA: Używamy 'api' i usuwamy '/api' z URL
                 params: { company: companyId },
             });
             setProjects((prev) => prev.filter((p) => p._id !== projectId));
@@ -364,6 +388,11 @@ export default function Projekty() {
         setRefreshKey((k) => k + 1);
     };
 
+    const handleProjectAdded = (newProject) => {
+        setProjects((prevProjects) => [newProject, ...prevProjects]);
+        setIsModalOpen(false);
+    };
+
     if (isInitialLoading || authLoading) {
         return <LoadingScreen message="Ładowanie projektów..." />;
     }
@@ -374,8 +403,8 @@ export default function Projekty() {
                 <div className="w-full max-w-md rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-red-700 shadow-sm">
                     <div className="mb-2 text-lg font-semibold">Błąd</div>
                     <div className="text-sm">{error}</div>
-                    <button 
-                        onClick={() => navigate('/dashboard')} 
+                    <button
+                        onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto"
                     >
                         Powrót do Dashboard
@@ -389,10 +418,15 @@ export default function Projekty() {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
                 <div className="w-full max-w-md rounded-xl border border-yellow-200 bg-yellow-50 px-6 py-6 text-yellow-700 shadow-sm">
-                    <div className="mb-2 text-lg font-semibold">Brak przypisanej firmy</div>
-                    <div className="text-sm">Nie jesteś przypisany do żadnej firmy. Skontaktuj się z administratorem.</div>
-                    <button 
-                        onClick={() => navigate('/dashboard')} 
+                    <div className="mb-2 text-lg font-semibold">
+                        Brak przypisanej firmy
+                    </div>
+                    <div className="text-sm">
+                        Nie jesteś przypisany do żadnej firmy. Skontaktuj się z
+                        administratorem.
+                    </div>
+                    <button
+                        onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-yellow-600 px-4 py-2 text-white transition-colors hover:bg-yellow-700 sm:w-auto"
                     >
                         Powrót do Dashboard
@@ -404,7 +438,10 @@ export default function Projekty() {
 
     return (
         <div className="min-h-screen bg-slate-50 p-2 sm:p-4 md:p-8">
-            <ProjectListHeader />
+            <ProjectListHeader
+                onAddProject={() => setIsModalOpen(true)}
+                currentUserRole={currentUserRole}
+            />
             <div className="rounded-2xl bg-white p-4 shadow-lg md:p-6">
                 <FilterControls
                     onFilterChange={setFilters}
@@ -421,9 +458,16 @@ export default function Projekty() {
                             <table className="min-w-full divide-y divide-slate-200">
                                 <thead className="bg-slate-50">
                                     <tr>
-                                        {['Nazwa Projektu', 'Status', 'Postęp', 'Termin', 'Przypisani', 'Akcje'].map((header) => (
-                                            <th 
-                                                key={header} 
+                                        {[
+                                            'Nazwa Projektu',
+                                            'Status',
+                                            'Postęp',
+                                            'Termin',
+                                            'Przypisani',
+                                            'Akcje',
+                                        ].map((header) => (
+                                            <th
+                                                key={header}
                                                 className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500"
                                             >
                                                 {header}
@@ -459,8 +503,16 @@ export default function Projekty() {
                 )}
             </div>
             <footer className="mt-8 text-center text-sm text-slate-400">
-                © {new Date().getFullYear()} WorkNest — Wszelkie prawa zastrzeżone
+                © {new Date().getFullYear()} WorkNest — Wszelkie prawa
+                zastrzeżone
             </footer>
+
+            {/* Modal do dodawania projektów */}
+            <AddProjectModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSuccess={handleProjectAdded}
+            />
         </div>
     );
 }
