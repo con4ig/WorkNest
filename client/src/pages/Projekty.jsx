@@ -220,7 +220,6 @@ export default function Projekty() {
 
     const handleRefresh = () => {
         setFilters({ name: '', status: '' });
-        setRefreshKey((k) => k + 1);
     };
 
     const handleProjectAdded = () => {
