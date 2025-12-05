@@ -19,11 +19,9 @@ export const updateProjectUsers = async (req, res) => {
     // Company isolation: Only allow modifying projects from the same company
     if (req.user.role !== "superadmin") {
       if (!req.user.company) {
-        return res
-          .status(403)
-          .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
-          });
+        return res.status(403).json({
+          message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+        });
       }
       query.company = req.user.company._id;
     }
@@ -72,18 +70,29 @@ export const updateProjectUsers = async (req, res) => {
 
 export const getProjects = async (req, res) => {
   try {
-    const { status, sortBy, limit, name } = req.query;
+    const { status, sortBy, limit, name, isArchived } = req.query;
 
     let query = {};
 
     // ✅ KRYTYCZNE ZABEZPIECZENIE: Sprawdź, czy middleware zadziałało
     if (!req.user) {
-      return res.status(401).json({ message: "Brak autoryzacji - req.user nie jest zdefiniowany." });
+      return res.status(401).json({
+        message: "Brak autoryzacji - req.user nie jest zdefiniowany.",
+      });
     }
 
     // Company isolation
     if (req.user.role !== "superadmin") {
       query.company = req.user.company;
+    }
+
+    // Filtrowanie po archiwizacji (domyślnie pokazuj tylko aktywne)
+    // $ne: true obsługuje przypadki: false, null, undefined (brak pola)
+    if (isArchived === "true") {
+      query.isArchived = true;
+    } else {
+      // Pokaż projekty gdzie isArchived NIE jest true (czyli false, null lub brak pola)
+      query.isArchived = { $ne: true };
     }
 
     // Nowość: Filtrowanie po nazwie projektu (jeśli podano)
@@ -142,7 +151,8 @@ export const getProjects = async (req, res) => {
 
 export const getProjectStats = async (req, res) => {
   try {
-    let query = {};
+    // Tylko aktywne projekty ($ne: true obsługuje false, null i brak pola)
+    let query = { isArchived: { $ne: true } };
 
     // Company isolation
     if (req.user.role !== "superadmin") {
@@ -185,11 +195,9 @@ export const getProjectById = async (req, res) => {
     // Company isolation: Only allow fetching projects from the same company
     if (req.user.role !== "superadmin") {
       if (!req.user.company) {
-        return res
-          .status(403)
-          .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
-          });
+        return res.status(403).json({
+          message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+        });
       }
       query.company = req.user.company._id;
     }
@@ -321,7 +329,8 @@ export const getUserAssignedProjectsSummary = async (req, res) => {
         .json({ error: "Brak dostępu do danych innych użytkowników" });
     }
 
-    const companyQuery = {};
+    // Tylko aktywne projekty ($ne: true obsługuje false, null i brak pola)
+    const companyQuery = { isArchived: { $ne: true } };
     if (req.user.role !== "superadmin") {
       companyQuery.company = req.user.company;
     }
@@ -359,7 +368,8 @@ export const getUserAssignedProjectsSummary = async (req, res) => {
 
 export const getStatsSummary = async (req, res) => {
   try {
-    const query = {};
+    // Tylko aktywne projekty ($ne: true obsługuje false, null i brak pola)
+    const query = { isArchived: { $ne: true } };
     if (req.user.role !== "superadmin") {
       // Pobierz ID firmy z zapytania lub od zalogowanego użytkownika
       const requestedCompanyId = req.query.company;
@@ -367,11 +377,15 @@ export const getStatsSummary = async (req, res) => {
 
       // Sprawdź, czy admin/hr ma prawo dostępu do żądanej firmy
       if (requestedCompanyId && requestedCompanyId !== userCompanyId) {
-        return res.status(403).json({ message: "Brak uprawnień do danych tej firmy." });
+        return res
+          .status(403)
+          .json({ message: "Brak uprawnień do danych tej firmy." });
       }
 
       if (!userCompanyId) {
-          return res.status(403).json({ message: "Użytkownik nie jest przypisany do firmy." });
+        return res
+          .status(403)
+          .json({ message: "Użytkownik nie jest przypisany do firmy." });
       }
       query.company = userCompanyId;
     }
@@ -392,5 +406,89 @@ export const getStatsSummary = async (req, res) => {
   } catch (error) {
     console.error("Błąd podczas pobierania statystyk:", error);
     res.status(500).json({ error: "Błąd podczas pobierania statystyk" });
+  }
+};
+
+// Archiwizuj projekt (soft delete)
+export const archiveProject = async (req, res) => {
+  try {
+    const query = { _id: req.params.id };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    const project = await Project.findOneAndUpdate(
+      query,
+      { isArchived: true },
+      { new: true }
+    );
+
+    if (!project) {
+      return res.status(404).json({ message: "Projekt nie znaleziony" });
+    }
+
+    res.json({ message: "Projekt zarchiwizowany pomyślnie", project });
+  } catch (err) {
+    console.error("Error archiving project:", err);
+    res.status(500).json({ message: "Błąd serwera" });
+  }
+};
+
+// Przywróć projekt z archiwum
+export const restoreProject = async (req, res) => {
+  try {
+    const query = { _id: req.params.id };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    const project = await Project.findOneAndUpdate(
+      query,
+      { isArchived: false },
+      { new: true }
+    );
+
+    if (!project) {
+      return res.status(404).json({ message: "Projekt nie znaleziony" });
+    }
+
+    res.json({ message: "Projekt przywrócony pomyślnie", project });
+  } catch (err) {
+    console.error("Error restoring project:", err);
+    res.status(500).json({ message: "Błąd serwera" });
+  }
+};
+
+// Szybka aktualizacja statusu (dla Kanban drag & drop)
+export const updateProjectStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (
+      !status ||
+      !["pending", "running", "completed", "on-hold"].includes(status)
+    ) {
+      return res.status(400).json({ message: "Nieprawidłowy status" });
+    }
+
+    const query = { _id: req.params.id };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    const project = await Project.findOneAndUpdate(
+      query,
+      { status },
+      { new: true, runValidators: true }
+    ).populate("assignedUsers", "username email");
+
+    if (!project) {
+      return res.status(404).json({ message: "Projekt nie znaleziony" });
+    }
+
+    res.json({ message: "Status zaktualizowany pomyślnie", project });
+  } catch (err) {
+    console.error("Error updating project status:", err);
+    res.status(500).json({ message: "Błąd serwera" });
   }
 };
