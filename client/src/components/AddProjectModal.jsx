@@ -44,7 +44,9 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
     const fetchUsers = async () => {
         try {
-            const res = await api.get('/users', { params: { company: companyId } }); // ZMIANA: Używamy 'api'
+            const res = await api.get('/users', {
+                params: { company: companyId },
+            }); // ZMIANA: Używamy 'api'
             setUsers(res.data.users || []); // ZABEZPIECZENIE: Upewnij się, że users jest zawsze tablicą
         } catch (err) {
             console.error('Error fetching users:', err);
@@ -73,8 +75,10 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            const response = await api.post( // ZMIANA: Używamy 'api'
-                '/projects', { ...formData, company: companyId }
+            const response = await api.post(
+                // ZMIANA: Używamy 'api'
+                '/projects',
+                { ...formData, company: companyId },
             );
 
             const newProject = response.data.project;
@@ -175,9 +179,10 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 onChange={handleChange}
                                 className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="low">Niski</option>
-                                <option value="medium">Średni</option>
-                                <option value="high">Wysoki</option>
+                                <option value="low">🟢 Niski</option>
+                                <option value="medium">🔵 Średni</option>
+                                <option value="high">🟠 Wysoki</option>
+                                <option value="critical">🔴 Krytyczny</option>
                             </select>
                         </div>
                     </div>

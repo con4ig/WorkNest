@@ -11,6 +11,9 @@ import {
   deleteProject,
   getUserAssignedProjectsSummary,
   getStatsSummary,
+  archiveProject,
+  restoreProject,
+  updateProjectStatus,
 } from "../controllers/projectController.js";
 
 const router = express.Router();
@@ -52,6 +55,30 @@ router.get(
   authenticate,
   authorize("admin", "hr"),
   getStatsSummary
+);
+
+// PATCH /api/projects/:id/archive - archiwizuj projekt (admin/hr)
+router.patch(
+  "/:id/archive",
+  authenticate,
+  authorize("admin", "hr"),
+  archiveProject
+);
+
+// PATCH /api/projects/:id/restore - przywróć projekt (admin/hr)
+router.patch(
+  "/:id/restore",
+  authenticate,
+  authorize("admin", "hr"),
+  restoreProject
+);
+
+// PATCH /api/projects/:id/status - szybka zmiana statusu dla Kanban (admin/hr)
+router.patch(
+  "/:id/status",
+  authenticate,
+  authorize("admin", "hr"),
+  updateProjectStatus
 );
 
 export default router;

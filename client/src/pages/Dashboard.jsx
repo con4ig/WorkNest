@@ -198,12 +198,13 @@ export default function Dashboard() {
                 ]);
             }
 
-            // Pobierz ostatnie projekty
+            // Pobierz ostatnie projekty (tylko aktywne, nie zarchiwizowane)
             const projectsRes = await api.get('/projects', {
                 params: {
                     sortBy: 'createdAt:desc',
-                    limit: 5,
+                    limit: 4,
                     company: companyId,
+                    isArchived: 'false', // Tylko aktywne projekty
                 },
             });
             setProjects(projectsRes.data.projects);
