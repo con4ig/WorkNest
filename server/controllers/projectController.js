@@ -492,3 +492,66 @@ export const updateProjectStatus = async (req, res) => {
     res.status(500).json({ message: "Błąd serwera" });
   }
 };
+
+// Operacje masowe na projektach
+export const bulkProjectAction = async (req, res) => {
+  try {
+    const { projectIds, action, payload } = req.body;
+
+    if (!Array.isArray(projectIds) || projectIds.length === 0) {
+      return res.status(400).json({ message: "Brak zaznaczonych projektów" });
+    }
+
+    // Budowanie query (zabezpieczenie per firma)
+    const query = { _id: { $in: projectIds } };
+    if (req.user.role !== "superadmin") {
+      query.company = req.user.company;
+    }
+
+    let result;
+    let message = "";
+
+    switch (action) {
+      case "archive":
+        result = await Project.updateMany(query, { isArchived: true });
+        message = `Zarchiwizowano ${result.modifiedCount} projektów`;
+        break;
+
+      case "restore":
+        result = await Project.updateMany(query, { isArchived: false });
+        message = `Przywrócono ${result.modifiedCount} projektów`;
+        break;
+
+      case "delete":
+        if (req.user.role !== "admin" && req.user.role !== "superadmin") {
+          return res
+            .status(403)
+            .json({ message: "Brak uprawnień do usuwania" });
+        }
+        result = await Project.deleteMany(query);
+        message = `Usunięto trwale ${result.deletedCount} projektów`;
+        break;
+
+      case "status":
+        if (
+          !payload ||
+          !["pending", "running", "completed", "on-hold"].includes(
+            payload.status
+          )
+        ) {
+          return res.status(400).json({ message: "Nieprawidłowy status" });
+        }
+        result = await Project.updateMany(query, { status: payload.status });
+        message = `Zmieniono status dla ${result.modifiedCount} projektów`;
+        break;
+
+      default:
+        return res.status(400).json({ message: "Nieznana akcja" });
+    }
+
+    res.json({ message, count: result.modifiedCount || result.deletedCount });
+  } catch (err) {
+    console.error("Error in bulk action:", err);
+    res.status(500).json({ message: "Błąd serwera podczas operacji masowej" });
+  }
+};
