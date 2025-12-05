@@ -19,22 +19,22 @@ const FilterControls = ({ onFilterChange, onRefresh, isFiltering }) => {
     }, [searchTerm, status, onFilterChange]);
 
     return (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="relative w-[300px] flex-grow">
                 <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 <input
                     type="text"
                     placeholder="Szukaj projektu..."
-                    className="w-full rounded-lg border-slate-200 py-2.5 pl-10 pr-4 text-sm focus:border-emerald-500 focus:ring-emerald-500 sm:w-64"
+                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm transition-all hover:border-emerald-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
             <div className="flex gap-2">
-                <div className="relative flex-1 sm:flex-none">
+                <div className="relative w-[196px] flex-1">
                     <ListFilter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                     <select
-                        className="w-full appearance-none rounded-lg border-slate-200 py-2.5 pl-10 pr-8 text-sm focus:border-emerald-500 focus:ring-emerald-500 sm:w-48"
+                        className="w-full appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-8 text-sm shadow-sm transition-all hover:border-emerald-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
                         value={status}
                         onChange={(e) => setStatus(e.target.value)}
                     >
@@ -47,7 +47,7 @@ const FilterControls = ({ onFilterChange, onRefresh, isFiltering }) => {
                 </div>
                 <button
                     onClick={onRefresh}
-                    className="rounded-lg border border-slate-200 bg-white p-2.5 text-slate-600 transition-colors hover:bg-slate-50 hover:text-emerald-600"
+                    className="rounded-lg border border-slate-300 bg-white p-2.5 text-slate-600 shadow-sm transition-all hover:border-emerald-400 hover:bg-slate-50 hover:text-emerald-600 active:scale-95"
                     title="Odśwież listę"
                 >
                     <RefreshCcw

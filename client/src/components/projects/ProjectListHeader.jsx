@@ -5,7 +5,7 @@ import { ArrowLeft, FolderKanban, Plus } from 'lucide-react';
 const ProjectListHeader = ({ onAddProject, currentUserRole }) => {
     const navigate = useNavigate();
     return (
-        <header className="sticky top-0 z-10 mb-6 rounded-2xl bg-white shadow-sm md:mb-8">
+        <header className="sticky top-0 z-10 mb-4 rounded-2xl bg-white shadow-sm md:mb-6">
             <div className="max-w-8xl mx-auto px-4 py-4 md:px-8 md:py-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-4">

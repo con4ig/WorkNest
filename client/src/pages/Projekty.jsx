@@ -314,7 +314,7 @@ export default function Projekty() {
             <div
                 className={`rounded-2xl bg-white p-4 shadow-lg transition-opacity duration-300 md:p-6 ${isFiltering ? 'opacity-60' : 'opacity-100'}`}
             >
-                <div className="mb-6 grid grid-cols-1 grid-rows-1">
+                <div className="mb-4 grid grid-cols-1 grid-rows-1">
                     {/* Bulk Actions Header Layer */}
                     <div
                         className={`z-20 col-start-1 row-start-1 transition-all duration-300 ease-in-out ${
@@ -341,7 +341,7 @@ export default function Projekty() {
                                 : 'translate-y-0 opacity-100'
                         }`}
                     >
-                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                             <FilterControls
                                 onFilterChange={setFilters}
                                 onRefresh={handleRefresh}

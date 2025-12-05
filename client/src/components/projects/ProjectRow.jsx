@@ -62,7 +62,7 @@ const ProjectRow = ({
     currentUserRole,
     onArchive,
     onRestore,
-    onDelete,
+    onPermanentDelete,
     onRowClick,
     isSelected,
     onToggleSelect,
@@ -91,8 +91,10 @@ const ProjectRow = ({
 
     return (
         <tr
-            className={`cursor-pointer transition-colors hover:bg-slate-50 ${
-                isSelected ? 'bg-emerald-50/60' : ''
+            className={`cursor-pointer border-b border-slate-100 transition-colors last:border-0 ${
+                isSelected
+                    ? 'bg-emerald-50 hover:bg-emerald-100'
+                    : 'hover:bg-slate-50'
             }`}
             onClick={() => onRowClick(project._id)}
         >
@@ -126,8 +128,18 @@ const ProjectRow = ({
                     {statusInfo.label}
                 </span>
             </td>
-            <td className="hidden px-6 py-4 lg:table-cell">
-                <AssignedUsersAvatarGroup users={project.assignedUsers} />
+            <td className="hidden px-6 py-4 md:table-cell">
+                <div className="flex w-full min-w-[100px] flex-col gap-1">
+                    <span className="text-xs font-medium text-slate-700">
+                        {project.progress || 0}%
+                    </span>
+                    <div className="h-1.5 w-full rounded-full bg-slate-200">
+                        <div
+                            className="h-1.5 rounded-full bg-emerald-600"
+                            style={{ width: `${project.progress || 0}%` }}
+                        ></div>
+                    </div>
+                </div>
             </td>
             <td className="hidden px-6 py-4 xl:table-cell">
                 <div className="flex items-center text-sm text-slate-500">
@@ -135,8 +147,11 @@ const ProjectRow = ({
                     {formatDate(project.endDate)}
                 </div>
             </td>
+            <td className="hidden px-6 py-4 lg:table-cell">
+                <AssignedUsersAvatarGroup users={project.assignedUsers} />
+            </td>
             <td className="px-6 py-4">
-                <div className="relative flex justify-end" ref={menuRef}>
+                <div className="relative flex" ref={menuRef}>
                     <button
                         onClick={handleMenuClick}
                         className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
@@ -177,7 +192,7 @@ const ProjectRow = ({
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onDelete(project._id);
+                                            onPermanentDelete(project._id);
                                             setShowMenu(false);
                                         }}
                                         className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
