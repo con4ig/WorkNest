@@ -55,7 +55,7 @@ export default function Projekty() {
             const width = window.innerWidth;
             if (width < 768) {
                 setScreenSize('mobile');
-            } else if (width <= 1024) {
+            } else if (width <= 1366) {
                 setScreenSize('tablet');
             } else {
                 setScreenSize('desktop');
@@ -234,6 +234,14 @@ export default function Projekty() {
         localStorage.setItem('projectsViewPreference', view);
     };
 
+    const handleSearchChange = useCallback((name) => {
+        setFilters((f) => ({ ...f, name }));
+    }, []);
+
+    const handleStatusFilterChange = useCallback((status) => {
+        setFilters((f) => ({ ...f, status }));
+    }, []);
+
     // Przywracanie projektu z archiwum
     const handleRestore = async (projectId) => {
         try {
@@ -346,6 +354,7 @@ export default function Projekty() {
                                 onFilterChange={setFilters}
                                 onRefresh={handleRefresh}
                                 isFiltering={isFiltering}
+                                screenSize={screenSize}
                             />
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                 {/* Przełącznik Aktywne/Archiwum */}
