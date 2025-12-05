@@ -66,6 +66,8 @@ const GridView = ({
     onRestore,
     onCardClick,
     showArchived,
+    selectedProjects = [], // Dodano
+    onToggleSelect, // Dodano
 }) => {
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -76,16 +78,28 @@ const GridView = ({
                     priorityStyles[project.priority] ||
                     priorityStyles['medium'];
 
+                const isSelected = selectedProjects.includes(project._id);
+
                 return (
                     <div
                         key={project._id}
                         className={`cursor-pointer rounded-lg border border-slate-200 bg-white p-4 shadow-md transition-all hover:shadow-lg ${
                             project.isArchived ? 'opacity-60' : ''
-                        }`}
+                        } ${isSelected ? 'ring-2 ring-emerald-500' : ''}`}
                         onClick={() => onCardClick(project._id)}
                     >
                         {/* Header */}
                         <div className="mb-4 flex items-start justify-between">
+                            {/* Checkbox */}
+                            <div className="mr-3 pt-1">
+                                <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => onToggleSelect(project._id)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                />
+                            </div>
                             <div className="flex-1">
                                 <h3 className="text-base font-bold text-slate-800">
                                     {project.name}

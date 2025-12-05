@@ -14,6 +14,7 @@ import {
   archiveProject,
   restoreProject,
   updateProjectStatus,
+  bulkProjectAction,
 } from "../controllers/projectController.js";
 
 const router = express.Router();
@@ -30,6 +31,14 @@ router.get("/", authenticate, getProjects);
 
 // GET /api/projects/stats - statystyki projektów (dla dashboard)
 router.get("/stats", authenticate, getProjectStats);
+
+// PATCH /api/projects/bulk-action - operacje masowe (admin/hr)
+router.patch(
+  "/bulk-action",
+  authenticate,
+  authorize("admin", "hr"),
+  bulkProjectAction
+);
 
 // GET /api/projects/:id - szczegóły projektu
 router.get("/:id", authenticate, getProjectById);
