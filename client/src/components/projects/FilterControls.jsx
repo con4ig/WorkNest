@@ -6,12 +6,20 @@ const FilterControls = ({
     onRefresh,
     isFiltering,
     screenSize,
+    filters,
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [status, setStatus] = useState('');
     const isMounted = useRef(false);
 
+    // Sync internal state with parent state when filters prop changes
     useEffect(() => {
+        setSearchTerm(filters.name);
+        setStatus(filters.status);
+    }, [filters]);
+
+    useEffect(() => {
+        // Debounce filter changes
         if (isMounted.current) {
             const handler = setTimeout(() => {
                 onFilterChange({ name: searchTerm, status });
