@@ -1,17 +1,9 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
+import React, { useEffect, useState, useCallback } from 'react';
+import api from '../services/api.js'; 
 import { useNavigate } from 'react-router-dom';
 import {
-    Search,
-    ListFilter,
-    RefreshCcw,
-    Trash2,
-    ArrowLeft,
     FolderKanban,
-    Plus,
     Archive,
-    ArchiveRestore,
-    X,
 } from 'lucide-react';
 import LoadingScreen from '../components/LoadingScreen';
 import AddProjectModal from '../components/AddProjectModal.jsx';
@@ -155,8 +147,8 @@ export default function Projekty() {
                 setIsInitialLoading(false);
                 setIsFiltering(false);
             }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [companyId, navigate, showArchived],
     );
 
@@ -233,14 +225,6 @@ export default function Projekty() {
         localStorage.setItem('projectsViewPreference', view);
     };
 
-    const handleSearchChange = useCallback((name) => {
-        setFilters((f) => ({ ...f, name }));
-    }, []);
-
-    const handleStatusFilterChange = useCallback((status) => {
-        setFilters((f) => ({ ...f, status }));
-    }, []);
-
     // Przywracanie projektu z archiwum
     const handleRestore = async (projectId) => {
         try {
@@ -299,7 +283,7 @@ export default function Projekty() {
                     </div>
                     <div className="text-sm">
                         Nie jesteś przypisany do żadnej firmy. Skontaktuj się z
-                        administratorem.
+                        administratorem
                     </div>
                     <button
                         onClick={() => navigate('/dashboard')}
