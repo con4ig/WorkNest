@@ -2,12 +2,53 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api.js';
 import { ArrowRight } from 'lucide-react';
-import { useState } from 'react'; // useState jest już importowany, ale upewnijmy się
-import toast from 'react-hot-toast'; 
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
 };
+
+const registrationSchema = z
+    .object({
+        email: z
+            .string()
+            .min(1, { message: 'Email jest wymagany' })
+            .email({ message: 'Nieprawidłowy format email' }),
+        username: z
+            .string()
+            .min(1, { message: 'Nazwa użytkownika jest wymagana' }),
+        password: z
+            .string()
+            .min(6, { message: 'Hasło musi mieć co najmniej 6 znaków' }),
+        role: z.enum(['admin', 'employee']),
+        companyName: z.string().optional(),
+        invitationCode: z.string().optional(),
+    })
+    .superRefine((data, ctx) => {
+        if (
+            data.role === 'admin' &&
+            (!data.companyName || data.companyName.trim().length === 0)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['companyName'],
+                message: 'Nazwa firmy jest wymagana',
+            });
+        }
+        if (
+            data.role === 'employee' &&
+            (!data.invitationCode || data.invitationCode.trim().length === 0)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['invitationCode'],
+                message: 'Kod zaproszenia jest wymagany',
+            });
+        }
+    });
 
 export default function Register() {
     const {
@@ -15,7 +56,17 @@ export default function Register() {
         handleSubmit,
         formState: { errors },
         watch,
-    } = useForm();
+    } = useForm({
+        resolver: zodResolver(registrationSchema),
+        defaultValues: {
+            role: 'admin',
+            email: '',
+            username: '',
+            password: '',
+            companyName: '',
+            invitationCode: '',
+        },
+    });
     const navigate = useNavigate();
     const selectedRole = watch('role', 'admin');
     const [isLoading, setIsLoading] = useState(false);
@@ -109,14 +160,7 @@ export default function Register() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('email', {
-                                            required: 'Email jest wymagany',
-                                            pattern: {
-                                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                                message:
-                                                    'Nieprawidłowy format email',
-                                            },
-                                        })}
+                                        {...register('email')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         placeholder="jan.kowalski@firma.pl"
                                     />
@@ -144,10 +188,7 @@ export default function Register() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('username', {
-                                            required:
-                                                'Nazwa użytkownika jest wymagana',
-                                        })}
+                                        {...register('username')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         placeholder="Jan.Kowalski"
                                     />
@@ -175,14 +216,7 @@ export default function Register() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('password', {
-                                            required: 'Hasło jest wymagane',
-                                            minLength: {
-                                                value: 6,
-                                                message:
-                                                    'Hasło musi mieć co najmniej 6 znaków',
-                                            },
-                                        })}
+                                        {...register('password')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         type="password"
                                         placeholder="********"
@@ -230,11 +264,7 @@ export default function Register() {
                                     </label>
                                     <div className="group relative">
                                         <input
-                                            {...register('companyName', {
-                                                required: selectedRole === 'admin'
-                                                    ? 'Nazwa firmy jest wymagana'
-                                                    : false,
-                                            })}
+                                            {...register('companyName')}
                                             className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                             placeholder="Nazwa Twojej firmy"
                                         />
@@ -262,11 +292,7 @@ export default function Register() {
                                     </label>
                                     <div className="group relative">
                                         <input
-                                            {...register('invitationCode', {
-                                                required: selectedRole === 'employee'
-                                                    ? 'Kod zaproszenia jest wymagany'
-                                                    : false,
-                                            })}
+                                            {...register('invitationCode')}
                                             className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                             placeholder="Wprowadź kod zaproszenia"
                                         />
