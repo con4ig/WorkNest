@@ -59,12 +59,13 @@ const ProjectCard = ({
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: project._id });
+    } = useSortable({ id: project._id, disabled: currentUserRole === 'employee' });
 
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.5 : 1,
+        cursor: currentUserRole === 'employee' ? 'default' : 'move',
     };
 
     const priorityInfo =
@@ -75,8 +76,8 @@ const ProjectCard = ({
             ref={setNodeRef}
             style={style}
             {...attributes}
-            {...listeners}
-            className="group relative mb-3 cursor-move rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+            {...(currentUserRole !== 'employee' ? listeners : {})}
+            className="group relative mb-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
             onClick={(e) => {
                 // Tylko jeśli nie przeciągamy
                 if (!isDragging) {
@@ -89,7 +90,7 @@ const ProjectCard = ({
                     {project.name}
                 </h4>
                 {/* Actions - visible on hover or if forced */}
-                {currentUserRole === 'admin' && (
+                {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
                     <div className="ml-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                         <button
                             onPointerDown={(e) => {

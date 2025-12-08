@@ -98,6 +98,7 @@ const ProjectRow = ({
             }`}
             onClick={() => onRowClick(project._id)}
         >
+            {currentUserRole !== 'employee' && (
             <td className="w-4 px-6 py-4" onClick={(e) => e.stopPropagation()}>
                 <div
                     className="flex h-5 w-5 cursor-pointer items-center justify-center rounded transition-transform active:scale-90"
@@ -111,6 +112,7 @@ const ProjectRow = ({
                     />
                 </div>
             </td>
+            )}
             <td className="px-6 py-4">
                 <div className="font-semibold text-slate-800">
                     {project.name}
@@ -151,6 +153,7 @@ const ProjectRow = ({
                 <AssignedUsersAvatarGroup users={project.assignedUsers} />
             </td>
             <td className="px-6 py-4">
+            {currentUserRole !== 'employee' && (
                 <div className="relative flex" ref={menuRef}>
                     <button
                         onClick={handleMenuClick}
@@ -188,7 +191,7 @@ const ProjectRow = ({
                                         </span>
                                     </button>
                                 )}
-                                {currentUserRole === 'admin' && (
+                                {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -205,6 +208,7 @@ const ProjectRow = ({
                         </div>
                     )}
                 </div>
+            )}
             </td>
         </tr>
     );
