@@ -75,15 +75,19 @@ const ProjectGridCard = ({
                     className="flex cursor-pointer items-center gap-3"
                     onClick={(e) => {
                         e.stopPropagation();
-                        onToggleSelect(project._id);
+                        if (currentUserRole !== 'employee') {
+                            onToggleSelect(project._id);
+                        }
                     }}
                 >
-                    <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => {}}
-                        className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                    />
+                    {currentUserRole !== 'employee' && (
+                        <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => {}}
+                            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                        />
+                    )}
                     <div>
                         <h3 className="text-base font-bold text-slate-800">
                             {project.name}
@@ -93,7 +97,7 @@ const ProjectGridCard = ({
                         </p>
                     </div>
                 </div>
-                {currentUserRole === 'admin' && (
+                {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
                     <div className="flex gap-1">
                         {!showArchived ? (
                             <button

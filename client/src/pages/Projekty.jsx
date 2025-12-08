@@ -72,12 +72,14 @@ export default function Projekty() {
     }, [filters, showArchived, currentView]);
 
     const toggleSelection = (projectId) => {
+        if (currentUserRole === 'employee') return;
         setSelectedProjects((prev) =>
             prev.includes(projectId) ? prev.filter((id) => id !== projectId) : [...prev, projectId]
         );
     };
 
     const toggleSelectAll = () => {
+        if (currentUserRole === 'employee') return;
         if (selectedProjects.length === projects.length) {
             setSelectedProjects([]);
         } else {
@@ -236,6 +238,11 @@ export default function Projekty() {
         localStorage.setItem('projectsViewPreference', view);
     };
 
+    const tableHeaders = ['Nazwa Projektu', 'Status', 'Postęp', 'Termin', 'Przypisani'];
+    if (currentUserRole !== 'employee') {
+        tableHeaders.push('Akcje');
+    }
+
     const handleStatusChange = async (projectId, newStatus) => {
         const originalProjects = projects;
         const updatedProjects = originalProjects.map((p) =>
@@ -305,17 +312,19 @@ export default function Projekty() {
             <ProjectListHeader onAddProject={() => setIsModalOpen(true)} currentUserRole={currentUserRole} />
             <div className={`rounded-2xl bg-white p-4 shadow-lg transition-opacity duration-300 md:p-6 ${isFiltering ? 'opacity-60' : 'opacity-100'}`}>
                 <div className="mb-4 grid grid-cols-1 grid-rows-1">
-                    <div className={`z-20 col-start-1 row-start-1 transition-all duration-300 ease-in-out ${selectedProjects.length > 0 ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'}`}>
-                        <BulkActionsHeader
-                            selectedCount={selectedProjects.length}
-                            onClearSelection={() => setSelectedProjects([])}
-                            onArchive={() => handleBulkAction('archive')}
-                            onRestore={() => handleBulkAction('restore')}
-                            onDelete={() => handleBulkAction('delete')}
-                            showArchived={showArchived}
-                        />
-                    </div>
-                    <div className={`z-10 col-start-1 row-start-1 transition-all duration-300 ease-in-out ${selectedProjects.length > 0 ? 'pointer-events-none -translate-y-2 opacity-0' : 'translate-y-0 opacity-100'}`}>
+                    {currentUserRole !== 'employee' && (
+                        <div className={`z-20 col-start-1 row-start-1 transition-all duration-300 ease-in-out ${selectedProjects.length > 0 ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'}`}>
+                            <BulkActionsHeader
+                                selectedCount={selectedProjects.length}
+                                onClearSelection={() => setSelectedProjects([])}
+                                onArchive={() => handleBulkAction('archive')}
+                                onRestore={() => handleBulkAction('restore')}
+                                onDelete={() => handleBulkAction('delete')}
+                                showArchived={showArchived}
+                            />
+                        </div>
+                    )}
+                    <div className={`z-10 col-start-1 row-start-1 transition-all duration-300 ease-in-out ${selectedProjects.length > 0 && currentUserRole !== 'employee' ? 'pointer-events-none -translate-y-2 opacity-0' : 'translate-y-0 opacity-100'}`}>
                         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                             <FilterControls filters={filters} onFilterChange={setFilters} onRefresh={handleRefresh} isFiltering={isFiltering} screenSize={screenSize} />
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -344,10 +353,12 @@ export default function Projekty() {
                             <table className="min-w-full divide-y divide-slate-200">
                                 <thead className="bg-slate-50">
                                     <tr>
+                                        {currentUserRole !== 'employee' && (
                                         <th className="w-4 px-6 py-3">
                                             <input type="checkbox" checked={projects.length > 0 && selectedProjects.length === projects.length} onChange={toggleSelectAll} className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
                                         </th>
-                                        {['Nazwa Projektu', 'Status', 'Postęp', 'Termin', 'Przypisani', 'Akcje'].map((header) => (
+                                        )}
+                                        {tableHeaders.map((header) => (
                                             <th key={header} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">{header}</th>
                                         ))}
                                     </tr>

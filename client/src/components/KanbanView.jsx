@@ -115,6 +115,7 @@ const KanbanView = ({
     }, {});
 
     const handleDragEnd = (event) => {
+        if (currentUserRole === 'employee') return;
         const { active, over } = event;
 
         if (!over) return;
