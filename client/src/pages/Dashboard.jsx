@@ -317,38 +317,26 @@ export default function Dashboard() {
 
             setProjects(projectsRes.data.projects);
 
-            // Przetwarzanie danych aktywności, aby pokazać bieżący tydzień roboczy (Pon-Pt)
+            // Przetwarzanie danych aktywności, aby pokazać ostatnie 7 dni
             const rawActivity = activityRes.data;
             const activityMap = rawActivity.reduce((acc, item) => {
                 acc[item.date] = item.count;
                 return acc;
             }, {});
 
-            const processedWeeklyData = [];
-            const dayNames = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt'];
+            const processedActivityData = [];
             const today = new Date();
-            const dayOfWeek = today.getDay();
-            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - daysToSubtract);
-            startOfWeek.setHours(0, 0, 0, 0);
-
-            for (let i = 0; i < 5; i++) {
-                const day = new Date(startOfWeek);
-                day.setDate(startOfWeek.getDate() + i);
-
-                const year = day.getFullYear();
-                const month = String(day.getMonth() + 1).padStart(2, '0');
-                const date = String(day.getDate()).padStart(2, '0');
-                const dayString = `${year}-${month}-${date}`;
-
-                processedWeeklyData.push({
-                    day: dayNames[i],
+            for (let i = 6; i >= 0; i--) {
+                const day = new Date(today);
+                day.setDate(today.getDate() - i);
+                const dayString = moment(day).format('YYYY-MM-DD');
+                processedActivityData.push({
+                    day: moment(day).format('ddd'),
                     fullDate: dayString,
                     val: activityMap[dayString] || 0,
                 });
             }
-            setWeeklyActivity(processedWeeklyData);
+            setWeeklyActivity(processedActivityData);
         
         } catch {
             // Silent error handling
