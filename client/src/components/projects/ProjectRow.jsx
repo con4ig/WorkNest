@@ -152,8 +152,8 @@ const ProjectRow = ({
             <td className="hidden px-6 py-4 lg:table-cell">
                 <AssignedUsersAvatarGroup users={project.assignedUsers} />
             </td>
-            <td className="px-6 py-4">
             {currentUserRole !== 'employee' && (
+            <td className="px-6 py-4">
                 <div className="relative flex" ref={menuRef}>
                     <button
                         onClick={handleMenuClick}
@@ -208,8 +208,8 @@ const ProjectRow = ({
                         </div>
                     )}
                 </div>
-            )}
             </td>
+            )}
         </tr>
     );
 };
