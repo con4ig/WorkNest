@@ -71,12 +71,17 @@ const ProjectGridCard = ({
             onClick={() => onCardClick(project._id)}
         >
             <div className="mb-4 flex items-start justify-between">
-                <div className="flex items-center gap-3">
+                <div
+                    className="flex cursor-pointer items-center gap-3"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleSelect(project._id);
+                    }}
+                >
                     <input
                         type="checkbox"
                         checked={isSelected}
-                        onChange={() => onToggleSelect(project._id)}
-                        onClick={(e) => e.stopPropagation()}
+                        onChange={() => {}}
                         className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                     />
                     <div>
