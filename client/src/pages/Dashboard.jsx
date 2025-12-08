@@ -21,6 +21,7 @@ import {
     XAxis,
     PieChart,
     Pie,
+    Cell,
     YAxis,
 } from 'recharts';
 
@@ -92,6 +93,130 @@ const Icon = {
     Key: () => <Key className="h-4 w-4" />,
 };
 
+// Hook do animacji liczenia w górę
+const useCountUp = (endValue, duration = 1500) => {
+    const [count, setCount] = useState(0);
+    const frameRate = 1000 / 60;
+    const totalFrames = Math.round(duration / frameRate);
+
+    useEffect(() => {
+        let frame = 0;
+        const counter = setInterval(() => {
+            frame++;
+            const progress = frame / totalFrames;
+            const currentCount = Math.round(endValue * (1 - Math.pow(1 - progress, 3)));
+
+            if (frame === totalFrames) {
+                clearInterval(counter);
+                setCount(endValue);
+            } else {
+                setCount(currentCount);
+            }
+        }, frameRate);
+
+        return () => clearInterval(counter);
+    }, [endValue, duration]);
+
+    return count;
+};
+
+// Helper component dla animowanych liczb
+const AnimatedNumber = ({ value }) => {
+    const animatedValue = useCountUp(value, 1000);
+    return <span>{animatedValue}</span>;
+};
+
+// Komponent do wyświetlania wykresu postępu projektu
+const ProjectProgressChart = ({ stats }) => {
+    const [hoveredSection, setHoveredSection] = useState(null);
+    
+    const totalProjects = Number(stats[0]?.value || 0);
+    const completedProjects = Number(stats[1]?.value || 0);
+    const runningProjects = Number(stats[2]?.value || 0);
+    const pendingProjects = Number(stats[3]?.value || 0);
+
+    const targetPercentage = totalProjects > 0 
+        ? Math.round((completedProjects / totalProjects) * 100) 
+        : 0;
+    const animatedPercentage = useCountUp(targetPercentage);
+
+    // Dane dla wykresu kołowego z wszystkimi statusami
+    const chartData = totalProjects > 0 
+        ? [
+            { name: 'Zakończone', value: completedProjects, color: '#10B981' },
+            { name: 'W Trakcie', value: runningProjects, color: '#F59E0B' },
+            { name: 'Oczekujące', value: pendingProjects, color: '#94A3B8' }
+          ].filter(item => item.value > 0)
+        : [{ name: 'Brak danych', value: 1, color: '#E5E7EB' }];
+
+    const CustomTooltip = ({ active, payload }) => {
+        if (active && payload && payload.length) {
+            const data = payload[0];
+            return (
+                <div className="bg-white px-3 py-2 shadow-lg rounded-lg border border-gray-200">
+                    <p className="font-semibold text-sm">{data.name}</p>
+                    <p className="text-gray-600 text-xs">
+                        {data.value} {data.value === 1 ? 'projekt' : 'projektów'}
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    return (
+        <div className="flex items-center gap-4">
+            {/* Wykres kołowy */}
+            <div className="relative h-24 w-24 flex-shrink-0">
+                <ResponsiveContainer width={96} height={96}>
+                    <PieChart>
+                        <Pie
+                            data={chartData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius="60%"
+                            outerRadius="90%"
+                            dataKey="value"
+                            stroke="none"
+                            onMouseEnter={(_, index) => setHoveredSection(index)}
+                            onMouseLeave={() => setHoveredSection(null)}
+                        >
+                            {chartData.map((entry, index) => (
+                                <Cell 
+                                    key={`cell-${index}`} 
+                                    fill={entry.color}
+                                    opacity={hoveredSection === null || hoveredSection === index ? 1 : 0.5}
+                                    style={{ transition: 'all 0.3s ease' }}
+                                />
+                            ))}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip />} />
+                    </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex items-center justify-center text-xl font-bold">
+                    {animatedPercentage}%
+                </div>
+            </div>
+
+            {/* Legenda */}
+            <div className="text-sm flex-1">
+                <div className="flex items-center gap-2 text-gray-500">
+                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                    Zakończone: <strong>{stats[1]?.value || '0'}</strong>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-gray-500">
+                    <span className="h-2 w-2 rounded-full bg-yellow-500"></span>
+                    W Trakcie: <strong>{stats[2]?.value || '0'}</strong>
+                </div>
+                <div className="mt-2 flex items-center gap-2 text-gray-500">
+                    <span className="h-2 w-2 rounded-full bg-gray-400"></span>
+                    Oczekujące: <strong>{stats[3]?.value || '0'}</strong>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function Dashboard() {
     const [projects, setProjects] = useState([]);
     const [message, setMessage] = useState('');
@@ -106,6 +231,7 @@ export default function Dashboard() {
     const location = useLocation();
     const { user, logout } = useAuth();
     const [weeklyActivity, setWeeklyActivity] = useState([]);
+    
     // Wykrywanie rozmiaru ekranu
     useEffect(() => {
         const checkMobile = () => {
@@ -169,8 +295,6 @@ export default function Dashboard() {
             }
 
             const [projectsRes, activityRes, statsRes] = await Promise.all(dataPromises);
-
-
 
             // Ustaw statystyki
             if (user.role === 'admin' || user.role === 'hr' || user.role === 'superadmin') {
@@ -238,8 +362,6 @@ export default function Dashboard() {
             fetchDashboardData();
         }
     }, [user]);
-
-
 
     const handleLogout = () => {
         logout();
@@ -330,7 +452,7 @@ export default function Dashboard() {
                             )}
                         </div>
 
-                        {/* Reszta sidebaru bez zmian... */}
+                        {/* Reszta sidebaru */}
                         <nav className="flex-1">
                             <ul className="space-y-2">
                                 {/* Dashboard */}
@@ -517,27 +639,27 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 gap-4 p-4 md:gap-4 md:p-6 lg:grid-cols-12">
                             {/* Stats big card */}
                             <div className="flex flex-col gap-4 md:gap-4 lg:col-span-8">
-                                <div className="flex max-h-36 items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg md:p-6">
+                                <div className="flex max-h-36 items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg md:p-6 hover:shadow-xl transition-shadow duration-300">
                                     <div>
                                         <div className="text-xs opacity-90 md:text-sm">
                                             {stats[0]?.title ||
                                                 'Wszystkie Projekty'}
                                         </div>
                                         <div className="mt-2 min-h-[48px] text-3xl font-bold md:text-4xl">
-                                            {stats[0]?.value || '0'}
+                                            <AnimatedNumber value={Number(stats[0]?.value || 0)} />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-4">
                                     {/* Stat 2 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
+                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
                                         <div className="text-xs text-gray-500">
                                             {stats[1]?.title ||
                                                 'Zakończone Projekty'}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
-                                            {stats[1]?.value || '0'}
+                                            <AnimatedNumber value={Number(stats[1]?.value || 0)} />
                                         </div>
                                         <div className="mt-2 text-xs text-gray-400 md:text-sm">
                                             {stats[1]?.hint}
@@ -545,12 +667,12 @@ export default function Dashboard() {
                                     </div>
 
                                     {/* Stat 3 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
+                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
                                         <div className="text-xs text-gray-500">
                                             {stats[2]?.title || 'W trakcie'}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
-                                            {stats[2]?.value || '0'}
+                                            <AnimatedNumber value={Number(stats[2]?.value || 0)} />
                                         </div>
                                         <div className="mt-2 text-xs text-gray-400 md:text-sm">
                                             {stats[2]?.hint}
@@ -558,12 +680,12 @@ export default function Dashboard() {
                                     </div>
 
                                     {/* Stat 4 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
+                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
                                         <div className="text-xs text-gray-500">
                                             {stats[3]?.title || 'Oczekujące'}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
-                                            {stats[3]?.value || '0'}
+                                            <AnimatedNumber value={Number(stats[3]?.value || 0)} />
                                         </div>
                                         <div className="mt-2 text-xs text-gray-400 md:text-sm">
                                             {stats[3]?.hint}
@@ -572,7 +694,7 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Weekly Activity Chart */}
-                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6">
+                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6 hover:shadow-md transition-shadow duration-300">
                                     <div className="mb-4">
                                         <div className="text-base font-medium">
                                             Aktywność w ostatnim tygodniu
@@ -581,7 +703,7 @@ export default function Dashboard() {
                                             Nowo dodane projekty
                                         </div>
                                     </div>
-                                    <div className="h-40 w-full">
+                                    <div className="h-48 w-full">
                                         {weeklyActivity.length === 0 ? (
                                             <div className="flex h-full items-center justify-center text-sm text-gray-500">
                                                 Brak danych do wykresu
@@ -615,12 +737,12 @@ export default function Dashboard() {
 
                             {/* Right column */}
                             <aside className="space-y-4 md:space-y-4 lg:col-span-4">
-                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
                                     <div className="mb-3 flex items-center justify-between">
                                         <div className="text-sm font-medium md:text-base">
                                             Przypomnienia
                                         </div>
-                                        <button className="text-xs text-emerald-600">
+                                        <button className="text-xs text-emerald-600 hover:text-emerald-700 transition-colors">
                                             Zobacz wszystkie
                                         </button>
                                     </div>
@@ -631,13 +753,13 @@ export default function Dashboard() {
                                         02:00 pm - 04:00 pm
                                     </div>
                                     <div className="mt-4">
-                                        <button className="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white sm:w-auto">
+                                        <button className="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white sm:w-auto hover:bg-emerald-700 transition-colors">
                                             Rozpocznij Spotkanie
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
                                     <div className="mb-3 flex items-center justify-between">
                                         <div className="text-sm font-medium md:text-base">
                                             Postęp Projektu
@@ -646,53 +768,13 @@ export default function Dashboard() {
                                             Ogólnie
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4">                                        
-                                        <div className="relative h-24 w-24">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <PieChart>
-                                                    <Pie
-                                                        data={[
-                                                            { name: 'Completed', value: Number(stats[1]?.value || 0) },
-                                                            { name: 'Other', value: Number(stats[0]?.value || 0) - Number(stats[1]?.value || 0) }
-                                                        ]}
-                                                        cx="50%"
-                                                        cy="50%"
-                                                        dataKey="value"
-                                                        innerRadius="70%"
-                                                        outerRadius="100%"
-                                                        startAngle={90}
-                                                        endAngle={450}
-                                                        stroke="none"
-                                                        fill="#10B981"
-                                                    >
-                                                    </Pie>
-                                                </PieChart>
-                                            </ResponsiveContainer>
-                                            <div className="absolute inset-0 flex items-center justify-center text-xl font-bold">
-                                                {stats[0]?.value > 0 ? `${Math.round((stats[1]?.value / stats[0]?.value) * 100)}%` : '0%'}
-                                            </div>
-                                        </div>
-                                        <div className="text-sm">
-                                            <div className="flex items-center gap-2 text-gray-500">
-                                                <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                                                Zakończone: <strong>{stats[1]?.value || '0'}</strong>
-                                            </div>
-                                            <div className="mt-2 flex items-center gap-2 text-gray-500">
-                                                <span className="h-2 w-2 rounded-full bg-yellow-500"></span>
-                                                W Trakcie
-                                            </div>
-                                            <div className="mt-2 flex items-center gap-2 text-gray-500">
-                                                <span className="h-2 w-2 rounded-full bg-gray-400"></span>
-                                                Oczekujące
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <ProjectProgressChart stats={stats} />
                                 </div>
 
                                 {/* Ostatnio dodane projekty lub Moje aktywności */}
                                 {(role === 'hr' || role === 'admin') &&
                                 projects.length > 0 ? (
-                                    <div className="rounded-xl bg-white p-4 shadow-sm">
+                                    <div className="rounded-xl bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
                                         <div className="mb-4 flex items-center justify-between">
                                             <div className="text-base font-medium">
                                                 Ostatnio dodane projekty
@@ -701,7 +783,7 @@ export default function Dashboard() {
                                                 onClick={() =>
                                                     navigate('/projekty')
                                                 }
-                                                className="text-xs text-emerald-600"
+                                                className="text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
                                             >
                                                 Zobacz wszystkie →
                                             </button>
