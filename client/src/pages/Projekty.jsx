@@ -44,7 +44,7 @@ export default function Projekty() {
 
     // Funkcje do obsługi notyfikacji
     const showNotification = (message, type = 'info') => {
-        setNotification({ message, type, visible: true });
+        // Użytkownik nie chce notyfikacji, więc ta funkcja jest pusta
     };
     const clearNotification = () => {
         setNotification({ ...notification, visible: false });
@@ -296,7 +296,7 @@ export default function Projekty() {
 
     return (
         <div className="min-h-screen bg-slate-50 p-2 sm:p-4 md:p-8">
-            <Notification notification={notification} onClear={clearNotification} />
+            {/* <Notification notification={notification} onClear={clearNotification} /> */}
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() => setConfirmationProps({ ...confirmationProps, isOpen: false })}

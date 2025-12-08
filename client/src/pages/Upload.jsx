@@ -54,15 +54,12 @@ function ProfileImageUpload() {
         try {
             const res = await api.put('/users/profile-image', formData);
 
-            console.log('Sukces:', res.data);
-
             setSuccess(true);
 
             setTimeout(() => {
                 window.location.href = '/dashboard';
             }, 1500);
         } catch (err) {
-            console.error('Błąd uploadu:', err);
             setError('Nie udało się zaktualizować zdjęcia. Spróbuj ponownie.');
         } finally {
             setLoading(false);

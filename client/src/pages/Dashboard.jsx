@@ -12,6 +12,17 @@ import {
     ChevronLeft,
     Key,
 } from 'lucide-react';
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    PieChart,
+    Pie,
+    YAxis,
+} from 'recharts';
 
 import moment from 'moment';
 import LoadingScreen from '../components/LoadingScreen.jsx';
@@ -91,10 +102,10 @@ export default function Dashboard() {
     const [isMobile, setIsMobile] = useState(false);
     const [profileImage, setProfileImage] = useState('');
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true); // Główny stan ładowania strony
+    const [loading, setLoading] = useState(true);
     const location = useLocation();
     const { user, logout } = useAuth();
-
+    const [weeklyActivity, setWeeklyActivity] = useState([]);
     // Wykrywanie rozmiaru ekranu
     useEffect(() => {
         const checkMobile = () => {
@@ -114,7 +125,7 @@ export default function Dashboard() {
 
     // Połączona funkcja do pobierania wszystkich danych
     const fetchDashboardData = async () => {
-        if (!user) return; // Czekaj na załadowanie użytkownika z kontekstu
+        if (!user) return;
 
         setLoading(true);
         try {
@@ -126,91 +137,97 @@ export default function Dashboard() {
             setRole(user.role);
             setProfileImage(user.profileImage);
 
-            // Pobierz statystyki w zależności od roli
             const companyId = user.company?._id;
             if (!companyId) {
-                console.error('Brak ID firmy dla użytkownika.');
                 setLoading(false);
                 return;
             }
 
-            if (
-                user.role === 'admin' ||
-                user.role === 'hr' ||
-                user.role === 'superadmin'
-            ) {
-                const statsRes = await api.get(`/projects/stats/summary`, {
+            // Pobieranie wszystkich danych równolegle
+            const dataPromises = [
+                api.get('/projects', {
+                    params: {
+                        sortBy: 'createdAt:desc',
+                        limit: 4,
+                        company: companyId,
+                        isArchived: 'false',
+                    },
+                }),
+                api.get('/projects/stats/weekly-activity', {
                     params: { company: companyId },
-                });
+                }),
+            ];
+
+            if (user.role === 'admin' || user.role === 'hr' || user.role === 'superadmin') {
+                dataPromises.push(api.get(`/projects/stats/summary`, {
+                    params: { company: companyId },
+                }));
+            } else {
+                dataPromises.push(api.get(`/projects/users/${user._id}/assigned-projects/summary`, {
+                    params: { company: companyId },
+                }));
+            }
+
+            const [projectsRes, activityRes, statsRes] = await Promise.all(dataPromises);
+
+
+
+            // Ustaw statystyki
+            if (user.role === 'admin' || user.role === 'hr' || user.role === 'superadmin') {
                 const { total, running, pending, completed } = statsRes.data;
                 setStats([
-                    {
-                        id: 1,
-                        title: 'Wszystkie Projekty',
-                        value: total.toString(),
-                    },
-                    {
-                        id: 2,
-                        title: 'Zakończone Projekty',
-                        value: completed.toString(),
-                    },
-                    {
-                        id: 3,
-                        title: 'W trakcie',
-                        value: running.toString(),
-                    },
-                    {
-                        id: 4,
-                        title: 'Oczekujące',
-                        value: pending.toString(),
-                    },
+                    { id: 1, title: 'Wszystkie Projekty', value: total.toString() },
+                    { id: 2, title: 'Zakończone Projekty', value: completed.toString() },
+                    { id: 3, title: 'W trakcie', value: running.toString() },
+                    { id: 4, title: 'Oczekujące', value: pending.toString() },
                 ]);
             } else {
-                const assignedRes = await api.get(
-                    `/projects/users/${user._id}/assigned-projects/summary`,
-                    {
-                        params: { company: companyId },
-                    },
-                );
-                const { assigned, completed, running, pending } =
-                    assignedRes.data;
+                const { assigned, completed, running, pending } = statsRes.data;
                 setStats([
-                    {
-                        id: 1,
-                        title: 'Moje Projekty',
-                        value: assigned.toString(),
-                    },
-                    {
-                        id: 2,
-                        title: 'Zakończone',
-                        value: completed.toString(),
-                    },
-                    {
-                        id: 3,
-                        title: 'W Trakcie',
-                        value: running.toString(),
-                    },
-                    {
-                        id: 4,
-                        title: 'Oczekujące',
-                        value: pending.toString(),
-                    },
+                    { id: 1, title: 'Moje Projekty', value: assigned.toString() },
+                    { id: 2, title: 'Zakończone', value: completed.toString() },
+                    { id: 3, title: 'W Trakcie', value: running.toString() },
+                    { id: 4, title: 'Oczekujące', value: pending.toString() },
                 ]);
             }
 
-            // Pobierz ostatnie projekty (tylko aktywne, nie zarchiwizowane)
-            const projectsRes = await api.get('/projects', {
-                params: {
-                    sortBy: 'createdAt:desc',
-                    limit: 4,
-                    company: companyId,
-                    isArchived: 'false', // Tylko aktywne projekty
-                },
-            });
             setProjects(projectsRes.data.projects);
-        } catch (err) {
-            console.error('Błąd ładowania danych dashboardu:', err);
-            // Nie ma potrzeby ręcznej nawigacji, interceptor to obsłuży
+
+            // Przetwarzanie danych aktywności, aby pokazać bieżący tydzień roboczy (Pon-Pt)
+            const rawActivity = activityRes.data;
+            const activityMap = rawActivity.reduce((acc, item) => {
+                acc[item.date] = item.count;
+                return acc;
+            }, {});
+
+            const processedWeeklyData = [];
+            const dayNames = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt'];
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - daysToSubtract);
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            for (let i = 0; i < 5; i++) {
+                const day = new Date(startOfWeek);
+                day.setDate(startOfWeek.getDate() + i);
+
+                const year = day.getFullYear();
+                const month = String(day.getMonth() + 1).padStart(2, '0');
+                const date = String(day.getDate()).padStart(2, '0');
+                const dayString = `${year}-${month}-${date}`;
+
+                processedWeeklyData.push({
+                    day: dayNames[i],
+                    fullDate: dayString,
+                    val: activityMap[dayString] || 0,
+                });
+            }
+            setWeeklyActivity(processedWeeklyData);
+        
+        } catch {
+            // Silent error handling
         } finally {
             setLoading(false);
         }
@@ -218,16 +235,14 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (user) {
-            // Uruchom pobieranie danych dopiero, gdy użytkownik jest dostępny
             fetchDashboardData();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]); // Uruchom ponownie, gdy zmieni się użytkownik z kontekstu
+    }, [user]);
 
-    // Użyj funkcji logout z AuthContext
+
+
     const handleLogout = () => {
         logout();
-        // Nawigacja do /login jest obsługiwana przez ProtectedRoute i AuthContext
     };
 
     if (loading) {
@@ -566,33 +581,34 @@ export default function Dashboard() {
                                             Nowo dodane projekty
                                         </div>
                                     </div>
-                                    <div className="flex h-32 items-end justify-between gap-2 text-center">
-                                        {/* Example static data */}
-                                        {[
-                                            { day: 'Pon', val: 2 },
-                                            { day: 'Wt', val: 5 },
-                                            { day: 'Śr', val: 3 },
-                                            { day: 'Czw', val: 7 },
-                                            { day: 'Pt', val: 4 },
-                                            { day: 'Sob', val: 1 },
-                                            { day: 'Ndz', val: 2 },
-                                        ].map((item) => (
-                                            <div
-                                                key={item.day}
-                                                className="flex h-full w-full flex-col items-center justify-end"
-                                            >
-                                                <div
-                                                    className="w-3/4 rounded-t-lg bg-emerald-500 transition-all hover:bg-emerald-600"
-                                                    style={{
-                                                        height: `${item.val * 10}%`,
-                                                    }}
-                                                    title={`${item.val} projektów`}
-                                                ></div>
-                                                <div className="mt-2 text-xs text-gray-500">
-                                                    {item.day}
-                                                </div>
+                                    <div className="h-40 w-full">
+                                        {weeklyActivity.length === 0 ? (
+                                            <div className="flex h-full items-center justify-center text-sm text-gray-500">
+                                                Brak danych do wykresu
                                             </div>
-                                        ))}
+                                        ) : (
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <BarChart
+                                                    data={weeklyActivity}
+                                                    margin={{ top: 5, right: 10, left: -25, bottom: 5 }}
+                                                >
+                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                                                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#6b7280' }} stroke="#e5e7eb" axisLine={false} tickLine={false} />
+                                                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#6b7280' }} stroke="#e5e7eb" axisLine={false} tickLine={false} tickCount={6} interval={0} />
+                                                    <Tooltip
+                                                        cursor={{ fill: 'rgba(52, 211, 153, 0.2)' }}
+                                                        contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}
+                                                        labelStyle={{ fontWeight: 'bold' }}
+                                                        formatter={(value) => [value, 'Nowe projekty']}
+                                                        labelFormatter={(label) => {
+                                                            const item = weeklyActivity.find((d) => d.day === label);
+                                                            return item ? moment(item.fullDate).format('DD MMM YYYY') : label;
+                                                        }}
+                                                    />
+                                                    <Bar dataKey="val" fill="#34d399" radius={[10, 10, 0, 0]} barSize={120} />
+                                                </BarChart>
+                                            </ResponsiveContainer>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -630,46 +646,43 @@ export default function Dashboard() {
                                             Ogólnie
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
-                                        <svg
-                                            width="80"
-                                            height="80"
-                                            viewBox="0 0 36 36"
-                                            className="md:h-24 md:w-24"
-                                        >
-                                            <path
-                                                d="M18 2a16 16 0 1 0 16 16A16 16 0 0 0 18 2Z"
-                                                fill="none"
-                                                stroke="#E6F4EA"
-                                                strokeWidth="6"
-                                            />
-                                            <path
-                                                d="M18 2a16 16 0 1 0 9 3"
-                                                fill="none"
-                                                stroke="#10B981"
-                                                strokeWidth="6"
-                                                strokeLinecap="round"
-                                                strokeDasharray="41 100"
-                                            />
-                                            <text
-                                                x="18"
-                                                y="22"
-                                                fontSize="8"
-                                                textAnchor="middle"
-                                                fill="#111827"
-                                                fontWeight="700"
-                                            >
-                                                41%
-                                            </text>
-                                        </svg>
-                                        <div className="text-sm">
-                                            <div className="text-gray-500">
-                                                Zakończone
+                                    <div className="flex items-center gap-4">                                        
+                                        <div className="relative h-24 w-24">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={[
+                                                            { name: 'Completed', value: Number(stats[1]?.value || 0) },
+                                                            { name: 'Other', value: Number(stats[0]?.value || 0) - Number(stats[1]?.value || 0) }
+                                                        ]}
+                                                        cx="50%"
+                                                        cy="50%"
+                                                        dataKey="value"
+                                                        innerRadius="70%"
+                                                        outerRadius="100%"
+                                                        startAngle={90}
+                                                        endAngle={450}
+                                                        stroke="none"
+                                                        fill="#10B981"
+                                                    >
+                                                    </Pie>
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                            <div className="absolute inset-0 flex items-center justify-center text-xl font-bold">
+                                                {stats[0]?.value > 0 ? `${Math.round((stats[1]?.value / stats[0]?.value) * 100)}%` : '0%'}
                                             </div>
-                                            <div className="mt-2 text-gray-500">
+                                        </div>
+                                        <div className="text-sm">
+                                            <div className="flex items-center gap-2 text-gray-500">
+                                                <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                                                Zakończone: <strong>{stats[1]?.value || '0'}</strong>
+                                            </div>
+                                            <div className="mt-2 flex items-center gap-2 text-gray-500">
+                                                <span className="h-2 w-2 rounded-full bg-yellow-500"></span>
                                                 W Trakcie
                                             </div>
-                                            <div className="mt-2 text-gray-500">
+                                            <div className="mt-2 flex items-center gap-2 text-gray-500">
+                                                <span className="h-2 w-2 rounded-full bg-gray-400"></span>
                                                 Oczekujące
                                             </div>
                                         </div>
