@@ -71,12 +71,10 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        console.log('🔄 Próba odświeżenia tokenu dostępowego...');
         // Wywołaj endpoint do odświeżania tokenu. Zakładam, że używasz ciasteczek httpOnly dla refresh tokenu.
         const { data } = await api.post('/auth/refresh'); 
         const newAccessToken = data.accessToken;
 
-        console.log('✅ Token odświeżony pomyślnie.');
         localStorage.setItem('accessToken', newAccessToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
         

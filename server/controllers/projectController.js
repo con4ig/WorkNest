@@ -555,3 +555,49 @@ export const bulkProjectAction = async (req, res) => {
     res.status(500).json({ message: "Błąd serwera podczas operacji masowej" });
   }
 };
+
+export const getWeeklyActivity = async (req, res) => {
+    try {
+        const query = { isArchived: { $ne: true } };
+        if (req.user.role !== 'superadmin') {
+            // Extract company ID if it's populated as an object
+            const companyId = req.user.company?._id || req.user.company;
+            if (!companyId) {
+                return res.status(403).json({
+                    message: "Użytkownik nie jest przypisany do firmy.",
+                });
+            }
+            query.company = companyId;
+        }
+
+        // Get last 8 days from server time to provide a safe window
+        const today = new Date();
+        const eightDaysAgo = new Date();
+        eightDaysAgo.setDate(today.getDate() - 7);
+
+        query.createdAt = { $gte: eightDaysAgo };
+
+        const activity = await Project.aggregate([
+            { $match: query },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: '%Y-%m-%d',
+                            date: '$createdAt',
+                            timezone: 'Europe/Warsaw',
+                        },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            { $project: { date: '$_id', count: '$count', _id: 0 } },
+            { $sort: { date: 1 } }
+        ]);
+        
+        res.json(activity);
+    } catch (error) {
+        console.error('Błąd podczas pobierania aktywności tygodniowej:', error);
+        res.status(500).json({ message: 'Błąd serwera' });
+    }
+};

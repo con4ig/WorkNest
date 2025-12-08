@@ -26,10 +26,6 @@ export default function GenerateCode() {
 
         try {
             const response = await api.post('/users/generate-invitation', {});
-            console.log(
-                'Generated code response:',
-                response.data.invitationCode,
-            );
             setInvitationCode(response.data.invitationCode);
         } catch (err) {
             const errorMsg =

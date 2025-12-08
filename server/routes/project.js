@@ -15,6 +15,7 @@ import {
   restoreProject,
   updateProjectStatus,
   bulkProjectAction,
+  getWeeklyActivity,
 } from "../controllers/projectController.js";
 
 const router = express.Router();
@@ -31,6 +32,9 @@ router.get("/", authenticate, getProjects);
 
 // GET /api/projects/stats - statystyki projektów (dla dashboard)
 router.get("/stats", authenticate, getProjectStats);
+
+// GET /api/projects/stats/weekly-activity - aktywność tygodniowa
+router.get("/stats/weekly-activity", authenticate, getWeeklyActivity);
 
 // PATCH /api/projects/bulk-action - operacje masowe (admin/hr)
 router.patch(
