@@ -2,26 +2,50 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
 };
+
+const loginSchema = z.object({
+    email: z
+        .string()
+        .min(1, { message: 'Email jest wymagany' })
+        .email({ message: 'Nieprawidłowy format email' }),
+    password: z
+        .string()
+        .min(6, { message: 'Hasło musi mieć co najmniej 6 znaków' }),
+});
 
 export default function Login() {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
+    } = useForm({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: '',
+            password: '',
+        },
+    });
     const navigate = useNavigate();
     const { login } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (data) => {
+        setIsLoading(true);
         try {
             await login(data.email, data.password);
             navigate('/dashboard');
         } catch (err) {
-            alert(err.response?.data?.message || 'Błąd logowania');
+            toast.error(err.response?.data?.message || 'Błąd logowania');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -85,14 +109,7 @@ export default function Login() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('email', {
-                                            required: 'Email jest wymagany',
-                                            pattern: {
-                                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                                message:
-                                                    'Nieprawidłowy format email',
-                                            },
-                                        })}
+                                        {...register('email')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         placeholder="jan.kowalski@firma.pl"
                                     />
@@ -120,9 +137,7 @@ export default function Login() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('password', {
-                                            required: 'Hasło jest wymagane',
-                                        })}
+                                        {...register('password')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         type="password"
                                         placeholder="********"
@@ -160,10 +175,11 @@ export default function Login() {
 
                         <button
                             type="submit"
+                            disabled={isLoading}
                             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                         >
-                            Zaloguj się
-                            <Icon.ArrowRight />
+                            {isLoading ? 'Logowanie...' : 'Zaloguj się'}
+                            {!isLoading && <Icon.ArrowRight />}
                         </button>
                     </form>
                 </div>
