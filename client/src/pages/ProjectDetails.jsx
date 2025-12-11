@@ -1,29 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../services/api.js'; // ZMIANA
+import api from '../services/api.js';
 import UserManagementModal from '../components/UserManagementModal.jsx';
-import {
-    Calendar,
-    User,
-    SquarePen,
-    Save,
-    X,
-    ArrowLeft,
-    Users,
-    Info,
-    CheckCircle2,
-    Circle,
-    Clock,
-    MessageSquare,
-    Activity as ActivityIcon,
-    Plus,
-    Trash2,
-    Edit3,
-    Send,
-    ChevronDown,
-    ChevronRight,
-    ListTodo,
-} from 'lucide-react';
 import moment from 'moment';
 import 'moment/locale/pl';
 import {
@@ -33,6 +11,15 @@ import {
 } from '../utils/translations';
 import { useAuth } from '../context/AuthContext';
 import LoadingScreen from '../components/LoadingScreen.jsx';
+import KanbanBoard from '../components/KanbanBoard.jsx';
+import {
+    Icon,
+    getPriorityClasses,
+    getStatusClasses,
+    AVAILABLE_STATUSES,
+    AVAILABLE_PRIORITIES,
+} from '../components/projects/ProjectTaskShared.jsx';
+import { ChevronRight } from 'lucide-react';
 
 moment.locale('pl');
 
@@ -46,7 +33,6 @@ const formatDateForDisplay = (dateString) => {
         });
     } catch (e) {
         console.error("Error formatting date", e);
-
         return 'Błędna data';
     }
 };
@@ -60,74 +46,6 @@ const formatDateForInput = (dateString) => {
         return '';
     }
 };
-
-const Icon = {
-    Calendar: ({ className = 'text-emerald-500' }) => (
-        <Calendar className={`h-6 w-6 ${className}`} />
-    ),
-    User: ({ className }) => <User className={`h-5 w-5 ${className}`} />,
-    Edit: () => <SquarePen className="h-5 w-5" />,
-    Save: () => <Save className="h-5 w-5" />,
-    Cancel: () => <X className="h-5 w-5" />,
-    Back: () => <ArrowLeft className="h-5 w-5" />,
-    Users: ({ className = 'text-emerald-500' }) => (
-        <Users className={`h-6 w-6 ${className}`} />
-    ),
-    Info: ({ className = 'text-emerald-500' }) => (
-        <Info className={`h-6 w-6 ${className}`} />
-    ),
-    CheckCircle: ({ className }) => (
-        <CheckCircle2 className={`h-5 w-5 ${className}`} />
-    ),
-    Circle: ({ className }) => <Circle className={`h-5 w-5 ${className}`} />,
-    Clock: ({ className }) => <Clock className={`h-5 w-5 ${className}`} />,
-    Message: ({ className = 'text-emerald-500' }) => (
-        <MessageSquare className={`h-6 w-6 ${className}`} />
-    ),
-    Activity: ({ className = 'text-emerald-500' }) => (
-        <ActivityIcon className={`h-6 w-6 ${className}`} />
-    ),
-    Plus: () => <Plus className="h-4 w-4" />,
-    Trash: () => <Trash2 className="h-4 w-4" />,
-    Edit3: () => <Edit3 className="h-4 w-4" />,
-    Send: () => <Send className="h-4 w-4" />,
-    ChevronDown: () => <ChevronDown className="h-4 w-4" />,
-    ChevronRight: () => <ChevronRight className="h-4 w-4" />,
-    ListTodo: ({ className = 'text-emerald-500' }) => (
-        <ListTodo className={`h-6 w-6 ${className}`} />
-    ),
-};
-
-const getStatusClasses = (status) => {
-    switch (status) {
-        case 'running':
-        case 'in-progress':
-            return 'bg-sky-100 text-sky-800 ring-sky-300/50';
-        case 'completed':
-            return 'bg-green-100 text-green-800 ring-green-300/50';
-        case 'on-hold':
-            return 'bg-amber-100 text-amber-800 ring-amber-300/50';
-        case 'todo':
-            return 'bg-slate-100 text-slate-800 ring-slate-300/50';
-        default:
-            return 'bg-slate-100 text-slate-800 ring-slate-300/50';
-    }
-};
-
-const getPriorityClasses = (priority) => {
-    switch (priority) {
-        case 'high':
-            return 'bg-red-100 text-red-800';
-        case 'medium':
-            return 'bg-amber-100 text-amber-800';
-        default:
-            return 'bg-green-100 text-green-800';
-    }
-};
-
-const AVAILABLE_STATUSES = ['pending', 'running', 'on-hold', 'completed'];
-const AVAILABLE_PRIORITIES = ['low', 'medium', 'high'];
-const TASK_STATUSES = ['todo', 'in-progress', 'completed'];
 
 const StatCard = ({ icon, title, children }) => (
     <div className="flex items-start gap-4">
@@ -205,234 +123,6 @@ const ContentCard = ({ icon, title, children, actions }) => (
         {children}
     </div>
 );
-
-// Komponent Zadania
-const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editData, setEditData] = useState({
-        title: task.title,
-        description: task.description,
-        status: task.status,
-        priority: task.priority,
-        assignedTo: task.assignedTo?._id || '',
-        dueDate: formatDateForInput(task.dueDate),
-    });
-
-    const handleSave = async () => {
-        // Stwórz obiekt payloadu do wysłania
-        const payload = {
-            ...editData,
-            // Konwertuj pusty string (z opcji "Nie przypisano") na 'null'
-            // Mongoose zrozumie 'null', ale nie zrozumie '""' dla pola ObjectId
-            assignedTo: editData.assignedTo || null,
-        };
-
-        try {
-            // Wyślij 'payload' zamiast 'editData'
-            await api.patch(`/tasks/${task._id}`, payload); // ZMIANA
-            setIsEditing(false);
-            onUpdate();
-        } catch (err) {
-            alert(`Błąd: ${err.message}`);
-        }
-    };
-
-    const toggleStatus = async () => {
-        const statuses = ['todo', 'in-progress', 'completed'];
-        const currentIndex = statuses.indexOf(task.status);
-        const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-
-        try {
-            await api.patch(`/tasks/${task._id}`, { status: nextStatus }); // ZMIANA
-            onUpdate();
-        } catch (err) {
-            alert(`Błąd: ${err.message}`);
-        }
-    };
-
-    const StatusIcon = () => {
-        switch (task.status) {
-            case 'completed':
-                return <Icon.CheckCircle className="text-green-600" />;
-            case 'in-progress':
-                return <Icon.Clock className="text-sky-600" />;
-            default:
-                return <Icon.Circle className="text-slate-400" />;
-        }
-    };
-
-    if (isEditing) {
-        return (
-            <div className="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-4">
-                <input
-                    type="text"
-                    value={editData.title}
-                    onChange={(e) =>
-                        setEditData({ ...editData, title: e.target.value })
-                    }
-                    className="mb-2 w-full rounded border border-gray-300 p-2"
-                    placeholder="Tytuł zadania"
-                />
-                <textarea
-                    value={editData.description}
-                    onChange={(e) =>
-                        setEditData({
-                            ...editData,
-                            description: e.target.value,
-                        })
-                    }
-                    className="mb-2 w-full rounded border border-gray-300 p-2"
-                    rows="2"
-                    placeholder="Opis zadania"
-                />
-                <div className="mb-2 flex gap-2">
-                    <select
-                        value={editData.status}
-                        onChange={(e) =>
-                            setEditData({ ...editData, status: e.target.value })
-                        }
-                        className="rounded border border-gray-300 p-2"
-                    >
-                        {TASK_STATUSES.map((s) => (
-                            <option key={s} value={s}>
-                                {translateTaskStatus(s)}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={editData.priority}
-                        onChange={(e) =>
-                            setEditData({
-                                ...editData,
-                                priority: e.target.value,
-                            })
-                        }
-                        className="rounded border border-gray-300 p-2"
-                    >
-                        {AVAILABLE_PRIORITIES.map((p) => (
-                            <option key={p} value={p}>
-                                {translatePriority(p)}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={editData.assignedTo}
-                        onChange={(e) =>
-                            setEditData({
-                                ...editData,
-                                assignedTo: e.target.value,
-                            })
-                        }
-                        className="flex-1 rounded border border-gray-300 p-2"
-                    >
-                        <option value="">Nie przypisano</option>{' '}
-                        {projectUsers.map((user) => (
-                            <option key={user._id} value={user._id}>
-                                {user.username}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <input
-                    type="date"
-                    value={editData.dueDate}
-                    onChange={(e) =>
-                        setEditData({ ...editData, dueDate: e.target.value })
-                    }
-                    className="mb-2 w-full rounded border border-gray-300 p-2"
-                />
-                <div className="flex gap-2">
-                    <button
-                        onClick={handleSave}
-                        className="flex items-center gap-1 rounded bg-emerald-600 px-3 py-1 text-sm text-white hover:bg-emerald-700"
-                    >
-                        <Icon.Save /> Zapisz
-                    </button>
-                    <button
-                        onClick={() => setIsEditing(false)}
-                        className="flex items-center gap-1 rounded bg-gray-300 px-3 py-1 text-sm hover:bg-gray-400"
-                    >
-                        <Icon.Cancel /> Anuluj
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="group flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all duration-200 ease-in-out hover:scale-[1.01] hover:border-emerald-300 hover:shadow-lg">
-            <button
-                onClick={toggleStatus}
-                className="mt-0.5 transition-transform hover:scale-110"
-            >
-                <StatusIcon />
-            </button>
-            <div className="flex-1">
-                <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                        <h4
-                            className={`font-semibold ${task.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-800'}`}
-                        >
-                            {task.title}
-                        </h4>
-                        {task.description && (
-                            <p className="mt-1 text-sm text-gray-600">
-                                {task.description}
-                            </p>
-                        )}
-                        <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                            <span
-                                className={`rounded-full px-2 py-1 ${getStatusClasses(task.status)}`}
-                            >
-                                {translateTaskStatus(task.status)}
-                            </span>
-                            <span
-                                className={`rounded-full px-2 py-1 ${getPriorityClasses(task.priority)}`}
-                            >
-                                {translatePriority(task.priority)}
-                            </span>
-                            {task.assignedTo && (
-                                <span className="rounded-full bg-gray-100 px-2 py-1 text-gray-700">
-                                    👤 {task.assignedTo.username}
-                                </span>
-                            )}
-                            {task.dueDate && (
-                                <span className="rounded-full bg-gray-100 px-2 py-1 text-gray-700">
-                                    📅{' '}
-                                    {moment(task.dueDate).format('DD MMM YYYY')}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                    {isAdmin && (
-                        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-emerald-600"
-                            >
-                                <Icon.Edit3 />
-                            </button>
-                            <button
-                                onClick={() => {
-                                    if (
-                                        window.confirm(
-                                            'Czy na pewno usunąć to zadanie?',
-                                        )
-                                    ) {
-                                        onDelete(task._id);
-                                    }
-                                }}
-                                className="rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
-                            >
-                                <Icon.Trash />
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
 
 // Komponent Komentarza
 const CommentItem = ({
@@ -585,16 +275,7 @@ export default function ProjectDetails() {
 
     // States dla zadań
     const [tasks, setTasks] = useState([]);
-    const [showAddTask, setShowAddTask] = useState(false);
-    const [isAddingTask, setIsAddingTask] = useState(false);
-    const [newTask, setNewTask] = useState({
-        title: '',
-        description: '',
-        priority: 'medium',
-        assignedTo: '',
-        dueDate: '',
-    });
-
+    
     // States dla komentarzy
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
@@ -606,7 +287,7 @@ export default function ProjectDetails() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get(`/projects/${id}`); // ZMIANA
+            const res = await api.get(`/projects/${id}`);
             setProject(res.data);
             setEditData({
                 name: res.data.name,
@@ -630,7 +311,7 @@ export default function ProjectDetails() {
 
     const fetchTasks = useCallback(async () => {
         try {
-            const res = await api.get(`/tasks/project/${id}`); // ZMIANA
+            const res = await api.get(`/tasks/project/${id}`);
             setTasks(res.data);
         } catch (err) {
             console.error('Błąd pobierania zadań:', err);
@@ -639,7 +320,7 @@ export default function ProjectDetails() {
 
     const fetchComments = useCallback(async () => {
         try {
-            const res = await api.get(`/comments/project/${id}`); // ZMIANA
+            const res = await api.get(`/comments/project/${id}`);
             setComments(res.data);
         } catch (err) {
             console.error('Błąd pobierania komentarzy:', err);
@@ -648,7 +329,7 @@ export default function ProjectDetails() {
 
     const fetchActivities = useCallback(async () => {
         try {
-            const res = await api.get(`/activities/project/${id}`); // ZMIANA
+            const res = await api.get(`/activities/project/${id}`);
             setActivities(res.data.activities);
         } catch (err) {
             console.error('Błąd pobierania aktywności:', err);
@@ -683,7 +364,7 @@ export default function ProjectDetails() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await api.patch(`/projects/${id}`, // ZMIANA
+            await api.patch(`/projects/${id}`,
                 {
                     ...editData,
                     startDate: editData.startDate || null,
@@ -701,40 +382,9 @@ export default function ProjectDetails() {
         }
     };
 
-    const handleAddTask = async () => {
-        if (!newTask.title.trim()) {
-            alert('Tytuł zadania jest wymagany');
-            return;
-        }
-
-        setIsAddingTask(true);
-        try {
-            await api.post('/tasks', // ZMIANA
-                {
-                    ...newTask,
-                    project: id,
-                }
-            );
-            setNewTask({
-                title: '',
-                description: '',
-                priority: 'medium',
-                assignedTo: '',
-                dueDate: '',
-            });
-            setShowAddTask(false);
-            fetchTasks();
-            fetchActivities();
-        } catch (err) {
-            alert(`Błąd: ${err.message}`);
-        } finally {
-            setIsAddingTask(false);
-        }
-    };
-
     const handleDeleteTask = async (taskId) => {
         try {
-            await api.delete(`/tasks/${taskId}`, { params: { company: currentUser?.company?._id } }); // ZMIANA
+            await api.delete(`/tasks/${taskId}`, { params: { company: currentUser?.company?._id } });
             fetchTasks();
             fetchActivities();
         } catch (err) {
@@ -746,7 +396,7 @@ export default function ProjectDetails() {
         if (!newComment.trim()) return;
 
         try {
-            await api.post('/comments', // ZMIANA
+            await api.post('/comments',
                 {
                     content: newComment,
                     project: id,
@@ -762,7 +412,7 @@ export default function ProjectDetails() {
 
     const handleReplyComment = async (parentId, content) => {
         try {
-            await api.post('/comments', // ZMIANA
+            await api.post('/comments',
                 {
                     content,
                     project: id,
@@ -779,7 +429,7 @@ export default function ProjectDetails() {
         if (!window.confirm('Czy na pewno usunąć ten komentarz?')) return;
 
         try {
-            await api.delete(`/comments/${commentId}`); // ZMIANA
+            await api.delete(`/comments/${commentId}`);
             fetchComments();
             fetchActivities();
         } catch (err) {
@@ -1077,158 +727,16 @@ export default function ProjectDetails() {
                     <ContentCard
                         icon={<Icon.ListTodo />}
                         title={`Zadania (${tasks.length})`}
-                        actions={
-                            isAdmin && (
-                                <button
-                                    onClick={() => setShowAddTask(!showAddTask)}
-                                    className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white hover:bg-emerald-700"
-                                >
-                                    <Icon.Plus /> Dodaj zadanie
-                                </button>
-                            )
-                        }
                     >
-                        {showAddTask && (
-                            <div className="mb-6 rounded-lg border-2 border-emerald-300 bg-emerald-50 p-4">
-                                <input
-                                    type="text"
-                                    value={newTask.title}
-                                    onChange={(e) =>
-                                        setNewTask({
-                                            ...newTask,
-                                            title: e.target.value,
-                                        })
-                                    }
-                                    placeholder="Tytuł zadania"
-                                    className="mb-2 w-full rounded border border-gray-300 p-2"
-                                />
-                                <textarea
-                                    value={newTask.description}
-                                    onChange={(e) =>
-                                        setNewTask({
-                                            ...newTask,
-                                            description: e.target.value,
-                                        })
-                                    }
-                                    placeholder="Opis zadania (opcjonalnie)"
-                                    className="mb-2 w-full rounded border border-gray-300 p-2"
-                                    rows="2"
-                                />
-                                <div className="mb-2 flex gap-2">
-                                    <select
-                                        value={newTask.priority}
-                                        onChange={(e) =>
-                                            setNewTask({
-                                                ...newTask,
-                                                priority: e.target.value,
-                                            })
-                                        }
-                                        className="rounded border border-gray-300 p-2"
-                                    >
-                                        {AVAILABLE_PRIORITIES.map((p) => (
-                                            <option key={p} value={p}>
-                                                {translatePriority(p)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <select
-                                        value={newTask.assignedTo}
-                                        onChange={(e) =>
-                                            setNewTask({
-                                                ...newTask,
-                                                assignedTo: e.target.value,
-                                            })
-                                        }
-                                        className="flex-1 rounded border border-gray-300 p-2"
-                                    >
-                                        <option value="">Nie przypisano</option>
-                                        {project.assignedUsers.map((user) => (
-                                            <option
-                                                key={user._id}
-                                                value={user._id}
-                                            >
-                                                {user.username}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <input
-                                        type="date"
-                                        value={newTask.dueDate}
-                                        onChange={(e) =>
-                                            setNewTask({
-                                                ...newTask,
-                                                dueDate: e.target.value,
-                                            })
-                                        }
-                                        className="rounded border border-gray-300 p-2"
-                                    />
-                                </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={handleAddTask}
-                                        disabled={isAddingTask}
-                                        className="flex items-center gap-1 rounded bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-                                    >
-                                        {isAddingTask ? (
-                                            <>
-                                                <svg
-                                                    className="h-4 w-4 animate-spin text-white"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <circle
-                                                        className="opacity-25"
-                                                        cx="12"
-                                                        cy="12"
-                                                        r="10"
-                                                        stroke="currentColor"
-                                                        strokeWidth="4"
-                                                    ></circle>
-                                                    <path
-                                                        className="opacity-75"
-                                                        fill="currentColor"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                    ></path>
-                                                </svg>
-                                                Dodawanie...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Icon.Plus /> Dodaj
-                                            </>
-                                        )}
-                                    </button>
-                                    <button
-                                        onClick={() => setShowAddTask(false)}
-                                        className="flex items-center gap-1 rounded bg-gray-300 px-4 py-2 text-sm hover:bg-gray-400"
-                                    >
-                                        <Icon.Cancel /> Anuluj
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="space-y-3">
-                            {tasks.length === 0 ? (
-                                <p className="py-8 text-center text-gray-500">
-                                    Nie ma jeszcze żadnych zadań.{' '}
-                                    {isAdmin &&
-                                        'Kliknij "Dodaj zadanie" aby utworzyć pierwsze.'}
-                                </p>
-                            ) : (
-                                tasks.map((task) => (
-                                    <TaskItem
-                                        key={task._id}
-                                        task={task}
-                                        onUpdate={fetchTasks}
-                                        onDelete={handleDeleteTask}
-                                        projectUsers={project.assignedUsers}
-                                        isAdmin={isAdmin}
-                                    />
-                                ))
-                            )}
-                        </div>
+                        <KanbanBoard
+                            tasks={tasks}
+                            onUpdate={fetchTasks}
+                            onDelete={handleDeleteTask}
+                            projectUsers={project.assignedUsers}
+                            isAdmin={isAdmin}
+                            projectId={id}
+                            onTaskCreated={fetchTasks}
+                        />
                     </ContentCard>
 
                     {/* ZESPÓŁ PROJEKTOWY */}
