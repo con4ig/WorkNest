@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -176,10 +176,23 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                            className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                                isLoading
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-emerald-600 hover:bg-emerald-700'
+                            }`}
                         >
-                            {isLoading ? 'Logowanie...' : 'Zaloguj się'}
-                            {!isLoading && <Icon.ArrowRight />}
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="h-5 w-5 animate-spin" />
+                                    Logowanie
+                                </>
+                            ) : (
+                                <>
+                                    Zaloguj się
+                                    <Icon.ArrowRight />
+                                </>
+                            )}
                         </button>
                     </form>
                 </div>

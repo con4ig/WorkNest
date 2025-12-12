@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Archive, Trash2 } from 'lucide-react';
+import { Archive, Trash2, Eye } from 'lucide-react';
 
 const priorityStyles = {
     low: { bg: 'bg-slate-100', text: 'text-slate-700', label: 'Niski' },
@@ -92,6 +92,18 @@ const ProjectCard = ({
                 {/* Actions - visible on hover or if forced */}
                 {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
                     <div className="ml-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                            onPointerDown={(e) => {
+                                e.stopPropagation();
+                                // We don't need onCardClick here if we have a click handler on the main div,
+                                // but for clarity and safety let's call it direct
+                                onCardClick(project._id);
+                            }}
+                            title="Szczegóły"
+                            className="rounded p-1 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                        >
+                            <Eye className="h-3.5 w-3.5" />
+                        </button>
                         <button
                             onPointerDown={(e) => {
                                 e.stopPropagation(); // Stop drag start

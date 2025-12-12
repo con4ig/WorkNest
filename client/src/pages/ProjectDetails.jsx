@@ -20,6 +20,8 @@ import {
     AVAILABLE_PRIORITIES,
 } from '../components/projects/ProjectTaskShared.jsx';
 import { ChevronRight } from 'lucide-react';
+import ConfirmationModal from '../components/ConfirmationModal.jsx';
+import Notification from '../components/Notification.jsx';
 
 moment.locale('pl');
 
@@ -284,6 +286,26 @@ export default function ProjectDetails() {
     const [activities, setActivities] = useState([]);
     const [showActivities, setShowActivities] = useState(false);
 
+    // Stany dla notyfikacji i modala potwierdzającego
+    const [notification, setNotification] = useState({ message: '', type: '', visible: false });
+    const [confirmationProps, setConfirmationProps] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+
+    // Funkcje pomocnicze
+    const showNotification = (message, type = 'info') => {
+        setNotification({ message, type, visible: true });
+        setTimeout(() => {
+            setNotification((prev) => ({ ...prev, visible: false }));
+        }, 3000);
+    };
+
+    const clearNotification = () => {
+        setNotification({ ...notification, visible: false });
+    };
+
+    const askForConfirmation = (props) => {
+        setConfirmationProps({ isOpen: true, ...props });
+    };
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -375,8 +397,9 @@ export default function ProjectDetails() {
             await fetchData();
             await fetchActivities();
             setIsEditing(false);
+            showNotification('Zmiany zostały zapisane', 'success');
         } catch (err) {
-            alert(`Błąd podczas zapisywania zmian: ${err.message}`);
+            showNotification(`Błąd podczas zapisywania zmian: ${err.message}`, 'error');
         } finally {
             setIsSaving(false);
         }
@@ -388,7 +411,7 @@ export default function ProjectDetails() {
             fetchTasks();
             fetchActivities();
         } catch (err) {
-            alert(`Błąd: ${err.message}`);
+            showNotification(`Błąd: ${err.message}`, 'error');
         }
     };
 
@@ -406,7 +429,7 @@ export default function ProjectDetails() {
             fetchComments();
             fetchActivities();
         } catch (err) {
-            alert(`Błąd: ${err.message}`);
+            showNotification(`Błąd: ${err.message}`, 'error');
         }
     };
 
@@ -421,20 +444,26 @@ export default function ProjectDetails() {
             );
             fetchComments();
         } catch (err) {
-            alert(`Błąd: ${err.message}`);
+            showNotification(`Błąd: ${err.message}`, 'error');
         }
     };
 
     const handleDeleteComment = async (commentId) => {
-        if (!window.confirm('Czy na pewno usunąć ten komentarz?')) return;
-
-        try {
-            await api.delete(`/comments/${commentId}`);
-            fetchComments();
-            fetchActivities();
-        } catch (err) {
-            alert(`Błąd: ${err.message}`);
-        }
+        askForConfirmation({
+            title: 'Usuwanie Komentarza',
+            message: 'Czy na pewno chcesz usunąć ten komentarz?',
+            confirmText: 'Usuń',
+            confirmVariant: 'danger',
+            onConfirm: async () => {
+                try {
+                    await api.delete(`/comments/${commentId}`);
+                    fetchComments();
+                    fetchActivities();
+                } catch (err) {
+                    showNotification(`Błąd: ${err.message}`, 'error');
+                }
+            },
+        });
     };
 
     const handleProjectUpdate = useCallback(() => {
@@ -468,6 +497,11 @@ export default function ProjectDetails() {
 
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-800 lg:flex-row">
+            <Notification notification={notification} onClear={clearNotification} />
+            <ConfirmationModal
+                {...confirmationProps}
+                onClose={() => setConfirmationProps({ ...confirmationProps, isOpen: false })}
+            />
             {/* LEWY PANEL (SIDEBAR) */}
             <aside className="flex w-full flex-col border-r border-gray-200 bg-white p-6 lg:min-h-screen lg:w-[380px] lg:p-8">
                 <div className="mb-10 flex items-center gap-3">
