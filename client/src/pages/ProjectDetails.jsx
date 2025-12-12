@@ -406,13 +406,21 @@ export default function ProjectDetails() {
     };
 
     const handleDeleteTask = async (taskId) => {
-        try {
-            await api.delete(`/tasks/${taskId}`, { params: { company: currentUser?.company?._id } });
-            fetchTasks();
-            fetchActivities();
-        } catch (err) {
-            showNotification(`Błąd: ${err.message}`, 'error');
-        }
+        askForConfirmation({
+            title: 'Usuwanie Zadania',
+            message: 'Czy na pewno chcesz usunąć to zadanie? Ta operacja jest nieodwracalna.',
+            confirmText: 'Usuń',
+            confirmVariant: 'danger',
+            onConfirm: async () => {
+                try {
+                    await api.delete(`/tasks/${taskId}`, { params: { company: currentUser?.company?._id } });
+                    fetchTasks();
+                    fetchActivities();
+                } catch (err) {
+                    showNotification(`Błąd: ${err.message}`, 'error');
+                }
+            },
+        });
     };
 
     const handleAddComment = async () => {

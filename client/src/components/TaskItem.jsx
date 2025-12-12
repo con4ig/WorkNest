@@ -243,15 +243,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                                     <Icon.Edit3 />
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        if (
-                                            window.confirm(
-                                                'Czy na pewno usunąć to zadanie?',
-                                            )
-                                        ) {
-                                            onDelete(task._id);
-                                        }
-                                    }}
+                                    onClick={() => onDelete(task._id)}
                                     className="rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
                                 >
                                     <Icon.Trash />
