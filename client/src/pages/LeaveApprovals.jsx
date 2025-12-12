@@ -90,10 +90,10 @@ export default function LeaveApprovals() {
         checkUserAccess();
     }, [navigate]);
 
-    const fetchLeaves = useCallback(async () => {
+    const fetchLeaves = useCallback(async (showLoader = false) => {
         if (!currentUser || !currentUser.company) return;
         try {
-            setLoading(true);
+            if (showLoader) setLoading(true);
             const params =
                 filter !== 'all'
                     ? { status: filter, company: currentUser.company._id }
@@ -104,14 +104,14 @@ export default function LeaveApprovals() {
             console.error('Error fetching leaves:', err);
             if (err.response?.status === 401) navigate('/login');
         } finally {
-            setLoading(false);
+            if (showLoader) setLoading(false);
         }
     }, [filter, navigate, currentUser]);
 
     useEffect(() => {
         if (!currentUser) return;
         if (currentUser.role === 'admin' || currentUser.role === 'hr') {
-            fetchLeaves();
+            fetchLeaves(true);
         } else {
             setError('Brak uprawnień do przeglądania tej strony');
         }
