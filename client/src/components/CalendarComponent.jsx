@@ -1,13 +1,24 @@
 import React from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import format from 'date-fns/format';
+import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
+import getDay from 'date-fns/getDay';
+import pl from 'date-fns/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import 'moment/locale/pl';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List, Filter } from 'lucide-react';
 
-// Setup localizer
-moment.locale('pl');
-const localizer = momentLocalizer(moment);
+const locales = {
+    'pl': pl,
+};
+
+const localizer = dateFnsLocalizer({
+    format,
+    parse,
+    startOfWeek,
+    getDay,
+    locales,
+});
 
 const CustomToolbar = ({ date, onNavigate, onView, view }) => {
     const goToBack = () => {
@@ -23,7 +34,7 @@ const CustomToolbar = ({ date, onNavigate, onView, view }) => {
     };
 
     const label = () => {
-        return moment(date).format('MMMM YYYY');
+        return format(date, 'MMMM yyyy', { locale: pl });
     };
 
     return (
@@ -80,7 +91,7 @@ const CustomToolbar = ({ date, onNavigate, onView, view }) => {
                 <button
                     onClick={() => onView('agenda')}
                     className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                        view === 'agenda'
+                         view === 'agenda'
                             ? 'bg-white text-emerald-600 shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
                     }`}
@@ -136,7 +147,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
                 border: '0px',
                 display: 'block',
                 fontSize: '0.85rem',
-                padding: '0', // Zero padding because CustomEvent handles it
+                padding: '0', 
                 boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }
         };
@@ -144,9 +155,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-[800px]">
-             {/* ... (styles same) ... */}
              <style>{`
-                /* ... existing styles ... */
                 .rbc-calendar { font-family: inherit; }
                 .rbc-header {
                     padding: 12px 0;
@@ -178,12 +187,14 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
             
             <Calendar
                 localizer={localizer}
-                events={events}
+                events={events} // Keep 'events'
                 startAccessor="start"
                 endAccessor="end"
                 style={{ height: '100%' }}
                 eventPropGetter={eventStyleGetter}
                 onSelectEvent={onEventClick}
+                
+                culture='pl'
                 
                 date={date}
                 view={view}
@@ -192,12 +203,19 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
 
                 components={{
                     toolbar: CustomToolbar,
-                    event: CustomEvent // Use custom event renderer
+                    event: CustomEvent 
                 }}
                 popup={true}
                 
                 messages={{
                     showMore: total => `+${total} więcej`
+                }}
+                // Date-fns format patterns
+                formats={{
+                    dayHeaderFormat: 'EEEE, d MMMM', 
+                    monthHeaderFormat: 'MMMM yyyy', 
+                    dayRangeHeaderFormat: ({ start, end }, culture, local) =>
+                        `${local.format(start, 'd MMMM', culture)} – ${local.format(end, 'd MMMM', culture)}`
                 }}
             />
         </div>
