@@ -316,7 +316,7 @@ export default function ProjectDetails() {
                 description: res.data.description,
                 status: res.data.status,
                 priority: res.data.priority,
-                progress: res.data.progress || 0,
+                // progress: res.data.progress || 0, // Automatyczne wyliczanie
                 startDate: formatDateForInput(res.data.startDate),
                 endDate: formatDateForInput(res.data.endDate),
             });
@@ -375,12 +375,8 @@ export default function ProjectDetails() {
     ]);
 
     const handleEditChange = (e) => {
-        const { name, value, type } = e.target;
-        let newValue =
-            name === 'progress' && type === 'number'
-                ? Math.max(0, Math.min(100, parseInt(value, 10) || 0))
-                : value;
-        setEditData((prev) => ({ ...prev, [name]: newValue }));
+        const { name, value } = e.target;
+        setEditData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleSave = async () => {
@@ -495,7 +491,14 @@ export default function ProjectDetails() {
         { total: 0, completed: 0, inProgress: 0, todo: 0 },
     );
 
-    const progress = project?.progress || 0;
+    const calculatedProgress = taskStats.total > 0
+        ? Math.round((taskStats.completed / taskStats.total) * 100)
+        : 0;
+    
+    // Fallback do ręcznego progressu jest niepotrzebny, jeśli chcemy full automation,
+    // ale może warto zostawić jako fallback wizualny, gdy zadania się jeszcze ładują?
+    // W sumie loader to obsłuży.
+    
     const isAdmin =
         currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
 
@@ -526,26 +529,11 @@ export default function ProjectDetails() {
 
                 <div className="flex flex-col items-center text-center">
                     <CircularProgress
-                        progress={isEditing ? editData.progress : progress || 0}
+                        progress={calculatedProgress}
                     />
-                    {isEditing && isAdmin ? (
-                        <div className="mt-4 w-full max-w-xs">
-                            <input
-                                type="range"
-                                name="progress"
-                                value={editData.progress}
-                                onChange={handleEditChange}
-                                min="0"
-                                max="100"
-                                className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-emerald-600"
-                                disabled={isSaving}
-                            />
-                        </div>
-                    ) : (
-                        <p className="mt-3 text-lg font-semibold text-slate-600">
-                            Postęp projektu
-                        </p>
-                    )}
+                     <p className="mt-3 text-lg font-semibold text-slate-600">
+                        Postęp projektu
+                    </p>
                 </div>
 
                 <div className="mt-10 space-y-6">
