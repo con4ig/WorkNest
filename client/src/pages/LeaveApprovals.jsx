@@ -88,16 +88,22 @@ export default function LeaveApprovals() {
             }
         };
         checkUserAccess();
+        return () => {
+            if (window.searchTimeout) clearTimeout(window.searchTimeout);
+        };
     }, [navigate]);
 
-    const fetchLeaves = useCallback(async (showLoader = false) => {
+    const fetchLeaves = useCallback(async (showLoader = false, searchQuery = '') => {
         if (!currentUser || !currentUser.company) return;
         try {
             if (showLoader) setLoading(true);
-            const params =
-                filter !== 'all'
-                    ? { status: filter, company: currentUser.company._id }
-                    : { company: currentUser.company._id };
+            const params = {
+                company: currentUser.company._id,
+                // Jeśli kopiemy (szukamy), ignorujemy zakładki i szukamy wszędzie. 
+                // Jeśli pole puste -> stosujemy filtr.
+                ...(searchQuery ? {} : (filter !== 'all' && { status: filter })),
+                ...(searchQuery && { search: searchQuery })
+            };
             const res = await api.get('/leaves', { params });
             setLeaves(res.data.leaves);
         } catch (err) {
@@ -286,17 +292,40 @@ export default function LeaveApprovals() {
                             </div>
                         </div>
 
-                        {/* Desktop filter tabs */}
-                        <div className="flex items-center gap-2 rounded-lg bg-gray-100 p-1">
-                            {filterTabs.map((tab) => (
-                                <button
-                                    key={tab.value}
-                                    onClick={() => setFilter(tab.value)}
-                                    className={`rounded-md px-4 py-2 text-sm transition-colors ${filter === tab.value ? 'bg-white font-medium text-emerald-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
+                        <div className="flex items-center gap-4">
+                             {/* Search Bar */}
+                             <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Szukaj pracownika..."
+                                    className="w-64 rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        // Clear previous timeout
+                                        if (window.searchTimeout) clearTimeout(window.searchTimeout);
+                                        // Set new timeout
+                                        window.searchTimeout = setTimeout(() => {
+                                            fetchLeaves(false, val);
+                                        }, 300); // 300ms delay
+                                    }}
+                                />
+                                <div className="absolute left-3 top-2.5 text-gray-400">
+                                    <Icon.Eye /> 
+                                </div>
+                             </div>
+
+                             {/* Desktop filter tabs */}
+                            <div className="flex items-center gap-2 rounded-lg bg-gray-100 p-1">
+                                {filterTabs.map((tab) => (
+                                    <button
+                                        key={tab.value}
+                                        onClick={() => setFilter(tab.value)}
+                                        className={`rounded-md px-4 py-2 text-sm transition-colors ${filter === tab.value ? 'bg-white font-medium text-emerald-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
@@ -409,6 +438,11 @@ export default function LeaveApprovals() {
                                                 <div className="text-xs text-gray-500">
                                                     {leave.user?.email}
                                                 </div>
+                                                {leave.user?.stats && (
+                                                    <div className="mt-0.5 text-xs font-semibold text-emerald-600">
+                                                       Wykorzystano: {leave.user.stats.usedDaysThisYear} dni (w tym roku)
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </td>
@@ -534,7 +568,12 @@ export default function LeaveApprovals() {
                                         <div className="text-xs text-gray-500">
                                             {leave.user?.email}
                                         </div>
-                                    </div>
+                                        {leave.user?.stats && (
+                                             <div className="mt-1 text-xs font-semibold text-emerald-600">
+                                                 Wykorzystano: {leave.user.stats.usedDaysThisYear} dni
+                                             </div>
+                                         )}
+                                     </div>
                                 </div>
                                 {getStatusBadge(leave.status)}
                             </div>

@@ -1,4 +1,5 @@
 import Leave from "../models/Leave.js";
+import mongoose from "mongoose";
 
 const getWorkingDays = (start, end) => {
   let count = 0;
@@ -34,14 +35,71 @@ export const getLeaves = async (req, res) => {
       query.status = req.query.status;
     }
 
+    // Admin/HR can filter by specific user
+    if ((req.user.role === "admin" || req.user.role === "hr") && req.query.userId) {
+      query.user = req.query.userId;
+    }
+
+    // Text search (username or email)
+    if (req.query.search) {
+      // Find users matching the search term first
+      const users = await mongoose.model('User').find({
+        $or: [
+            { username: { $regex: req.query.search, $options: 'i' } },
+            { email: { $regex: req.query.search, $options: 'i' } }
+        ]
+      }).select('_id');
+      
+      const userIds = users.map(u => u._id);
+      
+      // Add user IDs to query
+      if (query.user) {
+        // If user is already filtered (e.g. by role or userId param), valid intersection
+        // But simplifying: if searching text, we look for leaves of those users
+         query.user = { $in: userIds, $eq: query.user }; // Intersection (simplified logic below)
+         // Complex intersection might be needed if query.user is already set. 
+         // Let's refine:
+         if(Array.isArray(query.user)) {
+             // hard case, skip for MVP
+         } else if (typeof query.user === 'string' || query.user instanceof mongoose.Types.ObjectId) {
+             const match = userIds.find(id => id.toString() === query.user.toString());
+             query.user = match ? match : null; // If searched user doesn't match selected user, 0 results
+         }
+      } else {
+        query.user = { $in: userIds };
+      }
+    }
+
     const leaves = await Leave.find(query)
-      .populate("user", "username email")
+      .populate("user", "username email firstName lastName profileImage")
       .populate("reviewedBy", "username")
       .sort({ createdAt: -1 });
 
+    // Calculate usage stats for each user (only for pending/relevant leaves to avoid huge overhead if list is massive, but for now map all)
+    // Optimization: aggregate usage per user in one go? 
+    // For simplicity efficiently:
+    const leavesWithStats = await Promise.all(leaves.map(async (doc) => {
+        const leave = doc.toObject();
+        if (leave.user) {
+             const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+             const endOfYear = new Date(new Date().getFullYear(), 11, 31);
+             
+             // Count APPROVED days used this year
+             const usedLeaves = await Leave.find({
+                 user: leave.user._id,
+                 status: 'approved',
+                 startDate: { $gte: startOfYear, $lte: endOfYear }
+             });
+             
+             const usedDays = usedLeaves.reduce((sum, l) => sum + (l.days || 0), 0);
+             leave.user.stats = { usedDaysThisYear: usedDays };
+        }
+        return leave;
+    }));
+
     res.json({
-      count: leaves.length,
-      leaves,
+      count: leavesWithStats.length,
+      leaves: leavesWithStats,
     });
   } catch (err) {
     console.error("Error fetching leaves:", err);
