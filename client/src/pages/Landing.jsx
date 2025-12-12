@@ -163,8 +163,12 @@ function Landing() {
                                         </span>
                                         <div className="h-3 w-16 rounded-full bg-emerald-400"></div>
                                     </div>
-                                    <div className="flex aspect-video items-center justify-center rounded-xl border-4 border-emerald-500/20 bg-gray-100">
-                                        <img src={demo} alt="demo photo" />
+                                    <div className="overflow-hidden rounded-xl border-4 border-emerald-500/20 bg-gray-100">
+                                        <img
+                                            src={demo}
+                                            alt="demo photo"
+                                            className="h-auto w-full"
+                                        />
                                     </div>
                                 </div>
                             </div>
