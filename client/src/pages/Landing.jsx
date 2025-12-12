@@ -4,11 +4,14 @@ import { Link } from 'react-router-dom';
 import {
     Zap,
     Users,
-    TrendingUp,
-    CheckCircle,
     Quote,
     Rocket,
     ShieldCheck,
+    Layout,
+    CheckCircle,
+    Play,
+    Clock,
+    Lock,
 } from 'lucide-react';
 
 function Landing() {
@@ -29,15 +32,26 @@ function Landing() {
             title: 'Analityka i Raporty',
             description:
                 'Szczegółowe statystyki wydajności i wizualne raporty do optymalizacji procesów HR.',
-            icon: TrendingUp,
+            icon: Play,
         },
     ];
 
-    // Przywrócono pierwotne, większe wartości
-    const stats = [
-        { value: '15k+', label: 'Aktywnych Użytkowników' },
-        { value: '70k+', label: 'Pomyślnie Zarządzanych Projektów' },
-        { value: '99.8%', label: 'Wskaźnik Zadowolenia Klientów' },
+    const values = [
+        {
+            value: 'Intuicyjność',
+            label: 'Prosty interfejs bez skomplikowanego wdrożenia',
+            icon: Layout,
+        },
+        {
+            value: 'Szybkość',
+            label: 'Błyskawiczne działanie i natychmiastowe aktualizacje',
+            icon: Zap,
+        },
+        {
+            value: 'Bezpieczeństwo',
+            label: 'Twoje dane są chronione nowoczesnymi standardami',
+            icon: Lock,
+        },
     ];
 
     const finalCtaButton =
@@ -83,20 +97,23 @@ function Landing() {
                         </div>
                     </div>
 
-                    {/* 2. Sekcja Statystyk */}
-                    <div className="mx-4 mb-16 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 p-6 shadow-2xl shadow-emerald-600/40 md:mb-32 md:rounded-3xl md:p-9">
-                        <div className="grid gap-6 divide-y divide-emerald-500 text-center md:grid-cols-3 md:gap-8 md:divide-x md:divide-y-0">
-                            {stats.map((stat, index) => (
+                    {/* 2. Sekcja Wartości (Zamiast statystyk) */}
+                    <div className="mx-4 mb-16 rounded-2xl bg-white border border-gray-100 p-6 shadow-xl shadow-emerald-100/50 md:mb-32 md:rounded-3xl md:p-9">
+                        <div className="grid gap-6 divide-y divide-gray-100 text-center md:grid-cols-3 md:gap-8 md:divide-x md:divide-y-0">
+                            {values.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="px-4 py-4 md:px-6 md:py-0"
+                                    className="flex flex-col items-center px-4 py-4 md:px-6 md:py-0"
                                 >
-                                    <div className="mb-2 text-3xl font-extrabold tracking-tighter text-white md:text-4xl lg:text-5xl">
-                                        {stat.value}
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                                        <item.icon className="h-7 w-7" />
                                     </div>
-                                    <div className="text-sm font-medium text-emerald-200 md:text-base lg:text-lg">
-                                        {stat.label}
-                                    </div>
+                                    <h3 className="mb-2 text-xl font-bold text-gray-900">
+                                        {item.value}
+                                    </h3>
+                                    <p className="text-sm font-medium text-gray-500 md:text-base">
+                                        {item.label}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -183,45 +200,44 @@ function Landing() {
                         ))}
                     </div>
 
-                    {/* 5. Sekcja Zaufania / Testimoniale */}
+                    {/* 5. Sekcja "Jak to działa" (Zamiast opinii) */}
                     <div className="mb-32 rounded-3xl border border-gray-100 bg-white p-12 shadow-xl">
                         <div className="mx-auto mb-12 max-w-4xl text-center">
                             <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-emerald-600">
-                                CO MÓWIĄ NASI KLIENCI?
+                                PROSTY PROCES
                             </p>
                             <h2 className="text-4xl font-bold text-gray-900">
-                                Zaufaj liderom branży
+                                Zacznij w 3 prostych krokach
                             </h2>
                         </div>
 
-                        <div className="grid gap-8 md:grid-cols-2">
-                            {/* Testimonial 1 */}
-                            <div className="rounded-2xl border border-emerald-100 bg-gray-50 p-6 shadow-inner">
-                                <Quote className="mb-4 h-8 w-8 text-emerald-400" />
-                                <p className="mb-4 text-xl italic text-gray-700">
-                                    "Wdrożenie WorkNest skróciło czas
-                                    onboardingu o 40%. Interfejs jest
-                                    intuicyjny, a wsparcie techniczne na
-                                    najwyższym poziomie."
-                                </p>
-                                <div className="font-semibold text-gray-900">
-                                    - Anna Kowalska, Dyrektor HR w TechCorp
+                        <div className="grid gap-8 md:grid-cols-3">
+                            <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
+                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
+                                    1
                                 </div>
+                                <h3 className="mb-3 text-xl font-bold text-gray-900">Utwórz konto</h3>
+                                <p className="text-gray-600">
+                                    Zarejestruj swoją firmę w mniej niż minutę. Bez zbędnych formalności i kart kredytowych na start.
+                                </p>
                             </div>
-
-                            {/* Testimonial 2 */}
-                            <div className="rounded-2xl border border-emerald-100 bg-gray-50 p-6 shadow-inner">
-                                <Quote className="mb-4 h-8 w-8 text-emerald-400" />
-                                <p className="mb-4 text-xl italic text-gray-700">
-                                    "Przejrzyste raporty analityczne pozwalają
-                                    nam podejmować lepsze decyzje. To narzędzie,
-                                    które faktycznie napędza produktywność
-                                    zespołu."
-                                </p>
-                                <div className="font-semibold text-gray-900">
-                                    - Piotr Nowak, Menedżer Projektów w
-                                    GlobalSoft
+                            <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
+                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
+                                    2
                                 </div>
+                                <h3 className="mb-3 text-xl font-bold text-gray-900">Zaproś zespół</h3>
+                                <p className="text-gray-600">
+                                    Dodaj pracowników i przypisz im role. Stwórz strukturę, która odpowiada Twojej organizacji.
+                                </p>
+                            </div>
+                            <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
+                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
+                                    3
+                                </div>
+                                <h3 className="mb-3 text-xl font-bold text-gray-900">Zarządzaj projektami</h3>
+                                <p className="text-gray-600">
+                                    Twórz tablice Kanban, śledź postępy i ciesz się zorganizowaną pracą od pierwszego dnia.
+                                </p>
                             </div>
                         </div>
                     </div>
