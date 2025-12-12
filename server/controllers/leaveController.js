@@ -79,9 +79,9 @@ export const getMyLeaves = async (req, res) => {
 export const createLeave = async (req, res) => {
   const { leaveType, startDate, endDate, reason } = req.body;
 
-  if (!startDate || !endDate || !reason) {
+  if (!startDate || !endDate) {
     return res.status(400).json({
-      message: "Data rozpoczęcia, zakończenia i powód są wymagane",
+      message: "Data rozpoczęcia i zakończenia są wymagane",
     });
   }
 

@@ -66,10 +66,13 @@ export default function LeaveApprovals() {
     const [leaves, setLeaves] = useState([]);
     const [filter, setFilter] = useState('pending');
     const [loading, setLoading] = useState(true);
-    const [selectedLeave, setSelectedLeave] = useState(null);
+    const [selectedLeave, setSelectedLeave] = useState(null); // For rejection
+    const [leaveToApprove, setLeaveToApprove] = useState(null); // For approval confirmation
     const [showRejectModal, setShowRejectModal] = useState(false);
+    const [showApproveModal, setShowApproveModal] = useState(false);
     const [rejectNote, setRejectNote] = useState('');
-    const [Error, setError] = useState(null);
+    const [error, setError] = useState(null);
+    const [notification, setNotification] = useState(null); // { message, type: 'success'|'error' }
     const [currentUser, setCurrentUser] = useState(null);
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const navigate = useNavigate();
@@ -114,22 +117,32 @@ export default function LeaveApprovals() {
         }
     }, [currentUser, fetchLeaves]);
 
-    const handleApprove = async (id) => {
-        if (!window.confirm('Czy na pewno chcesz zatwierdzić ten wniosek?'))
-            return;
+    const showNotification = (message, type = 'success') => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification(null), 3000);
+    };
+
+    const handleApproveClick = (id) => {
+        setLeaveToApprove(id);
+        setShowApproveModal(true);
+    };
+
+    const confirmApprove = async () => {
+        if (!leaveToApprove) return;
         try {
-            await api.patch(`/leaves/${id}/approve`, { company: currentUser.company._id });
+            await api.patch(`/leaves/${leaveToApprove}/approve`, { company: currentUser.company._id });
             fetchLeaves();
-            alert('Wniosek zatwierdzony pomyślnie');
+            setShowApproveModal(false);
+            setLeaveToApprove(null);
         } catch (err) {
             console.error('Error approving leave:', err);
-            alert(err.response?.data?.message || 'Błąd zatwierdzania');
+            showNotification(err.response?.data?.message || 'Błąd zatwierdzania', 'error');
         }
     };
 
     const handleReject = async () => {
         if (!rejectNote.trim()) {
-            alert('Podaj powód odrzucenia');
+            showNotification('Podaj powód odrzucenia', 'error');
             return;
         }
         try {
@@ -138,10 +151,10 @@ export default function LeaveApprovals() {
             setShowRejectModal(false);
             setRejectNote('');
             setSelectedLeave(null);
-            alert('Wniosek odrzucony');
+            showNotification('Wniosek odrzucony pomyślnie');
         } catch (err) {
             console.error('Error rejecting leave:', err);
-            alert(err.response?.data?.message || 'Błąd odrzucania');
+            showNotification(err.response?.data?.message || 'Błąd odrzucania', 'error');
         }
     };
 
@@ -167,20 +180,31 @@ export default function LeaveApprovals() {
 
     const getLeaveTypeLabel = (type) => {
         const labels = {
-            vacation: 'Urlop',
-            sick: 'Zwolnienie',
-            personal: 'Okolicznościowy',
+            vacation: 'Urlop wypoczynkowy',
+            on_demand: 'Urlop na żądanie',
+            unpaid: 'Urlop bezpłatny',
+            occasional: 'Urlop okolicznościowy',
+            maternity: 'Urlop macierzyński',
+            paternity: 'Urlop ojcowski',
+            parental: 'Urlop rodzicielski',
+            childcare: 'Urlop wychowawczy',
+            care: 'Urlop opiekuńczy',
+            training: 'Urlop szkoleniowy',
+            job_search: 'Na poszukiwanie pracy',
+            health: 'Zdrowotny/Rehabilitacyjny',
+            sick: 'Zwolnienie lekarskie',
+            personal: 'Urlop okolicznościowy (stary)',
             other: 'Inny',
         };
         return labels[type] || type;
     };
 
-    if (Error) {
+    if (error) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
                 <div className="w-full max-w-md rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-red-700 shadow-sm">
                     <div className="mb-2 text-lg font-semibold">Błąd</div>
-                    <div className="text-sm">{Error}</div>
+                    <div className="text-sm">{error}</div>
                     <button
                         onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto"
@@ -214,6 +238,13 @@ export default function LeaveApprovals() {
         <div className="min-h-screen bg-gray-100 pb-6">
             {/* Header - Responsywny */}
             <div className="sticky top-0 z-10 bg-white shadow-sm">
+                {notification && (
+                    <div className={`absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-full px-6 py-2 shadow-lg transition-all ${
+                        notification.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+                    }`}>
+                        {notification.message}
+                    </div>
+                )}
                 <div className="px-4 py-4 md:px-8 md:py-6">
                     {/* Mobile header */}
                     <div className="flex items-center justify-between md:hidden">
@@ -421,9 +452,9 @@ export default function LeaveApprovals() {
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() =>
-                                                        handleApprove(leave._id)
+                                                        handleApproveClick(leave._id)
                                                     }
-                                                    className="flex items-center gap-1 rounded-lg bg-green-600 px-3 py-1.5 text-xs text-white transition-colors hover:bg-green-700"
+                                                    className="flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-all hover:bg-emerald-100 hover:shadow-sm"
                                                     title="Zatwierdź"
                                                 >
                                                     <Icon.Check />
@@ -438,7 +469,7 @@ export default function LeaveApprovals() {
                                                             true,
                                                         );
                                                     }}
-                                                    className="flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs text-white transition-colors hover:bg-red-700"
+                                                    className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 hover:shadow-sm"
                                                     title="Odrzuć"
                                                 >
                                                     <Icon.X />
@@ -562,10 +593,10 @@ export default function LeaveApprovals() {
 
                             {/* Akcje */}
                             {leave.status === 'pending' && (
-                                <div className="mt-4 flex gap-2">
+                                <div className="mt-4 flex gap-3">
                                     <button
-                                        onClick={() => handleApprove(leave._id)}
-                                        className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
+                                        onClick={() => handleApproveClick(leave._id)}
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 active:scale-95"
                                     >
                                         <Icon.Check />
                                         Zatwierdź
@@ -575,7 +606,7 @@ export default function LeaveApprovals() {
                                             setSelectedLeave(leave._id);
                                             setShowRejectModal(true);
                                         }}
-                                        className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95"
                                     >
                                         <Icon.X />
                                         Odrzuć
@@ -608,6 +639,40 @@ export default function LeaveApprovals() {
                     )}
                 </div>
             </div>
+
+            {/* Approve Confirmation Modal */}
+            {showApproveModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-all">
+                    <div className="w-full max-w-sm scale-100 rounded-2xl bg-white p-6 shadow-2xl transition-all">
+                        <div className="mb-4 flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                                <Icon.Check />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-900">Zatwierdzić wniosek?</h3>
+                                <p className="text-sm text-gray-500">Tej operacji nie można cofnąć.</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowApproveModal(false);
+                                    setLeaveToApprove(null);
+                                }}
+                                className="flex-1 rounded-xl px-4 py-2.5 font-medium text-gray-600 transition-colors hover:bg-gray-100"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                                onClick={confirmApprove}
+                                className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 font-bold text-white shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 hover:scale-[1.02]"
+                            >
+                                Potwierdź
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Reject Modal - Responsywny */}
             {showRejectModal && (

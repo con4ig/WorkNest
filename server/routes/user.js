@@ -12,6 +12,8 @@ import {
   getProfileImage,
   deleteProfileImage,
   generateInvitation,
+  getInvitations,
+  revokeInvitation,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -46,7 +48,7 @@ router.get("/me", authenticate, getCurrentUser);
 // GET /api/users/:id
 // Pobieranie danych konkretnego pracownika
 // ============================================
-router.get("/:id", authenticate, getUserById);
+// router.get("/:id", authenticate, getUserById); // Moved down to avoid collision with /invitations
 
 // ============================================
 // PATCH /api/users/:id
@@ -65,6 +67,27 @@ router.patch(
   updateUserRole
 );
 
+router.post(
+  "/generate-invitation",
+  authenticate,
+  authorize("admin"),
+  generateInvitation
+);
+
+router.get(
+  "/invitations",
+  authenticate,
+  authorize("admin"),
+  getInvitations
+);
+
+router.delete(
+  "/invitations/:id",
+  authenticate,
+  authorize("admin"),
+  revokeInvitation
+);
+
 // Endpoint do uploadu zdjęcia profilowego
 router.put(
   "/profile-image",
@@ -79,11 +102,13 @@ router.get("/profile-image", authenticate, getProfileImage);
 // Endpoint do usunięcia zdjęcia profilowego
 router.delete("/profile-image", authenticate, deleteProfileImage);
 
-router.post(
-  "/generate-invitation",
-  authenticate,
-  authorize("admin"),
-  generateInvitation
-);
+
+
+// ============================================
+// GET /api/users/:id
+// Pobieranie danych konkretnego pracownika
+// ============================================
+// To musi być NA SAMYM KOŃCU, żeby nie przechwytywać innych tras (np. /invitations)
+router.get("/:id", authenticate, getUserById);
 
 export default router;

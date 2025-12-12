@@ -131,8 +131,19 @@ export default function MyLeaves() {
     const getLeaveTypeLabel = (type) => {
         const labels = {
             vacation: 'Urlop wypoczynkowy',
+            on_demand: 'Urlop na żądanie',
+            unpaid: 'Urlop bezpłatny',
+            occasional: 'Urlop okolicznościowy',
+            maternity: 'Urlop macierzyński',
+            paternity: 'Urlop ojcowski',
+            parental: 'Urlop rodzicielski',
+            childcare: 'Urlop wychowawczy',
+            care: 'Urlop opiekuńczy',
+            training: 'Urlop szkoleniowy',
+            job_search: 'Urlop na poszukiwanie pracy',
+            health: 'Urlop zdrowotny/rehabilitacyjny',
             sick: 'Zwolnienie lekarskie',
-            personal: 'Urlop okolicznościowy',
+            personal: 'Urlop okolicznościowy (stary)',
             other: 'Inny',
         };
         return labels[type] || type;

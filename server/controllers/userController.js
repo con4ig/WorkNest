@@ -390,6 +390,7 @@ export const deleteProfileImage = async (req, res) => {
 
 export const generateInvitation = async (req, res) => {
   try {
+    const { maxUses, expiresIn, role } = req.body; // Pobierz parametry
     const companyId = req.user.company?._id || req.user.company;
 
     if (!companyId) {
@@ -398,10 +399,27 @@ export const generateInvitation = async (req, res) => {
         .json({ message: "User is not assigned to a company." });
     }
 
+    // Oblicz datę wygaśnięcia
+    let expirationDate = new Date();
+    if (expiresIn) {
+      // Obsługa różnych formatów czasu (np. "30m", "24h", "7d") lub milliseconds
+      const timeValue = parseInt(expiresIn);
+      const timeUnit = expiresIn.slice(-1);
+
+      if (timeUnit === 'm') expirationDate.setMinutes(expirationDate.getMinutes() + timeValue);
+      else if (timeUnit === 'h') expirationDate.setHours(expirationDate.getHours() + timeValue);
+      else if (timeUnit === 'd') expirationDate.setDate(expirationDate.getDate() + timeValue);
+      else expirationDate = new Date(Date.now() + 5 * 60 * 1000); // Default 5 min fallback
+    } else {
+       expirationDate = new Date(Date.now() + 5 * 60 * 1000); // Default 5 min
+    }
+
     const newInvitation = new Invitation({
       company: companyId,
       createdBy: req.user._id,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+      expiresAt: expirationDate,
+      maxUses: maxUses || 1,
+      role: role || 'employee',
     });
 
     await newInvitation.save();
@@ -409,9 +427,51 @@ export const generateInvitation = async (req, res) => {
     res.status(201).json({
       message: "Invitation code generated successfully.",
       invitationCode: newInvitation.code,
+      invitation: newInvitation // Zwróć cały obiekt
     });
   } catch (err) {
     console.error("Error generating invitation code:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getInvitations = async (req, res) => {
+  try {
+    const companyId = req.user.company?._id || req.user.company;
+     if (!companyId) return res.status(400).json({ message: "Brak firmy" });
+
+    // Pobierz tylko aktywne zaproszenia (lub wszystkie i filtruj na froncie - lepiej wszystkie dla historii?)
+    // Pobieramy wszystkie, które jeszcze nie wygasły LUB mają jeszcze użycia
+    // Ale admin może chcieć widzieć listę aktywnych kodów.
+    const invitations = await Invitation.find({ company: companyId })
+      .sort({ createdAt: -1 })
+      .populate('createdBy', 'username');
+
+    res.json(invitations);
+  } catch (err) {
+    console.error("Error fetching invitations:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const revokeInvitation = async (req, res) => {
+  try {
+     const { id } = req.params;
+     // Sprawdź czy to zaproszenie należy do firmy admina (security)
+     const invitation = await Invitation.findById(id);
+
+     if (!invitation) return res.status(404).json({ message: "Nie znaleziono zaproszenia" });
+
+     // Sprawdź uprawnienia firmy
+     const userCompanyId = req.user.company?._id || req.user.company;
+     if (invitation.company.toString() !== userCompanyId.toString()) {
+        return res.status(403).json({ message: "Brak uprawnień" });
+     }
+
+     await Invitation.findByIdAndDelete(id);
+     res.json({ message: "Zaproszenie usunięte" });
+  } catch (err) {
+    console.error("Error revoking invitation:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

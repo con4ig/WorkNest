@@ -21,6 +21,19 @@ const invitationSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    maxUses: {
+      type: Number,
+      default: 1, // Domyślnie jednorazowy
+    },
+    uses: {
+      type: Number,
+      default: 0,
+    },
+    role: {
+      type: String,
+      enum: ["employee", "hr", "admin"],
+      default: "employee",
+    },
   },
   { timestamps: true }
 );
@@ -32,5 +45,10 @@ invitationSchema.pre("save", function (next) {
   }
   next();
 });
+
+// Automatyczne usuwanie wygasłych zaproszeń (TTL Index)
+// expiredAt: dokument zostanie usunięty 7 dni po dacie 'expiresAt'
+// MongoDB sprawdza to w tle co ok. 60 sekund.
+invitationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 604800 }); // 7 dni (w sekundach)
 
 export default mongoose.model("Invitation", invitationSchema);
