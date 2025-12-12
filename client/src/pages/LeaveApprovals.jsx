@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api.js';
 import LoadingScreen from '../components/LoadingScreen.jsx';
+import CalendarComponent from '../components/CalendarComponent.jsx';
 
 const Icon = {
     ArrowLeft: () => (
@@ -24,6 +25,36 @@ const Icon = {
             strokeWidth="2"
         >
             <path d="M20 6L9 17l-5-5" />
+        </svg>
+    ),
+    Calendar: () => (
+        <svg
+            className="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+        >
+            <path d="M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+    ),
+    List: () => (
+        <svg
+             className="h-5 w-5"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             strokeWidth="2"
+        >
+            <line x1="8" y1="6" x2="21" y2="6" />
+            <line x1="8" y1="12" x2="21" y2="12" />
+            <line x1="8" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="3.01" y2="6" />
+            <line x1="3" y1="12" x2="3.01" y2="12" />
+            <line x1="3" y1="18" x2="3.01" y2="18" />
         </svg>
     ),
     X: () => (
@@ -65,6 +96,7 @@ const Icon = {
 export default function LeaveApprovals() {
     const [leaves, setLeaves] = useState([]);
     const [filter, setFilter] = useState('pending');
+    const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
     const [loading, setLoading] = useState(true);
     const [selectedLeave, setSelectedLeave] = useState(null); // For rejection
     const [leaveToApprove, setLeaveToApprove] = useState(null); // For approval confirmation
@@ -319,13 +351,37 @@ export default function LeaveApprovals() {
                                 {filterTabs.map((tab) => (
                                     <button
                                         key={tab.value}
-                                        onClick={() => setFilter(tab.value)}
+                                        onClick={() => {
+                                            setFilter(tab.value);
+                                            // Jeśli wchodzimy w odrzucone, wracamy do listy (kalendarz nie ma sensu)
+                                            if (tab.value === 'rejected') setViewMode('list');
+                                        }}
                                         className={`rounded-md px-4 py-2 text-sm transition-colors ${filter === tab.value ? 'bg-white font-medium text-emerald-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                                     >
                                         {tab.label}
                                     </button>
                                 ))}
                             </div>
+
+                            {/* View Toggle - ukrywamy dla Odrzuconych */}
+                            {filter !== 'rejected' && (
+                                <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1">
+                                    <button
+                                        onClick={() => setViewMode('list')}
+                                        className={`rounded-md p-2 transition-colors ${viewMode === 'list' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                        title="Lista"
+                                    >
+                                        <Icon.List />
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('calendar')}
+                                        className={`rounded-md p-2 transition-colors ${viewMode === 'calendar' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                        title="Kalendarz"
+                                    >
+                                        <Icon.Calendar />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -339,6 +395,7 @@ export default function LeaveApprovals() {
                                         onClick={() => {
                                             setFilter(tab.value);
                                             setShowFilterMenu(false);
+                                            if (tab.value === 'rejected') setViewMode('list');
                                         }}
                                         className={`rounded-md px-3 py-2 text-sm transition-colors ${filter === tab.value ? 'bg-emerald-600 font-medium text-white shadow-sm' : 'bg-white text-gray-600'}`}
                                     >
@@ -353,6 +410,29 @@ export default function LeaveApprovals() {
 
             {/* Content */}
             <div className="px-4 py-6 md:mx-auto md:max-w-7xl md:px-8 md:py-8">
+                {viewMode === 'calendar' && filter !== 'rejected' ? (
+                     <CalendarComponent 
+                        // Nigdy nie pokazujemy odrzuconych w kalendarzu, nawet jak sa w "All"
+                        leaves={leaves.filter(l => l.status !== 'rejected')}
+                        onEventClick={(event) => {
+                             // Handle event click - logic to approve/reject
+                             // For now validation/MVP: if pending, maybe open modal?
+                             // Reusing existing logic:
+                             const leave = event.resource;
+                             if(leave.status === 'pending') {
+                                 // We could open a modal here. For MVP let's confirm approvsl?
+                                 // Or better, switch to list and highlight?
+                                 // Simple approach: if pending, show approve modal
+                                 setLeaveToApprove(leave._id);
+                                 setShowApproveModal(true);
+                             } else {
+                                // show info notification?
+                                showNotification(`Wniosek: ${leave.status}`, 'success');
+                             }
+                        }}
+                     />
+                ) : (
+                <>
                 {/* Stats - Responsywne */}
                 <div className="mb-6 grid grid-cols-2 gap-3 md:mb-8 md:grid-cols-4 md:gap-4">
                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
@@ -677,6 +757,8 @@ export default function LeaveApprovals() {
                         </div>
                     )}
                 </div>
+                </>
+                )}
             </div>
 
             {/* Approve Confirmation Modal */}
