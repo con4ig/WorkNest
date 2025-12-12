@@ -119,14 +119,28 @@ export const register = async (req, res) => {
           .json({ message: "Nieprawidłowy lub wygasły kod zaproszenia" });
       }
 
+      // Sprawdź czy kod nie został zużyty (dla bezpieczeństwa, choć expiresAt powinno wystarczyć, jeśli usuwamy)
+      if (invitation.maxUses > 0 && invitation.uses >= invitation.maxUses) {
+         return res.status(400).json({ message: "Limit użyć tego kodu został wyczerpany" });
+      }
+
       companyId = invitation.company;
-      await Invitation.findByIdAndDelete(invitation._id);
+      
+      // Zwiększ licznik użyć
+      invitation.uses += 1;
+      
+      // Jeśli osiągnięto limit -> usuń kod, w przeciwnym razie zapisz zaktualizowany licznik
+      if (invitation.maxUses > 0 && invitation.uses >= invitation.maxUses) {
+         await Invitation.findByIdAndDelete(invitation._id);
+      } else {
+         await invitation.save();
+      }
 
       const newUser = new User({
         username,
         email,
         password: hashedPassword,
-        role: invitation.role, // Użyj roli z zaproszenia
+        role: invitation.role || role, // Użyj roli z zaproszenia (jeśli jest), fallback do roli z requestu (ale z zaproszenia bezpieczniej)
         company: companyId,
       });
 
