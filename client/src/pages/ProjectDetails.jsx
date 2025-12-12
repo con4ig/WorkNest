@@ -306,8 +306,8 @@ export default function ProjectDetails() {
         setConfirmationProps({ isOpen: true, ...props });
     };
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
+    const fetchData = useCallback(async (showLoader = false) => {
+        if (showLoader) setLoading(true);
         try {
             const res = await api.get(`/projects/${id}`);
             setProject(res.data);
@@ -327,7 +327,7 @@ export default function ProjectDetails() {
                 `Nie udało się załadować danych projektu: ${err.response?.data?.message || err.message}`,
             );
         } finally {
-            setLoading(false);
+            if (showLoader) setLoading(false);
         }
     }, [id]);
 
@@ -360,7 +360,7 @@ export default function ProjectDetails() {
 
     useEffect(() => {
         if (id && currentUser) {
-            fetchData();
+            fetchData(true);
             fetchTasks();
             fetchComments();
             fetchActivities();
