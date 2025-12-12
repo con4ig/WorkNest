@@ -45,7 +45,7 @@ const KanbanColumn = ({
                     className={`font-bold ${config.textColor}`}
                 >{`${tasks.length}`}</span>
             </div>
-            <div className="flex-grow space-y-3">
+            <div className="custom-scrollbar max-h-[600px] flex-grow space-y-3 overflow-y-auto pr-2">
                 {tasks.length > 0 ? (
                     tasks.map((task) => (
                         <TaskItem
