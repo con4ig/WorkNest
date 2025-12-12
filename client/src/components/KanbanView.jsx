@@ -97,7 +97,11 @@ const KanbanView = ({
     currentUserRole,
 }) => {
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 5,
+            },
+        }),
         useSensor(KeyboardSensor),
     );
 
