@@ -155,6 +155,18 @@ const schema = new mongoose.Schema(
         description: { type: String },
       },
     ],
+    documents: [
+      {
+        name: { type: String, required: true },
+        url: { type: String, required: true },
+        category: {
+          type: String,
+          enum: ["documentation", "agreement"],
+          required: true,
+        },
+        uploadedAt: { type: Date, default: Date.now },
+      },
+    ],
     profileImage: {
       type: String,
       default: "", // lub np. null

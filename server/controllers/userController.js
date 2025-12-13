@@ -236,7 +236,7 @@ export const updateUser = async (req, res) => {
     const allowedFields = [
       "username", "email", "firstName", "lastName", "phoneNumber",
       "position", "department", "hireDate", "salary", "status",
-      "contractType", "address", "city", "peselOrId", "notes", "employmentHistory"
+      "contractType", "address", "city", "peselOrId", "notes", "employmentHistory", "documents"
     ];
 
     allowedFields.forEach(field => {
