@@ -147,7 +147,7 @@ const StatCard = ({ icon, title, children }) => (
 );
 
 const ContentCard = ({ icon, title, children }) => (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg sm:p-8">
+    <div className="rounded-xl bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-5 flex items-center gap-4 border-b border-slate-200 pb-4">
             {icon}
             <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
@@ -215,6 +215,7 @@ export default function UserDetails() {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({});
     const [isSaving, setIsSaving] = useState(false);
+    const [employmentHistory, setEmploymentHistory] = useState([]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -242,10 +243,12 @@ export default function UserDetails() {
                 city: res.data.city || '',
                 peselOrId: res.data.peselOrId || '',
                 notes: res.data.notes || '',
+                employmentHistory: res.data.employmentHistory || [],
             };
 
             setUser(res.data);
             setEditData(userData);
+            setEmploymentHistory(res.data.employmentHistory || []);
             setError(null);
         } catch (err) {
             console.error('Error fetching user:', err);
@@ -266,6 +269,34 @@ export default function UserDetails() {
         let newValue = value;
         if (type === 'number') newValue = parseInt(value, 10) || 0;
         setEditData((prev) => ({ ...prev, [name]: newValue }));
+    };
+
+    const handleHistoryChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedHistory = [...editData.employmentHistory];
+        updatedHistory[index] = { ...updatedHistory[index], [name]: value };
+        setEditData((prev) => ({ ...prev, employmentHistory: updatedHistory }));
+    };
+
+    const handleAddHistory = () => {
+        const newHistoryEntry = {
+            company: '',
+            position: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+        };
+        setEditData((prev) => ({
+            ...prev,
+            employmentHistory: [...prev.employmentHistory, newHistoryEntry],
+        }));
+    };
+
+    const handleRemoveHistory = (index) => {
+        const updatedHistory = editData.employmentHistory.filter(
+            (_, i) => i !== index,
+        );
+        setEditData((prev) => ({ ...prev, employmentHistory: updatedHistory }));
     };
 
     const handleSave = async () => {
@@ -426,7 +457,7 @@ export default function UserDetails() {
 
             {/* --- GŁÓWNA ZAWARTOŚĆ --- */}
             <main className="w-full flex-grow p-6 lg:p-10">
-                <header className="relative mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 p-8 shadow-2xl shadow-emerald-200">
+                <header className="relative mb-10 overflow-hidden rounded-t-xl bg-white border-b p-8">
                     <div className="relative z-10">
                         {isEditing ? (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -436,7 +467,7 @@ export default function UserDetails() {
                                     value={editData.firstName}
                                     onChange={handleEditChange}
                                     placeholder="Imię..."
-                                    className="rounded border-b-2 border-white/50 bg-white/20 px-2 py-1 text-lg font-bold text-white backdrop-blur focus:outline-none"
+                                    className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
                                 />
                                 <input
                                     type="text"
@@ -444,11 +475,11 @@ export default function UserDetails() {
                                     value={editData.lastName}
                                     onChange={handleEditChange}
                                     placeholder="Nazwisko..."
-                                    className="rounded border-b-2 border-white/50 bg-white/20 px-2 py-1 text-lg font-bold text-white backdrop-blur focus:outline-none"
+                                    className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
                                 />
                             </div>
                         ) : (
-                            <h1 className="text-4xl font-extrabold tracking-tight text-white lg:text-5xl">
+                            <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 lg:text-5xl">
                                 {fullName}
                             </h1>
                         )}
@@ -459,7 +490,7 @@ export default function UserDetails() {
                                         <button
                                             onClick={handleSave}
                                             disabled={isSaving}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-emerald-700 shadow-md transition-all hover:bg-slate-200 disabled:opacity-60"
+                                            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 font-bold text-white shadow-md transition-all hover:bg-emerald-700 disabled:opacity-60"
                                         >
                                             {isSaving ? (
                                                 'Zapisywanie...'
@@ -474,7 +505,7 @@ export default function UserDetails() {
                                                 setIsEditing(false);
                                                 fetchData();
                                             }}
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all hover:bg-black/30"
+                                            className="flex items-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 font-bold text-gray-800 transition-all hover:bg-gray-300"
                                         >
                                             <Icon.Cancel /> Anuluj
                                         </button>
@@ -482,7 +513,7 @@ export default function UserDetails() {
                                 ) : (
                                     <button
                                         onClick={() => setIsEditing(true)}
-                                        className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-slate-800 shadow-lg transition-all hover:bg-slate-200"
+                                        className="flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:bg-slate-900"
                                     >
                                         <Icon.Edit /> Edytuj dane
                                     </button>
@@ -700,6 +731,139 @@ export default function UserDetails() {
                                 {user.notes || 'Brak notatek'}
                             </p>
                         )}
+                    </ContentCard>
+
+                    {/* Sekcja Historia Zatrudnienia */}
+                    <ContentCard
+                        icon={<Icon.Briefcase />}
+                        title="Historia zatrudnienia"
+                    >
+                        <div className="space-y-6">
+                            {isEditing
+                                ? editData.employmentHistory.map(
+                                      (item, index) => (
+                                          <div
+                                              key={index}
+                                              className="rounded-lg border bg-slate-50 p-4"
+                                          >
+                                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                  <EditableField
+                                                      label="Firma"
+                                                      name="company"
+                                                      value={item.company}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Stanowisko"
+                                                      name="position"
+                                                      value={item.position}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Data rozpoczęcia"
+                                                      name="startDate"
+                                                      type="date"
+                                                      value={formatDateForInput(
+                                                          item.startDate,
+                                                      )}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Data zakończenia"
+                                                      name="endDate"
+                                                      type="date"
+                                                      value={formatDateForInput(
+                                                          item.endDate,
+                                                      )}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                              </div>
+                                              <textarea
+                                                  name="description"
+                                                  rows="3"
+                                                  placeholder="Opis..."
+                                                  value={item.description}
+                                                  onChange={(e) =>
+                                                      handleHistoryChange(
+                                                          index,
+                                                          e,
+                                                      )
+                                                  }
+                                                  className="mt-4 w-full rounded-lg border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                              ></textarea>
+                                              <button
+                                                  onClick={() =>
+                                                      handleRemoveHistory(index)
+                                                  }
+                                                  className="mt-2 text-sm font-semibold text-red-600 hover:text-red-800"
+                                              >
+                                                  Usuń
+                                              </button>
+                                          </div>
+                                      ),
+                                  )
+                                : employmentHistory.map((item, index) => (
+                                      <div
+                                          key={index}
+                                          className="relative pl-8"
+                                      >
+                                          <div className="absolute left-0 top-1 h-full w-px bg-slate-200"></div>
+                                          <div className="absolute left-[-5px] top-1 h-3 w-3 rounded-full bg-emerald-500"></div>
+                                          <p className="font-bold text-slate-800">
+                                              {item.position}
+                                          </p>
+                                          <p className="text-sm text-slate-600">
+                                              {item.company}
+                                          </p>
+                                          <p className="text-xs text-slate-400">
+                                              {formatDateForDisplay(
+                                                  item.startDate,
+                                              )}{' '}
+                                              -{' '}
+                                              {formatDateForDisplay(
+                                                  item.endDate,
+                                              )}
+                                          </p>
+                                          <p className="mt-2 text-sm text-slate-500">
+                                              {item.description}
+                                          </p>
+                                      </div>
+                                  ))}
+                            {isEditing && (
+                                <button
+                                    onClick={handleAddHistory}
+                                    className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
+                                >
+                                    + Dodaj wpis
+                                </button>
+                            )}
+                            {!isEditing &&
+                                employmentHistory.length === 0 && (
+                                    <p className="text-slate-500">
+                                        Brak historii zatrudnienia.
+                                    </p>
+                                )}
+                        </div>
                     </ContentCard>
                 </div>
             </main>

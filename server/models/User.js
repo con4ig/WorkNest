@@ -146,6 +146,15 @@ const schema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    employmentHistory: [
+      {
+        company: { type: String },
+        position: { type: String },
+        startDate: { type: Date },
+        endDate: { type: Date },
+        description: { type: String },
+      },
+    ],
     profileImage: {
       type: String,
       default: "", // lub np. null
