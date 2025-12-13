@@ -47,8 +47,8 @@ invitationSchema.pre("save", function (next) {
 });
 
 // Automatyczne usuwanie wygasłych zaproszeń (TTL Index)
-// expiredAt: dokument zostanie usunięty 7 dni po dacie 'expiresAt'
+// expiredAt: dokument zostanie usunięty natychmiast po dacie 'expiresAt'
 // MongoDB sprawdza to w tle co ok. 60 sekund.
-invitationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 604800 }); // 7 dni (w sekundach)
+invitationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.model("Invitation", invitationSchema);

@@ -109,6 +109,7 @@ export const getUserById = async (req, res) => {
       city: user.city || "",
       peselOrId: user.peselOrId || "",
       notes: user.notes || "",
+      employmentHistory: user.employmentHistory || [],
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     });
@@ -148,6 +149,7 @@ export const updateUser = async (req, res) => {
       city,
       peselOrId,
       notes,
+      employmentHistory,
     } = req.body;
 
     // Walidacja danych
@@ -196,8 +198,7 @@ export const updateUser = async (req, res) => {
     if (salary !== undefined && salary < 0) {
       return res.status(400).json({ message: "Pensja nie może być ujemna" });
     }
-
-    // ✅ NAJPIERW POBIERZ UŻYTKOWNIKA
+    
     const existingUser = await User.findById(userId);
     if (!existingUser) {
       return res.status(404).json({ message: "Użytkownik nie znaleziony" });
@@ -235,7 +236,7 @@ export const updateUser = async (req, res) => {
     const allowedFields = [
       "username", "email", "firstName", "lastName", "phoneNumber",
       "position", "department", "hireDate", "salary", "status",
-      "contractType", "address", "city", "peselOrId", "notes"
+      "contractType", "address", "city", "peselOrId", "notes", "employmentHistory"
     ];
 
     allowedFields.forEach(field => {
@@ -439,6 +440,9 @@ export const getInvitations = async (req, res) => {
   try {
     const companyId = req.user.company?._id || req.user.company;
      if (!companyId) return res.status(400).json({ message: "Brak firmy" });
+
+    // Lazy remove expired invitations
+    await Invitation.deleteMany({ expiresAt: { $lt: new Date() } });
 
     // Pobierz tylko aktywne zaproszenia (lub wszystkie i filtruj na froncie - lepiej wszystkie dla historii?)
     // Pobieramy wszystkie, które jeszcze nie wygasły LUB mają jeszcze użycia
