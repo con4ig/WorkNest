@@ -92,6 +92,9 @@ const Icon = {
     Notes: ({ className = 'text-emerald-500' }) => (
         <FileText className={`h-6 w-6 ${className}`} />
     ),
+    Documents: ({ className = 'text-emerald-500' }) => (
+        <FileText className={`h-6 w-6 ${className}`} />
+    ),
 };
 
 // --- Funkcje stylizujące ---
@@ -244,6 +247,7 @@ export default function UserDetails() {
                 peselOrId: res.data.peselOrId || '',
                 notes: res.data.notes || '',
                 employmentHistory: res.data.employmentHistory || [],
+                documents: res.data.documents || [],
             };
 
             setUser(res.data);
@@ -299,18 +303,94 @@ export default function UserDetails() {
         setEditData((prev) => ({ ...prev, employmentHistory: updatedHistory }));
     };
 
+    const handleDocumentChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedDocuments = [...editData.documents];
+        updatedDocuments[index] = { ...updatedDocuments[index], [name]: value };
+        setEditData((prev) => ({ ...prev, documents: updatedDocuments }));
+    };
+
+    const handleAddDocument = () => {
+        const newDocument = {
+            name: '',
+            url: '',
+            category: 'documentation',
+            uploadedAt: new Date().toISOString(),
+        };
+        setEditData((prev) => ({
+            ...prev,
+            documents: [...(prev.documents || []), newDocument],
+        }));
+    };
+
+    const handleRemoveDocument = (index) => {
+        const updatedDocuments = editData.documents.filter(
+            (_, i) => i !== index,
+        );
+        setEditData((prev) => ({ ...prev, documents: updatedDocuments }));
+    };
+
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await api.patch(`/users/${id}`, {
-                ...editData,
-                hireDate: editData.hireDate || null,
-                salary: editData.salary || 0,
+            const dataToSave = { ...editData };
+
+            // Filtruj puste wpisy w dokumentach
+            if (dataToSave.documents) {
+                dataToSave.documents = dataToSave.documents.filter(
+                    (doc) => doc.name && doc.url,
+                );
+            }
+
+            // Filtruj puste wpisy w historii zatrudnienia
+            if (dataToSave.employmentHistory) {
+                dataToSave.employmentHistory =
+                    dataToSave.employmentHistory.filter(
+                        (hist) => hist.company && hist.position,
+                    );
+            }
+
+            const response = await api.patch(`/users/${id}`, {
+                ...dataToSave,
+                hireDate: dataToSave.hireDate || null,
+                salary: dataToSave.salary || 0,
             });
-            await fetchData();
+
+            const updatedUser = response.data.user;
+
+            // Zaktualizuj stany bezpośrednio z odpowiedzi API
+            setUser(updatedUser);
+            setEmploymentHistory(updatedUser.employmentHistory || []);
+
+            // Zsynchronizuj dane edycji z nowymi danymi
+            const userData = {
+                username: updatedUser.username || '',
+                email: updatedUser.email || '',
+                firstName: updatedUser.firstName || '',
+                lastName: updatedUser.lastName || '',
+                phoneNumber: updatedUser.phoneNumber || '',
+                position: updatedUser.position || '',
+                department: updatedUser.department || '',
+                hireDate: formatDateForInput(updatedUser.hireDate || ''),
+                salary: updatedUser.salary || 0,
+                status: updatedUser.status || 'active',
+                contractType: updatedUser.contractType || 'full-time',
+                role: updatedUser.role || 'employee',
+                address: updatedUser.address || '',
+                city: updatedUser.city || '',
+                peselOrId: updatedUser.peselOrId || '',
+                notes: updatedUser.notes || '',
+                employmentHistory: updatedUser.employmentHistory || [],
+                documents: updatedUser.documents || [],
+            };
+            setEditData(userData);
+
             setIsEditing(false);
         } catch (err) {
-            alert(`Błąd podczas zapisywania zmian: ${err.message}`);
+            const errorMessage =
+                err.response?.data?.message ||
+                'Wystąpił nieoczekiwany błąd. Spróbuj ponownie.';
+            alert(`Błąd podczas zapisywania zmian: ${errorMessage}`);
         } finally {
             setIsSaving(false);
         }
@@ -861,6 +941,117 @@ export default function UserDetails() {
                                 employmentHistory.length === 0 && (
                                     <p className="text-slate-500">
                                         Brak historii zatrudnienia.
+                                    </p>
+                                )}
+                        </div>
+                    </ContentCard>
+
+                    {/* Sekcja Dokumenty i Umowy */}
+                    <ContentCard
+                        icon={<Icon.Documents />}
+                        title="Dokumenty i Umowy"
+                    >
+                        <div className="space-y-6">
+                            {isEditing
+                                ? (editData.documents || []).map(
+                                      (doc, index) => (
+                                          <div
+                                              key={index}
+                                              className="rounded-lg border bg-slate-50 p-4"
+                                          >
+                                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                  <EditableField
+                                                      label="Nazwa dokumentu"
+                                                      name="name"
+                                                      value={doc.name}
+                                                      onChange={(e) =>
+                                                          handleDocumentChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="URL do pliku"
+                                                      name="url"
+                                                      value={doc.url}
+                                                      onChange={(e) =>
+                                                          handleDocumentChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Kategoria"
+                                                      name="category"
+                                                      value={doc.category}
+                                                      options={[
+                                                          'documentation',
+                                                          'agreement',
+                                                      ]}
+                                                      onChange={(e) =>
+                                                          handleDocumentChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                              </div>
+                                              <button
+                                                  onClick={() =>
+                                                      handleRemoveDocument(index)
+                                                  }
+                                                  className="mt-4 text-sm font-semibold text-red-600 hover:text-red-800"
+                                              >
+                                                  Usuń dokument
+                                              </button>
+                                          </div>
+                                      ),
+                                  )
+                                : (user.documents || []).map((doc, index) => (
+                                      <div
+                                          key={index}
+                                          className="flex items-center justify-between rounded-lg bg-slate-50 p-4"
+                                      >
+                                          <div className="flex flex-col">
+                                              <a
+                                                  href={doc.url}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="font-bold text-emerald-600 hover:underline"
+                                              >
+                                                  {doc.name}
+                                              </a>
+                                              <span className="text-sm text-slate-500">
+                                                  {doc.category === 'agreement'
+                                                      ? 'Umowa'
+                                                      : 'Dokumentacja'}
+                                              </span>
+                                          </div>
+                                          <span className="text-xs text-slate-400">
+                                              Dodano:{' '}
+                                              {formatDateForDisplay(
+                                                  doc.uploadedAt,
+                                              )}
+                                          </span>
+                                      </div>
+                                  ))}
+
+                            {isEditing && (
+                                <button
+                                    onClick={handleAddDocument}
+                                    className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
+                                >
+                                    + Dodaj dokument
+                                </button>
+                            )}
+
+                            {!isEditing &&
+                                (!user.documents ||
+                                    user.documents.length === 0) && (
+                                    <p className="text-slate-500">
+                                        Brak dokumentów i umów.
                                     </p>
                                 )}
                         </div>
