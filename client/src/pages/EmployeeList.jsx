@@ -108,6 +108,21 @@ const Icon = {
             <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
     ),
+    Download: ({ size = 20, className = "" }) => (
+        <svg
+            className={`${className}`}
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+        >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+    ),
 };
 
 const RoleChangeModal = ({
@@ -286,26 +301,102 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
         onImport(file, tempPassword);
     };
 
+    const handleDownloadTemplate = () => {
+        const headers = ['email', 'username', 'firstName', 'lastName', 'position', 'department', 'salary', 'role'];
+        const exampleRows = [
+            ['jan.kowalski@firma.pl', 'janek', 'Jan', 'Kowalski', 'Programista', 'IT', '8000', 'employee'],
+            ['anna.nowak@firma.pl', 'anna', 'Anna', 'Nowak', 'HR Manager', 'HR', '9500', 'hr']
+        ];
+        
+        const csvContent = [
+            headers.join(','),
+            ...exampleRows.map(row => row.join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'szablon_pracownikow.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
-            <div className="w-full max-w-md rounded-xl border border-slate-200/50 bg-white shadow-2xl p-6">
+            <div className="w-full max-w-2xl rounded-xl border border-slate-200/50 bg-white shadow-2xl p-6">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-slate-900">Import Pracowników</h3>
+                    <h3 className="text-xl font-bold text-slate-900">Import Pracowników z CSV</h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><Icon.X /></button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="mb-6 bg-slate-50 p-5 rounded-lg border border-slate-100 text-sm text-slate-600 space-y-4">
+                    <div>
+                        <p className="font-semibold text-slate-800 mb-2">Instrukcja:</p>
+                        <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600">
+                            <li>Wypełnij dane w pliku CSV (wymagane: <b>email, username</b>).</li>
+                            <li>Każdy kolejny wiersz w pliku to nowy pracownik.</li>
+                            <li>Możesz dodać wielu pracowników naraz (np. 50+ wierszy).</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <p className="font-semibold text-slate-800 mb-2">Dozwolone role (wpisz angielską nazwę w CSV):</p>
+                        <div className="overflow-hidden rounded-lg border border-slate-200">
+                            <table className="w-full text-left text-xs">
+                                <thead className="bg-slate-100 font-semibold text-slate-700">
+                                    <tr>
+                                        <th className="px-3 py-2 border-r border-slate-200">Wartość w CSV (Angielski)</th>
+                                        <th className="px-3 py-2">Rola w systemie (Polski)</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-200 bg-white">
+                                    <tr>
+                                        <td className="px-3 py-2 border-r border-slate-200 font-mono text-emerald-600">employee</td>
+                                        <td className="px-3 py-2">Pracownik</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="px-3 py-2 border-r border-slate-200 font-mono text-blue-600">hr</td>
+                                        <td className="px-3 py-2">HR Manager</td>
+                                    </tr>
+                                    <tr>
+                                        <td className="px-3 py-2 border-r border-slate-200 font-mono text-purple-600">admin</td>
+                                        <td className="px-3 py-2">Administrator</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="button"
+                        onClick={handleDownloadTemplate}
+                        className="mt-2 text-emerald-600 hover:text-emerald-700 font-medium text-sm flex items-center gap-1 border border-emerald-200 bg-emerald-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-emerald-100"
+                    >
+                        <Icon.Download size={16} /> Pobierz przykładowy szablon CSV
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Plik CSV</label>
                         <input 
                             type="file" 
                             accept=".csv"
                             onChange={(e) => setFile(e.target.files[0])}
-                            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                            className="block w-full text-sm text-slate-500 
+                                file:mr-4 file:py-2.5 file:px-4 
+                                file:rounded-lg file:border-0 
+                                file:text-sm file:font-semibold 
+                                file:bg-emerald-50 file:text-emerald-700 
+                                hover:file:bg-emerald-100
+                                cursor-pointer"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Hasło tymczasowe dla nowych kont</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Hasło tymczasowe</label>
                         <input 
                             type="text" 
                             value={tempPassword}
@@ -671,9 +762,10 @@ export default function EmployeeList() {
                             {currentUser?.role === 'admin' && (
                                 <button 
                                     onClick={() => setImportFormOpen(true)}
-                                    className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-emerald-700"
+                                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-200"
                                 >
-                                    <Icon.Upload /> Import CSV
+                                    <Icon.Upload /> 
+                                    <span>Importuj CSV</span>
                                 </button>
                             )}
                             <div className="relative">

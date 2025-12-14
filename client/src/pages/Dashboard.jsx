@@ -735,10 +735,10 @@ export default function Dashboard() {
                                         </button>
                                     </div>
                                     <div className="text-sm text-gray-600">
-                                        Spotkanie z firmą Arc
+                                        Spotkanie z firmą XYZ
                                     </div>
                                     <div className="mt-1 text-xs text-gray-400">
-                                        02:00 pm - 04:00 pm
+                                        18:00 - 20:00
                                     </div>
                                     <div className="mt-4">
                                         <button className="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white sm:w-auto hover:bg-emerald-700 transition-colors">
