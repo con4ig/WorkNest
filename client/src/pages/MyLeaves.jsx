@@ -184,7 +184,7 @@ export default function MyLeaves() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 select-none">
             <Notification notification={notification} onClear={clearNotification} />
             <ConfirmationModal
                 {...confirmationProps}

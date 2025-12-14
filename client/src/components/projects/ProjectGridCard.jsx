@@ -63,36 +63,55 @@ const ProjectGridCard = ({
 }) => {
     const statusInfo = statusStyles[project.status] || statusStyles['pending'];
 
+    const handleCardClick = (e) => {
+        if (currentUserRole !== 'employee') {
+            onToggleSelect(project._id);
+        } else {
+            onCardClick(project._id);
+        }
+    };
+
     return (
         <div
             className={`cursor-pointer rounded-lg border border-slate-200 bg-white p-4 shadow-md transition-shadow hover:shadow-lg ${
                 isSelected ? 'ring-2 ring-emerald-500' : ''
             }`}
-            onClick={() => onCardClick(project._id)}
+            onClick={handleCardClick}
         >
             <div className="mb-4 flex items-start justify-between">
-                <div
-                    className="flex cursor-pointer items-center gap-3"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        if (currentUserRole !== 'employee') {
-                            onToggleSelect(project._id);
-                        }
-                    }}
-                >
+                <div className="flex items-center gap-3">
                     {currentUserRole !== 'employee' && (
-                        <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => {}}
-                            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                        />
+                        <div
+                            className="flex h-8 w-8 items-center justify-center -ml-2 hover:bg-slate-100 rounded-full transition-colors"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleSelect(project._id);
+                            }}
+                        >
+                            <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => {}}
+                                className="h-4 w-4 cursor-pointer rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500 hover:ring-2 hover:ring-emerald-300 transition-all"
+                            />
+                        </div>
                     )}
                     <div>
-                        <h3 className="text-base font-bold text-slate-800">
+                        <h3 
+                            className="text-base font-bold text-slate-800 hover:text-emerald-600 hover:underline"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onCardClick(project._id);
+                            }}
+                        >
                             {project.name}
                         </h3>
-                        <p className="max-w-[150px] truncate text-xs text-slate-500">
+                        <p 
+                            className="max-w-[150px] truncate text-xs text-slate-500"
+                            onClick={(e) => {
+                                // Description click also selects (bubbles to root)
+                            }}
+                        >
                             {project.description}
                         </p>
                     </div>

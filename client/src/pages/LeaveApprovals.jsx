@@ -273,7 +273,7 @@ export default function LeaveApprovals() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-100 pb-6">
+        <div className="min-h-screen bg-gray-100 pb-6 select-none">
             {/* Header - Responsywny */}
             <div className="sticky top-0 z-10 bg-white shadow-sm">
                 {notification && (

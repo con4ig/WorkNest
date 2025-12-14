@@ -32,7 +32,7 @@ export default function Projekty() {
     const [filters, setFilters] = useState({ name: '', status: '' });
     const [refreshKey, setRefreshKey] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentView, setCurrentView] = useState(() => localStorage.getItem('projectsViewPreference') || 'list');
+    const [currentView, setCurrentView] = useState(() => localStorage.getItem('projectsViewPreference') || 'kanban');
     const [showArchived, setShowArchived] = useState(false);
     const [screenSize, setScreenSize] = useState('desktop');
     const [selectedProjects, setSelectedProjects] = useState([]);
@@ -302,7 +302,7 @@ export default function Projekty() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 p-2 sm:p-4 md:p-8">
+        <div className="min-h-screen bg-slate-50 p-2 sm:p-4 md:p-8 select-none">
             {/* <Notification notification={notification} onClear={clearNotification} /> */}
             <ConfirmationModal
                 {...confirmationProps}
