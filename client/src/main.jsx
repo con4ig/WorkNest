@@ -19,6 +19,7 @@ import Polityka from './pages/Poltyka_prywatnosc.jsx';
 import UserDetails from './pages/UserDetails.jsx';
 import Upload from './pages/Upload.jsx';
 import GenerateCode from './pages/GenerateCode.jsx';
+import ForcePasswordChange from './pages/ForcePasswordChange.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
@@ -58,6 +59,7 @@ createRoot(document.getElementById('root')).render(
                         <Route path="/leave-approvals" element={<LeaveApprovals />} />
                         <Route path="/upload" element={<Upload />} />
                         <Route path="/generate-code" element={<GenerateCode />} />
+                        <Route path="/force-password-change" element={<ForcePasswordChange />} />
                     </Route>
                 </Routes>
             </Router>

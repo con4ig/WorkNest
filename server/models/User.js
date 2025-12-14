@@ -146,6 +146,10 @@ const schema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    mustChangePassword: {
+      type: Boolean,
+      default: false,
+    },
     employmentHistory: [
       {
         company: { type: String },

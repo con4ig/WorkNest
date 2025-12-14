@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Invitation from "../models/Invitation.js";
+import bcrypt from "bcryptjs";
 
 export const getUsers = async (req, res) => {
   try {
@@ -477,5 +478,109 @@ export const revokeInvitation = async (req, res) => {
   } catch (err) {
     console.error("Error revoking invitation:", err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const importUsersFromCSV = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const companyId = req.user.company?._id || req.user.company;
+    if (!companyId) {
+      return res.status(400).json({ message: "User is not assigned to a company." });
+    }
+
+    const { password: tempPassword } = req.body;
+    const passwordToUse = tempPassword || "WorkNest123!";
+
+    let fileContent = req.file.buffer.toString("utf-8");
+    if (fileContent.charCodeAt(0) === 0xFEFF) {
+        fileContent = fileContent.slice(1);
+    }
+
+    const rows = fileContent.split(/\r?\n/);
+    
+    if (rows.length < 2) {
+      return res.status(400).json({ message: "CSV file is empty or missing headers" });
+    }
+
+    const headers = rows[0].split(",").map(h => h.trim());
+    
+    const headerMap = {};
+    headers.forEach((header, index) => {
+        const cleanHeader = header.replace(/^"|"$/g, '').replace(/^\uFEFF/, '').trim();
+        headerMap[index] = cleanHeader;
+    });
+
+    const failed = [];
+    let processed = 0;
+    let created = 0;
+
+    for (let i = 1; i < rows.length; i++) {
+        const rowString = rows[i].trim();
+        if (!rowString) continue;
+
+        const values = rowString.split(",");
+        
+        if (values.length < headers.length) {
+            continue; 
+        }
+
+        const userData = {};
+        
+        Object.keys(headerMap).forEach(colIndex => {
+            const field = headerMap[colIndex];
+             if (values[colIndex]) {
+                 userData[field] = values[colIndex].trim().replace(/^"|"$/g, '');
+             }
+        });
+
+        if (!userData.email || !userData.username) {
+            failed.push({ row: i + 1, message: "Brak wymaganych pól (email, username)" });
+            continue;
+        }
+
+        try {
+            const existingUser = await User.findOne({ email: userData.email });
+            if (existingUser) {
+                 failed.push({ row: i + 1, email: userData.email, message: "Użytkownik o takim adresie email już istnieje" });
+                 continue;
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(passwordToUse, salt);
+
+            const newUser = new User({
+                ...userData,
+                password: hashedPassword,
+                company: companyId,
+                role: userData.role || 'employee',
+                status: userData.status || 'active',
+                mustChangePassword: true
+            });
+            
+            await newUser.save();
+            created++;
+
+        } catch (err) {
+            failed.push({ row: i + 1, email: userData.email, message: err.message });
+        }
+        processed++;
+    }
+
+    res.json({
+        message: "Import zakończony",
+        processed,
+        created,
+        failedCount: failed.length,
+        failedSamples: failed.slice(0, 10),
+        defaultPassword: passwordToUse
+    });
+
+  } catch (err) {
+    console.error("CSV Import error:", err);
+    res.status(500).json({ message: "Błąd serwera podczas przetwarzania CSV" });
   }
 };

@@ -14,6 +14,7 @@ import {
   generateInvitation,
   getInvitations,
   revokeInvitation,
+  importUsersFromCSV,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -28,6 +29,23 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new Error("Only image files are allowed"));
+    }
+  },
+});
+
+const csvUpload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    // Check mime type and extension
+    if (
+      file.mimetype === "text/csv" ||
+      file.mimetype === "application/vnd.ms-excel" || // Excel often saves CSV with this mime
+      file.originalname.toLowerCase().endsWith(".csv")
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only CSV files are allowed"));
     }
   },
 });
@@ -86,6 +104,15 @@ router.delete(
   authenticate,
   authorize("admin"),
   revokeInvitation
+);
+
+// Endpoint do importu CSV
+router.post(
+  "/import-csv",
+  authenticate,
+  authorize("hr", "admin"),
+  csvUpload.single("file"),
+  importUsersFromCSV
 );
 
 // Endpoint do uploadu zdjęcia profilowego

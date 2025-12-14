@@ -40,8 +40,13 @@ export default function Login() {
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
-            await login(data.email, data.password);
-            navigate('/dashboard');
+            const response = await login(data.email, data.password);
+            
+            if (response?.user?.mustChangePassword) {
+                navigate('/force-password-change');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             toast.error(err.response?.data?.message || 'Błąd logowania');
         } finally {

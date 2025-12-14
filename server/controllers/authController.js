@@ -209,6 +209,7 @@ export const login = async (req, res) => {
         role: user.role,
         company: user.company,
         profileImage: user.profileImage || "",
+        mustChangePassword: user.mustChangePassword,
       },
     });
   } catch (err) {
@@ -247,6 +248,7 @@ export const refresh = async (req, res) => {
         role: user.role,
         company: user.company,
         profileImage: user.profileImage || "",
+        mustChangePassword: user.mustChangePassword,
       },
     });
   } catch (err) {
@@ -274,4 +276,33 @@ export const logout = (req, res) => {
   res.clearCookie("token", cookieOptions);
 
   res.json({ message: "Wylogowano pomyślnie" });
+};
+
+export const changePassword = async (req, res) => {
+    try {
+        const { newPassword } = req.body;
+        const userId = req.user._id;
+
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ message: "Hasło musi mieć co najmniej 6 znaków" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        user.mustChangePassword = false;
+        await user.save();
+
+        res.json({ message: "Hasło zostało zmienione pomyślnie" });
+
+    } catch (err) {
+        console.error("Change password error:", err);
+        res.status(500).json({ message: "Błąd serwera podczas zmiany hasła" });
+    }
 };
