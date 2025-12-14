@@ -48,7 +48,8 @@ router.patch(
 router.get("/:id", authenticate, getProjectById);
 
 // POST /api/projects - utworzenie nowego projektu (admin/hr)
-router.post("/", authenticate, authorize("admin", "hr"), createProject);
+import { limitDemoResources } from "../middleware/limitDemoResources.js";
+router.post("/", authenticate, authorize("admin", "hr"), limitDemoResources, createProject);
 
 // PATCH /api/projects/:id - aktualizacja projektu (admin/hr)
 router.patch("/:id", authenticate, authorize("admin"), updateProject);

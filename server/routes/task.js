@@ -14,7 +14,8 @@ const router = express.Router();
 router.get("/project/:projectId", authenticate, getTasksByProject);
 
 // POST - Utwórz nowe zadanie
-router.post("/", authenticate, authorize("admin", "hr"), createTask);
+import { limitDemoResources } from "../middleware/limitDemoResources.js";
+router.post("/", authenticate, authorize("admin", "hr"), limitDemoResources, createTask);
 
 // PATCH - Aktualizuj zadanie
 router.patch("/:id", authenticate, updateTask);

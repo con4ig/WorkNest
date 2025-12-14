@@ -11,7 +11,15 @@ router.post("/register", register);
 // ============================================
 // POST /api/auth/login
 // ============================================
+// POST /api/auth/login
+// ============================================
 router.post("/login", login);
+
+// ============================================
+// POST /api/auth/demo-login
+// ============================================
+import { demoLogin } from "../controllers/authController.js";
+router.post("/demo-login", demoLogin);
 
 // ============================================
 // POST /api/auth/refresh

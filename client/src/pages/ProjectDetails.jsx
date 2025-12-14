@@ -393,7 +393,7 @@ export default function ProjectDetails() {
             await fetchData();
             await fetchActivities();
             setIsEditing(false);
-            showNotification('Zmiany zostały zapisane', 'success');
+            setIsEditing(false);
         } catch (err) {
             showNotification(`Błąd podczas zapisywania zmian: ${err.message}`, 'error');
         } finally {

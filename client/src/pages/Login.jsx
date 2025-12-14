@@ -6,6 +6,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import api from '../services/api';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -102,6 +103,32 @@ export default function Login() {
                             </Link>
                         </p>
                     </div>
+
+                    {/* Przycisk Demo */}
+                    <button
+                        type="button"
+                        onClick={async () => {
+                            setIsLoading(true);
+                            try {
+                                const res = await api.post('/auth/demo-login');
+                                const data = res.data;
+
+                                // Manualnie wywołujemy to co w authContext.login
+                                localStorage.setItem('accessToken', data.accessToken);
+                                // Hack: reload page to init auth context properly
+                                window.location.href = '/dashboard';
+
+                            } catch (err) {
+                                toast.error('Błąd logowania do demo');
+                                console.error(err);
+                                setIsLoading(false);
+                            }
+                        }}
+                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-emerald-50 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                    >
+                        🚀 Wypróbuj Demo (1-Click)
+                    </button>
+
 
                     <form
                         onSubmit={handleSubmit(onSubmit)}
