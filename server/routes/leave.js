@@ -19,7 +19,8 @@ router.get("/", authenticate, getLeaves);
 router.get("/my", authenticate, getMyLeaves);
 
 // POST /api/leaves - utworzenie wniosku urlopowego
-router.post("/", authenticate, createLeave);
+import { limitDemoResources } from "../middleware/limitDemoResources.js";
+router.post("/", authenticate, limitDemoResources, createLeave);
 
 // PATCH /api/leaves/:id/approve - zatwierdzenie urlopu (HR/Admin)
 router.patch(

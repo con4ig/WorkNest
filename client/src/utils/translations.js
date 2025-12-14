@@ -47,6 +47,7 @@ export const translateProjectStatus = (status) => {
         pending: 'Oczekujący',
         running: 'W trakcie',
         completed: 'Zakończony',
+        'on-hold': 'Wstrzymany',
     };
     return statusMap[status] || status;
 };
