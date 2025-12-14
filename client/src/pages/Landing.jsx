@@ -58,7 +58,7 @@ function Landing() {
         'px-12 py-4 text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl shadow-2xl shadow-emerald-500/50 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-[1.03]';
 
     return (
-        <div className="min-h-screen bg-gray-50/50">
+        <div className="min-h-screen bg-gray-50/50 select-none">
             {/* Navbar pozostaje bez zmian (przyjmujemy, że jest już w stylu Emerald/Teal z poprzedniego kroku) */}
             <Navbar />
 

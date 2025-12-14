@@ -731,7 +731,7 @@ export default function EmployeeList() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-slate-50 select-none">
             <div className="sticky top-0 z-10 border-b border-slate-200 bg-white shadow-sm">
                 <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-6">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

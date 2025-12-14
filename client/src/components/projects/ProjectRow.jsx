@@ -183,12 +183,10 @@ const ProjectRow = ({
                                             onArchive(project._id);
                                             setShowMenu(false);
                                         }}
-                                        className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                                        className="group flex w-full items-center px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
                                     >
-                                        <Archive className="mr-2 h-4 w-4 text-orange-500" />
-                                        <span className="text-orange-600">
-                                            Archiwizuj
-                                        </span>
+                                        <Archive className="mr-2 h-4 w-4 text-slate-500 transition-colors group-hover:text-slate-700" />
+                                        Archiwizuj
                                     </button>
                                 )}
                                 {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
@@ -198,9 +196,9 @@ const ProjectRow = ({
                                             onPermanentDelete(project._id);
                                             setShowMenu(false);
                                         }}
-                                        className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                        className="group flex w-full items-center px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-red-50 hover:text-red-700"
                                     >
-                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        <Trash2 className="mr-2 h-4 w-4 text-slate-500 transition-colors group-hover:text-red-600" />
                                         Usuń trwale
                                     </button>
                                 )}

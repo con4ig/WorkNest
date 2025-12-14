@@ -360,7 +360,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 select-none">
             {/* Overlay dla mobile gdy sidebar otwarty */}
             {isMobile && isSidebarOpen && (
                 <div

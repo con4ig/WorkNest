@@ -8,7 +8,6 @@ const ViewSwitcher = ({
     disableKanban = false,
 }) => {
     const views = [
-        { id: 'list', icon: LayoutList, label: 'Lista' },
         {
             id: 'kanban',
             icon: LayoutDashboard,
@@ -16,6 +15,7 @@ const ViewSwitcher = ({
             disabledInArchive: true,
             forceDisabled: disableKanban,
         },
+        { id: 'list', icon: LayoutList, label: 'Lista' },
         { id: 'grid', icon: LayoutGrid, label: 'Siatka' },
     ];
 
