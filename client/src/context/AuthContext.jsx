@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post('/auth/login', { email, password });
       localStorage.setItem('accessToken', data.accessToken);
       setUser(data.user);
+      return data;
     } catch (error) {
       console.error("Błąd logowania:", error);
       throw error; // Rzuć błąd dalej, aby komponent logowania mógł go obsłużyć

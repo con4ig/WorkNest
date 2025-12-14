@@ -95,6 +95,19 @@ const Icon = {
             <path d="M12 8v4M12 16h.01" />
         </svg>
     ),
+    Upload: () => (
+        <svg
+            className="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+        >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+    ),
 };
 
 const RoleChangeModal = ({
@@ -251,6 +264,179 @@ const RoleChangeModal = ({
     );
 };
 
+// Nowe okno importu - prosi o plik hasło
+const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
+    const [file, setFile] = useState(null);
+    const [tempPassword, setTempPassword] = useState('WorkNest123!');
+    const [error, setError] = useState('');
+
+    if (!isOpen) return null;
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setError('');
+        if (!file) {
+            setError('Wybierz plik CSV');
+            return;
+        }
+        if (!tempPassword || tempPassword.length < 6) {
+            setError('Hasło tymczasowe musi mieć min. 6 znaków');
+            return;
+        }
+        onImport(file, tempPassword);
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
+            <div className="w-full max-w-md rounded-xl border border-slate-200/50 bg-white shadow-2xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-slate-900">Import Pracowników</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><Icon.X /></button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Plik CSV</label>
+                        <input 
+                            type="file" 
+                            accept=".csv"
+                            onChange={(e) => setFile(e.target.files[0])}
+                            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Hasło tymczasowe dla nowych kont</label>
+                        <input 
+                            type="text" 
+                            value={tempPassword}
+                            onChange={(e) => setTempPassword(e.target.value)}
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"
+                            placeholder="np. Firma2024!"
+                        />
+                        <p className="mt-1 text-xs text-slate-500">Pracownik będzie musiał zmienić to hasło przy pierwszym logowaniu.</p>
+                    </div>
+
+                    {error && <p className="text-sm text-red-600">{error}</p>}
+
+                    <div className="flex justify-end gap-3 mt-6">
+                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg">Anuluj</button>
+                        <button 
+                            type="submit" 
+                            disabled={isLoading}
+                            className="px-4 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50"
+                        >
+                            {isLoading ? 'Importowanie...' : 'Importuj'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+const ImportResultModal = ({ isOpen, onClose, results }) => {
+    if (!isOpen || !results) return null;
+
+    const hasErrors = results.failedCount > 0;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
+            <div className="w-full max-w-2xl rounded-xl border border-slate-200/50 bg-white shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5 shrink-0">
+                    <div>
+                        <h3 className="text-lg font-semibold tracking-tight text-slate-900">
+                            Wynik Importu CSV
+                        </h3>
+                        <p className="mt-0.5 text-sm text-slate-500">
+                            Podsumowanie operacji
+                        </p>
+                    </div>
+                     <button
+                        onClick={onClose}
+                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                    >
+                        <Icon.X />
+                    </button>
+                </div>
+                
+                <div className="p-6 overflow-y-auto">
+                    <div className="mb-6 rounded-lg bg-blue-50 border border-blue-100 p-4 text-blue-800">
+                        <div className="flex items-start gap-3">
+                            <Icon.AlertCircle />
+                            <div>
+                                <h4 className="font-bold text-sm">Informacja o logowaniu</h4>
+                                <p className="text-sm mt-1">
+                                    Dla nowych użytkowników ustawiono domyślne hasło: <code className="bg-blue-100 px-1 py-0.5 rounded font-mono font-bold">WorkNest123!</code>
+                                </p>
+                                <p className="text-xs mt-1 text-blue-600">
+                                    Przekaż to hasło pracownikom i poproś o jego zmianę po pierwszym logowaniu.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4 mb-6">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center">
+                             <div className="text-2xl font-bold text-slate-700">{results.processed}</div>
+                             <div className="text-xs text-slate-500 uppercase font-semibold">Przetworzono</div>
+                        </div>
+                        <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100 text-center">
+                             <div className="text-2xl font-bold text-emerald-600">{results.created}</div>
+                             <div className="text-xs text-emerald-600 uppercase font-semibold">Utworzono</div>
+                        </div>
+                        <div className={`p-4 rounded-lg border text-center ${hasErrors ? 'bg-red-50 border-red-100' : 'bg-slate-50 border-slate-100'}`}>
+                             <div className={`text-2xl font-bold ${hasErrors ? 'text-red-600' : 'text-slate-700'}`}>{results.failedCount}</div>
+                             <div className={`text-xs uppercase font-semibold ${hasErrors ? 'text-red-600' : 'text-slate-500'}`}>Błędy</div>
+                        </div>
+                    </div>
+
+                    {hasErrors && (
+                        <div className="space-y-3">
+                            <h4 className="font-semibold text-slate-800 flex items-center gap-2">
+                                <Icon.AlertCircle /> Szczegóły błędów
+                            </h4>
+                            <div className="bg-red-50 rounded-lg border border-red-100 overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-red-100/50 text-red-800 font-semibold">
+                                        <tr>
+                                            <th className="px-4 py-2">Wiersz</th>
+                                            <th className="px-4 py-2">Email</th>
+                                            <th className="px-4 py-2">Błąd</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-red-100 text-red-700">
+                                        {results.failedSamples.map((fail, idx) => (
+                                            <tr key={idx}>
+                                                <td className="px-4 py-2">{fail.row}</td>
+                                                <td className="px-4 py-2">{fail.email || '-'}</td>
+                                                <td className="px-4 py-2">{fail.message}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                {results.failedCount > results.failedSamples.length && (
+                                    <div className="px-4 py-2 text-center text-xs text-red-600 italic bg-red-100/30">
+                                        ...i {results.failedCount - results.failedSamples.length} więcej błędów
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="p-6 border-t border-slate-100 shrink-0 flex justify-end">
+                    <button 
+                        onClick={onClose}
+                        className="bg-slate-900 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-slate-800 transition-colors"
+                    >
+                        Zamknij
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Toast = ({ message, type = 'success', onClose }) => {
     useEffect(() => {
         const timer = setTimeout(onClose, 3000);
@@ -284,6 +470,9 @@ export default function EmployeeList() {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [toast, setToast] = useState(null);
+    const [importModalOpen, setImportModalOpen] = useState(false); // Used for RESULTS
+    const [importFormOpen, setImportFormOpen] = useState(false); // Used for FORM
+    const [importResults, setImportResults] = useState(null);
     const navigate = useNavigate();
 
     const fetchData = useCallback(async () => {
@@ -358,6 +547,39 @@ export default function EmployeeList() {
             });
         } finally {
             setChangingRole(null);
+        }
+    };
+
+
+
+    const handleImportSubmit = async (file, password) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('password', password);
+
+        try {
+            setLoading(true);
+            const res = await api.post('/users/import-csv', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            
+            setImportResults(res.data);
+            setImportFormOpen(false);
+            setImportModalOpen(true);
+            
+            if (res.data.created > 0) {
+                 fetchData();
+            }
+
+        } catch (err) {
+            console.error('CSV Import error:', err);
+            const msg = err.response?.data?.message || 'Błąd importu CSV';
+            setToast({
+                message: msg,
+                type: 'error'
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -445,15 +667,25 @@ export default function EmployeeList() {
                             </div>
                         </div>
 
-                        <div className="relative">
-                            <input
-                                className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 md:w-80"
-                                placeholder="Szukaj użytkownika..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                                <Icon.Search />
+                        <div className="flex gap-2">
+                            {currentUser?.role === 'admin' && (
+                                <button 
+                                    onClick={() => setImportFormOpen(true)}
+                                    className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-emerald-700"
+                                >
+                                    <Icon.Upload /> Import CSV
+                                </button>
+                            )}
+                            <div className="relative">
+                                <input
+                                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 md:w-80"
+                                    placeholder="Szukaj użytkownika..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <Icon.Search />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -715,6 +947,19 @@ export default function EmployeeList() {
                 currentRole={selectedUser?.role}
                 onConfirm={handleRoleChange}
                 isChanging={changingRole === selectedUser?._id}
+            />
+
+            <ImportModal
+                isOpen={importFormOpen}
+                onClose={() => setImportFormOpen(false)}
+                onImport={handleImportSubmit}
+                isLoading={loading}
+            />
+
+            <ImportResultModal 
+                isOpen={importModalOpen}
+                onClose={() => setImportModalOpen(false)}
+                results={importResults}
             />
 
             {toast && (

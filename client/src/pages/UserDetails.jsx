@@ -330,6 +330,8 @@ export default function UserDetails() {
         setEditData((prev) => ({ ...prev, documents: updatedDocuments }));
     };
 
+
+
     const handleSave = async () => {
         setIsSaving(true);
         try {
