@@ -64,8 +64,9 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
     // Funkcja do wyszukiwania użytkowników
     const handleSearch = async (term) => {
         if (!companyId) return; // Nie wyszukuj, jeśli companyId nie jest dostępne
-        if (term.trim().length < 2) {
-            setAvailableUsers([]);
+        
+        // Pomiń walidację długości dla pustego ciągu (init load), ale zablokuj dla 1 znaku
+        if (term.trim().length === 1) {
             return;
         }
 
@@ -99,7 +100,15 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         }, 500); // 500ms delay
 
         return () => clearTimeout(timer);
-    }, [searchTerm, project.assignedUsers, companyId]); // WAŻNE: dodaj companyId jako dependency
+    }, [searchTerm, project, companyId]); // Zmieniono dependency array, aby reagował na otwarcie (mount)
+
+    // Logika wyświetlania - limit 3 jeśli brak wyszukiwania
+    const isSearchActive = searchTerm.trim().length >= 2;
+    const displayedUsers = isSearchActive 
+        ? availableUsers 
+        : availableUsers.slice(0, 3);
+    
+    const hiddenCount = !isSearchActive ? Math.max(0, availableUsers.length - 3) : 0;
 
     // Funkcja do dodawania/usuwania użytkownika
     const handleToggleUser = async (userId, action) => {
@@ -113,10 +122,10 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                 onUpdate(response.data.project);
             }
 
-            // Wyczyść search po dodaniu
+            // Wyczyść search po dodaniu (co spowoduje reload domyślnej listy)
             if (action === 'add') {
                 setSearchTerm('');
-                setAvailableUsers([]);
+                // Nie czyścimy availableUsers, useEffect sam odświeży listę dla pustego searcha
             }
         } catch (err) {
             console.error(
@@ -245,17 +254,12 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                         <div className="mb-4">
                             <input
                                 type="text"
-                                placeholder="Szukaj po nazwie lub emailu (min. 2 znaki)..."
+                                placeholder="Szukaj po nazwie lub emailu..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                             />
-                            {searchTerm.trim().length > 0 &&
-                                searchTerm.trim().length < 2 && (
-                                    <p className="mt-1 text-xs text-gray-500">
-                                        Wpisz przynajmniej 2 znaki
-                                    </p>
-                                )}
+                            {/* Removed min length hint since we show defaults */ }
                         </div>
 
                         {searchError && (
@@ -271,57 +275,64 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                             </div>
                         )}
 
-                        {/* Wyniki Wyszukiwania */}
-                        {!loadingSearch && searchTerm.trim().length >= 2 && (
+                        {/* Wyniki Wyszukiwania / Lista Domyślna */}
+                        {!loadingSearch && (
                             <div className="max-h-64 space-y-2 overflow-y-auto">
-                                {availableUsers.length > 0 ? (
-                                    availableUsers.map((user) => (
-                                        <div
-                                            key={user._id}
-                                            className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div
-                                                    className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
-                                                        user.role === 'admin'
-                                                            ? 'bg-purple-600 text-white'
-                                                            : user.role === 'hr'
-                                                              ? 'bg-blue-600 text-white'
-                                                              : 'bg-gray-400 text-white'
-                                                    }`}
-                                                >
-                                                    {user.username
-                                                        .charAt(0)
-                                                        .toUpperCase()}
-                                                </div>
-                                                <div>
-                                                    <div className="font-medium text-gray-800">
-                                                        {user.username}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500">
-                                                        {user.email} - {translateRole(user.role)}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() =>
-                                                    handleToggleUser(
-                                                        user._id,
-                                                        'add',
-                                                    )
-                                                }
-                                                disabled={isUpdating}
-                                                className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                {displayedUsers.length > 0 ? (
+                                    <>
+                                        {displayedUsers.map((user) => (
+                                            <div
+                                                key={user._id}
+                                                className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
                                             >
-                                                <Icon.Add />
-                                                <span>Dodaj</span>
-                                            </button>
-                                        </div>
-                                    ))
+                                                <div className="flex items-center gap-3">
+                                                    <div
+                                                        className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
+                                                            user.role === 'admin'
+                                                                ? 'bg-purple-600 text-white'
+                                                                : user.role === 'hr'
+                                                                  ? 'bg-blue-600 text-white'
+                                                                  : 'bg-gray-400 text-white'
+                                                        }`}
+                                                    >
+                                                        {user.username
+                                                            .charAt(0)
+                                                            .toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-medium text-gray-800">
+                                                            {user.username}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                            {user.email} - {translateRole(user.role)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() =>
+                                                        handleToggleUser(
+                                                            user._id,
+                                                            'add',
+                                                        )
+                                                    }
+                                                    disabled={isUpdating}
+                                                    className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    <Icon.Add />
+                                                    <span>Dodaj</span>
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {hiddenCount > 0 && (
+                                            <div className="text-center py-2 text-sm text-gray-500 bg-gray-50 rounded-lg">
+                                                ...i {hiddenCount} innych pracowników. 
+                                                <span className="font-medium text-emerald-600 ml-1">Wpisz nazwę, aby znaleźć.</span>
+                                            </div>
+                                        )}
+                                    </>
                                 ) : (
                                     <div className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
-                                        Brak wyników lub wszyscy użytkownicy już
-                                        przypisani
+                                        {searchTerm ? "Nie znaleziono użytkowników" : "Wszyscy użytkownicy są już przypisani"}
                                     </div>
                                 )}
                             </div>
