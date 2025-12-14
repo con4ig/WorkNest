@@ -133,7 +133,7 @@ export default function LeaveApprovals() {
                 company: currentUser.company._id,
                 // Jeśli kopiemy (szukamy), ignorujemy zakładki i szukamy wszędzie. 
                 // Jeśli pole puste -> stosujemy filtr.
-                ...(searchQuery ? {} : (filter !== 'all' && { status: filter })),
+                ...(filter !== 'all' && { status: filter }),
                 ...(searchQuery && { search: searchQuery })
             };
             const res = await api.get('/leaves', { params });
