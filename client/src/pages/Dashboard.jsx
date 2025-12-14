@@ -627,7 +627,7 @@ export default function Dashboard() {
                         <div className="grid grid-cols-1 gap-4 p-4 md:gap-4 md:p-6 lg:grid-cols-12">
                             {/* Stats big card */}
                             <div className="flex flex-col gap-4 md:gap-4 lg:col-span-8">
-                                <div className="flex max-h-36 items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg md:p-6 hover:shadow-xl transition-shadow duration-300">
+                                <div className="flex max-h-36 items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg md:p-6">
                                     <div>
                                         <div className="text-xs opacity-90 md:text-sm">
                                             {stats[0]?.title ||
@@ -641,7 +641,7 @@ export default function Dashboard() {
 
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-4">
                                     {/* Stat 2 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
                                             {stats[1]?.title ||
                                                 'Zakończone Projekty'}
@@ -655,7 +655,7 @@ export default function Dashboard() {
                                     </div>
 
                                     {/* Stat 3 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
                                             {stats[2]?.title || 'W trakcie'}
                                         </div>
@@ -668,7 +668,7 @@ export default function Dashboard() {
                                     </div>
 
                                     {/* Stat 4 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
                                             {stats[3]?.title || 'Oczekujące'}
                                         </div>
@@ -682,7 +682,7 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* Weekly Activity Chart */}
-                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6 hover:shadow-md transition-shadow duration-300">
+                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6">
                                     <div className="mb-4">
                                         <div className="text-base font-medium">
                                             Aktywność w ostatnim tygodniu
@@ -691,7 +691,7 @@ export default function Dashboard() {
                                             Nowo dodane projekty
                                         </div>
                                     </div>
-                                    <div className="h-48 w-full">
+                                    <div className="h-48 w-full select-none outline-none [&_*]:outline-none [&_.recharts-wrapper]:outline-none [&_.recharts-surface]:outline-none">
                                         {weeklyActivity.length === 0 ? (
                                             <div className="flex h-full items-center justify-center text-sm text-gray-500">
                                                 Brak danych do wykresu

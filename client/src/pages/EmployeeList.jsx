@@ -282,7 +282,7 @@ const RoleChangeModal = ({
 // Nowe okno importu - prosi o plik hasło
 const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
     const [file, setFile] = useState(null);
-    const [tempPassword, setTempPassword] = useState('WorkNest123!');
+    const [tempPassword, setTempPassword] = useState('');
     const [error, setError] = useState('');
 
     if (!isOpen) return null;
