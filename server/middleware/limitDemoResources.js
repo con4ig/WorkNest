@@ -5,8 +5,8 @@ import User from "../models/User.js";
 
 export const limitDemoResources = async (req, res, next) => {
   try {
-    // Only check if user is the specific Demo Admin
-    if (req.user.email !== 'demo@worknest.com') {
+    // Check if user belongs to "Demo Company"
+    if (req.user.company?.name !== 'Demo Company') {
       return next();
     }
 
@@ -16,7 +16,7 @@ export const limitDemoResources = async (req, res, next) => {
     const LIMITS = {
         projects: 5,
         tasks: 20,
-        leaves: 20, // increased slightly to allow seeding + some user actions
+        leaves: 20, 
         users: 10
     };
 
