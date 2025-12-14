@@ -18,6 +18,7 @@ import LoadingScreen from '../components/LoadingScreen.jsx';
 import CustomSelect from '../components/common/CustomSelect.jsx';
 import moment from 'moment';
 import 'moment/locale/pl';
+import { useAuth } from '../context/AuthContext';
 
 moment.locale('pl');
 
@@ -25,6 +26,8 @@ export default function GenerateCode() {
     const navigate = useNavigate();
     const [pageLoading, setPageLoading] = useState(true);
     const [invitations, setInvitations] = useState([]);
+    const { user: currentUser } = useAuth();
+    const [showDemoWarning, setShowDemoWarning] = useState(false);
     
     // Form state
     const [loading, setLoading] = useState(false);
@@ -246,7 +249,14 @@ export default function GenerateCode() {
                             )}
 
                             <button
-                                onClick={handleGenerate}
+                                onClick={() => {
+                                    // Check if demo user
+                                    if (currentUser?.email === 'demo@worknest.com') {
+                                        setShowDemoWarning(true);
+                                    } else {
+                                        handleGenerate();
+                                    }
+                                }}
                                 disabled={loading}
                                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-70"
                             >
@@ -359,6 +369,61 @@ export default function GenerateCode() {
                     </div>
                 </div>
             </div>
+            
+            {/* Demo Warning Modal */}
+            {showDemoWarning && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in duration-300">
+                        <div className="bg-amber-50 p-6 pb-4">
+                             <div className="flex items-start gap-4">
+                                <div className="flex-shrink-0 rounded-full bg-amber-100 p-3 text-amber-600">
+                                    <Shield className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-900">
+                                        Środowisko Testowe (Demo)
+                                    </h3>
+                                    <p className="mt-2 text-sm leading-relaxed text-gray-600">
+                                        Pamiętaj, że konto Demo jest <strong>tymczasowe</strong>. 
+                                    </p>
+                                </div>
+                             </div>
+                        </div>
+                        <div className="px-6 py-4">
+                            <ul className="mb-4 space-y-3 text-sm text-gray-600">
+                                <li className="flex items-start gap-2">
+                                    <Check className="h-5 w-5 flex-shrink-0 text-emerald-500" />
+                                    <span>Wygenerowany kod <strong>zadziała poprawnie</strong> przy rejestracji.</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                     <Trash2 className="h-5 w-5 flex-shrink-0 text-amber-500" />
+                                    <span>Jeżeli klikniesz "Wypróbuj Demo" ponownie, <strong>wszystkie dane (w tym ten kod i nowi użytkownicy) zostaną usunięte</strong>.</span>
+                                </li>
+                            </ul>
+                            <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
+                                <strong>Wskazówka:</strong> Skopiuj kod, wyloguj się i użyj go od razu w formularzu rejestracji, aby przetestować proces onboardingu.
+                            </div>
+                        </div>
+                        <div className="flex justify-end gap-3 border-t bg-gray-50 px-6 py-4">
+                            <button
+                                onClick={() => setShowDemoWarning(false)}
+                                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowDemoWarning(false);
+                                    handleGenerate();
+                                }}
+                                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                            >
+                                Rozumiem, generuj kod
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
