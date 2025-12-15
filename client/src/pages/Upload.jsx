@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Camera, Upload, X, Check, ArrowLeft } from 'lucide-react';
 import api from '../services/api.js';
 
 function ProfileImageUpload() {
+    const navigate = useNavigate();
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -57,7 +59,7 @@ function ProfileImageUpload() {
             setSuccess(true);
 
             setTimeout(() => {
-                window.location.href = '/dashboard';
+                navigate('/dashboard');
             }, 1500);
         } catch (err) {
             setError('Nie udało się zaktualizować zdjęcia. Spróbuj ponownie.');
@@ -82,21 +84,21 @@ function ProfileImageUpload() {
                 <div className="animate-blob animation-delay-4000 absolute -bottom-8 left-1/2 h-64 w-64 rounded-full bg-emerald-100 opacity-20 mix-blend-multiply blur-xl filter"></div>
             </div>
 
-            <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+            <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
                 {/* Back button */}
                 <button
-                    onClick={() => (window.location.href = '/dashboard')}
+                    onClick={() => navigate('/dashboard')}
                     className="absolute left-4 top-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </button>
 
                 {/* Header */}
-                <div className="mb-8 text-center">
-                    <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-                        <Camera className="h-8 w-8 text-emerald-600" />
+                <div className="mb-6 text-center sm:mb-8">
+                    <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 sm:h-16 sm:w-16">
+                        <Camera className="h-7 w-7 text-emerald-600 sm:h-8 sm:w-8" />
                     </div>
-                    <h2 className="mb-2 text-3xl font-bold text-gray-800">
+                    <h2 className="mb-2 text-2xl font-bold text-gray-800 sm:text-3xl">
                         Zmień zdjęcie profilowe
                     </h2>
                     <p className="text-sm text-gray-500">
@@ -113,7 +115,7 @@ function ProfileImageUpload() {
                                     <img
                                         src={preview}
                                         alt="Podgląd"
-                                        className="h-40 w-40 rounded-full border-4 border-emerald-500 object-cover shadow-lg transition-transform group-hover:scale-105"
+                                        className="h-32 w-32 rounded-full border-4 border-emerald-500 object-cover shadow-lg transition-transform group-hover:scale-105 sm:h-40 sm:w-40"
                                     />
                                     <button
                                         type="button"
@@ -124,22 +126,22 @@ function ProfileImageUpload() {
                                     </button>
                                     {success && (
                                         <div className="absolute inset-0 flex items-center justify-center rounded-full bg-emerald-500 bg-opacity-90">
-                                            <Check className="h-16 w-16 animate-bounce text-white" />
+                                            <Check className="h-12 w-12 animate-bounce text-white sm:h-16 sm:w-16" />
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <div className="flex h-40 w-40 items-center justify-center rounded-full border-4 border-dashed border-gray-300 bg-gray-50">
-                                    <Upload className="h-12 w-12 text-gray-400" />
+                                <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-dashed border-gray-300 bg-gray-50 sm:h-40 sm:w-40">
+                                    <Upload className="h-10 w-10 text-gray-400 sm:h-12 sm:w-12" />
                                 </div>
                             )}
                         </div>
 
                         {/* File input - styled */}
                         <label className="group relative block cursor-pointer">
-                            <div className="flex transform items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 text-white shadow-md transition-all hover:scale-105 hover:shadow-lg group-hover:from-emerald-600 group-hover:to-emerald-700">
+                            <div className="flex transform items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-md transition-all hover:scale-105 hover:shadow-lg group-hover:from-emerald-600 group-hover:to-emerald-700 sm:text-base">
                                 <Upload className="h-5 w-5" />
-                                <span className="font-medium">
+                                <span>
                                     {preview
                                         ? 'Wybierz inne zdjęcie'
                                         : 'Wybierz zdjęcie'}
@@ -186,7 +188,7 @@ function ProfileImageUpload() {
 
                     {/* Action buttons */}
                     {preview && !success && (
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3 sm:flex-row">
                             <button
                                 type="submit"
                                 disabled={loading || !image}
@@ -207,11 +209,9 @@ function ProfileImageUpload() {
 
                             <button
                                 type="button"
-                                onClick={() =>
-                                    (window.location.href = '/dashboard')
-                                }
+                                onClick={() => navigate('/dashboard')}
                                 disabled={loading}
-                                className="rounded-xl bg-gray-100 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50"
+                                className="rounded-xl bg-gray-100 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50 sm:order-first"
                             >
                                 Anuluj
                             </button>
