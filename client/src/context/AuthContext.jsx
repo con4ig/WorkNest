@@ -52,7 +52,19 @@ export const AuthProvider = ({ children }) => {
     // api.post('/auth/logout');
   };
 
-  const value = { user, loading, login, logout };
+  const demoLogin = async () => {
+    try {
+      const { data } = await api.post('/auth/demo-login');
+      localStorage.setItem('accessToken', data.accessToken);
+      setUser(data.user);
+      return data;
+    } catch (error) {
+      console.error("Błąd logowania demo:", error);
+      throw error;
+    }
+  };
+
+  const value = { user, loading, login, logout, demoLogin };
 
   return (
     <AuthContext.Provider value={value}>

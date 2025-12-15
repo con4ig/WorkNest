@@ -35,7 +35,7 @@ export default function Login() {
         },
     });
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, demoLogin } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (data) => {
@@ -110,17 +110,12 @@ export default function Login() {
                         onClick={async () => {
                             setIsLoading(true);
                             try {
-                                const res = await api.post('/auth/demo-login');
-                                const data = res.data;
-
-                                // Manualnie wywołujemy to co w authContext.login
-                                localStorage.setItem('accessToken', data.accessToken);
-                                // Hack: reload page to init auth context properly
-                                window.location.href = '/dashboard';
-
+                                await demoLogin();
+                                navigate('/dashboard');
                             } catch (err) {
                                 toast.error('Błąd logowania do demo');
                                 console.error(err);
+                            } finally {
                                 setIsLoading(false);
                             }
                         }}
