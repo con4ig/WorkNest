@@ -13,13 +13,9 @@ export default function Navbar() {
     const { user, logout, loading } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate('/login');
-        } catch (err) {
-            console.error('Błąd wylogowania:', err);
-        }
+    const handleLogout = () => {
+        navigate('/');
+        setTimeout(logout, 0);
     };
 
     const navItemClass =

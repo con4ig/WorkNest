@@ -96,7 +96,10 @@ export default function ForcePasswordChange() {
                     
                     <div className="mt-6 text-center">
                         <button 
-                            onClick={logout}
+                            onClick={() => {
+                                navigate('/');
+                                setTimeout(logout, 0);
+                            }}
                             className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
                         >
                             Wyloguj się

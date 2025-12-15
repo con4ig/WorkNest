@@ -352,7 +352,8 @@ export default function Dashboard() {
     }, [user]);
 
     const handleLogout = () => {
-        logout();
+        navigate('/');
+        setTimeout(logout, 0);
     };
 
     if (loading) {
