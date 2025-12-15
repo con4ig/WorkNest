@@ -189,7 +189,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div
-                                                    className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
+                                                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                                                         user.role === 'admin'
                                                             ? 'bg-purple-600 text-white'
                                                             : user.role === 'hr'
@@ -210,7 +210,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="text-xs text-gray-500 truncate max-w-48">
                                                         {user.email} - {translateRole(user.role)}
                                                     </div>
                                                 </div>
@@ -287,7 +287,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <div
-                                                        className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
+                                                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                                                             user.role === 'admin'
                                                                 ? 'bg-purple-600 text-white'
                                                                 : user.role === 'hr'
@@ -303,7 +303,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                         <div className="font-medium text-gray-800">
                                                             {user.username}
                                                         </div>
-                                                        <div className="text-xs text-gray-500">
+                                                        <div className="text-xs text-gray-500 truncate max-w-48">
                                                             {user.email} - {translateRole(user.role)}
                                                         </div>
                                                     </div>

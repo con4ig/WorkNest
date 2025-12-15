@@ -237,18 +237,18 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                         }
                                         className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                                     />
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                                    <div className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
-                                    <div className="flex-1">
-                                        <div className="text-sm font-medium">
+                                    <div className="flex-1 overflow-hidden">
+                                        <div className="truncate text-sm font-medium">
                                             {user.username}
                                         </div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="truncate text-xs text-gray-500 max-w-48">
                                             {user.email}
                                         </div>
                                     </div>
-                                    <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
+                                    <span className="ml-auto flex-shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
                                         {translateRole(user.role)}
                                     </span>
                                 </label>

@@ -177,9 +177,9 @@ const RoleChangeModal = ({
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
-            <div className="w-full max-w-lg rounded-xl border border-slate-200/50 bg-white shadow-2xl">
-                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-xl border border-slate-200/50 bg-white shadow-2xl">
+                <div className="flex items-start justify-between border-b border-slate-100 p-5">
                     <div>
                         <h3 className="text-lg font-semibold tracking-tight text-slate-900">
                             Zmiana roli użytkownika
@@ -190,13 +190,13 @@ const RoleChangeModal = ({
                     </div>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                        className="-mt-1 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                     >
                         <Icon.X />
                     </button>
                 </div>
 
-                <div className="px-6 py-5">
+                <div className="p-5">
                     <div className="space-y-2.5">
                         {roles.map((role) => (
                             <button
@@ -205,7 +205,12 @@ const RoleChangeModal = ({
                                 className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
                                     selectedRole === role.value
                                         ? getRoleColor(role.value) +
-                                          ' shadow-sm'
+                                          ' shadow-sm ring-2 ring-offset-1 ring-offset-white ' +
+                                          (role.value === 'admin'
+                                              ? 'ring-purple-400'
+                                              : role.value === 'hr'
+                                                ? 'ring-blue-400'
+                                                : 'ring-slate-400')
                                         : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                                 }`}
                             >
@@ -247,7 +252,7 @@ const RoleChangeModal = ({
 
                     {selectedRole !== currentRole && (
                         <div className="mt-4 flex items-start gap-2.5 rounded-lg border border-amber-200/50 bg-amber-50 p-3 text-sm text-amber-800">
-                            <div className="mt-0.5 text-amber-600">
+                            <div className="mt-0.5 flex-shrink-0 text-amber-600">
                                 <Icon.AlertCircle />
                             </div>
                             <p className="leading-relaxed">
@@ -258,11 +263,11 @@ const RoleChangeModal = ({
                     )}
                 </div>
 
-                <div className="flex gap-3 border-t border-slate-100 px-6 py-4">
+                <div className="flex gap-3 border-t border-slate-100 p-4">
                     <button
                         onClick={onClose}
                         disabled={isChanging}
-                        className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+                        className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
                     >
                         Anuluj
                     </button>
@@ -302,17 +307,44 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
     };
 
     const handleDownloadTemplate = () => {
-        const headers = ['email', 'username', 'firstName', 'lastName', 'position', 'department', 'salary', 'role'];
-        const exampleRows = [
-            ['jan.kowalski@firma.pl', 'janek', 'Jan', 'Kowalski', 'Programista', 'IT', '8000', 'employee'],
-            ['anna.nowak@firma.pl', 'anna', 'Anna', 'Nowak', 'HR Manager', 'HR', '9500', 'hr']
+        const headers = [
+            'email',
+            'username',
+            'firstName',
+            'lastName',
+            'position',
+            'department',
+            'salary',
+            'role',
         ];
-        
+        const exampleRows = [
+            [
+                'jan.kowalski@firma.pl',
+                'janek',
+                'Jan',
+                'Kowalski',
+                'Programista',
+                'IT',
+                '8000',
+                'employee',
+            ],
+            [
+                'anna.nowak@firma.pl',
+                'anowak',
+                'Anna',
+                'Nowak',
+                'HR Manager',
+                'HR',
+                '9500',
+                'hr',
+            ],
+        ];
+
         const csvContent = [
             headers.join(','),
-            ...exampleRows.map(row => row.join(','))
+            ...exampleRows.map((row) => row.join(',')),
         ].join('\n');
-        
+
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -326,95 +358,145 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
-            <div className="w-full max-w-2xl rounded-xl border border-slate-200/50 bg-white shadow-2xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-slate-900">Import Pracowników z CSV</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><Icon.X /></button>
+            <div className="w-full max-w-2xl rounded-xl border border-slate-200/50 bg-white p-5 shadow-2xl sm:p-6">
+                <div className="mb-6 flex items-start justify-between">
+                    <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
+                        Import Pracowników z CSV
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        className="-mt-1 text-slate-400 hover:text-slate-600"
+                    >
+                        <Icon.X />
+                    </button>
                 </div>
 
-                <div className="mb-6 bg-slate-50 p-5 rounded-lg border border-slate-100 text-sm text-slate-600 space-y-4">
+                <div className="mb-6 space-y-4 rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm text-slate-600">
                     <div>
-                        <p className="font-semibold text-slate-800 mb-2">Instrukcja:</p>
-                        <ul className="list-disc list-inside space-y-1 ml-1 text-slate-600">
-                            <li>Wypełnij dane w pliku CSV (wymagane: <b>email, username</b>).</li>
-                            <li>Każdy kolejny wiersz w pliku to nowy pracownik.</li>
-                            <li>Możesz dodać wielu pracowników naraz (np. 50+ wierszy).</li>
+                        <p className="mb-2 font-semibold text-slate-800">
+                            Instrukcja:
+                        </p>
+                        <ul className="ml-1 list-disc list-inside space-y-1 text-slate-600">
+                            <li>
+                                Wypełnij dane w pliku CSV (wymagane:{' '}
+                                <b>email, username</b>).
+                            </li>
+                            <li>
+                                Każdy kolejny wiersz w pliku to nowy pracownik.
+                            </li>
+                            <li>
+                                Możesz dodać wielu pracowników naraz (np. 50+
+                                wierszy).
+                            </li>
                         </ul>
                     </div>
-                    
+
                     <div>
-                        <p className="font-semibold text-slate-800 mb-2">Dozwolone role (wpisz angielską nazwę w CSV):</p>
+                        <p className="mb-2 font-semibold text-slate-800">
+                            Dozwolone role (wpisz angielską nazwę w CSV):
+                        </p>
                         <div className="overflow-hidden rounded-lg border border-slate-200">
                             <table className="w-full text-left text-xs">
                                 <thead className="bg-slate-100 font-semibold text-slate-700">
                                     <tr>
-                                        <th className="px-3 py-2 border-r border-slate-200">Wartość w CSV (Angielski)</th>
-                                        <th className="px-3 py-2">Rola w systemie (Polski)</th>
+                                        <th className="border-r border-slate-200 px-3 py-2">
+                                            Wartość w CSV (Angielski)
+                                        </th>
+                                        <th className="px-3 py-2">
+                                            Rola w systemie (Polski)
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200 bg-white">
                                     <tr>
-                                        <td className="px-3 py-2 border-r border-slate-200 font-mono text-emerald-600">employee</td>
-                                        <td className="px-3 py-2">Pracownik</td>
+                                        <td className="border-r border-slate-200 px-3 py-2 font-mono text-emerald-600">
+                                            employee
+                                        </td>
+                                        <td className="px-3 py-2">
+                                            Pracownik
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td className="px-3 py-2 border-r border-slate-200 font-mono text-blue-600">hr</td>
-                                        <td className="px-3 py-2">HR Manager</td>
+                                        <td className="border-r border-slate-200 px-3 py-2 font-mono text-blue-600">
+                                            hr
+                                        </td>
+                                        <td className="px-3 py-2">
+                                            HR Manager
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td className="px-3 py-2 border-r border-slate-200 font-mono text-purple-600">admin</td>
-                                        <td className="px-3 py-2">Administrator</td>
+                                        <td className="border-r border-slate-200 px-3 py-2 font-mono text-purple-600">
+                                            admin
+                                        </td>
+                                        <td className="px-3 py-2">
+                                            Administrator
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <button 
+                    <button
                         type="button"
                         onClick={handleDownloadTemplate}
-                        className="mt-2 text-emerald-600 hover:text-emerald-700 font-medium text-sm flex items-center gap-1 border border-emerald-200 bg-emerald-50 px-3 py-1.5 rounded-lg transition-colors hover:bg-emerald-100"
+                        className="mt-2 flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-100"
                     >
-                        <Icon.Download size={16} /> Pobierz przykładowy szablon CSV
+                        <Icon.Download size={16} /> Pobierz przykładowy szablon
+                        CSV
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Plik CSV</label>
-                        <input 
-                            type="file" 
+                        <label className="mb-1 block text-sm font-medium text-slate-700">
+                            Plik CSV
+                        </label>
+                        <input
+                            type="file"
                             accept=".csv"
                             onChange={(e) => setFile(e.target.files[0])}
-                            className="block w-full text-sm text-slate-500 
-                                file:mr-4 file:py-2.5 file:px-4 
-                                file:rounded-lg file:border-0 
-                                file:text-sm file:font-semibold 
-                                file:bg-emerald-50 file:text-emerald-700 
-                                hover:file:bg-emerald-100
-                                cursor-pointer"
+                            className="block w-full cursor-pointer text-sm text-slate-500 
+                                file:mr-4 file:rounded-lg file:border-0 
+                                file:bg-emerald-50 file:px-4 
+                                file:py-2.5 file:text-sm 
+                                file:font-semibold file:text-emerald-700 
+                                hover:file:bg-emerald-100"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Hasło tymczasowe</label>
-                        <input 
-                            type="text" 
+                        <label className="mb-1 block text-sm font-medium text-slate-700">
+                            Hasło tymczasowe
+                        </label>
+                        <input
+                            type="text"
                             value={tempPassword}
                             onChange={(e) => setTempPassword(e.target.value)}
                             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"
                             placeholder="np. Firma2024!"
                         />
-                        <p className="mt-1 text-xs text-slate-500">Pracownik będzie musiał zmienić to hasło przy pierwszym logowaniu.</p>
+                        <p className="mt-1 text-xs text-slate-500">
+                            Pracownik będzie musiał zmienić to hasło przy
+                            pierwszym logowaniu.
+                        </p>
                     </div>
 
-                    {error && <p className="text-sm text-red-600">{error}</p>}
+                    {error && (
+                        <p className="text-sm text-red-600">{error}</p>
+                    )}
 
-                    <div className="flex justify-end gap-3 mt-6">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg">Anuluj</button>
-                        <button 
-                            type="submit" 
+                    <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                            Anuluj
+                        </button>
+                        <button
+                            type="submit"
                             disabled={isLoading}
-                            className="px-4 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50"
+                            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
                         >
                             {isLoading ? 'Importowanie...' : 'Importuj'}
                         </button>
@@ -432,82 +514,137 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
-            <div className="w-full max-w-2xl rounded-xl border border-slate-200/50 bg-white shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5 shrink-0">
-                    <div>
-                        <h3 className="text-lg font-semibold tracking-tight text-slate-900">
-                            Wynik Importu CSV
-                        </h3>
-                        <p className="mt-0.5 text-sm text-slate-500">
-                            Podsumowanie operacji
-                        </p>
+            <div className="flex h-full max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-slate-200/50 bg-white shadow-2xl">
+                <div className="shrink-0 border-b border-slate-100 px-5 py-4 sm:px-6">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <h3 className="text-lg font-semibold tracking-tight text-slate-900">
+                                Wynik Importu CSV
+                            </h3>
+                            <p className="mt-0.5 text-sm text-slate-500">
+                                Podsumowanie operacji
+                            </p>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="-mr-1 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                        >
+                            <Icon.X />
+                        </button>
                     </div>
-                     <button
-                        onClick={onClose}
-                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-                    >
-                        <Icon.X />
-                    </button>
                 </div>
-                
-                <div className="p-6 overflow-y-auto">
-                    <div className="mb-6 rounded-lg bg-blue-50 border border-blue-100 p-4 text-blue-800">
+
+                <div className="overflow-y-auto p-5 sm:p-6">
+                    <div className="mb-6 rounded-lg border border-blue-100 bg-blue-50 p-4 text-blue-800">
                         <div className="flex items-start gap-3">
-                            <Icon.AlertCircle />
+                            <Icon.AlertCircle className="flex-shrink-0" />
                             <div>
-                                <h4 className="font-bold text-sm">Informacja o logowaniu</h4>
-                                <p className="text-sm mt-1">
-                                    Dla nowych użytkowników ustawiono domyślne hasło: <code className="bg-blue-100 px-1 py-0.5 rounded font-mono font-bold">WorkNest123!</code>
+                                <h4 className="font-bold text-sm">
+                                    Informacja o logowaniu
+                                </h4>
+                                <p className="mt-1 text-sm">
+                                    Dla nowych użytkowników ustawiono domyślne
+                                    hasło:{' '}
+                                    <code className="rounded bg-blue-100 px-1 py-0.5 font-mono font-bold">
+                                        WorkNest123!
+                                    </code>
                                 </p>
-                                <p className="text-xs mt-1 text-blue-600">
-                                    Przekaż to hasło pracownikom i poproś o jego zmianę po pierwszym logowaniu.
+                                <p className="mt-1 text-xs text-blue-600">
+                                    Przekaż to hasło pracownikom i poproś o
+                                    jego zmianę po pierwszym logowaniu.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 mb-6">
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-center">
-                             <div className="text-2xl font-bold text-slate-700">{results.processed}</div>
-                             <div className="text-xs text-slate-500 uppercase font-semibold">Przetworzono</div>
+                    <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div className="rounded-lg border border-slate-100 bg-slate-50 p-4 text-center">
+                            <div className="text-2xl font-bold text-slate-700">
+                                {results.processed}
+                            </div>
+                            <div className="text-xs font-semibold uppercase text-slate-500">
+                                Przetworzono
+                            </div>
                         </div>
-                        <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100 text-center">
-                             <div className="text-2xl font-bold text-emerald-600">{results.created}</div>
-                             <div className="text-xs text-emerald-600 uppercase font-semibold">Utworzono</div>
+                        <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4 text-center">
+                            <div className="text-2xl font-bold text-emerald-600">
+                                {results.created}
+                            </div>
+                            <div className="text-xs font-semibold uppercase text-emerald-600">
+                                Utworzono
+                            </div>
                         </div>
-                        <div className={`p-4 rounded-lg border text-center ${hasErrors ? 'bg-red-50 border-red-100' : 'bg-slate-50 border-slate-100'}`}>
-                             <div className={`text-2xl font-bold ${hasErrors ? 'text-red-600' : 'text-slate-700'}`}>{results.failedCount}</div>
-                             <div className={`text-xs uppercase font-semibold ${hasErrors ? 'text-red-600' : 'text-slate-500'}`}>Błędy</div>
+                        <div
+                            className={`rounded-lg border p-4 text-center ${
+                                hasErrors
+                                    ? 'border-red-100 bg-red-50'
+                                    : 'border-slate-100 bg-slate-50'
+                            }`}
+                        >
+                            <div
+                                className={`text-2xl font-bold ${
+                                    hasErrors
+                                        ? 'text-red-600'
+                                        : 'text-slate-700'
+                                }`}
+                            >
+                                {results.failedCount}
+                            </div>
+                            <div
+                                className={`text-xs font-semibold uppercase ${
+                                    hasErrors
+                                        ? 'text-red-600'
+                                        : 'text-slate-500'
+                                }`}
+                            >
+                                Błędy
+                            </div>
                         </div>
                     </div>
 
                     {hasErrors && (
                         <div className="space-y-3">
-                            <h4 className="font-semibold text-slate-800 flex items-center gap-2">
+                            <h4 className="flex items-center gap-2 font-semibold text-slate-800">
                                 <Icon.AlertCircle /> Szczegóły błędów
                             </h4>
-                            <div className="bg-red-50 rounded-lg border border-red-100 overflow-hidden">
-                                <table className="w-full text-sm text-left">
-                                    <thead className="bg-red-100/50 text-red-800 font-semibold">
+                            <div className="overflow-hidden rounded-lg border border-red-100 bg-red-50">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-red-100/50 font-semibold text-red-800">
                                         <tr>
-                                            <th className="px-4 py-2">Wiersz</th>
-                                            <th className="px-4 py-2">Email</th>
+                                            <th className="px-4 py-2">
+                                                Wiersz
+                                            </th>
+                                            <th className="px-4 py-2">
+                                                Email
+                                            </th>
                                             <th className="px-4 py-2">Błąd</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-red-100 text-red-700">
-                                        {results.failedSamples.map((fail, idx) => (
-                                            <tr key={idx}>
-                                                <td className="px-4 py-2">{fail.row}</td>
-                                                <td className="px-4 py-2">{fail.email || '-'}</td>
-                                                <td className="px-4 py-2">{fail.message}</td>
-                                            </tr>
-                                        ))}
+                                        {results.failedSamples.map(
+                                            (fail, idx) => (
+                                                <tr key={idx}>
+                                                    <td className="px-4 py-2">
+                                                        {fail.row}
+                                                    </td>
+                                                    <td className="px-4 py-2">
+                                                        {fail.email || '-'}
+                                                    </td>
+                                                    <td className="px-4 py-2">
+                                                        {fail.message}
+                                                    </td>
+                                                </tr>
+                                            ),
+                                        )}
                                     </tbody>
                                 </table>
-                                {results.failedCount > results.failedSamples.length && (
-                                    <div className="px-4 py-2 text-center text-xs text-red-600 italic bg-red-100/30">
-                                        ...i {results.failedCount - results.failedSamples.length} więcej błędów
+                                {results.failedCount >
+                                    results.failedSamples.length && (
+                                    <div className="bg-red-100/30 px-4 py-2 text-center text-xs italic text-red-600">
+                                        ...i{' '}
+                                        {results.failedCount -
+                                            results.failedSamples.length}{' '}
+                                        więcej błędów
                                     </div>
                                 )}
                             </div>
@@ -515,10 +652,10 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                     )}
                 </div>
 
-                <div className="p-6 border-t border-slate-100 shrink-0 flex justify-end">
-                    <button 
+                <div className="shrink-0 border-t border-slate-100 p-4 sm:flex sm:justify-end">
+                    <button
                         onClick={onClose}
-                        className="bg-slate-900 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-slate-800 transition-colors"
+                        className="w-full rounded-lg bg-slate-900 px-5 py-2.5 font-medium text-white transition-colors hover:bg-slate-800 sm:w-auto"
                     >
                         Zamknij
                     </button>
@@ -732,24 +869,22 @@ export default function EmployeeList() {
 
     return (
         <div className="min-h-screen bg-slate-50 select-none">
-            <div className="sticky top-0 z-10 border-b border-slate-200 bg-white shadow-sm">
-                <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-6">
+            <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/80 shadow-sm backdrop-blur-md">
+                <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 md:px-8">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
                             >
                                 <Icon.ArrowLeft />
-                                <span>Powrót</span>
                             </button>
-                            <div className="hidden h-6 w-px bg-slate-200 md:block"></div>
+                            <div className="h-7 w-px bg-slate-200"></div>
                             <div>
-                                <h1 className="flex items-center gap-3 text-xl font-bold text-slate-800 sm:text-2xl">
-                                    <Icon.Users className="text-emerald-600" />
+                                <h1 className="text-xl font-bold text-slate-800">
                                     Zarządzanie Zespołem
                                 </h1>
-                                <p className="mt-1 text-sm text-slate-500">
+                                <p className="mt-0.5 text-xs text-slate-500">
                                     {filteredUsers.length}{' '}
                                     {filteredUsers.length === 1
                                         ? 'użytkownik'
@@ -758,22 +893,24 @@ export default function EmployeeList() {
                             </div>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
                             {currentUser?.role === 'admin' && (
-                                <button 
+                                <button
                                     onClick={() => setImportFormOpen(true)}
-                                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-200"
+                                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-200 sm:w-auto"
                                 >
-                                    <Icon.Upload /> 
+                                    <Icon.Upload />
                                     <span>Importuj CSV</span>
                                 </button>
                             )}
-                            <div className="relative">
+                            <div className="relative w-full sm:w-auto">
                                 <input
-                                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 md:w-80"
+                                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 md:w-72"
                                     placeholder="Szukaj użytkownika..."
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={(e) =>
+                                        setSearchQuery(e.target.value)
+                                    }
                                 />
                                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                                     <Icon.Search />
@@ -784,41 +921,41 @@ export default function EmployeeList() {
                 </div>
             </div>
 
-            <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-8">
-                <div className="mb-6 grid grid-cols-3 gap-4">
-                    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                        <div className="mb-3 flex items-center gap-2">
+            <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
+                <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                        <div className="mb-2 flex items-center gap-2">
                             <div className="rounded-lg bg-slate-100 p-2 text-slate-600">
                                 <Icon.Users />
                             </div>
                         </div>
-                        <div className="text-3xl font-semibold text-slate-900">
+                        <div className="text-2xl font-semibold text-slate-900 sm:text-3xl">
                             {users.length}
                         </div>
                         <div className="mt-1 text-sm font-medium text-slate-500">
                             Wszyscy użytkownicy
                         </div>
                     </div>
-                    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                        <div className="mb-3 flex items-center gap-2">
+                    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                        <div className="mb-2 flex items-center gap-2">
                             <div className="rounded-lg bg-blue-100 p-2 text-blue-600">
                                 <Icon.Briefcase />
                             </div>
                         </div>
-                        <div className="text-3xl font-semibold text-blue-600">
+                        <div className="text-2xl font-semibold text-blue-600 sm:text-3xl">
                             {users.filter((u) => u.role === 'hr').length}
                         </div>
                         <div className="mt-1 text-sm font-medium text-slate-500">
                             Menedżerowie HR
                         </div>
                     </div>
-                    <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-                        <div className="mb-3 flex items-center gap-2">
+                    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                        <div className="mb-2 flex items-center gap-2">
                             <div className="rounded-lg bg-purple-100 p-2 text-purple-600">
                                 <Icon.Shield />
                             </div>
                         </div>
-                        <div className="text-3xl font-semibold text-purple-600">
+                        <div className="text-2xl font-semibold text-purple-600 sm:text-3xl">
                             {users.filter((u) => u.role === 'admin').length}
                         </div>
                         <div className="mt-1 text-sm font-medium text-slate-500">
@@ -879,7 +1016,7 @@ export default function EmployeeList() {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-600">
+                                    <td className="px-6 py-4 text-sm text-slate-600 truncate max-w-xs">
                                         {user.email}
                                     </td>
                                     <td className="px-6 py-4">
@@ -943,12 +1080,12 @@ export default function EmployeeList() {
                     {filteredUsers.map((user) => (
                         <div
                             key={user._id}
-                            className="cursor-pointer rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md"
+                            className="cursor-pointer rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-emerald-300 hover:shadow-md"
                             onClick={() => navigate(`/employees/${user._id}`)}
                         >
                             <div className="mb-3 flex items-start justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-600 text-base font-semibold text-white">
+                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-base font-semibold text-white">
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
@@ -974,7 +1111,7 @@ export default function EmployeeList() {
                                     <span className="text-slate-500">
                                         Email:
                                     </span>
-                                    <span className="ml-2 truncate font-medium text-slate-700">
+                                    <span className="ml-2 truncate font-medium text-slate-700 max-w-48">
                                         {user.email}
                                     </span>
                                 </div>
@@ -999,7 +1136,7 @@ export default function EmployeeList() {
                                                 setSelectedUser(user);
                                                 setModalOpen(true);
                                             }}
-                                            className="w-full rounded-lg border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50"
+                                            className="w-full rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50"
                                         >
                                             Zmień rolę
                                         </button>
@@ -1016,7 +1153,7 @@ export default function EmployeeList() {
                     ))}
 
                     {filteredUsers.length === 0 && (
-                        <div className="py-16 text-center">
+                        <div className="rounded-lg border-2 border-dashed border-slate-200 bg-white py-16 text-center">
                             <div className="mb-3 text-5xl">🔍</div>
                             <div className="text-base font-semibold text-slate-900">
                                 Brak wyników

@@ -275,136 +275,121 @@ export default function LeaveApprovals() {
     return (
         <div className="min-h-screen bg-gray-100 pb-6 select-none">
             {/* Header - Responsywny */}
-            <div className="sticky top-0 z-10 bg-white shadow-sm">
+            <div className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 shadow-sm backdrop-blur-md">
                 {notification && (
-                    <div className={`absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-full px-6 py-2 shadow-lg transition-all ${
-                        notification.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
-                    }`}>
+                    <div
+                        className={`absolute left-1/2 top-4 z-50 -translate-x-1/2 rounded-full px-6 py-2 shadow-lg transition-all ${
+                            notification.type === 'success'
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-red-600 text-white'
+                        }`}
+                    >
                         {notification.message}
                     </div>
                 )}
-                <div className="px-4 py-4 md:px-8 md:py-6">
-                    {/* Mobile header */}
-                    <div className="flex items-center justify-between md:hidden">
-                        <button
-                            onClick={() => navigate('/dashboard')}
-                            className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100"
-                        >
-                            <Icon.ArrowLeft />
-                        </button>
-                        <h1 className="text-lg font-bold">
-                            Zarządzanie Urlopami
-                        </h1>
-                        <button
-                            onClick={() => setShowFilterMenu(!showFilterMenu)}
-                            className="rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100"
-                        >
-                            <Icon.Menu />
-                        </button>
-                    </div>
-
-                    {/* Desktop header */}
-                    <div className="hidden md:flex md:items-center md:justify-between">
-                        <div className="flex items-center gap-4">
+                <div className="px-4 py-4 sm:px-6 md:px-8">
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div className="flex items-center gap-3">
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:bg-gray-100"
+                                className="flex-shrink-0 rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100"
                             >
                                 <Icon.ArrowLeft />
-                                <span>Dashboard</span>
                             </button>
-                            <div className="h-8 w-px bg-gray-200"></div>
+                            <div className="h-7 w-px bg-slate-200" />
                             <div>
-                                <h1 className="text-2xl font-bold">
+                                <h1 className="text-lg font-bold text-slate-800 sm:text-xl">
                                     Zarządzanie Urlopami
                                 </h1>
-                                <p className="text-sm text-gray-500">
+                                <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
                                     Przeglądaj i zatwierdzaj wnioski urlopowe
                                 </p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                             {/* Search Bar */}
-                             <div className="relative">
+                        <div className="flex w-full items-center gap-2 md:w-auto">
+                            <div className="relative flex-grow">
                                 <input
                                     type="text"
                                     placeholder="Szukaj pracownika..."
-                                    className="w-64 rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                    className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                                     onChange={(e) => {
                                         const val = e.target.value;
-                                        // Clear previous timeout
-                                        if (window.searchTimeout) clearTimeout(window.searchTimeout);
-                                        // Set new timeout
-                                        window.searchTimeout = setTimeout(() => {
-                                            fetchLeaves(false, val);
-                                        }, 300); // 300ms delay
+                                        if (window.searchTimeout)
+                                            clearTimeout(window.searchTimeout);
+                                        window.searchTimeout = setTimeout(
+                                            () => {
+                                                fetchLeaves(false, val);
+                                            },
+                                            300,
+                                        );
                                     }}
                                 />
-                                <div className="absolute left-3 top-2.5 text-gray-400">
-                                    <Icon.Eye /> 
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                                    <Icon.Eye />
                                 </div>
-                             </div>
-
-                             {/* Desktop filter tabs */}
-                            <div className="flex items-center gap-2 rounded-lg bg-gray-100 p-1">
-                                {filterTabs.map((tab) => (
-                                    <button
-                                        key={tab.value}
-                                        onClick={() => {
-                                            setFilter(tab.value);
-                                            // Jeśli wchodzimy w odrzucone, wracamy do listy (kalendarz nie ma sensu)
-                                            if (tab.value === 'rejected') setViewMode('list');
-                                        }}
-                                        className={`rounded-md px-4 py-2 text-sm transition-colors ${filter === tab.value ? 'bg-white font-medium text-emerald-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                                    >
-                                        {tab.label}
-                                    </button>
-                                ))}
                             </div>
-
-                            {/* View Toggle - ukrywamy dla Odrzuconych */}
-                            {filter !== 'rejected' && (
-                                <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1">
-                                    <button
-                                        onClick={() => setViewMode('list')}
-                                        className={`rounded-md p-2 transition-colors ${viewMode === 'list' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        title="Lista"
-                                    >
-                                        <Icon.List />
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('calendar')}
-                                        className={`rounded-md p-2 transition-colors ${viewMode === 'calendar' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        title="Kalendarz"
-                                    >
-                                        <Icon.Calendar />
-                                    </button>
-                                </div>
-                            )}
+                            <div className="relative md:hidden">
+                                <button
+                                    onClick={() =>
+                                        setShowFilterMenu(!showFilterMenu)
+                                    }
+                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500"
+                                >
+                                    <Icon.Menu />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Mobile filter menu (dropdown) */}
-                    {showFilterMenu && (
-                        <div className="mt-4 rounded-lg bg-gray-50 p-2 md:hidden">
-                            <div className="grid grid-cols-2 gap-2">
-                                {filterTabs.map((tab) => (
-                                    <button
-                                        key={tab.value}
-                                        onClick={() => {
-                                            setFilter(tab.value);
-                                            setShowFilterMenu(false);
-                                            if (tab.value === 'rejected') setViewMode('list');
-                                        }}
-                                        className={`rounded-md px-3 py-2 text-sm transition-colors ${filter === tab.value ? 'bg-emerald-600 font-medium text-white shadow-sm' : 'bg-white text-gray-600'}`}
-                                    >
+                    {/* Filter Tabs */}
+                    <div
+                        className={`flex-col gap-2 pt-4 md:flex md:flex-row md:items-center md:justify-between md:pt-4 ${showFilterMenu ? 'flex' : 'hidden'}`}
+                    >
+                        <div className="grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1 sm:grid-cols-4 md:inline-flex md:flex-wrap">
+                            {filterTabs.map((tab) => (
+                                <button
+                                    key={tab.value}
+                                    onClick={() => {
+                                        setFilter(tab.value);
+                                        if (tab.value === 'rejected')
+                                            setViewMode('list');
+                                    }}
+                                    className={`w-full rounded-md px-3 py-2 text-center text-xs font-medium transition-colors sm:text-sm md:w-auto ${
+                                        filter === tab.value
+                                            ? 'bg-white text-emerald-600 shadow-sm'
+                                            : 'text-slate-600 hover:text-slate-900'
+                                    }`}
+                                >
+                                    <span className="hidden sm:inline">
                                         {tab.label}
-                                    </button>
-                                ))}
-                            </div>
+                                    </span>
+                                    <span className="sm:hidden">
+                                        {tab.shortLabel}
+                                    </span>
+                                </button>
+                            ))}
                         </div>
-                    )}
+
+                        {filter !== 'rejected' && (
+                            <div className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-slate-100 p-1 md:mt-0">
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`rounded-md p-2 transition-colors ${viewMode === 'list' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    title="Lista"
+                                >
+                                    <Icon.List />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('calendar')}
+                                    className={`rounded-md p-2 transition-colors ${viewMode === 'calendar' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    title="Kalendarz"
+                                >
+                                    <Icon.Calendar />
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -434,33 +419,33 @@ export default function LeaveApprovals() {
                 ) : (
                 <>
                 {/* Stats - Responsywne */}
-                <div className="mb-6 grid grid-cols-2 gap-3 md:mb-8 md:grid-cols-4 md:gap-4">
-                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
-                        <div className="text-xs uppercase text-gray-500">
+                <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 md:gap-4">
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+                        <div className="text-xs uppercase text-slate-500">
                             Wszystkie
                         </div>
-                        <div className="mt-2 text-xl font-bold md:text-2xl">
+                        <div className="mt-2 text-xl font-bold text-slate-800 md:text-2xl">
                             {stats.total}
                         </div>
                     </div>
-                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
-                        <div className="text-xs uppercase text-gray-500">
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+                        <div className="text-xs uppercase text-slate-500">
                             Oczekujące
                         </div>
                         <div className="mt-2 text-xl font-bold text-yellow-600 md:text-2xl">
                             {stats.pending}
                         </div>
                     </div>
-                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
-                        <div className="text-xs uppercase text-gray-500">
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+                        <div className="text-xs uppercase text-slate-500">
                             Zatwierdzone
                         </div>
                         <div className="mt-2 text-xl font-bold text-green-600 md:text-2xl">
                             {stats.approved}
                         </div>
                     </div>
-                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
-                        <div className="text-xs uppercase text-gray-500">
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+                        <div className="text-xs uppercase text-slate-500">
                             Odrzucone
                         </div>
                         <div className="mt-2 text-xl font-bold text-red-600 md:text-2xl">
@@ -515,7 +500,7 @@ export default function LeaveApprovals() {
                                                     {leave.user?.username ||
                                                         'Nieznany'}
                                                 </div>
-                                                <div className="text-xs text-gray-500">
+                                                <div className="text-xs text-gray-500 truncate max-w-xs">
                                                     {leave.user?.email}
                                                 </div>
                                                 {leave.user?.stats && (
@@ -631,12 +616,12 @@ export default function LeaveApprovals() {
                     {leaves.map((leave) => (
                         <div
                             key={leave._id}
-                            className="rounded-xl bg-white p-4 shadow-sm"
+                            className="rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md"
                         >
                             {/* Header karty */}
                             <div className="mb-3 flex items-start justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 font-bold text-white shadow-sm">
+                                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 font-bold text-white shadow-sm">
                                         {leave.user?.username
                                             ?.charAt(0)
                                             .toUpperCase() || '?'}
@@ -645,15 +630,20 @@ export default function LeaveApprovals() {
                                         <div className="font-medium text-gray-900">
                                             {leave.user?.username || 'Nieznany'}
                                         </div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-gray-500 truncate max-w-48">
                                             {leave.user?.email}
                                         </div>
                                         {leave.user?.stats && (
-                                             <div className="mt-1 text-xs font-semibold text-emerald-600">
-                                                 Wykorzystano: {leave.user.stats.usedDaysThisYear} dni
-                                             </div>
-                                         )}
-                                     </div>
+                                            <div className="mt-1 text-xs font-semibold text-emerald-600">
+                                                Wykorzystano:{' '}
+                                                {
+                                                    leave.user.stats
+                                                        .usedDaysThisYear
+                                                }{' '}
+                                                dni
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 {getStatusBadge(leave.status)}
                             </div>
@@ -688,14 +678,16 @@ export default function LeaveApprovals() {
                                         {leave.days}
                                     </span>
                                 </div>
-                                <div className="text-sm">
-                                    <span className="text-gray-500">
-                                        Powód:
-                                    </span>
-                                    <p className="mt-1 text-gray-700">
-                                        {leave.reason}
-                                    </p>
-                                </div>
+                                {leave.reason && (
+                                    <div className="text-sm">
+                                        <span className="text-gray-500">
+                                            Powód:
+                                        </span>
+                                        <p className="mt-1 text-gray-700">
+                                            {leave.reason}
+                                        </p>
+                                    </div>
+                                )}
                                 {leave.reviewNote && (
                                     <div className="rounded-lg bg-red-50 p-2 text-xs text-red-600">
                                         <strong>Notatka:</strong>{' '}
@@ -704,7 +696,7 @@ export default function LeaveApprovals() {
                                 )}
                                 {leave.reviewedBy &&
                                     leave.status !== 'pending' && (
-                                        <div className="text-xs text-gray-400">
+                                        <div className="pt-1 text-right text-xs text-gray-400">
                                             Przez: {leave.reviewedBy.username}
                                         </div>
                                     )}
@@ -712,10 +704,12 @@ export default function LeaveApprovals() {
 
                             {/* Akcje */}
                             {leave.status === 'pending' && (
-                                <div className="mt-4 flex gap-3">
+                                <div className="mt-4 flex gap-3 border-t pt-3">
                                     <button
-                                        onClick={() => handleApproveClick(leave._id)}
-                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 active:scale-95"
+                                        onClick={() =>
+                                            handleApproveClick(leave._id)
+                                        }
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-700 transition-all active:scale-95"
                                     >
                                         <Icon.Check />
                                         Zatwierdź
@@ -725,7 +719,7 @@ export default function LeaveApprovals() {
                                             setSelectedLeave(leave._id);
                                             setShowRejectModal(true);
                                         }}
-                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95"
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-600 transition-all active:scale-95"
                                     >
                                         <Icon.X />
                                         Odrzuć
@@ -736,7 +730,7 @@ export default function LeaveApprovals() {
                     ))}
 
                     {leaves.length === 0 && (
-                        <div className="py-16 text-center text-gray-500">
+                        <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white py-16 text-center text-gray-500">
                             <div className="mb-4 flex justify-center">
                                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                                     <Icon.Eye />
@@ -764,29 +758,33 @@ export default function LeaveApprovals() {
             {/* Approve Confirmation Modal */}
             {showApproveModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-all">
-                    <div className="w-full max-w-sm scale-100 rounded-2xl bg-white p-6 shadow-2xl transition-all">
-                        <div className="mb-4 flex items-center gap-4">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl transition-all">
+                        <div className="mb-4 flex flex-col items-center text-center sm:flex-row sm:text-left">
+                            <div className="mb-4 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 sm:mb-0 sm:mr-4">
                                 <Icon.Check />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">Zatwierdzić wniosek?</h3>
-                                <p className="text-sm text-gray-500">Tej operacji nie można cofnąć.</p>
+                                <h3 className="text-lg font-bold text-gray-900">
+                                    Zatwierdzić wniosek?
+                                </h3>
+                                <p className="text-sm text-gray-500">
+                                    Tej operacji nie można cofnąć.
+                                </p>
                             </div>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-col-reverse gap-3 sm:flex-row">
                             <button
                                 onClick={() => {
                                     setShowApproveModal(false);
                                     setLeaveToApprove(null);
                                 }}
-                                className="flex-1 rounded-xl px-4 py-2.5 font-medium text-gray-600 transition-colors hover:bg-gray-100"
+                                className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50"
                             >
                                 Anuluj
                             </button>
                             <button
                                 onClick={confirmApprove}
-                                className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 font-bold text-white shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 hover:scale-[1.02]"
+                                className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 font-bold text-white shadow-sm shadow-emerald-200 transition-all hover:bg-emerald-700"
                             >
                                 Potwierdź
                             </button>
@@ -797,39 +795,39 @@ export default function LeaveApprovals() {
 
             {/* Reject Modal - Responsywny */}
             {showRejectModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white">
-                        <div className="border-b p-4 md:p-6">
-                            <h3 className="text-lg font-bold md:text-xl">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+                        <div className="border-b p-5">
+                            <h3 className="text-lg font-bold">
                                 Odrzuć wniosek
                             </h3>
                             <p className="mt-1 text-sm text-gray-500">
                                 Podaj powód odrzucenia wniosku
                             </p>
                         </div>
-                        <div className="p-4 md:p-6">
+                        <div className="p-5">
                             <textarea
                                 value={rejectNote}
                                 onChange={(e) => setRejectNote(e.target.value)}
                                 rows="4"
-                                className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 md:px-4"
+                                className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/50"
                                 placeholder="np. Brak dostępności personelu w tym okresie..."
                             />
                         </div>
-                        <div className="flex flex-col gap-2 border-t p-4 md:flex-row md:items-center md:justify-end md:gap-3 md:p-6">
+                        <div className="flex flex-col-reverse gap-3 border-t p-4 sm:flex-row sm:justify-end">
                             <button
                                 onClick={() => {
                                     setShowRejectModal(false);
                                     setRejectNote('');
                                     setSelectedLeave(null);
                                 }}
-                                className="order-2 rounded-lg px-6 py-2 text-gray-600 transition-colors hover:bg-gray-100 md:order-1"
+                                className="rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
                             >
                                 Anuluj
                             </button>
                             <button
                                 onClick={handleReject}
-                                className="order-1 rounded-lg bg-red-600 px-6 py-2 text-white transition-colors hover:bg-red-700 md:order-2"
+                                className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-700"
                             >
                                 Odrzuć wniosek
                             </button>

@@ -34,7 +34,7 @@ const KanbanColumn = ({
     const config = statusConfig[status];
 
     return (
-        <div className="flex min-h-[200px] flex-1 flex-col rounded-xl bg-gray-100 p-4">
+        <div className="flex min-h-[200px] w-full min-w-[300px] flex-1 flex-col rounded-xl bg-gray-100 p-4 sm:min-w-[350px]">
             <div
                 className={`mb-4 flex items-center justify-between rounded-lg px-4 py-2 ${config.color}`}
             >
@@ -84,7 +84,7 @@ const KanbanBoard = ({ tasks, onUpdate, onDelete, projectUsers, isAdmin, project
     };
 
     return (
-        <div className="flex gap-6">
+        <div className="flex gap-6 overflow-x-auto pb-4">
             {Object.keys(groupedTasks).map((status) => (
                 <KanbanColumn
                     key={status}

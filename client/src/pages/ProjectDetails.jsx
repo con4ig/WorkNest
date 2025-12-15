@@ -50,10 +50,10 @@ const formatDateForInput = (dateString) => {
 };
 
 const StatCard = ({ icon, title, children }) => (
-    <div className="flex items-start gap-4">
-        <div className="mt-1">{icon}</div>
-        <div className="w-full">
-            <h3 className="font-semibold text-gray-500">{title}</h3>
+    <div className="flex items-start gap-3 sm:gap-4">
+        <div className="mt-1 flex-shrink-0">{icon}</div>
+        <div className="w-full min-w-0">
+            <h3 className="truncate font-semibold text-gray-500">{title}</h3>
             <div className="mt-1">{children}</div>
         </div>
     </div>
@@ -67,7 +67,7 @@ const CircularProgress = ({ progress }) => {
     const strokeDashoffset = circumference - (progress / 100) * circumference;
 
     return (
-        <div className="relative flex h-40 w-40 items-center justify-center">
+        <div className="relative flex h-32 w-32 items-center justify-center sm:h-40 sm:w-40">
             <svg
                 height={radius * 2}
                 width={radius * 2}
@@ -106,7 +106,7 @@ const CircularProgress = ({ progress }) => {
                     </linearGradient>
                 </defs>
             </svg>
-            <div className="absolute text-4xl font-bold text-emerald-600">
+            <div className="absolute text-3xl font-bold text-emerald-600 sm:text-4xl">
                 {progress}%
             </div>
         </div>
@@ -114,13 +114,15 @@ const CircularProgress = ({ progress }) => {
 };
 
 const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-md sm:p-8">
-        <div className="mb-5 flex items-center justify-between border-b border-gray-200 pb-4">
-            <div className="flex items-center gap-4">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-md sm:rounded-3xl sm:p-6">
+        <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-4 sm:mb-5">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
                 {icon}
-                <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+                <h2 className="truncate text-xl font-bold text-gray-800 sm:text-2xl">
+                    {title}
+                </h2>
             </div>
-            {actions && <div className="flex gap-2">{actions}</div>}
+            {actions && <div className="flex flex-shrink-0 gap-2">{actions}</div>}
         </div>
         {children}
     </div>
@@ -514,29 +516,27 @@ export default function ProjectDetails() {
                 onClose={() => setConfirmationProps({ ...confirmationProps, isOpen: false })}
             />
             {/* LEWY PANEL (SIDEBAR) */}
-            <aside className="flex w-full flex-col border-r border-gray-200 bg-white p-6 lg:min-h-screen lg:w-[380px] lg:p-8">
-                <div className="mb-10 flex items-center gap-3">
+            <aside className="flex w-full flex-col border-r border-gray-200 bg-white p-4 lg:min-h-screen lg:w-[380px] lg:p-8">
+                <div className="mb-8 flex items-center gap-3">
                     <button
                         onClick={() => navigate('/projekty')}
                         className="rounded-lg bg-slate-100 p-2.5 transition-colors hover:bg-slate-200"
                     >
                         <Icon.Back />
                     </button>
-                    <h2 className="text-xl font-bold tracking-tight text-slate-800">
+                    <h2 className="text-lg font-bold tracking-tight text-slate-800 sm:text-xl">
                         Szczegóły Projektu
                     </h2>
                 </div>
 
                 <div className="flex flex-col items-center text-center">
-                    <CircularProgress
-                        progress={calculatedProgress}
-                    />
-                     <p className="mt-3 text-lg font-semibold text-slate-600">
+                    <CircularProgress progress={calculatedProgress} />
+                    <p className="mt-3 text-base font-semibold text-slate-600 sm:text-lg">
                         Postęp projektu
                     </p>
                 </div>
 
-                <div className="mt-10 space-y-6">
+                <div className="mt-8 space-y-6 sm:mt-10">
                     <StatCard
                         icon={<Icon.Calendar />}
                         title="Okres trwania projektu"
@@ -559,12 +559,12 @@ export default function ProjectDetails() {
                                 />
                             </div>
                         ) : (
-                            <p className="text-lg font-bold text-gray-800">
-                                {formatDateForDisplay(project.startDate) && formatDateForDisplay(project.endDate) ?
-                                    `${formatDateForDisplay(project.startDate)} - ${formatDateForDisplay(project.endDate)}`
+                            <p className="text-base font-bold text-gray-800 sm:text-lg">
+                                {formatDateForDisplay(project.startDate) &&
+                                formatDateForDisplay(project.endDate)
+                                    ? `${formatDateForDisplay(project.startDate)} - ${formatDateForDisplay(project.endDate)}`
                                     : 'Nieokreślono'}
                             </p>
-
                         )}
                     </StatCard>
                     <StatCard
@@ -579,7 +579,7 @@ export default function ProjectDetails() {
                                     name="status"
                                     value={editData.status}
                                     onChange={handleEditChange}
-                                    className={`rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold capitalize ring-1 ring-inset ring-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                    className={`w-full rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold capitalize ring-1 ring-inset ring-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:w-auto`}
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
@@ -591,7 +591,7 @@ export default function ProjectDetails() {
                                     name="priority"
                                     value={editData.priority}
                                     onChange={handleEditChange}
-                                    className={`rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold capitalize ring-1 ring-inset ring-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500`}
+                                    className={`w-full rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold capitalize ring-1 ring-inset ring-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:w-auto`}
                                 >
                                     {AVAILABLE_PRIORITIES.map((p) => (
                                         <option key={p} value={p}>
@@ -601,7 +601,7 @@ export default function ProjectDetails() {
                                 </select>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <span
                                     className={`rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(project.status)}`}
                                 >
@@ -666,8 +666,8 @@ export default function ProjectDetails() {
             </aside>
 
             {/* GŁÓWNA ZAWARTOŚĆ */}
-            <main className="w-full flex-grow p-6 lg:p-10">
-                <header className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-500 p-8 shadow-xl shadow-emerald-300/50">
+            <main className="w-full flex-grow p-4 lg:p-10">
+                <header className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 p-6 shadow-xl shadow-emerald-300/50 sm:rounded-3xl sm:p-8">
                     <div className="relative z-10">
                         {isEditing && isAdmin ? (
                             <input
@@ -675,22 +675,22 @@ export default function ProjectDetails() {
                                 name="name"
                                 value={editData.name}
                                 onChange={handleEditChange}
-                                className="w-full border-b-2 border-white/50 bg-transparent text-4xl font-extrabold tracking-tight text-white placeholder:text-white/70 focus:outline-none lg:text-5xl"
+                                className="w-full border-b-2 border-white/50 bg-transparent text-3xl font-extrabold tracking-tight text-white placeholder:text-white/70 focus:outline-none sm:text-4xl lg:text-5xl"
                                 placeholder="Nazwa projektu..."
                             />
                         ) : (
-                            <h1 className="text-4xl font-extrabold tracking-tight text-white lg:text-5xl">
+                            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
                                 {project.name}
                             </h1>
                         )}
                         {isAdmin && (
-                            <div className="mt-6 flex flex-wrap gap-3">
+                            <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
                                 {isEditing && isAdmin ? (
                                     <>
                                         <button
                                             onClick={handleSave}
                                             disabled={isSaving}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-emerald-700 shadow-md transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-gray-200 disabled:opacity-60"
+                                            className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-bold text-emerald-700 shadow-md transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-gray-200 disabled:opacity-60 sm:px-5 sm:py-2.5"
                                         >
                                             {isSaving ? (
                                                 'Zapisywanie...'
@@ -705,7 +705,7 @@ export default function ProjectDetails() {
                                                 setIsEditing(false);
                                                 fetchData();
                                             }}
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-black/30"
+                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-black/30 sm:px-5 sm:py-2.5"
                                         >
                                             <Icon.Cancel /> Anuluj
                                         </button>
@@ -714,7 +714,7 @@ export default function ProjectDetails() {
                                     <>
                                         <button
                                             onClick={() => setIsEditing(true)}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-slate-800 shadow-lg transition-all hover:bg-slate-200"
+                                            className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-bold text-slate-800 shadow-lg transition-all hover:bg-slate-200 sm:px-5 sm:py-2.5"
                                         >
                                             <Icon.Edit /> Edytuj
                                         </button>
@@ -722,7 +722,7 @@ export default function ProjectDetails() {
                                             onClick={() =>
                                                 setShowUserModal(true)
                                             }
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all hover:bg-black/30"
+                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all hover:bg-black/30 sm:px-5 sm:py-2.5"
                                         >
                                             <Icon.User /> Zarządzaj zespołem
                                         </button>
@@ -774,29 +774,29 @@ export default function ProjectDetails() {
                         icon={<Icon.Users />}
                         title={`Zespół projektowy (${project.assignedUsers.length})`}
                     >
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                             {project.assignedUsers.map((user) => (
                                 <div
                                     key={user._id}
-                                    className="flex cursor-pointer items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4 transition-colors hover:border-emerald-400 hover:bg-emerald-50"
+                                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50 sm:gap-4 sm:p-4"
                                 >
                                     <div
-                                        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-base font-bold text-white ${user.role === 'admin' ? 'bg-purple-500' : 'bg-emerald-500'}`}
+                                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-base font-bold text-white sm:h-11 sm:w-11 ${user.role === 'admin' ? 'bg-purple-500' : 'bg-emerald-500'}`}
                                     >
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">
+                                    <div className="min-w-0">
+                                        <p className="truncate font-semibold text-gray-800">
                                             {user.username}
                                         </p>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="truncate text-sm text-gray-500 max-w-48">
                                             {user.email}
                                         </p>
                                     </div>
                                 </div>
                             ))}
                             {project.assignedUsers.length === 0 && (
-                                <p className="col-span-full text-gray-500">
+                                <p className="col-span-full text-center text-gray-500 sm:text-left">
                                     Do tego projektu nie przypisano jeszcze
                                     żadnych użytkowników.
                                 </p>
