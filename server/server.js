@@ -112,7 +112,7 @@ if (process.env.NODE_ENV === "production") {
 
   // Reguła 3: Catch-all dla wszystkich innych zapytań (routing SPA)
   // Serwuj index.html, ale powiedz przeglądarce, żeby zawsze sprawdzała, czy jest nowa wersja.
-  app.get("*", (req, res) => {
+  app.get("/*", (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"), (err) => {
         if (err) {
