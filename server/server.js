@@ -110,9 +110,9 @@ if (process.env.NODE_ENV === "production") {
   // Reguła 2: Serwuj pozostałe pliki statyczne (np. favicon.ico) bez specjalnego cache'owania
   app.use(express.static(path.join(__dirname, '../client/dist')));
 
-  // Reguła 3: Catch-all dla wszystkich innych zapytań (routing SPA)
+  // Reguła 3: Catch-all dla wszystkich innych zapytań GET, które nie są do API (routing SPA)
   // Serwuj index.html, ale powiedz przeglądarce, żeby zawsze sprawdzała, czy jest nowa wersja.
-  app.get("/*", (req, res) => {
+  app.get(/^(?!\/api).*/, (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"), (err) => {
         if (err) {
