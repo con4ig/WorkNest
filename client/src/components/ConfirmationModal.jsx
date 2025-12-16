@@ -17,7 +17,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
     }
 
     return (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm" onMouseDown={onClose}>
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4" onMouseDown={onClose}>
             <div className="relative w-full max-w-md transform rounded-2xl bg-white p-6 shadow-xl transition-all" onMouseDown={(e) => e.stopPropagation()}>
                 <button
                     onClick={onClose}
@@ -34,7 +34,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
                     <p className="text-base text-slate-500">{message}</p>
                 </div>
 
-                <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4">
                     <button
                         onClick={onClose}
                         className="rounded-lg border border-slate-300 bg-white py-3 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"

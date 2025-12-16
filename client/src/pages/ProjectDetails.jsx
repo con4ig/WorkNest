@@ -106,7 +106,7 @@ const CircularProgress = ({ progress }) => {
                     </linearGradient>
                 </defs>
             </svg>
-            <div className="absolute text-3xl font-bold text-emerald-600 sm:text-4xl">
+            <div className="absolute text-2xl font-bold text-emerald-600 sm:text-3xl">
                 {progress}%
             </div>
         </div>
