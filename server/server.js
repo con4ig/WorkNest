@@ -100,12 +100,31 @@ app.use("/api/activities", activityRoutes);
 
 // ========== PRODUKCJA: Serwowanie React App ==========
 if (process.env.NODE_ENV === "production") {
-  // Serwuj pliki statyczne
-  app.use(express.static(path.join(__dirname, "../client/dist")));
+  // Reguła 1: Serwuj zasoby z /assets z długim czasem cache'owania
+  // Pliki te mają hashe w nazwach, więc są niezmienne (immutable).
+  app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets'), {
+    maxAge: '1y',       // 1 rok
+    immutable: true     // Powiedz przeglądarce, że plik nigdy się nie zmieni
+  }));
 
-  // Catch-all dla React Router - MUSI BYĆ OSTATNI!
+  // Reguła 2: Serwuj pozostałe pliki statyczne (np. favicon.ico) bez specjalnego cache'owania
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
+  // Reguła 3: Catch-all dla wszystkich innych zapytań (routing SPA)
+  // Serwuj index.html, ale powiedz przeglądarce, żeby zawsze sprawdzała, czy jest nowa wersja.
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"), (err) => {
+        if (err) {
+            // Jeśli plik index.html nie istnieje, to znaczy, że build się nie udał.
+            // Wyślij pomocną wiadomość.
+            res.status(404).send(
+              "Plik index.html nie został znaleziony. " +
+              "Upewnij się, że uruchomiłeś komendę 'npm run build --prefix client' " +
+              "i że proces budowania na Render zakończył się sukcesem."
+            );
+        }
+    });
   });
 } else {
   // Development - opcjonalne
