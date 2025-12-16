@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 import helmet from "helmet";
+import path from "path";
+import { fileURLToPath } from "url";
 // import emailRoutes from "./routes/email.js";
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
@@ -16,6 +18,9 @@ import commentRoutes from "./routes/comment.js";
 import activityRoutes from "./routes/activity.js";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const allowedOrigins = [
@@ -33,7 +38,8 @@ app.use(
         connectSrc: ["'self'", ...allowedOrigins],
         imgSrc: ["'self'", "data:", "https:"],
         scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
         objectSrc: ["'none'"],
         upgradeInsecureRequests: [],
       },
@@ -83,6 +89,26 @@ app.use(
   })
 );
 
+// Trasy API
+app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/leaves", leaveRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/activities", activityRoutes);
+
+// --- Obsługa aplikacji klienckiej (React) ---
+// Serwuj pliki statyczne z builda klienta
+app.use(express.static(path.join(__dirname, "../client/dist")));
+
+// "Catch-all" - dla wszystkich innych zapytań GET, odeślij index.html
+// To pozwala React Routerowi przejąć kontrolę po stronie klienta
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
+});
+
+
 const PORT = process.env.PORT || 5500;
 
 // Połączenie z MongoDB
@@ -98,20 +124,6 @@ const connectDB = async () => {
 };
 
 connectDB();
-
-// Trasy
-// app.use("/api/email", emailRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/projects", projectRoutes);
-app.use("/api/leaves", leaveRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/comments", commentRoutes);
-app.use("/api/activities", activityRoutes);
-
-app.get("/", (req, res) => {
-  res.send("API działa poprawnie");
-});
 
 app.listen(PORT, () => {
   console.log(`Serwer działa na porcie ${PORT}`);
