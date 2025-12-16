@@ -8,7 +8,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import path from "path";
 import { fileURLToPath } from "url";
-// import emailRoutes from "./routes/email.js";
+
 import authRoutes from "./routes/auth.js";
 import projectRoutes from "./routes/project.js";
 import leaveRoutes from "./routes/leave.js";
@@ -29,7 +29,7 @@ const allowedOrigins = [
   "https://worknest-1.onrender.com",
 ];
 
-// Helmet configuration with specific security headers
+// Helmet configuration
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -51,7 +51,7 @@ app.use(
   })
 );
 
-// Add Permissions-Policy header
+// Permissions-Policy header
 app.use((req, res, next) => {
   res.setHeader(
     "Permissions-Policy",
@@ -59,37 +59,37 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 app.use(morgan("dev"));
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Zezwalaj na żądania bez 'origin' (np. z Postmana lub mobilnych aplikacji)
       if (!origin) return callback(null, true);
       if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
+        const msg = "The CORS policy for this site does not allow access from the specified Origin.";
         return callback(new Error(msg), false);
       }
       return callback(null, true);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"], // WAŻNE: Dodano 'Authorization'
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
 app.use(
   rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 300, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    windowMs: 10 * 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
   })
 );
 
-// Trasy API
+// ========== WAŻNE: TRASY API MUSZĄ BYĆ PRZED STATIC FILES ==========
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/leaves", leaveRoutes);
@@ -98,16 +98,21 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/activities", activityRoutes);
 
-// --- Obsługa aplikacji klienckiej (React) ---
-// Serwuj pliki statyczne z builda klienta
-app.use(express.static(path.join(__dirname, "../client/dist")));
+// ========== PRODUKCJA: Serwowanie React App ==========
+if (process.env.NODE_ENV === "production") {
+  // Serwuj pliki statyczne
+  app.use(express.static(path.join(__dirname, "../client/dist")));
 
-// "Catch-all" - dla wszystkich innych zapytań GET, odeślij index.html
-// To pozwala React Routerowi przejąć kontrolę po stronie klienta
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
-});
-
+  // Catch-all dla React Router - MUSI BYĆ OSTATNI!
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+  });
+} else {
+  // Development - opcjonalne
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
+}
 
 const PORT = process.env.PORT || 5500;
 
@@ -115,7 +120,6 @@ const PORT = process.env.PORT || 5500;
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
-
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
@@ -126,5 +130,6 @@ const connectDB = async () => {
 connectDB();
 
 app.listen(PORT, () => {
-  console.log(`Serwer działa na porcie ${PORT}`);
+  console.log(`🚀 Serwer działa na porcie ${PORT}`);
+  console.log(`📁 Środowisko: ${process.env.NODE_ENV || "development"}`);
 });
