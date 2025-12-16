@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Navigate } from 'react-router-dom';
 
 // Pobierz URL API ze zmiennych środowiskowych lub użyj wartości domyślnej
 const API_URL = import.meta.env.PROD ? 'https://worknest-qpsw.onrender.com/api' : 'http://localhost:5500/api';
@@ -89,10 +88,9 @@ api.interceptors.response.use(
       } catch (refreshError) {
         console.error("🔴 Błąd odświeżania tokenu. Wylogowywanie...", refreshError);
         processQueue(refreshError, null);
-        // W przypadku błędu odświeżania, wyloguj użytkownika
-        localStorage.removeItem('accessToken');
-        // Możesz tutaj dodać przekierowanie do strony logowania
-        Navigate('/login');
+        // W przypadku błędu odświeżania, emituj zdarzenie, aby wylogować użytkownika
+        // i przekierować go w komponencie React.
+        window.dispatchEvent(new Event('auth-error'));
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

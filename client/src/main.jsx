@@ -1,6 +1,6 @@
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './styles/fonts.css';
 import './styles/index.css';
 import Login from './pages/Login.jsx';
@@ -20,9 +20,32 @@ import UserDetails from './pages/UserDetails.jsx';
 import Upload from './pages/Upload.jsx';
 import GenerateCode from './pages/GenerateCode.jsx';
 import ForcePasswordChange from './pages/ForcePasswordChange.jsx';
-import { AuthProvider } from './context/AuthContext.jsx';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
+
+// Komponent do obsługi globalnych błędów autoryzacji
+const AuthErrorHandler = () => {
+    const navigate = useNavigate();
+    const { logout } = useAuth();
+
+    useEffect(() => {
+        const handleAuthError = () => {
+            console.log("Wykryto błąd autoryzacji. Wylogowywanie i przekierowywanie.");
+            logout();
+            navigate('/login');
+        };
+
+        window.addEventListener('auth-error', handleAuthError);
+
+        return () => {
+            window.removeEventListener('auth-error', handleAuthError);
+        };
+    }, [navigate, logout]);
+
+    return null; // Ten komponent niczego nie renderuje
+};
+
 
 // ====================================================================
 // Główny komponent aplikacji
@@ -31,6 +54,7 @@ createRoot(document.getElementById('root')).render(
     <StrictMode>
         <AuthProvider>
             <Router>
+                <AuthErrorHandler />
                 <Toaster
                     containerStyle={{ zIndex: 9999 }}
                     position="top-center"
