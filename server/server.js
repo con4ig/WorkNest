@@ -74,6 +74,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
+<<<<<<< HEAD
 
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -97,6 +98,19 @@ app.use("/api/auth/register", authLimiter);
 app.use("/api/auth/refresh", authLimiter); 
 app.use("/api", apiLimiter); 
 
+=======
+app.use(
+  rateLimit({
+    windowMs: 1 * 60 * 1000,
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
+
+
+// ========== WAŻNE: TRASY API MUSZĄ BYĆ PRZED STATIC FILES ==========
+>>>>>>> 37c9ceac25cd59f6eb5c7767a3c406faa8b6b23c
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/leaves", leaveRoutes);
