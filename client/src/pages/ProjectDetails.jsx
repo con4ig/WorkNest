@@ -21,7 +21,6 @@ import {
 } from '../components/projects/ProjectTaskShared.jsx';
 import { ChevronRight } from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
-import Notification from '../components/Notification.jsx';
 
 moment.locale('pl');
 
@@ -34,7 +33,7 @@ const formatDateForDisplay = (dateString) => {
             day: 'numeric',
         });
     } catch (e) {
-        console.error("Error formatting date", e);
+        console.error('Error formatting date', e);
         return 'Błędna data';
     }
 };
@@ -122,7 +121,9 @@ const ContentCard = ({ icon, title, children, actions }) => (
                     {title}
                 </h2>
             </div>
-            {actions && <div className="flex flex-shrink-0 gap-2">{actions}</div>}
+            {actions && (
+                <div className="flex flex-shrink-0 gap-2">{actions}</div>
+            )}
         </div>
         {children}
     </div>
@@ -279,7 +280,7 @@ export default function ProjectDetails() {
 
     // States dla zadań
     const [tasks, setTasks] = useState([]);
-    
+
     // States dla komentarzy
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
@@ -288,50 +289,44 @@ export default function ProjectDetails() {
     const [activities, setActivities] = useState([]);
     const [showActivities, setShowActivities] = useState(false);
 
-    // Stany dla notyfikacji i modala potwierdzającego
-    const [notification, setNotification] = useState({ message: '', type: '', visible: false });
-    const [confirmationProps, setConfirmationProps] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-
-    // Funkcje pomocnicze
-    const showNotification = (message, type = 'info') => {
-        setNotification({ message, type, visible: true });
-        setTimeout(() => {
-            setNotification((prev) => ({ ...prev, visible: false }));
-        }, 3000);
-    };
-
-    const clearNotification = () => {
-        setNotification({ ...notification, visible: false });
-    };
+    const [confirmationProps, setConfirmationProps] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
 
     const askForConfirmation = (props) => {
         setConfirmationProps({ isOpen: true, ...props });
     };
 
-    const fetchData = useCallback(async (showLoader = false) => {
-        if (showLoader) setLoading(true);
-        try {
-            const res = await api.get(`/projects/${id}`);
-            setProject(res.data);
-            setEditData({
-                name: res.data.name,
-                description: res.data.description,
-                status: res.data.status,
-                priority: res.data.priority,
-                // progress: res.data.progress || 0, // Automatyczne wyliczanie
-                startDate: formatDateForInput(res.data.startDate),
-                endDate: formatDateForInput(res.data.endDate),
-            });
-            setError(null);
-        } catch (err) {
-            console.error('Błąd pobierania projektu:', err);
-            setError(
-                `Nie udało się załadować danych projektu: ${err.response?.data?.message || err.message}`,
-            );
-        } finally {
-            if (showLoader) setLoading(false);
-        }
-    }, [id]);
+    const fetchData = useCallback(
+        async (showLoader = false) => {
+            if (showLoader) setLoading(true);
+            try {
+                const res = await api.get(`/projects/${id}`);
+                setProject(res.data);
+                setEditData({
+                    name: res.data.name,
+                    description: res.data.description,
+                    status: res.data.status,
+                    priority: res.data.priority,
+                    // progress: res.data.progress || 0, // Automatyczne wyliczanie
+                    startDate: formatDateForInput(res.data.startDate),
+                    endDate: formatDateForInput(res.data.endDate),
+                });
+                setError(null);
+            } catch (err) {
+                console.error('Błąd pobierania projektu:', err);
+                setError(
+                    `Nie udało się załadować danych projektu: ${err.response?.data?.message || err.message}`,
+                );
+            } finally {
+                if (showLoader) setLoading(false);
+            }
+        },
+        [id],
+    );
 
     const fetchTasks = useCallback(async () => {
         try {
@@ -384,20 +379,18 @@ export default function ProjectDetails() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await api.patch(`/projects/${id}`,
-                {
-                    ...editData,
-                    startDate: editData.startDate || null,
-                    endDate: editData.endDate || null,
-                    company: currentUser.company._id,
-                }
-            );
+            await api.patch(`/projects/${id}`, {
+                ...editData,
+                startDate: editData.startDate || null,
+                endDate: editData.endDate || null,
+                company: currentUser.company._id,
+            });
             await fetchData();
             await fetchActivities();
             setIsEditing(false);
             setIsEditing(false);
         } catch (err) {
-            showNotification(`Błąd podczas zapisywania zmian: ${err.message}`, 'error');
+            error(`Błąd: ${err.message}`, 'error');
         } finally {
             setIsSaving(false);
         }
@@ -406,16 +399,19 @@ export default function ProjectDetails() {
     const handleDeleteTask = async (taskId) => {
         askForConfirmation({
             title: 'Usuwanie Zadania',
-            message: 'Czy na pewno chcesz usunąć to zadanie? Ta operacja jest nieodwracalna.',
+            message:
+                'Czy na pewno chcesz usunąć to zadanie? Ta operacja jest nieodwracalna.',
             confirmText: 'Usuń',
             confirmVariant: 'danger',
             onConfirm: async () => {
                 try {
-                    await api.delete(`/tasks/${taskId}`, { params: { company: currentUser?.company?._id } });
+                    await api.delete(`/tasks/${taskId}`, {
+                        params: { company: currentUser?.company?._id },
+                    });
                     fetchTasks();
                     fetchActivities();
                 } catch (err) {
-                    showNotification(`Błąd: ${err.message}`, 'error');
+                    error(`Błąd: ${err.message}`, 'error');
                 }
             },
         });
@@ -425,32 +421,28 @@ export default function ProjectDetails() {
         if (!newComment.trim()) return;
 
         try {
-            await api.post('/comments',
-                {
-                    content: newComment,
-                    project: id,
-                }
-            );
+            await api.post('/comments', {
+                content: newComment,
+                project: id,
+            });
             setNewComment('');
             fetchComments();
             fetchActivities();
         } catch (err) {
-            showNotification(`Błąd: ${err.message}`, 'error');
+            error(`Błąd: ${err.message}`, 'error');
         }
     };
 
     const handleReplyComment = async (parentId, content) => {
         try {
-            await api.post('/comments',
-                {
-                    content,
-                    project: id,
-                    parentComment: parentId,
-                }
-            );
+            await api.post('/comments', {
+                content,
+                project: id,
+                parentComment: parentId,
+            });
             fetchComments();
         } catch (err) {
-            showNotification(`Błąd: ${err.message}`, 'error');
+            error(`Błąd: ${err.message}`, 'error');
         }
     };
 
@@ -466,7 +458,7 @@ export default function ProjectDetails() {
                     fetchComments();
                     fetchActivities();
                 } catch (err) {
-                    showNotification(`Błąd: ${err.message}`, 'error');
+                    error(`Błąd: ${err.message}`, 'error');
                 }
             },
         });
@@ -493,14 +485,15 @@ export default function ProjectDetails() {
         { total: 0, completed: 0, inProgress: 0, todo: 0 },
     );
 
-    const calculatedProgress = taskStats.total > 0
-        ? Math.round((taskStats.completed / taskStats.total) * 100)
-        : 0;
-    
+    const calculatedProgress =
+        taskStats.total > 0
+            ? Math.round((taskStats.completed / taskStats.total) * 100)
+            : 0;
+
     // Fallback do ręcznego progressu jest niepotrzebny, jeśli chcemy full automation,
     // ale może warto zostawić jako fallback wizualny, gdy zadania się jeszcze ładują?
     // W sumie loader to obsłuży.
-    
+
     const isAdmin =
         currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
 
@@ -510,10 +503,14 @@ export default function ProjectDetails() {
 
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-800 lg:flex-row">
-            <Notification notification={notification} onClear={clearNotification} />
             <ConfirmationModal
                 {...confirmationProps}
-                onClose={() => setConfirmationProps({ ...confirmationProps, isOpen: false })}
+                onClose={() =>
+                    setConfirmationProps({
+                        ...confirmationProps,
+                        isOpen: false,
+                    })
+                }
             />
             {/* LEWY PANEL (SIDEBAR) */}
             <aside className="flex w-full flex-col border-r border-gray-200 bg-white p-4 lg:min-h-screen lg:w-[380px] lg:p-8">
@@ -789,7 +786,7 @@ export default function ProjectDetails() {
                                         <p className="truncate font-semibold text-gray-800">
                                             {user.username}
                                         </p>
-                                        <p className="truncate text-sm text-gray-500 max-w-48">
+                                        <p className="max-w-48 truncate text-sm text-gray-500">
                                             {user.email}
                                         </p>
                                     </div>
