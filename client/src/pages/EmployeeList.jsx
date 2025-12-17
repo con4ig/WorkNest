@@ -472,7 +472,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                             type="text"
                             value={tempPassword}
                             onChange={(e) => setTempPassword(e.target.value)}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500"
+                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:ring-2 focus:ring-emerald-500 md:text-sm"
                             placeholder="np. Firma2024!"
                         />
                         <p className="mt-1 text-xs text-slate-500">
@@ -905,7 +905,7 @@ export default function EmployeeList() {
                             )}
                             <div className="relative w-full sm:w-auto">
                                 <input
-                                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm shadow-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 md:w-72"
+                                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-base shadow-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 md:w-72 md:text-sm"
                                     placeholder="Szukaj użytkownika..."
                                     value={searchQuery}
                                     onChange={(e) =>

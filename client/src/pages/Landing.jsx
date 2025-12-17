@@ -75,23 +75,17 @@ function Landing() {
                         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-600 md:text-sm">
                             SYSTEM HR NEXT-GEN
                         </p>
-                        <h1 className="mb-6 text-4xl font-extrabold leading-tight tracking-tighter text-gray-900 sm:text-5xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl">
+                        <h1 className="mb-6 text-3xl font-extrabold leading-tight tracking-tighter text-gray-900 sm:text-4xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl">
                             Odkryj nowy wymiar
                             <span className="block bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                                 efektywności w Twoim HR
                             </span>
                         </h1>
                         <p className="mx-auto mb-8 max-w-3xl px-4 text-base font-light text-gray-600 sm:text-lg md:mb-10 md:text-xl lg:text-2xl">
-                            Zarządzaj zespołem, automatyzuj procesy i osiągaj
-                            cele strategiczne — kompleksowe narzędzie, które
-                            rewolucjonizuje pracę w Twojej organizacji.
+                            Zarządzaj zespołem i automatyzuj procesy HR w jednym, nowoczesnym narzędziu.
                         </p>
-                        <div className="flex flex-col justify-center gap-4 px-4 sm:flex-row md:gap-6">
-                            <button className="transform rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 text-base font-bold text-white shadow-2xl shadow-emerald-500/50 transition-all duration-300 hover:scale-[1.03] hover:from-emerald-700 hover:to-teal-700 md:px-10 md:py-4 md:text-lg">
-                                <CheckCircle className="mr-2 inline-block h-4 w-4 md:h-5 md:w-5" />
-                                Rozpocznij Bezpłatny Okres Próbny
-                            </button>
-                            <button className="rounded-xl border-2 border-emerald-200 bg-white px-6 py-3 text-base font-bold text-emerald-600 shadow-lg transition-colors duration-300 hover:bg-emerald-50 md:px-10 md:py-4 md:text-lg">
+                        <div className="flex justify-center px-4">
+                            <button className="transform rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-3 text-base font-bold text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:scale-[1.03] hover:from-emerald-700 hover:to-teal-700 md:px-10 md:py-4 md:text-lg">
                                 Zobacz demo
                             </button>
                         </div>
