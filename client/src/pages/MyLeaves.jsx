@@ -5,7 +5,6 @@ import RequestLeaveModal from '../components/RequestLeaveModal';
 import { useAuth } from '../context/AuthContext';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
-import Notification from '../components/Notification.jsx';
 
 const Icon = {
     ArrowLeft: () => (
@@ -82,7 +81,9 @@ export default function MyLeaves() {
     const fetchLeaves = async () => {
         if (!user || !user.company) return;
         try {
-            const res = await api.get('/leaves/my', { params: { company: user.company._id } });
+            const res = await api.get('/leaves/my', {
+                params: { company: user.company._id },
+            });
             setLeaves(res.data.leaves);
             setStats(res.data.stats);
             setLoading(false);
@@ -95,19 +96,12 @@ export default function MyLeaves() {
         }
     };
 
-    const [notification, setNotification] = useState({ message: '', type: '', visible: false });
-    const [confirmationProps, setConfirmationProps] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-
-    const showNotification = (message, type = 'info') => {
-        setNotification({ message, type, visible: true });
-        setTimeout(() => {
-            setNotification((prev) => ({ ...prev, visible: false }));
-        }, 3000);
-    };
-
-    const clearNotification = () => {
-        setNotification({ ...notification, visible: false });
-    };
+    const [confirmationProps, setConfirmationProps] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
 
     const askForConfirmation = (props) => {
         setConfirmationProps({ isOpen: true, ...props });
@@ -116,7 +110,8 @@ export default function MyLeaves() {
     const handleDeleteClick = (id) => {
         askForConfirmation({
             title: 'Usuwanie Wniosku',
-            message: 'Czy na pewno chcesz usunąć ten wniosek? Ta operacja jest nieodwracalna.',
+            message:
+                'Czy na pewno chcesz usunąć ten wniosek? Ta operacja jest nieodwracalna.',
             confirmText: 'Usuń',
             confirmVariant: 'danger',
             onConfirm: () => handleDelete(id),
@@ -127,12 +122,12 @@ export default function MyLeaves() {
         if (!user || !user.company) return;
 
         try {
-            await api.delete(`/leaves/${id}`, { params: { company: user.company._id } });
+            await api.delete(`/leaves/${id}`, {
+                params: { company: user.company._id },
+            });
             fetchLeaves();
-            showNotification('Wniosek został usunięty', 'success');
         } catch (err) {
             console.error('Error deleting leave:', err);
-            showNotification(err.response?.data?.message || 'Błąd usuwania wniosku', 'error');
         }
     };
 
@@ -184,11 +179,15 @@ export default function MyLeaves() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 select-none">
-            <Notification notification={notification} onClear={clearNotification} />
+        <div className="min-h-screen select-none bg-gray-100">
             <ConfirmationModal
                 {...confirmationProps}
-                onClose={() => setConfirmationProps({ ...confirmationProps, isOpen: false })}
+                onClose={() =>
+                    setConfirmationProps({
+                        ...confirmationProps,
+                        isOpen: false,
+                    })
+                }
             />
             <div className="sticky top-0 z-10 bg-white shadow-sm">
                 <div className="mx-auto max-w-7xl px-8 py-6">
