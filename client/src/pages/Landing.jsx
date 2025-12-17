@@ -238,23 +238,7 @@ function Landing() {
                                 </p>
                             </div>
                         </div>
-                    </div>
-
-                    {/* 6. Sekcja Końcowego Wezwania do Akcji (Final CTA) */}
-                    <div className="mx-4 rounded-2xl border-2 border-emerald-200/50 bg-gradient-to-br from-emerald-50 to-teal-50 px-4 py-12 text-center shadow-2xl shadow-emerald-200/50 md:rounded-3xl md:border-4 md:py-20">
-                        <Rocket className="mx-auto mb-4 h-8 w-8 text-emerald-600 md:mb-6 md:h-12 md:w-12" />
-                        <h2 className="mb-4 px-4 text-3xl font-extrabold text-gray-900 md:text-4xl lg:text-5xl">
-                            Gotowy na rewolucję w zarządzaniu HR?
-                        </h2>
-                        <p className="mx-auto mb-8 max-w-3xl px-4 text-base text-gray-600 md:mb-10 md:text-lg lg:text-xl">
-                            Dołącz do tysięcy firm, które już dziś zwiększają
-                            swoją efektywność z WorkNest.
-                        </p>
-                        <button className="transform rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-3 text-lg font-bold text-white shadow-2xl shadow-emerald-500/50 transition-all duration-300 hover:scale-[1.03] hover:from-emerald-600 hover:to-teal-600 md:px-12 md:py-4 md:text-xl">
-                            <CheckCircle className="mr-2 inline-block h-5 w-5 md:h-6 md:w-6" />
-                            Rozpocznij Test Już Teraz!
-                        </button>
-                    </div>
+                
                 </main>
             </div>
 
