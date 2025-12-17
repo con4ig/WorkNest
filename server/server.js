@@ -46,6 +46,17 @@ const apiLimiter = rateLimit({
 
 // używaj tylko dla API
 app.use("/api/", apiLimiter);
+app.use(express.static(path.join(__dirname, "client/dist"), {
+  maxAge: "0", // albo "1y" dla plików z hashem
+}));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/dist", "index.html"), {
+    headers: {
+      "Cache-Control": "no-cache"
+    }
+  });
+});
 
 
 
