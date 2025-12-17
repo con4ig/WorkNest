@@ -23,6 +23,7 @@ import ForcePasswordChange from './pages/ForcePasswordChange.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
+import ErrorBoundary from './pages/ErrorBoundary.jsx';
 
 // Komponent do obsługi globalnych błędów autoryzacji
 const AuthErrorHandler = () => {
@@ -52,41 +53,43 @@ const AuthErrorHandler = () => {
 // ====================================================================
 createRoot(document.getElementById('root')).render(
     <StrictMode>
-        <AuthProvider>
-            <Router>
-                <AuthErrorHandler />
-                <Toaster
-                    containerStyle={{ zIndex: 9999 }}
-                    position="top-center"
-                    reverseOrder={false}
-                    toastOptions={{
-                        duration: 5000,
-                        style: { background: '#333', color: '#fff' },
-                    }}
-                />
-                <Routes>
-                    <Route path="/" element={<App />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/forgot-password" element={<Forgot />} />
-                    <Route path="/regulamin" element={<Regulamin />} />
-                    <Route path="/polityka-prywatnosci" element={<Polityka />} />
-
-                    <Route element={<ProtectedRoute />}>
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/employees" element={<EmployeeList />} />
-                        <Route path="/projekty" element={<Projekty />} />
-                        
-                        <Route path="/projects/:id" element={<ProjectDetails />} />
-                        <Route path="/employees/:id" element={<UserDetails />} />
-                        <Route path="/myleaves" element={<MyLeaves />} />
-                        <Route path="/leave-approvals" element={<LeaveApprovals />} />
-                        <Route path="/upload" element={<Upload />} />
-                        <Route path="/generate-code" element={<GenerateCode />} />
-                        <Route path="/force-password-change" element={<ForcePasswordChange />} />
-                    </Route>
-                </Routes>
-            </Router>
-        </AuthProvider>
+        <ErrorBoundary>
+            <AuthProvider>
+                <Router>
+                    <AuthErrorHandler />
+                    <Toaster
+                        containerStyle={{ zIndex: 9999 }}
+                        position="top-center"
+                        reverseOrder={false}
+                        toastOptions={{
+                            duration: 5000,
+                            style: { background: '#333', color: '#fff' },
+                        }}
+                    />
+                    <Routes>
+                        <Route path="/" element={<App />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/forgot-password" element={<Forgot />} />
+                        <Route path="/regulamin" element={<Regulamin />} />
+                        <Route path="/polityka-prywatnosci" element={<Polityka />} />
+                    
+                        <Route element={<ProtectedRoute />}>
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/employees" element={<EmployeeList />} />
+                            <Route path="/projekty" element={<Projekty />} />
+                            
+                            <Route path="/projects/:id" element={<ProjectDetails />} />
+                            <Route path="/employees/:id" element={<UserDetails />} />
+                            <Route path="/myleaves" element={<MyLeaves />} />
+                            <Route path="/leave-approvals" element={<LeaveApprovals />} />
+                            <Route path="/upload" element={<Upload />} />
+                            <Route path="/generate-code" element={<GenerateCode />} />
+                            <Route path="/force-password-change" element={<ForcePasswordChange />} />
+                        </Route>
+                    </Routes>
+                </Router>
+            </AuthProvider>
+        </ErrorBoundary>
     </StrictMode>
 );

@@ -74,16 +74,29 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
-app.use(
-  rateLimit({
-    windowMs: 10 * 60 * 1000,
-    max: 300,
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
 
-// ========== WAŻNE: TRASY API MUSZĄ BYĆ PRZED STATIC FILES ==========
+const apiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 150,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Osobny, łagodniejszy limiter dla auth
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 50, 
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+});
+
+// Aplikuj różne limitery
+app.use("/api/auth/login", authLimiter); 
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/refresh", authLimiter); 
+app.use("/api", apiLimiter); 
+
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/leaves", leaveRoutes);
