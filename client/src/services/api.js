@@ -50,6 +50,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (error.response?.status === 401 && originalRequest.url === '/auth/refresh') {
+      console.error("🔴 Refresh token wygasł. Wylogowywanie...");
+      localStorage.removeItem('accessToken'); 
+      window.dispatchEvent(new Event('auth-error'));
+      return Promise.reject(error);
+    }
+
     // Sprawdzamy, czy błąd to 401 i czy nie jest to ponowna próba po odświeżeniu
     if (error.response?.status === 401 && !originalRequest._retry) {
       

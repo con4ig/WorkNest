@@ -6,7 +6,6 @@ import moment from 'moment';
 import 'moment/locale/pl';
 import {
     translateProjectStatus,
-    translateTaskStatus,
     translatePriority,
 } from '../utils/translations';
 import { useAuth } from '../context/AuthContext';
