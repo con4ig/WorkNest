@@ -37,14 +37,17 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.set('trust proxy', 1);
-app.use(
-  rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  })
-);
+const apiLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minut
+  max: 450,                 // Limit na IP
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// używaj tylko dla API
+app.use("/api/", apiLimiter);
+
+
 
 const PORT = process.env.PORT || 5500;
 
