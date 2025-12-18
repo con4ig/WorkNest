@@ -1,27 +1,103 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import { ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
 };
+
+const registrationSchema = z
+    .object({
+        email: z
+            .string()
+            .min(1, { message: 'Email jest wymagany' })
+            .email({ message: 'Nieprawidłowy format email' }),
+        username: z
+            .string()
+            .min(1, { message: 'Nazwa użytkownika jest wymagana' }),
+        password: z
+            .string()
+            .min(6, { message: 'Hasło musi mieć co najmniej 6 znaków' }),
+        role: z.enum(['admin', 'employee']),
+        companyName: z.string().optional(),
+        invitationCode: z.string().optional(),
+    })
+    .superRefine((data, ctx) => {
+        if (
+            data.role === 'admin' &&
+            (!data.companyName || data.companyName.trim().length === 0)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['companyName'],
+                message: 'Nazwa firmy jest wymagana',
+            });
+        }
+        if (
+            data.role === 'employee' &&
+            (!data.invitationCode || data.invitationCode.trim().length === 0)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['invitationCode'],
+                message: 'Kod zaproszenia jest wymagany',
+            });
+        }
+    });
 
 export default function Register() {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm();
+        watch,
+    } = useForm({
+        resolver: zodResolver(registrationSchema),
+        defaultValues: {
+            role: 'admin',
+            email: '',
+            username: '',
+            password: '',
+            companyName: '',
+            invitationCode: '',
+        },
+    });
     const navigate = useNavigate();
+    const selectedRole = watch('role', 'admin');
+    const [isLoading, setIsLoading] = useState(false);
 
     const onSubmit = async (data) => {
+        setIsLoading(true);
         try {
-            await axios.post('/api/auth/register', data);
-            alert('Rejestracja zakończona sukcesem!');
+            const registrationData = {
+                email: data.email,
+                username: data.username,
+                password: data.password,
+                role: data.role,
+                companyName: data.companyName,
+                invitationCode: data.invitationCode,
+            };
+
+            // Oczyszczanie danych przed wysłaniem
+            if (registrationData.role === 'admin') {
+                delete registrationData.invitationCode;
+            } else if (registrationData.role === 'employee') {
+                delete registrationData.companyName;
+            }
+
+            await api.post('/auth/register', registrationData);
+
+            toast.success('Rejestracja zakończona sukcesem!');
             navigate('/login');
         } catch (err) {
-            alert(err.response?.data?.message || 'Błąd rejestracji');
+            toast.error(err.response?.data?.message || 'Błąd rejestracji');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -84,14 +160,7 @@ export default function Register() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('email', {
-                                            required: 'Email jest wymagany',
-                                            pattern: {
-                                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                                message:
-                                                    'Nieprawidłowy format email',
-                                            },
-                                        })}
+                                        {...register('email')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         placeholder="jan.kowalski@firma.pl"
                                     />
@@ -119,10 +188,7 @@ export default function Register() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('username', {
-                                            required:
-                                                'Nazwa użytkownika jest wymagana',
-                                        })}
+                                        {...register('username')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         placeholder="Jan.Kowalski"
                                     />
@@ -150,14 +216,7 @@ export default function Register() {
                                 </label>
                                 <div className="group relative">
                                     <input
-                                        {...register('password', {
-                                            required: 'Hasło jest wymagane',
-                                            minLength: {
-                                                value: 6,
-                                                message:
-                                                    'Hasło musi mieć co najmniej 6 znaków',
-                                            },
-                                        })}
+                                        {...register('password')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         type="password"
                                         placeholder="********"
@@ -179,14 +238,91 @@ export default function Register() {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Role Selection */}
+                            <div>
+                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    Kim jesteś?
+                                </label>
+                                <select
+                                    {...register('role')}
+                                    className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                >
+                                    <option value="admin">
+                                        Zakładam konto dla mojej firmy
+                                    </option>
+                                    <option value="employee">
+                                        Dołączam do istniejącej firmy
+                                    </option>
+                                </select>
+                            </div>
+
+                            {selectedRole === 'admin' ? (
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        Nazwa firmy
+                                    </label>
+                                    <div className="group relative">
+                                        <input
+                                            {...register('companyName')}
+                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            placeholder="Nazwa Twojej firmy"
+                                        />
+                                        {errors.companyName && (
+                                            <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
+                                                <svg
+                                                    className="h-4 w-4"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    />
+                                                </svg>
+                                                {errors.companyName.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        Kod zaproszenia
+                                    </label>
+                                    <div className="group relative">
+                                        <input
+                                            {...register('invitationCode')}
+                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            placeholder="Wprowadź kod zaproszenia"
+                                        />
+                                        {errors.invitationCode && (
+                                            <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
+                                                <svg
+                                                    className="h-4 w-4"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path
+                                                        fillRule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                    />
+                                                </svg>
+                                                {errors.invitationCode.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <button
                             type="submit"
+                            disabled={isLoading}
                             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                         >
-                            Zarejestruj się
-                            <Icon.ArrowRight />
+                            {isLoading ? 'Rejestrowanie...' : 'Zarejestruj się'}
+                            {!isLoading && <Icon.ArrowRight />}
                         </button>
                     </form>
                 </div>

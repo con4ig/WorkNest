@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
+import { useAuth } from '../context/AuthContext.jsx';
+import { translateRole } from '../utils/translations.js';
 
 const Icon = {
     X: () => (
@@ -16,6 +18,9 @@ const Icon = {
 };
 
 export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
+    const { user } = useAuth();
+    const companyId = user?.company?._id;
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -31,17 +36,18 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && companyId) {
             fetchUsers();
         }
-    }, [isOpen]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, companyId]);
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get('/api/users', {
-                withCredentials: true,
-            });
-            setUsers(res.data.users);
+            const res = await api.get('/users', {
+                params: { company: companyId },
+            }); // ZMIANA: Używamy 'api'
+            setUsers(res.data.users || []); // ZABEZPIECZENIE: Upewnij się, że users jest zawsze tablicą
         } catch (err) {
             console.error('Error fetching users:', err);
         }
@@ -69,20 +75,16 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            // Krok 1: ODBIERZ ODPOWIEDŹ Z SERWERA
-            const response = await axios.post('/api/projects', formData, {
-                withCredentials: true,
-            });
+            const response = await api.post(
+                // ZMIANA: Używamy 'api'
+                '/projects',
+                { ...formData, company: companyId },
+            );
 
-            // Krok 2: WYDOBYJ OBIEKT PROJEKTU Z ODPOWIEDZI
-            // Upewnij się, że to odpowiada strukturze odpowiedzi z server.js!
             const newProject = response.data.project;
 
-            // Krok 3: Wywołanie onSuccess z DANYMI PROJEKTU
-            onSuccess(newProject); // 👈 TUTAJ PRAWDOPODOBNIE JEST PROBLEM
+            onSuccess(newProject);
 
-            // Reset i zamknięcie
-            // ... reset form data ...
             onClose();
         } catch (err) {
             console.error('Error creating project:', err);
@@ -177,9 +179,10 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 onChange={handleChange}
                                 className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="low">Niski</option>
-                                <option value="medium">Średni</option>
-                                <option value="high">Wysoki</option>
+                                <option value="low">🟢 Niski</option>
+                                <option value="medium">🔵 Średni</option>
+                                <option value="high">🟠 Wysoki</option>
+                                <option value="critical">🔴 Krytyczny</option>
                             </select>
                         </div>
                     </div>
@@ -234,19 +237,19 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                         }
                                         className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                                     />
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                                    <div className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
-                                    <div className="flex-1">
-                                        <div className="text-sm font-medium">
+                                    <div className="flex-1 overflow-hidden">
+                                        <div className="truncate text-sm font-medium">
                                             {user.username}
                                         </div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="truncate text-xs text-gray-500 max-w-48">
                                             {user.email}
                                         </div>
                                     </div>
-                                    <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                                        {user.role}
+                                    <span className="ml-auto flex-shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
+                                        {translateRole(user.role)}
                                     </span>
                                 </label>
                             ))}

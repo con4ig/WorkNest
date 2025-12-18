@@ -54,8 +54,8 @@ server/
 | ✔️        | Formularz logowania                       | Autoryzacja użytkownika z walidacją danych |
 | ✔️        | Rejestracja użytkownika                   | Tworzenie konta z rolą domyślną (np. pracownik) |
 | ✔️        | Dashboard pracownika                      | Widok z informacjami o użytkowniku i jego aktywności |
-| ⬜        | Role: admin / HR / pracownik              | Różne uprawnienia i dostęp do funkcji w zależności od roli |
-| ⬜        | Historia obecności / urlopów              | Lista obecności i wniosków urlopowych użytkownika |
-| ⬜        | Edycja profilu użytkownika                | Możliwość zmiany danych osobowych i hasła |
-| ⬜        | Lista pracowników (dla HR)                | Widok wszystkich użytkowników z możliwością filtrowania |
-| ⬜        | Dodawanie i zatwierdzanie urlopów         | Formularz wniosku urlopowego + panel akceptacji dla HR/admina |
+| ✔️        | Role: admin / HR / pracownik              | Różne uprawnienia i dostęp do funkcji w zależności od roli |
+| ✔️        | Historia obecności / urlopów              | Lista obecności i wniosków urlopowych użytkownika |
+| ✔️        | Edycja profilu użytkownika                | Możliwość zmiany danych osobowych i hasła |
+| ✔️        | Lista pracowników (dla HR)                | Widok wszystkich użytkowników z możliwością filtrowania |
+| ✔️        | Dodawanie i zatwierdzanie urlopów         | Formularz wniosku urlopowego + panel akceptacji dla HR/admina |

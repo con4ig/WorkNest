@@ -1,107 +1,100 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Briefcase, LogOut, UserPlus, LogIn, LayoutDashboard, Menu } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import {
+    Briefcase,
+    LogOut,
+    UserPlus,
+    LogIn,
+    LayoutDashboard,
+} from 'lucide-react';
 
 export default function Navbar() {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState(null);
+    const { user, logout, loading } = useAuth();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get('/api/auth/me');
-        setUsername(res.data.username);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          // Oczekiwany błąd, gdy użytkownik nie jest zalogowany - nie trzeba go logować.
-        } else {
-          console.error('Błąd przy sprawdzaniu autoryzacji:', err);
-        }
-        setUsername(null); // nie zalogowany
-      }
+    const handleLogout = () => {
+        navigate('/');
+        setTimeout(logout, 0);
     };
 
-    checkAuth();
-  }, []);
+    const navItemClass =
+        'flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300';
+    const buttonPrimaryClass =
+        'px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/50 transition-all duration-300 transform hover:scale-[1.02]';
+    const buttonSecondaryClass =
+        'px-5 py-2.5 rounded-full text-sm font-bold text-emerald-600 border border-emerald-200 bg-white hover:bg-emerald-50 transition-all duration-300';
 
-  const handleLogout = async () => {
-    try {
-      await axios.post('/api/auth/logout', {}, { withCredentials: true });
-      localStorage.clear(); // usuń dane użytkownika
-      navigate('/login');
-    } catch (err) {
-      console.error('Błąd wylogowania:', err);
-    }
-  };
+    return (
+        <nav className="sticky top-0 z-50 border-b border-emerald-50/50 bg-white bg-white/95 shadow-xl backdrop-blur-sm">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="flex h-16 items-center justify-between md:h-20">
+                    {/* Logo */}
+                    <Link to="/" className="flex items-center gap-2 md:gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/30 md:h-10 md:w-10">
+                            <Briefcase className="h-4 w-4 text-white md:h-5 md:w-5" />
+                        </div>
+                        <span className="text-xl font-extrabold tracking-tight text-gray-900 md:text-2xl">
+                            Work<span className="text-emerald-600">Nest</span>
+                        </span>
+                    </Link>
 
-  // Klasy w nowym stylu (Emerald/Teal)
-  const navItemClass = "flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all duration-300";
-  const buttonPrimaryClass = "ml-3 px-5 py-2.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-lg shadow-emerald-500/50 transition-all duration-300 transform hover:scale-[1.02]";
-  const buttonSecondaryClass = "ml-3 px-5 py-2.5 rounded-full text-sm font-bold text-emerald-600 border border-emerald-200 bg-white hover:bg-emerald-50 transition-all duration-300";
+                    {/* Desktop Navigation - Full Menu */}
+                    <div className="hidden items-center gap-1 md:flex">
+                        {loading ? (
+                            <div className="h-10 w-48 animate-pulse rounded-full bg-gray-200"></div>
+                        ) : user ? (
+                            <>
+                                <Link to="/dashboard" className={navItemClass}>
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Dashboard
+                                </Link>
+                                <button
+                                    onClick={handleLogout}
+                                    className={`ml-3 ${buttonSecondaryClass}`}
+                                >
+                                    <LogOut className="mr-1 inline h-4 w-4" />
+                                    Wyloguj
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className={navItemClass}>
+                                    <LogIn className="h-4 w-4" />
+                                    Zaloguj się
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className={`ml-3 ${buttonPrimaryClass}`}
+                                >
+                                    <UserPlus className="mr-1 inline h-4 w-4" />
+                                    Zarejestruj się
+                                </Link>
+                            </>
+                        )}
+                    </div>
 
-
-  return (
-    <nav className="bg-white border-b border-emerald-50/50 shadow-xl sticky top-0 z-50 backdrop-blur-sm bg-white/95">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-3">
-              {/* Logotyp z gradientem Szmaragd/Morski */}
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                <Briefcase className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-2xl font-extrabold text-gray-900 tracking-tight">Work<span className="text-emerald-600">Nest</span></span>
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-1">
-            <Link
-              to="/"
-              className={navItemClass}
-            >
-              Home
-            </Link>
-
-            {username ? (
-              <>
-                <Link
-                  to="/dashboard"
-                  className={navItemClass}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className={buttonSecondaryClass}
-                >
-                  <LogOut className="w-4 h-4 mr-1 inline" />
-                  Wyloguj
-                </button>
-              </>
-
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className={navItemClass}
-                >
-                  <LogIn className="w-4 h-4" />
-                  Zaloguj się
-                </Link>
-                <Link
-                  to="/register"
-                  className={buttonPrimaryClass}
-                >
-                  <UserPlus className="w-4 h-4 mr-1 inline" />
-                  Zarejestruj się
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
+                    {/* Mobile Navigation - Only Login Button */}
+                    <div className="flex items-center md:hidden">
+                        {loading ? (
+                            <div className="h-10 w-28 animate-pulse rounded-full bg-gray-200"></div>
+                        ) : user ? (
+                            <button
+                                onClick={handleLogout}
+                                className={buttonPrimaryClass}
+                            >
+                                <LogOut className="mr-1 inline h-4 w-4" />
+                                Wyloguj
+                            </button>
+                        ) : (
+                            <Link to="/login" className={buttonPrimaryClass}>
+                                <LogIn className="mr-1 inline h-4 w-4" />
+                                Zaloguj się
+                            </Link>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    );
 }

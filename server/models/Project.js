@@ -16,7 +16,7 @@ const projectSchema = new mongoose.Schema(
     },
     priority: {
       type: String,
-      enum: ["low", "medium", "high"],
+      enum: ["low", "medium", "high", "critical"],
       default: "medium",
     },
     startDate: {
@@ -24,6 +24,11 @@ const projectSchema = new mongoose.Schema(
     },
     endDate: {
       type: Date,
+    },
+    isArchived: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
     assignedUsers: [
       {
@@ -41,6 +46,11 @@ const projectSchema = new mongoose.Schema(
       default: 0,
       min: 0,
       max: 100,
+    },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
     },
   },
   { timestamps: true }

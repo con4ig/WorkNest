@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import {
     Mail,
     Phone,
@@ -15,7 +15,13 @@ import {
     Building2,
     Badge,
 } from 'lucide-react';
+import {
+    translateStatus,
+    translateContractType,
+    translateRole,
+} from '../utils/translations.js';
 
+import LoadingScreen from '../components/LoadingScreen';
 // --- Pomocnicze funkcje formatowania ---
 const formatDateForDisplay = (dateString) => {
     if (!dateString) return 'Nie określono';
@@ -86,6 +92,9 @@ const Icon = {
     Notes: ({ className = 'text-emerald-500' }) => (
         <FileText className={`h-6 w-6 ${className}`} />
     ),
+    Documents: ({ className = 'text-emerald-500' }) => (
+        <FileText className={`h-6 w-6 ${className}`} />
+    ),
 };
 
 // --- Funkcje stylizujące ---
@@ -141,7 +150,7 @@ const StatCard = ({ icon, title, children }) => (
 );
 
 const ContentCard = ({ icon, title, children }) => (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-lg sm:p-8">
+    <div className="rounded-xl bg-white p-6 shadow-sm sm:p-8">
         <div className="mb-5 flex items-center gap-4 border-b border-slate-200 pb-4">
             {icon}
             <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
@@ -172,7 +181,7 @@ const EditableField = ({
                 <option value="">-- Wybierz --</option>
                 {options.map((opt) => (
                     <option key={opt} value={opt}>
-                        {opt}
+                        {name === 'role' ? translateRole(opt) : opt}
                     </option>
                 ))}
             </select>
@@ -209,17 +218,15 @@ export default function UserDetails() {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({});
     const [isSaving, setIsSaving] = useState(false);
+    const [employmentHistory, setEmploymentHistory] = useState([]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const meRes = await axios.get('/api/auth/me', {
-                withCredentials: true,
-            });
+            const meRes = await api.get('/users/me');
             setCurrentUser(meRes.data);
-            const res = await axios.get(`/api/users/${id}`, {
-                withCredentials: true,
-            });
+
+            const res = await api.get(`/users/${id}`);
 
             // Ustaw domyślne wartości dla pól HR jeśli ich nie ma
             const userData = {
@@ -239,10 +246,13 @@ export default function UserDetails() {
                 city: res.data.city || '',
                 peselOrId: res.data.peselOrId || '',
                 notes: res.data.notes || '',
+                employmentHistory: res.data.employmentHistory || [],
+                documents: res.data.documents || [],
             };
 
             setUser(res.data);
             setEditData(userData);
+            setEmploymentHistory(res.data.employmentHistory || []);
             setError(null);
         } catch (err) {
             console.error('Error fetching user:', err);
@@ -265,38 +275,130 @@ export default function UserDetails() {
         setEditData((prev) => ({ ...prev, [name]: newValue }));
     };
 
+    const handleHistoryChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedHistory = [...editData.employmentHistory];
+        updatedHistory[index] = { ...updatedHistory[index], [name]: value };
+        setEditData((prev) => ({ ...prev, employmentHistory: updatedHistory }));
+    };
+
+    const handleAddHistory = () => {
+        const newHistoryEntry = {
+            company: '',
+            position: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+        };
+        setEditData((prev) => ({
+            ...prev,
+            employmentHistory: [...prev.employmentHistory, newHistoryEntry],
+        }));
+    };
+
+    const handleRemoveHistory = (index) => {
+        const updatedHistory = editData.employmentHistory.filter(
+            (_, i) => i !== index,
+        );
+        setEditData((prev) => ({ ...prev, employmentHistory: updatedHistory }));
+    };
+
+    const handleDocumentChange = (index, e) => {
+        const { name, value } = e.target;
+        const updatedDocuments = [...editData.documents];
+        updatedDocuments[index] = { ...updatedDocuments[index], [name]: value };
+        setEditData((prev) => ({ ...prev, documents: updatedDocuments }));
+    };
+
+    const handleAddDocument = () => {
+        const newDocument = {
+            name: '',
+            url: '',
+            category: 'documentation',
+            uploadedAt: new Date().toISOString(),
+        };
+        setEditData((prev) => ({
+            ...prev,
+            documents: [...(prev.documents || []), newDocument],
+        }));
+    };
+
+    const handleRemoveDocument = (index) => {
+        const updatedDocuments = editData.documents.filter(
+            (_, i) => i !== index,
+        );
+        setEditData((prev) => ({ ...prev, documents: updatedDocuments }));
+    };
+
+
+
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await axios.patch(
-                `/api/users/${id}`,
-                {
-                    ...editData,
-                    hireDate: editData.hireDate || null,
-                    salary: editData.salary || 0,
-                },
-                { withCredentials: true },
-            );
-            await fetchData();
+            const dataToSave = { ...editData };
+
+            // Filtruj puste wpisy w dokumentach
+            if (dataToSave.documents) {
+                dataToSave.documents = dataToSave.documents.filter(
+                    (doc) => doc.name && doc.url,
+                );
+            }
+
+            // Filtruj puste wpisy w historii zatrudnienia
+            if (dataToSave.employmentHistory) {
+                dataToSave.employmentHistory =
+                    dataToSave.employmentHistory.filter(
+                        (hist) => hist.company && hist.position,
+                    );
+            }
+
+            const response = await api.patch(`/users/${id}`, {
+                ...dataToSave,
+                hireDate: dataToSave.hireDate || null,
+                salary: dataToSave.salary || 0,
+            });
+
+            const updatedUser = response.data.user;
+
+            // Zaktualizuj stany bezpośrednio z odpowiedzi API
+            setUser(updatedUser);
+            setEmploymentHistory(updatedUser.employmentHistory || []);
+
+            // Zsynchronizuj dane edycji z nowymi danymi
+            const userData = {
+                username: updatedUser.username || '',
+                email: updatedUser.email || '',
+                firstName: updatedUser.firstName || '',
+                lastName: updatedUser.lastName || '',
+                phoneNumber: updatedUser.phoneNumber || '',
+                position: updatedUser.position || '',
+                department: updatedUser.department || '',
+                hireDate: formatDateForInput(updatedUser.hireDate || ''),
+                salary: updatedUser.salary || 0,
+                status: updatedUser.status || 'active',
+                contractType: updatedUser.contractType || 'full-time',
+                role: updatedUser.role || 'employee',
+                address: updatedUser.address || '',
+                city: updatedUser.city || '',
+                peselOrId: updatedUser.peselOrId || '',
+                notes: updatedUser.notes || '',
+                employmentHistory: updatedUser.employmentHistory || [],
+                documents: updatedUser.documents || [],
+            };
+            setEditData(userData);
+
             setIsEditing(false);
         } catch (err) {
-            alert(`Błąd podczas zapisywania zmian: ${err.message}`);
+            const errorMessage =
+                err.response?.data?.message ||
+                'Wystąpił nieoczekiwany błąd. Spróbuj ponownie.';
+            alert(`Błąd podczas zapisywania zmian: ${errorMessage}`);
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (loading)
-        return (
-            <div className="flex h-screen items-center justify-center bg-slate-50">
-                <div className="text-center">
-                    <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                    <p className="text-lg text-slate-600">
-                        Ładowanie danych pracownika...
-                    </p>
-                </div>
-            </div>
-        );
+    if (loading) return <LoadingScreen message="Ładowanie danych pracownika..." />;
 
     if (error)
         return (
@@ -352,7 +454,7 @@ export default function UserDetails() {
                 </div>
 
                 <div className="space-y-6">
-                    <StatCard icon={<Icon.Badge />} title="Status i umowa">
+                    <StatCard icon={<Icon.Badge />} title="Status i Umowa">
                         {isEditing ? (
                             <div className="space-y-3">
                                 <select
@@ -363,7 +465,7 @@ export default function UserDetails() {
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
-                                            {s}
+                                            {translateStatus(s)}
                                         </option>
                                     ))}
                                 </select>
@@ -375,7 +477,7 @@ export default function UserDetails() {
                                 >
                                     {AVAILABLE_CONTRACT_TYPES.map((c) => (
                                         <option key={c} value={c}>
-                                            {c}
+                                            {translateContractType(c)}
                                         </option>
                                     ))}
                                 </select>
@@ -385,12 +487,12 @@ export default function UserDetails() {
                                 <span
                                     className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(user.status)}`}
                                 >
-                                    {user.status}
+                                    {translateStatus(user.status)}
                                 </span>
                                 <span
                                     className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${getContractClasses(user.contractType)}`}
                                 >
-                                    {user.contractType}
+                                    {translateContractType(user.contractType)}
                                 </span>
                             </div>
                         )}
@@ -437,7 +539,7 @@ export default function UserDetails() {
 
             {/* --- GŁÓWNA ZAWARTOŚĆ --- */}
             <main className="w-full flex-grow p-6 lg:p-10">
-                <header className="relative mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 p-8 shadow-2xl shadow-emerald-200">
+                <header className="relative mb-10 overflow-hidden rounded-t-xl bg-white border-b p-8">
                     <div className="relative z-10">
                         {isEditing ? (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -447,7 +549,7 @@ export default function UserDetails() {
                                     value={editData.firstName}
                                     onChange={handleEditChange}
                                     placeholder="Imię..."
-                                    className="rounded border-b-2 border-white/50 bg-white/20 px-2 py-1 text-lg font-bold text-white backdrop-blur focus:outline-none"
+                                    className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
                                 />
                                 <input
                                     type="text"
@@ -455,11 +557,11 @@ export default function UserDetails() {
                                     value={editData.lastName}
                                     onChange={handleEditChange}
                                     placeholder="Nazwisko..."
-                                    className="rounded border-b-2 border-white/50 bg-white/20 px-2 py-1 text-lg font-bold text-white backdrop-blur focus:outline-none"
+                                    className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
                                 />
                             </div>
                         ) : (
-                            <h1 className="text-4xl font-extrabold tracking-tight text-white lg:text-5xl">
+                            <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 lg:text-5xl">
                                 {fullName}
                             </h1>
                         )}
@@ -470,7 +572,7 @@ export default function UserDetails() {
                                         <button
                                             onClick={handleSave}
                                             disabled={isSaving}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-emerald-700 shadow-md transition-all hover:bg-slate-200 disabled:opacity-60"
+                                            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 font-bold text-white shadow-md transition-all hover:bg-emerald-700 disabled:opacity-60"
                                         >
                                             {isSaving ? (
                                                 'Zapisywanie...'
@@ -485,7 +587,7 @@ export default function UserDetails() {
                                                 setIsEditing(false);
                                                 fetchData();
                                             }}
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-5 py-2.5 font-bold text-white transition-all hover:bg-black/30"
+                                            className="flex items-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 font-bold text-gray-800 transition-all hover:bg-gray-300"
                                         >
                                             <Icon.Cancel /> Anuluj
                                         </button>
@@ -493,7 +595,7 @@ export default function UserDetails() {
                                 ) : (
                                     <button
                                         onClick={() => setIsEditing(true)}
-                                        className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 font-bold text-slate-800 shadow-lg transition-all hover:bg-slate-200"
+                                        className="flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:bg-slate-900"
                                     >
                                         <Icon.Edit /> Edytuj dane
                                     </button>
@@ -600,7 +702,7 @@ export default function UserDetails() {
                                             Rola
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {user.role}
+                                            {translateRole(user.role)}
                                         </p>
                                     </div>
                                     <div>
@@ -711,6 +813,250 @@ export default function UserDetails() {
                                 {user.notes || 'Brak notatek'}
                             </p>
                         )}
+                    </ContentCard>
+
+                    {/* Sekcja Historia Zatrudnienia */}
+                    <ContentCard
+                        icon={<Icon.Briefcase />}
+                        title="Historia zatrudnienia"
+                    >
+                        <div className="space-y-6">
+                            {isEditing
+                                ? editData.employmentHistory.map(
+                                      (item, index) => (
+                                          <div
+                                              key={index}
+                                              className="rounded-lg border bg-slate-50 p-4"
+                                          >
+                                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                  <EditableField
+                                                      label="Firma"
+                                                      name="company"
+                                                      value={item.company}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Stanowisko"
+                                                      name="position"
+                                                      value={item.position}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Data rozpoczęcia"
+                                                      name="startDate"
+                                                      type="date"
+                                                      value={formatDateForInput(
+                                                          item.startDate,
+                                                      )}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Data zakończenia"
+                                                      name="endDate"
+                                                      type="date"
+                                                      value={formatDateForInput(
+                                                          item.endDate,
+                                                      )}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                              </div>
+                                              <textarea
+                                                  name="description"
+                                                  rows="3"
+                                                  placeholder="Opis..."
+                                                  value={item.description}
+                                                  onChange={(e) =>
+                                                      handleHistoryChange(
+                                                          index,
+                                                          e,
+                                                      )
+                                                  }
+                                                  className="mt-4 w-full rounded-lg border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                              ></textarea>
+                                              <button
+                                                  onClick={() =>
+                                                      handleRemoveHistory(index)
+                                                  }
+                                                  className="mt-2 text-sm font-semibold text-red-600 hover:text-red-800"
+                                              >
+                                                  Usuń
+                                              </button>
+                                          </div>
+                                      ),
+                                  )
+                                : employmentHistory.map((item, index) => (
+                                      <div
+                                          key={index}
+                                          className="relative pl-8"
+                                      >
+                                          <div className="absolute left-0 top-1 h-full w-px bg-slate-200"></div>
+                                          <div className="absolute left-[-5px] top-1 h-3 w-3 rounded-full bg-emerald-500"></div>
+                                          <p className="font-bold text-slate-800">
+                                              {item.position}
+                                          </p>
+                                          <p className="text-sm text-slate-600">
+                                              {item.company}
+                                          </p>
+                                          <p className="text-xs text-slate-400">
+                                              {formatDateForDisplay(
+                                                  item.startDate,
+                                              )}{' '}
+                                              -{' '}
+                                              {formatDateForDisplay(
+                                                  item.endDate,
+                                              )}
+                                          </p>
+                                          <p className="mt-2 text-sm text-slate-500">
+                                              {item.description}
+                                          </p>
+                                      </div>
+                                  ))}
+                            {isEditing && (
+                                <button
+                                    onClick={handleAddHistory}
+                                    className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
+                                >
+                                    + Dodaj wpis
+                                </button>
+                            )}
+                            {!isEditing &&
+                                employmentHistory.length === 0 && (
+                                    <p className="text-slate-500">
+                                        Brak historii zatrudnienia.
+                                    </p>
+                                )}
+                        </div>
+                    </ContentCard>
+
+                    {/* Sekcja Dokumenty i Umowy */}
+                    <ContentCard
+                        icon={<Icon.Documents />}
+                        title="Dokumenty i Umowy"
+                    >
+                        <div className="space-y-6">
+                            {isEditing
+                                ? (editData.documents || []).map(
+                                      (doc, index) => (
+                                          <div
+                                              key={index}
+                                              className="rounded-lg border bg-slate-50 p-4"
+                                          >
+                                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                  <EditableField
+                                                      label="Nazwa dokumentu"
+                                                      name="name"
+                                                      value={doc.name}
+                                                      onChange={(e) =>
+                                                          handleDocumentChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="URL do pliku"
+                                                      name="url"
+                                                      value={doc.url}
+                                                      onChange={(e) =>
+                                                          handleDocumentChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                                  <EditableField
+                                                      label="Kategoria"
+                                                      name="category"
+                                                      value={doc.category}
+                                                      options={[
+                                                          'documentation',
+                                                          'agreement',
+                                                      ]}
+                                                      onChange={(e) =>
+                                                          handleDocumentChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                  />
+                                              </div>
+                                              <button
+                                                  onClick={() =>
+                                                      handleRemoveDocument(index)
+                                                  }
+                                                  className="mt-4 text-sm font-semibold text-red-600 hover:text-red-800"
+                                              >
+                                                  Usuń dokument
+                                              </button>
+                                          </div>
+                                      ),
+                                  )
+                                : (user.documents || []).map((doc, index) => (
+                                      <div
+                                          key={index}
+                                          className="flex items-center justify-between rounded-lg bg-slate-50 p-4"
+                                      >
+                                          <div className="flex flex-col">
+                                              <a
+                                                  href={doc.url}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="font-bold text-emerald-600 hover:underline"
+                                              >
+                                                  {doc.name}
+                                              </a>
+                                              <span className="text-sm text-slate-500">
+                                                  {doc.category === 'agreement'
+                                                      ? 'Umowa'
+                                                      : 'Dokumentacja'}
+                                              </span>
+                                          </div>
+                                          <span className="text-xs text-slate-400">
+                                              Dodano:{' '}
+                                              {formatDateForDisplay(
+                                                  doc.uploadedAt,
+                                              )}
+                                          </span>
+                                      </div>
+                                  ))}
+
+                            {isEditing && (
+                                <button
+                                    onClick={handleAddDocument}
+                                    className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
+                                >
+                                    + Dodaj dokument
+                                </button>
+                            )}
+
+                            {!isEditing &&
+                                (!user.documents ||
+                                    user.documents.length === 0) && (
+                                    <p className="text-slate-500">
+                                        Brak dokumentów i umów.
+                                    </p>
+                                )}
+                        </div>
                     </ContentCard>
                 </div>
             </main>

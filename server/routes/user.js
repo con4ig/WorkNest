@@ -1,236 +1,78 @@
 import express from "express";
-import User from "../models/User.js";
 import authenticate from "../middleware/authenticate.js";
 import authorize from "../middleware/authorize.js";
-import multer from 'multer';
-
+import multer from "multer";
+import {
+  getUsers,
+  getCurrentUser,
+  getUserById,
+  updateUser,
+  updateUserRole,
+  uploadProfileImage,
+  getProfileImage,
+  deleteProfileImage,
+  generateInvitation,
+  getInvitations,
+  revokeInvitation,
+  importUsersFromCSV,
+} from "../controllers/userController.js";
 
 const router = express.Router();
+
+// Konfiguracja multer - przechowuj w pamięci, nie na dysku
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"));
+    }
+  },
+});
+
+const csvUpload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    // Check mime type and extension
+    if (
+      file.mimetype === "text/csv" ||
+      file.mimetype === "application/vnd.ms-excel" || // Excel often saves CSV with this mime
+      file.originalname.toLowerCase().endsWith(".csv")
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only CSV files are allowed"));
+    }
+  },
+});
 
 // ============================================
 // GET /api/users
 // Lista wszystkich pracowników (HR i Admin)
 // ============================================
-router.get("/", authenticate, authorize("hr", "admin"), async (req, res) => {
-  try {
-    const { search } = req.query;
+router.get("/", authenticate, authorize("hr", "admin"), getUsers);
 
-    let query = {};
-
-    // Jeśli jest parametr search - filtruj po username, email, firstName lub lastName
-    if (search && search.trim().length >= 2) {
-      query = {
-        $or: [
-          { username: { $regex: search.trim(), $options: "i" } },
-          { email: { $regex: search.trim(), $options: "i" } },
-          { firstName: { $regex: search.trim(), $options: "i" } },
-          { lastName: { $regex: search.trim(), $options: "i" } },
-        ],
-      };
-    }
-
-    const users = await User.find(query).select("-password");
-    res.json({ count: users.length, users: users });
-  } catch (err) {
-    console.error("Error fetching users:", err);
-    res.status(500).json({ message: "Błąd serwera" });
-  }
-});
+// ============================================
+// GET /api/users/me
+// Pobieranie danych zalogowanego użytkownika
+// ============================================
+router.get("/me", authenticate, getCurrentUser);
 
 // ============================================
 // GET /api/users/:id
 // Pobieranie danych konkretnego pracownika
 // ============================================
-router.get("/:id", authenticate, async (req, res) => {
-  try {
-    // Sprawdzenie czy middleware authenticate ustawił req.user
-    if (!req.user) {
-      console.error(
-        "❌ req.user jest undefined - middleware authenticate nie działa"
-      );
-      return res.status(401).json({ message: "Nie jesteś zalogowany" });
-    }
-
-    const user = await User.findById(req.params.id).select("-password");
-
-    if (!user) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
-    }
-
-    // Sprawdzenie uprawnień: user może obejrzeć swoje dane, HR/Admin mogą obejrzeć każdego
-    if (
-      req.user._id.toString() !== req.params.id &&
-      !["hr", "admin"].includes(req.user.role)
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Brak uprawnień do przeglądania tego profilu" });
-    }
-
-    // Zwróć wszystkie dostępne pola, nawet jeśli są puste
-    res.json({
-      _id: user._id,
-      username: user.username || "",
-      email: user.email || "",
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      phoneNumber: user.phoneNumber || "",
-      position: user.position || "",
-      department: user.department || "",
-      hireDate: user.hireDate || null,
-      salary: user.salary || 0,
-      status: user.status || "active",
-      contractType: user.contractType || "full-time",
-      role: user.role || "employee",
-      address: user.address || "",
-      city: user.city || "",
-      peselOrId: user.peselOrId || "",
-      notes: user.notes || "",
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    });
-  } catch (err) {
-    console.error("Error fetching user:", err);
-    res.status(500).json({ message: "Błąd serwera" });
-  }
-});
+// router.get("/:id", authenticate, getUserById); // Moved down to avoid collision with /invitations
 
 // ============================================
 // PATCH /api/users/:id
 // Aktualizacja danych pracownika
-// - User może edytować swoje dane (bez roli)
-// - HR/Admin mogą edytować wszystko (w tym rolę)
 // ============================================
-router.patch("/:id", authenticate, async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const isOwnProfile = req.user._id.toString() === userId;
-    const isAdmin = ["hr", "admin"].includes(req.user.role);
-
-    // Sprawdzenie uprawnień: tylko HR/Admin mogą edytować cudze dane
-    if (!isOwnProfile && !isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "Możesz edytować tylko swoje dane" });
-    }
-
-    const {
-      username,
-      email,
-      firstName,
-      lastName,
-      phoneNumber,
-      position,
-      department,
-      hireDate,
-      salary,
-      status,
-      contractType,
-      role,
-      address,
-      city,
-      peselOrId,
-      notes,
-    } = req.body;
-
-    // Walidacja danych
-    if (email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: "Nieprawidłowy format email" });
-      }
-    }
-
-    if (
-      status &&
-      !["active", "inactive", "on-leave", "terminated"].includes(status)
-    ) {
-      return res.status(400).json({
-        message:
-          "Nieprawidłowy status. Dozwolone: active, inactive, on-leave, terminated",
-      });
-    }
-
-    if (
-      contractType &&
-      !["full-time", "part-time", "contract", "temporary"].includes(
-        contractType
-      )
-    ) {
-      return res.status(400).json({
-        message:
-          "Nieprawidłowy typ umowy. Dozwolone: full-time, part-time, contract, temporary",
-      });
-    }
-
-    if (role && !["employee", "hr", "admin"].includes(role)) {
-      return res.status(400).json({
-        message: "Nieprawidłowa rola. Dozwolone: employee, hr, admin",
-      });
-    }
-
-    // Pracownicy nie mogą zmieniać swojej roli
-    if (!isAdmin && role) {
-      return res
-        .status(403)
-        .json({ message: "Nie możesz zmieniać swoją rolę" });
-    }
-
-    if (salary !== undefined && salary < 0) {
-      return res.status(400).json({ message: "Pensja nie może być ujemna" });
-    }
-
-    // Sprawdzenie czy użytkownik istnieje
-    const existingUser = await User.findById(userId);
-    if (!existingUser) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
-    }
-
-    // Sprawdzenie czy email już istnieje (jeśli zmienia się email)
-    if (email && email !== existingUser.email) {
-      const emailExists = await User.findOne({ email });
-      if (emailExists) {
-        return res.status(400).json({ message: "Email jest już w użyciu" });
-      }
-    }
-
-    // Przygotowanie obiektu do aktualizacji (tylko niepuste pola)
-    const updateData = {};
-    if (username !== undefined) updateData.username = username;
-    if (email !== undefined) updateData.email = email;
-    if (firstName !== undefined) updateData.firstName = firstName;
-    if (lastName !== undefined) updateData.lastName = lastName;
-    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
-    if (position !== undefined) updateData.position = position;
-    if (department !== undefined) updateData.department = department;
-    if (hireDate !== undefined)
-      updateData.hireDate = hireDate ? new Date(hireDate) : null;
-    if (salary !== undefined) updateData.salary = salary;
-    if (status !== undefined) updateData.status = status;
-    if (contractType !== undefined) updateData.contractType = contractType;
-    if (role !== undefined && isAdmin) updateData.role = role; // Tylko Admin może zmieniać rolę
-    if (address !== undefined) updateData.address = address;
-    if (city !== undefined) updateData.city = city;
-    if (peselOrId !== undefined) updateData.peselOrId = peselOrId;
-    if (notes !== undefined) updateData.notes = notes;
-
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
-
-    res.json({
-      message: "Dane pracownika zaktualizowane pomyślnie",
-      user: updatedUser,
-    });
-  } catch (err) {
-    console.error("Error updating user:", err);
-    if (err.name === "ValidationError") {
-      return res.status(400).json({ message: err.message });
-    }
-    res.status(500).json({ message: "Błąd serwera" });
-  }
-});
+router.patch("/:id", authenticate, updateUser);
 
 // ============================================
 // PATCH /api/users/:id/role
@@ -240,148 +82,60 @@ router.patch(
   "/:id/role",
   authenticate,
   authorize("admin"),
-  async (req, res) => {
-    const { role } = req.body;
-
-    // Walidacja roli
-    if (!["employee", "hr", "admin"].includes(role)) {
-      return res.status(400).json({
-        message: "Nieprawidłowa rola. Dozwolone: employee, hr, admin",
-      });
-    }
-
-    try {
-      const user = await User.findByIdAndUpdate(
-        req.params.id,
-        { role },
-        { new: true }
-      ).select("-password");
-
-      if (!user) {
-        return res.status(404).json({ message: "Użytkownik nie znaleziony" });
-      }
-
-      res.json({
-        message: "Rola zmieniona pomyślnie",
-        user,
-      });
-    } catch (err) {
-      console.error("Error updating role:", err);
-      res.status(500).json({ message: "Błąd serwera" });
-    }
-  }
+  updateUserRole
 );
 
-// ============================================
-// DELETE /api/users/:id
-// Usunięcie pracownika (tylko Admin)
-// ============================================
-router.delete("/:id", authenticate, authorize("admin"), async (req, res) => {
-  try {
-    // Nie pozwól usunąć samego siebie
-    if (req.user._id.toString() === req.params.id) {
-      return res
-        .status(400)
-        .json({ message: "Nie możesz usunąć własnego konta" });
-    }
+router.post(
+  "/generate-invitation",
+  authenticate,
+  authorize("admin"),
+  generateInvitation
+);
 
-    const user = await User.findByIdAndDelete(req.params.id);
+router.get(
+  "/invitations",
+  authenticate,
+  authorize("admin"),
+  getInvitations
+);
 
-    if (!user) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
-    }
+router.delete(
+  "/invitations/:id",
+  authenticate,
+  authorize("admin"),
+  revokeInvitation
+);
 
-    res.json({ message: "Użytkownik usunięty pomyślnie" });
-  } catch (err) {
-    console.error("Error deleting user:", err);
-    res.status(500).json({ message: "Błąd serwera" });
-  }
-});
-
-
-// Konfiguracja multer - przechowuj w pamięci, nie na dysku
-const storage = multer.memoryStorage();
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
-  }
-});
+// Endpoint do importu CSV
+router.post(
+  "/import-csv",
+  authenticate,
+  authorize("hr", "admin"),
+  csvUpload.single("file"),
+  importUsersFromCSV
+);
 
 // Endpoint do uploadu zdjęcia profilowego
-router.put('/profile-image', authenticate, upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Konwertuj buffer na Base64 string
-    const base64Image = req.file.buffer.toString('base64');
-    const mimeType = req.file.mimetype;
-    
-    // Zapisz jako data URL (łatwiejsze do wyświetlenia w frontendzie)
-    user.profileImage = `data:${mimeType};base64,${base64Image}`;
-    
-    await user.save();
-
-    res.json({
-      message: 'Profile image updated successfully',
-      profileImage: user.profileImage
-    });
-
-  } catch (err) {
-    console.error('Upload error:', err);
-    res.status(500).json({ 
-      message: 'Server error', 
-      error: err.message 
-    });
-  }
-});
+router.put(
+  "/profile-image",
+  authenticate,
+  upload.single("image"),
+  uploadProfileImage
+);
 
 // Endpoint do pobierania zdjęcia profilowego (opcjonalny)
-router.get('/profile-image', authenticate, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('profileImage');
-    
-    if (!user || !user.profileImage) {
-      return res.status(404).json({ message: 'No profile image found' });
-    }
-
-    res.json({ profileImage: user.profileImage });
-  } catch (err) {
-    console.error('Get image error:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
+router.get("/profile-image", authenticate, getProfileImage);
 
 // Endpoint do usunięcia zdjęcia profilowego
-router.delete('/profile-image', authenticate, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+router.delete("/profile-image", authenticate, deleteProfileImage);
 
-    user.profileImage = "";
-    await user.save();
 
-    res.json({ message: 'Profile image deleted successfully' });
-  } catch (err) {
-    console.error('Delete image error:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
 
+// ============================================
+// GET /api/users/:id
+// Pobieranie danych konkretnego pracownika
+// ============================================
+// To musi być NA SAMYM KOŃCU, żeby nie przechwytywać innych tras (np. /invitations)
+router.get("/:id", authenticate, getUserById);
 
 export default router;

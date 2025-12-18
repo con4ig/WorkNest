@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 
 function Forgot() {
     const [step, setStep] = useState(1);
@@ -18,7 +18,7 @@ function Forgot() {
     // Logika zostaje w oddzielnych funkcjach dla czytelności
     const handleSendOtp = async (data) => {
         try {
-            await axios.post('/api/email/send-otp', { email: data.email });
+            await api.post('/email/send-otp', { email: data.email });
             setEmail(data.email);
             setStep(2);
         } catch (err) {
@@ -28,7 +28,7 @@ function Forgot() {
 
     const handleVerifyOtp = async (data) => {
         try {
-            const response = await axios.post('/api/email/verify-otp', {
+            const response = await api.post('/email/verify-otp', {
                 email: email, // Używamy email zapisanego w stanie
                 code: data.otp,
             });
@@ -47,7 +47,7 @@ function Forgot() {
                 return;
             }
 
-            await axios.post('/api/auth/reset-password', {
+            await api.post('/auth/reset-password', {
                 email: email, // Używamy email zapisanego w stanie
                 newPassword: data.newPassword,
             });

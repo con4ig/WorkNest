@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api.js';
 import RequestLeaveModal from '../components/RequestLeaveModal';
+import { useAuth } from '../context/AuthContext';
+import LoadingScreen from '../components/LoadingScreen.jsx';
+import ConfirmationModal from '../components/ConfirmationModal.jsx';
 
 const Icon = {
     ArrowLeft: () => (
@@ -67,15 +70,19 @@ export default function MyLeaves() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     useEffect(() => {
-        fetchLeaves();
-    }, []);
+        if (user && user.company) {
+            fetchLeaves();
+        }
+    }, [user]);
 
     const fetchLeaves = async () => {
+        if (!user || !user.company) return;
         try {
-            const res = await axios.get('/api/leaves/my', {
-                withCredentials: true,
+            const res = await api.get('/leaves/my', {
+                params: { company: user.company._id },
             });
             setLeaves(res.data.leaves);
             setStats(res.data.stats);
@@ -89,15 +96,38 @@ export default function MyLeaves() {
         }
     };
 
+    const [confirmationProps, setConfirmationProps] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
+
+    const askForConfirmation = (props) => {
+        setConfirmationProps({ isOpen: true, ...props });
+    };
+
+    const handleDeleteClick = (id) => {
+        askForConfirmation({
+            title: 'Usuwanie Wniosku',
+            message:
+                'Czy na pewno chcesz usunąć ten wniosek? Ta operacja jest nieodwracalna.',
+            confirmText: 'Usuń',
+            confirmVariant: 'danger',
+            onConfirm: () => handleDelete(id),
+        });
+    };
+
     const handleDelete = async (id) => {
-        if (!window.confirm('Czy na pewno chcesz usunąć ten wniosek?')) return;
+        if (!user || !user.company) return;
 
         try {
-            await axios.delete(`/api/leaves/${id}`, { withCredentials: true });
+            await api.delete(`/leaves/${id}`, {
+                params: { company: user.company._id },
+            });
             fetchLeaves();
         } catch (err) {
             console.error('Error deleting leave:', err);
-            alert(err.response?.data?.message || 'Błąd usuwania wniosku');
         }
     };
 
@@ -126,26 +156,39 @@ export default function MyLeaves() {
     const getLeaveTypeLabel = (type) => {
         const labels = {
             vacation: 'Urlop wypoczynkowy',
+            on_demand: 'Urlop na żądanie',
+            unpaid: 'Urlop bezpłatny',
+            occasional: 'Urlop okolicznościowy',
+            maternity: 'Urlop macierzyński',
+            paternity: 'Urlop ojcowski',
+            parental: 'Urlop rodzicielski',
+            childcare: 'Urlop wychowawczy',
+            care: 'Urlop opiekuńczy',
+            training: 'Urlop szkoleniowy',
+            job_search: 'Urlop na poszukiwanie pracy',
+            health: 'Urlop zdrowotny/rehabilitacyjny',
             sick: 'Zwolnienie lekarskie',
-            personal: 'Urlop okolicznościowy',
+            personal: 'Urlop okolicznościowy (stary)',
             other: 'Inny',
         };
         return labels[type] || type;
     };
 
     if (loading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-100">
-                <div className="text-center">
-                    <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                    <div className="text-lg text-gray-600">Ładowanie...</div>
-                </div>
-            </div>
-        );
+        return <LoadingScreen message="Ładowanie wniosków..." />;
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen select-none bg-gray-100">
+            <ConfirmationModal
+                {...confirmationProps}
+                onClose={() =>
+                    setConfirmationProps({
+                        ...confirmationProps,
+                        isOpen: false,
+                    })
+                }
+            />
             <div className="sticky top-0 z-10 bg-white shadow-sm">
                 <div className="mx-auto max-w-7xl px-8 py-6">
                     <div className="flex items-center justify-between">
@@ -272,7 +315,7 @@ export default function MyLeaves() {
                                         {leave.status === 'pending' && (
                                             <button
                                                 onClick={() =>
-                                                    handleDelete(leave._id)
+                                                    handleDeleteClick(leave._id)
                                                 }
                                                 className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50"
                                                 title="Usuń"
