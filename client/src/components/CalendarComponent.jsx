@@ -108,7 +108,8 @@ const CustomEvent = ({ event }) => {
     );
 };
 
-const CalendarComponent = ({ leaves, onEventClick, views = ['month', 'week', 'agenda'] }) => {
+const CalendarComponent = ({ leaves, onEventClick }) => {
+    const views = ['month'];
     const [date, setDate] = React.useState(new Date());
     const [view, setView] = React.useState(views[0] || 'month');
 
