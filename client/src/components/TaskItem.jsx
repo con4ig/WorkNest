@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import api from '../../src/services/api.js';
 import moment from 'moment';
 import 'moment/locale/pl';
@@ -43,6 +43,19 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
         dueDate: formatDateForInput(task.dueDate),
     });
 
+    useEffect(() => {
+        if (!isEditing) {
+            setEditData({
+                title: task.title,
+                description: task.description,
+                status: task.status,
+                priority: task.priority,
+                assignedTo: task.assignedTo?._id || '',
+                dueDate: formatDateForInput(task.dueDate),
+            });
+        }
+    }, [task, isEditing]);
+
     const handleSave = async () => {
         const payload = {
             ...editData,
@@ -58,13 +71,9 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
         }
     };
 
-    const toggleStatus = async () => {
-        const statuses = ['todo', 'in-progress', 'completed'];
-        const currentIndex = statuses.indexOf(task.status);
-        const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-
+    const handleStatusChange = async (newStatus) => {
         try {
-            await api.patch(`/tasks/${task._id}`, { status: nextStatus });
+            await api.patch(`/tasks/${task._id}`, { status: newStatus });
             onUpdate();
         } catch (err) {
             alert(`Błąd: ${err.message}`);
@@ -79,18 +88,6 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
         ...projectUsers.map(u => ({ id: u._id, name: u.username }))
     ];
 
-
-    const StatusIcon = () => {
-        switch (task.status) {
-            case 'completed':
-                return <Icon.CheckCircle className="text-green-600" />;
-            case 'in-progress':
-                return <Icon.Clock className="text-sky-600" />;
-            default:
-                return <Icon.Circle className="text-slate-400" />;
-        }
-    };
-
     return (
         <div
             className={`group flex items-start gap-3 rounded-lg border bg-white p-4 transition-all duration-200 ease-in-out ${
@@ -99,14 +96,6 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                     : 'border-gray-200 hover:border-emerald-300 hover:shadow-md'
             }`}
         >
-            <button
-                onClick={!isEditing ? toggleStatus : () => {}}
-                disabled={isEditing}
-                className="mt-0.5 transition-transform duration-200 ease-in-out enabled:hover:scale-110 disabled:cursor-not-allowed"
-            >
-                <StatusIcon />
-            </button>
-
             <div className="flex-1">
                 {isEditing ? (
                     <div className="flex flex-col">
@@ -184,13 +173,17 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                         </>
                     ) : (
                         <>
-                            <span
-                                className={`rounded-full px-2 py-1 ${getStatusClasses(
-                                    task.status,
-                                )}`}
+                            <select
+                                value={task.status}
+                                onChange={(e) => handleStatusChange(e.target.value)}
+                                className="relative z-20 cursor-pointer rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-left text-xs transition-colors hover:border-emerald-500 focus:outline-none focus-visible:border-emerald-500"
                             >
-                                {translateTaskStatus(task.status)}
-                            </span>
+                                {statusOptions.map(option => (
+                                    <option key={option.id} value={option.id}>
+                                        {option.name}
+                                    </option>
+                                ))}
+                            </select>
                             <span
                                 className={`rounded-full px-2 py-1 ${getPriorityClasses(
                                     task.priority,
@@ -222,12 +215,14 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                         {isEditing ? (
                             <div className="flex gap-2">
                                 <button
+                                    type="button"
                                     onClick={handleSave}
                                     className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
                                 >
                                     <Icon.Save size={14} /> Zapisz
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={() => setIsEditing(false)}
                                     className="flex items-center gap-1.5 rounded-md bg-gray-200 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-300"
                                 >
@@ -237,12 +232,14 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                         ) : (
                             <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                                 <button
+                                    type="button"
                                     onClick={() => setIsEditing(true)}
                                     className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-emerald-600"
                                 >
                                     <Icon.Edit3 />
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={() => onDelete(task._id)}
                                     className="rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
                                 >
@@ -258,5 +255,3 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
 };
 
 export default TaskItem;
-
-
