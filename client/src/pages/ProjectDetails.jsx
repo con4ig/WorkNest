@@ -821,7 +821,7 @@ export default function ProjectDetails() {
                                 />
                                 <button
                                     onClick={handleAddComment}
-                                    className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+                                    className="flex-shrink-0 rounded-lg bg-emerald-600 p-3 text-white hover:bg-emerald-700 sm:p-2 sm:px-4"
                                 >
                                     <Icon.Send />
                                 </button>
