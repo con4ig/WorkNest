@@ -307,50 +307,17 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
     };
 
     const handleDownloadTemplate = () => {
-        const headers = [
-            'email',
-            'username',
-            'firstName',
-            'lastName',
-            'position',
-            'department',
-            'salary',
-            'role',
-        ];
+        const headers = [ 'email', 'username', 'firstName', 'lastName', 'position', 'department', 'salary', 'role' ];
         const exampleRows = [
-            [
-                'jan.kowalski@firma.pl',
-                'janek',
-                'Jan',
-                'Kowalski',
-                'Programista',
-                'IT',
-                '8000',
-                'employee',
-            ],
-            [
-                'anna.nowak@firma.pl',
-                'anowak',
-                'Anna',
-                'Nowak',
-                'HR Manager',
-                'HR',
-                '9500',
-                'hr',
-            ],
+            [ 'jan.kowalski@firma.pl', 'janek', 'Jan', 'Kowalski', 'Programista', 'IT', '8000', 'employee' ],
+            [ 'anna.nowak@firma.pl', 'anowak', 'Anna', 'Nowak', 'HR Manager', 'HR', '9500', 'hr' ],
         ];
-
-        const csvContent = [
-            headers.join(','),
-            ...exampleRows.map((row) => row.join(',')),
-        ].join('\n');
-
+        const csvContent = [ headers.join(','), ...exampleRows.map(row => row.join(',')) ].join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
         link.setAttribute('download', 'szablon_pracownikow.csv');
-        link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -358,134 +325,96 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
-            <div className="w-full max-w-2xl rounded-xl border border-slate-200/50 bg-white p-5 shadow-2xl sm:p-6">
-                <div className="mb-6 flex items-start justify-between">
-                    <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
-                        Import Pracowników z CSV
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="-mt-1 text-slate-400 hover:text-slate-600"
-                    >
-                        <Icon.X />
-                    </button>
-                </div>
-
-                <div className="mb-6 space-y-4 rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm text-slate-600">
-                    <div>
-                        <p className="mb-2 font-semibold text-slate-800">
-                            Instrukcja:
-                        </p>
-                        <ul className="ml-1 list-disc list-inside space-y-1 text-slate-600">
-                            <li>
-                                Wypełnij dane w pliku CSV (wymagane:{' '}
-                                <b>email, username</b>).
-                            </li>
-                            <li>
-                                Każdy kolejny wiersz w pliku to nowy pracownik.
-                            </li>
-                            <li>
-                                Możesz dodać wielu pracowników naraz (np. 50+
-                                wierszy).
-                            </li>
-                        </ul>
+            <div className="flex h-full w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-slate-200/50 bg-white shadow-2xl max-h-[95vh] sm:max-h-[90vh]">
+                {/* Header */}
+                <div className="shrink-0 border-b border-slate-100 px-4 py-4 sm:px-6">
+                    <div className="flex items-start justify-between">
+                        <h3 className="text-base font-bold text-slate-900 sm:text-xl">
+                            Import Pracowników z CSV
+                        </h3>
+                        <button onClick={onClose} className="-mr-1 rounded-lg p-1 text-slate-400 hover:text-slate-600">
+                            <Icon.X />
+                        </button>
                     </div>
-
-                    <div>
-                        <p className="mb-2 font-semibold text-slate-800">
-                            Dozwolone role (wpisz angielską nazwę w CSV):
-                        </p>
-                        <div className="overflow-hidden rounded-lg border border-slate-200">
-                            <table className="w-full text-left text-xs">
-                                <thead className="bg-slate-100 font-semibold text-slate-700">
-                                    <tr>
-                                        <th className="border-r border-slate-200 px-3 py-2">
-                                            Wartość w CSV (Angielski)
-                                        </th>
-                                        <th className="px-3 py-2">
-                                            Rola w systemie (Polski)
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-200 bg-white">
-                                    <tr>
-                                        <td className="border-r border-slate-200 px-3 py-2 font-mono text-emerald-600">
-                                            employee
-                                        </td>
-                                        <td className="px-3 py-2">
-                                            Pracownik
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="border-r border-slate-200 px-3 py-2 font-mono text-blue-600">
-                                            hr
-                                        </td>
-                                        <td className="px-3 py-2">
-                                            HR Manager
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="border-r border-slate-200 px-3 py-2 font-mono text-purple-600">
-                                            admin
-                                        </td>
-                                        <td className="px-3 py-2">
-                                            Administrator
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                </div>
+                
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+                    <div className="mb-6 space-y-4 rounded-lg border border-slate-100 bg-slate-50/80 p-3 sm:p-4 text-sm text-slate-600">
+                        <div>
+                            <p className="mb-2 font-semibold text-slate-800">
+                                Instrukcja:
+                            </p>
+                            <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm text-slate-600">
+                                <li>Wypełnij dane w pliku CSV (wymagane: <b>email, username</b>).</li>
+                                <li>Każdy wiersz w pliku to nowy pracownik.</li>
+                                <li>Możesz dodać wielu pracowników naraz (np. 50+ wierszy).</li>
+                            </ul>
                         </div>
+                        
+                        <div>
+                             <p className="mb-2 font-semibold text-slate-800">
+                                Dozwolone role w pliku CSV:
+                            </p>
+                            <div className="text-xs sm:text-sm space-y-1">
+                                <p><code className="font-mono text-emerald-600 text-xs bg-emerald-50 p-0.5 rounded">employee</code> - Pracownik</p>
+                                <p><code className="font-mono text-blue-600 text-xs bg-blue-50 p-0.5 rounded">hr</code> - HR Manager</p>
+                                <p><code className="font-mono text-purple-600 text-xs bg-purple-50 p-0.5 rounded">admin</code> - Administrator</p>
+                             </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={handleDownloadTemplate}
+                            className="mt-2 flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs sm:text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100"
+                        >
+                            <Icon.Download size={16} /> Pobierz szablon CSV
+                        </button>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={handleDownloadTemplate}
-                        className="mt-2 flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-100"
-                    >
-                        <Icon.Download size={16} /> Pobierz przykładowy szablon
-                        CSV
-                    </button>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                                Plik CSV
+                            </label>
+                            <input
+                                type="file"
+                                accept=".csv"
+                                onChange={(e) => setFile(e.target.files[0])}
+                                className="block w-full cursor-pointer text-sm text-slate-500 
+                                    file:mr-4 file:rounded-lg file:border-0 
+                                    file:bg-emerald-50 file:px-4 
+                                    file:py-2 file:text-xs
+                                    sm:file:py-2.5 sm:file:text-sm
+                                    file:font-semibold file:text-emerald-700 
+                                    hover:file:bg-emerald-100"
+                            />
+                        </div>
+                        <div>
+                            <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                                Hasło tymczasowe
+                            </label>
+                            <input
+                                type="text"
+                                value={tempPassword}
+                                onChange={(e) => setTempPassword(e.target.value)}
+                                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:ring-2 focus:ring-emerald-500 md:text-sm"
+                                placeholder="np. Firma2024!"
+                            />
+                            <p className="mt-1.5 text-xs text-slate-500">
+                                Pracownik będzie musiał zmienić to hasło przy pierwszym logowaniu.
+                            </p>
+                        </div>
+
+                        {error && (
+                            <p className="text-sm text-red-600">{error}</p>
+                        )}
+                    </form>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-slate-700">
-                            Plik CSV
-                        </label>
-                        <input
-                            type="file"
-                            accept=".csv"
-                            onChange={(e) => setFile(e.target.files[0])}
-                            className="block w-full cursor-pointer text-sm text-slate-500 
-                                file:mr-4 file:rounded-lg file:border-0 
-                                file:bg-emerald-50 file:px-4 
-                                file:py-2.5 file:text-sm 
-                                file:font-semibold file:text-emerald-700 
-                                hover:file:bg-emerald-100"
-                        />
-                    </div>
-                    <div>
-                        <label className="mb-1 block text-sm font-medium text-slate-700">
-                            Hasło tymczasowe
-                        </label>
-                        <input
-                            type="text"
-                            value={tempPassword}
-                            onChange={(e) => setTempPassword(e.target.value)}
-                            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:ring-2 focus:ring-emerald-500 md:text-sm"
-                            placeholder="np. Firma2024!"
-                        />
-                        <p className="mt-1 text-xs text-slate-500">
-                            Pracownik będzie musiał zmienić to hasło przy
-                            pierwszym logowaniu.
-                        </p>
-                    </div>
-
-                    {error && (
-                        <p className="text-sm text-red-600">{error}</p>
-                    )}
-
-                    <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                {/* Footer */}
+                <div className="shrink-0 border-t border-slate-100 p-4">
+                    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                         <button
                             type="button"
                             onClick={onClose}
@@ -494,6 +423,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                             Anuluj
                         </button>
                         <button
+                            onClick={handleSubmit}
                             type="submit"
                             disabled={isLoading}
                             className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
@@ -501,7 +431,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                             {isLoading ? 'Importowanie...' : 'Importuj'}
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
