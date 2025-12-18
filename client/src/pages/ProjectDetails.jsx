@@ -762,6 +762,7 @@ export default function ProjectDetails() {
                             isAdmin={isAdmin}
                             projectId={id}
                             onTaskCreated={fetchTasks}
+                            isProjectEditing={isEditing}
                         />
                     </ContentCard>
 

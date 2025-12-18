@@ -21,7 +21,7 @@ moment.locale('pl');
 const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
     <button
         type="button"
-        className="flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-50 px-2 py-1 text-xs text-gray-700 hover:bg-gray-200"
+        className="flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200 w-40"
         onClick={onClick}
         ref={ref}
     >
@@ -32,7 +32,7 @@ const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
 CustomDateInput.displayName = 'CustomDateInput';
 
 
-const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
+const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEditing }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
         title: task.title,
@@ -140,68 +140,91 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin }) => {
                     </div>
                 )}
 
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                <div className="mt-3 flex flex-col gap-2 text-xs">
                     {isEditing ? (
                         <>
-                            <CustomSelect
-                                selected={editData.status}
-                                onChange={(value) => setEditData({ ...editData, status: value })}
-                                options={statusOptions}
-                            />
-                            <CustomSelect
-                                selected={editData.priority}
-                                onChange={(value) => setEditData({ ...editData, priority: value })}
-                                options={priorityOptions}
-                            />
-                            <CustomSelect
-                                selected={editData.assignedTo}
-                                onChange={(value) => setEditData({ ...editData, assignedTo: value })}
-                                options={userOptions}
-                                placeholder="Przypisz osobę"
-                            />
-                            
-                            <DatePicker
-                                selected={editData.dueDate ? new Date(editData.dueDate) : null}
-                                onChange={(date) => {
-                                    const formattedDate = date ? formatDateForInput(date) : '';
-                                    setEditData({ ...editData, dueDate: formattedDate });
-                                }}
-                                dateFormat="dd MMM yyyy"
-                                isClearable
-                                customInput={<CustomDateInput />}
-                            />
+                            <div className="flex flex-wrap gap-2">
+                                <select
+                                    value={editData.status}
+                                    onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+                                    className="rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-xs focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                >
+                                    {statusOptions.map(option => (
+                                        <option key={option.id} value={option.id}>
+                                            {option.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={editData.priority}
+                                    onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
+                                    className="rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-xs focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                >
+                                    {priorityOptions.map(option => (
+                                        <option key={option.id} value={option.id}>
+                                            {option.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                                <select
+                                    value={editData.assignedTo}
+                                    onChange={(e) => setEditData({ ...editData, assignedTo: e.target.value })}
+                                    className="rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-xs focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                >
+                                    {userOptions.map(option => (
+                                        <option key={option.id} value={option.id}>
+                                            {option.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                
+                                <DatePicker
+                                    selected={editData.dueDate ? new Date(editData.dueDate) : null}
+                                    onChange={(date) => {
+                                        const formattedDate = date ? formatDateForInput(date) : '';
+                                        setEditData({ ...editData, dueDate: formattedDate });
+                                    }}
+                                    dateFormat="dd MMM yyyy"
+                                    isClearable
+                                    customInput={<CustomDateInput />}
+                                    popperPlacement="top-start"
+                                />
+                            </div>
                         </>
                     ) : (
                         <>
-                            <select
-                                value={task.status}
-                                onChange={(e) => handleStatusChange(e.target.value)}
-                                className="relative z-20 cursor-pointer rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-left text-xs transition-colors hover:border-emerald-500 focus:outline-none focus-visible:border-emerald-500"
-                            >
-                                {statusOptions.map(option => (
-                                    <option key={option.id} value={option.id}>
-                                        {option.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <span
-                                className={`rounded-full px-2 py-1 ${getPriorityClasses(
-                                    task.priority,
-                                )}`}
-                            >
-                                {translatePriority(task.priority)}
-                            </span>
-                            {task.assignedTo && (
-                                <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-1 text-gray-700">
-                                    <Icon.User size={12} /> {task.assignedTo.username}
+                            <div className="flex items-center gap-2">
+                                <span
+                                    className={`rounded-full px-2 py-1 ${getStatusClasses(
+                                        task.status,
+                                    )}`}
+                                >
+                                    {translateTaskStatus(task.status)}
                                 </span>
-                            )}
-                            {task.dueDate && (
-                                <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-1 text-gray-700">
-                                    <Icon.Calendar size={12} />{' '}
-                                    {moment(task.dueDate).format('DD MMM YYYY')}
+                                <span
+                                    className={`rounded-full px-2 py-1 ${getPriorityClasses(
+                                        task.priority,
+                                    )}`}
+                                >
+                                    {translatePriority(task.priority)}
                                 </span>
-                            )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {task.assignedTo && (
+                                    <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 w-fit">
+                                        <Icon.User size={12} /> {task.assignedTo.username}
+                                    </span>
+                                )}
+                                {task.dueDate && (
+                                    <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 w-fit">
+                                        <Icon.Calendar size={12} />{' '}
+                                        {moment(task.dueDate).format('DD MMM YYYY')}
+                                    </span>
+                                )}
+                            </div>
                         </>
                     )}
                 </div>

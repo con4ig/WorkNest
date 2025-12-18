@@ -1,5 +1,4 @@
 import React from 'react';
-import { translateTaskStatus } from '../utils/translations';
 import TaskItem from './TaskItem.jsx';
 import InlineCreateTask from './InlineCreateTask.jsx';
 
@@ -12,6 +11,7 @@ const KanbanColumn = ({
     isAdmin,
     projectId,
     onTaskCreated,
+    isProjectEditing,
 }) => {
     const statusConfig = {
         todo: {
@@ -55,6 +55,7 @@ const KanbanColumn = ({
                             onDelete={onDelete}
                             projectUsers={projectUsers}
                             isAdmin={isAdmin}
+                            isProjectEditing={isProjectEditing}
                         />
                     ))
                 ) : (
@@ -76,7 +77,7 @@ const KanbanColumn = ({
 };
 
 
-const KanbanBoard = ({ tasks, onUpdate, onDelete, projectUsers, isAdmin, projectId, onTaskCreated }) => {
+const KanbanBoard = ({ tasks, onUpdate, onDelete, projectUsers, isAdmin, projectId, onTaskCreated, isProjectEditing }) => {
     const groupedTasks = {
         todo: tasks.filter((t) => t.status === 'todo'),
         'in-progress': tasks.filter((t) => t.status === 'in-progress'),
@@ -96,6 +97,7 @@ const KanbanBoard = ({ tasks, onUpdate, onDelete, projectUsers, isAdmin, project
                     isAdmin={isAdmin}
                     projectId={projectId}
                     onTaskCreated={onTaskCreated}
+                    isProjectEditing={isProjectEditing}
                 />
             ))}
         </div>
