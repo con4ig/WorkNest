@@ -6,7 +6,7 @@ import startOfWeek from 'date-fns/startOfWeek';
 import getDay from 'date-fns/getDay';
 import pl from 'date-fns/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, List, Filter } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const locales = {
     'pl': pl,
@@ -20,7 +20,7 @@ const localizer = dateFnsLocalizer({
     locales,
 });
 
-const CustomToolbar = ({ date, onNavigate, onView, view }) => {
+const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
     const goToBack = () => {
         onNavigate('PREV');
     };
@@ -35,6 +35,12 @@ const CustomToolbar = ({ date, onNavigate, onView, view }) => {
 
     const label = () => {
         return format(date, 'MMMM yyyy', { locale: pl });
+    };
+    
+    const viewButtons = {
+        month: 'Miesiąc',
+        week: 'Tydzień',
+        agenda: 'Agenda',
     };
 
     return (
@@ -67,38 +73,23 @@ const CustomToolbar = ({ date, onNavigate, onView, view }) => {
             </div>
 
             {/* Right: View Switcher */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                <button
-                    onClick={() => onView('month')}
-                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                        view === 'month'
-                            ? 'bg-white text-emerald-600 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    Miesiąc
-                </button>
-                <button
-                    onClick={() => onView('week')}
-                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                        view === 'week'
-                            ? 'bg-white text-emerald-600 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    Tydzień
-                </button>
-                <button
-                    onClick={() => onView('agenda')}
-                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                         view === 'agenda'
-                            ? 'bg-white text-emerald-600 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    Agenda
-                </button>
-            </div>
+            {views.length > 1 && (
+                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                    {views.map(viewName => (
+                        <button
+                            key={viewName}
+                            onClick={() => onView(viewName)}
+                            className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                                view === viewName
+                                    ? 'bg-white text-emerald-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            {viewButtons[viewName]}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };
@@ -117,9 +108,9 @@ const CustomEvent = ({ event }) => {
     );
 };
 
-const CalendarComponent = ({ leaves, onEventClick }) => {
+const CalendarComponent = ({ leaves, onEventClick, views = ['month', 'week', 'agenda'] }) => {
     const [date, setDate] = React.useState(new Date());
-    const [view, setView] = React.useState('month');
+    const [view, setView] = React.useState(views[0] || 'month');
 
     const events = leaves.map(leave => ({
         id: leave._id,
@@ -200,6 +191,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
                 view={view}
                 onNavigate={setDate}
                 onView={setView}
+                views={views}
 
                 components={{
                     toolbar: CustomToolbar,

@@ -412,6 +412,7 @@ export default function LeaveApprovals() {
             <div className="px-4 py-6 md:mx-auto md:max-w-7xl md:px-8 md:py-8">
                 {viewMode === 'calendar' && filter !== 'rejected' ? (
                      <CalendarComponent 
+                        views={['month']}
                         // Nigdy nie pokazujemy odrzuconych w kalendarzu, nawet jak sa w "All"
                         leaves={leaves.filter(l => l.status !== 'rejected')}
                         onEventClick={(event) => {
