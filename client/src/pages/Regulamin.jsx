@@ -37,7 +37,8 @@ function TermsOfService() {
                                 Informacje o Właścicielu Serwisu
                             </h3>
                             <p className="text-gray-700">
-                                Właścicielem i administratorem serwisu WorkNest jest:
+                                Właścicielem i administratorem serwisu WorkNest
+                                jest:
                                 <br />
                                 **{administrator.nazwa}**
                                 <br />
@@ -45,13 +46,18 @@ function TermsOfService() {
                             </p>
                         </div>
                         <p className="mb-3 leading-relaxed text-gray-700">
-                            1. Niniejszy regulamin określa zasady korzystania z serwisu WorkNest, który jest projektem portfolio i ma charakter demonstracyjny.
+                            1. Niniejszy regulamin określa zasady korzystania z
+                            serwisu WorkNest, który jest projektem portfolio i
+                            ma charakter demonstracyjny.
                         </p>
                         <p className="mb-3 leading-relaxed text-gray-700">
-                            2. Serwis WorkNest jest platformą demonstracyjną, prezentującą możliwości technologiczne i funkcjonalne, a nie komercyjną usługą.
+                            2. Serwis WorkNest jest platformą demonstracyjną,
+                            prezentującą możliwości technologiczne i
+                            funkcjonalne, a nie komercyjną usługą.
                         </p>
                         <p className="leading-relaxed text-gray-700">
-                            3. Korzystanie z Serwisu jest równoznaczne z akceptacją niniejszego Regulaminu.
+                            3. Korzystanie z Serwisu jest równoznaczne z
+                            akceptacją niniejszego Regulaminu.
                         </p>
                     </section>
 
@@ -67,7 +73,9 @@ function TermsOfService() {
                                     Wymagania Techniczne
                                 </strong>
                                 <p className="mt-1 text-sm text-gray-600">
-                                    Dostęp do Serwisu wymaga urządzenia z dostępem do Internetu oraz aktualnej przeglądarki internetowej.
+                                    Dostęp do Serwisu wymaga urządzenia z
+                                    dostępem do Internetu oraz aktualnej
+                                    przeglądarki internetowej.
                                 </p>
                             </li>
                             <li className="rounded-lg border-l-4 border-emerald-500 bg-white p-4 shadow-md">
@@ -76,7 +84,12 @@ function TermsOfService() {
                                     Obowiązki Użytkownika
                                 </strong>
                                 <p className="mt-1 text-sm text-gray-600">
-                                    Użytkownik zobowiązuje się do korzystania z Serwisu w sposób zgodny z prawem i dobrymi obyczajami, a w szczególności do nieumieszczania w nim treści o charakterze bezprawnym, obraźliwym lub naruszającym prawa osób trzecich.
+                                    Użytkownik zobowiązuje się do korzystania z
+                                    Serwisu w sposób zgodny z prawem i dobrymi
+                                    obyczajami, a w szczególności do
+                                    nieumieszczania w nim treści o charakterze
+                                    bezprawnym, obraźliwym lub naruszającym
+                                    prawa osób trzecich.
                                 </p>
                             </li>
                         </ul>
@@ -94,7 +107,13 @@ function TermsOfService() {
                                     Wyłączenie Odpowiedzialności
                                 </strong>
                                 <p className="mt-1 text-sm text-gray-600">
-                                    Serwis jest udostępniany w celach demonstracyjnych "tak jak jest". Właściciel serwisu nie ponosi odpowiedzialności za jakiekolwiek szkody wynikające z jego użytkowania, w tym za utratę danych. Użytkownik korzysta z serwisu na własne ryzyko.
+                                    Serwis jest udostępniany w celach
+                                    demonstracyjnych "tak jak jest". Właściciel
+                                    serwisu nie ponosi odpowiedzialności za
+                                    jakiekolwiek szkody wynikające z jego
+                                    użytkowania, w tym za utratę danych.
+                                    Użytkownik korzysta z serwisu na własne
+                                    ryzyko.
                                 </p>
                             </li>
                             <li className="rounded-lg border-l-4 border-teal-500 bg-white p-4 shadow-md">
@@ -103,7 +122,9 @@ function TermsOfService() {
                                     Prawa Autorskie
                                 </strong>
                                 <p className="mt-1 text-sm text-gray-600">
-                                    Wszelkie prawa do Serwisu, w tym do jego kodu, wyglądu i treści, należą do Właściciela serwisu.
+                                    Wszelkie prawa do Serwisu, w tym do jego
+                                    kodu, wyglądu i treści, należą do
+                                    Właściciela serwisu.
                                 </p>
                             </li>
                         </ul>
@@ -115,10 +136,13 @@ function TermsOfService() {
                             § 4. Postanowienia Końcowe
                         </h2>
                         <p className="mb-3 leading-relaxed text-gray-700">
-                            1. W sprawach nieuregulowanych niniejszym Regulaminem mają zastosowanie przepisy prawa polskiego.
+                            1. W sprawach nieuregulowanych niniejszym
+                            Regulaminem mają zastosowanie przepisy prawa
+                            polskiego.
                         </p>
                         <p className="mb-3 leading-relaxed text-gray-700">
-                            2. Właściciel serwisu zastrzega sobie prawo do zmiany Regulaminu w dowolnym czasie.
+                            2. Właściciel serwisu zastrzega sobie prawo do
+                            zmiany Regulaminu w dowolnym czasie.
                         </p>
                     </section>
                 </div>

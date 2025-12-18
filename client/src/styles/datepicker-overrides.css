@@ -1,0 +1,66 @@
+/* src/styles/datepicker-overrides.css */
+
+/* Change the background of the calendar header */
+.react-datepicker__header {
+    background-color: #0d9488; /* A shade of teal/emerald */
+    border-bottom: 1px solid #14b8a6;
+}
+
+/* Change the text color in the header */
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Style for the selected day */
+.react-datepicker__day--selected {
+    background-color: #10b981; /* Emerald-500 */
+    color: #ffffff;
+    border-radius: 50%;
+}
+.react-datepicker__day--selected:hover {
+    background-color: #059669; /* Emerald-600 */
+}
+
+/* Style for the day in the selecting range */
+.react-datepicker__day--in-selecting-range {
+    background-color: #a7f3d0; /* Emerald-200 */
+}
+
+/* Style for the day in a selected range */
+.react-datepicker__day--in-range {
+    background-color: #d1fae5; /* Emerald-100 */
+}
+
+/* Hover state for days */
+.react-datepicker__day:hover {
+    background-color: #f0fdf4; /* Emerald-50 */
+    border-radius: 50%;
+}
+
+/* Style for today's date */
+.react-datepicker__day--today {
+    font-weight: bold;
+    border: 1px solid #10b981;
+    border-radius: 50%;
+}
+
+/* Navigation arrows */
+.react-datepicker__navigation-icon::before {
+    border-color: #ffffff;
+    border-width: 2px 2px 0 0;
+}
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+    border-color: #ccfbf1;
+}
+
+/* Style for the time picker */
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
+    background-color: #10b981;
+    color: white;
+}
+
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover {
+    background-color: #f0fdf4;
+}

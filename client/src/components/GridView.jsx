@@ -1,0 +1,35 @@
+import React from 'react';
+import ProjectGridCard from './projects/ProjectGridCard';
+
+const GridView = ({
+    projects,
+    currentUserRole,
+    onDelete,
+    onArchive,
+    onRestore,
+    onCardClick,
+    showArchived,
+    selectedProjects = [],
+    onToggleSelect,
+}) => {
+    return (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {projects.map((project) => (
+                <ProjectGridCard
+                    key={project._id}
+                    project={project}
+                    currentUserRole={currentUserRole}
+                    onPermanentDelete={onDelete}
+                    onArchive={onArchive}
+                    onRestore={onRestore}
+                    onCardClick={onCardClick}
+                    showArchived={showArchived}
+                    isSelected={selectedProjects.includes(project._id)}
+                    onToggleSelect={onToggleSelect}
+                />
+            ))}
+        </div>
+    );
+};
+
+export default GridView;

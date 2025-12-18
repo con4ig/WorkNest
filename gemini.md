@@ -1,6 +1,4 @@
-# Context
-// Wymuś załadowanie całego folderu 'backend'
-/server/**
+### Context
 
-// Wymuś załadowanie stylów frontendu
-/client/**
+./client/**
+./server/**
