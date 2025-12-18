@@ -1,6 +1,9 @@
 import Navbar from '../components/Navbar.jsx';
 import demo from '../assets/demo.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 import {
     Zap,
     Users,
@@ -12,9 +15,14 @@ import {
     Play,
     Clock,
     Lock,
+    Loader2,
 } from 'lucide-react';
 
 function Landing() {
+    const navigate = useNavigate();
+    const { demoLogin } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
+
     const features = [
         {
             title: 'Zarządzanie Projektami',
@@ -85,8 +93,34 @@ function Landing() {
                             Zarządzaj zespołem i automatyzuj procesy HR w jednym, nowoczesnym narzędziu.
                         </p>
                         <div className="flex justify-center px-4">
-                            <button className="transform rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-3 text-base font-bold text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:scale-[1.03] hover:from-emerald-700 hover:to-teal-700 md:px-10 md:py-4 md:text-lg">
-                                Zobacz demo
+                            <button
+                                onClick={async () => {
+                                    setIsLoading(true);
+                                    try {
+                                        await demoLogin();
+                                        navigate('/dashboard');
+                                    } catch (err) {
+                                        toast.error('Błąd logowania do demo');
+                                        console.error(err);
+                                    } finally {
+                                        setIsLoading(false);
+                                    }
+                                }}
+                                disabled={isLoading}
+                                className={`flex items-center justify-center gap-2 transform rounded-xl px-8 py-3 text-base font-bold text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 md:px-10 md:py-4 md:text-lg ${
+                                    isLoading
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:scale-[1.03] hover:from-emerald-700 hover:to-teal-700'
+                                }`}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                        Ładowanie...
+                                    </>
+                                ) : (
+                                    'Zobacz demo'
+                                )}
                             </button>
                         </div>
                     </div>
