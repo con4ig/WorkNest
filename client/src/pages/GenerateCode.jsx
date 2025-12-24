@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -23,6 +24,7 @@ import { useAuth } from '../context/AuthContext';
 moment.locale('pl');
 
 export default function GenerateCode() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [pageLoading, setPageLoading] = useState(true);
     const [invitations, setInvitations] = useState([]);
@@ -80,19 +82,19 @@ export default function GenerateCode() {
             await api.post('/users/generate-invitation', payload);
             await fetchInvitations();
         } catch (err) {
-            setError(err.response?.data?.message || 'Błąd generowania kodu');
+            setError(err.response?.data?.message || t('generateCode.generateError') || 'Błąd generowania kodu');
         } finally {
             setLoading(false);
         }
     };
 
     const handleRevoke = async (id) => {
-        if (!window.confirm('Czy na pewno chcesz unieważnić ten kod?')) return;
+        if (!window.confirm(t('generateCode.revokeConfirm'))) return;
         try {
             await api.delete(`/users/invitations/${id}`);
             await fetchInvitations();
         } catch (err) {
-            alert('Nie udało się usunąć zaproszenia');
+            alert(t('generateCode.revokeError'));
         }
     };
 
@@ -104,21 +106,21 @@ export default function GenerateCode() {
 
     // Options for selects
     const roleOptions = [
-        { id: 'employee', name: 'Pracownik' },
-        { id: 'hr', name: 'HR Manager' },
-        { id: 'admin', name: 'Administrator' },
+        { id: 'employee', name: t('common.roles.employee') },
+        { id: 'hr', name: t('common.roles.hr') },
+        { id: 'admin', name: t('common.roles.admin') },
     ];
 
     const expirationOptions = [
-        { id: '5m', name: '5 minut' },
-        { id: '30m', name: '30 minut' },
-        { id: '1h', name: '1 godzina' },
-        { id: '24h', name: '24 godziny' },
-        { id: '7d', name: '7 dni' },
-        { id: '30d', name: '30 dni' },
+        { id: '5m', name: t('generateCode.expirations.5m') },
+        { id: '30m', name: t('generateCode.expirations.30m') },
+        { id: '1h', name: t('generateCode.expirations.1h') },
+        { id: '24h', name: t('generateCode.expirations.24h') },
+        { id: '7d', name: t('generateCode.expirations.7d') },
+        { id: '30d', name: t('generateCode.expirations.30d') },
     ];
 
-    if (pageLoading) return <LoadingScreen message="Ładowanie panelu..." />;
+    if (pageLoading) return <LoadingScreen message={t('generateCode.loading')} />;
 
     return (
         <div className="min-h-screen bg-gray-100 p-6 lg:p-10">
@@ -128,16 +130,15 @@ export default function GenerateCode() {
                     onClick={() => navigate('/dashboard')}
                     className="mb-6 flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-emerald-600"
                 >
-                    <ArrowLeft className="h-4 w-4" /> Wróć do dashboardu
+                    <ArrowLeft className="h-4 w-4" /> {t('generateCode.backToDashboard')}
                 </button>
                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-                            Zarządzanie Zaproszeniami
+                            {t('generateCode.title')}
                         </h1>
                         <p className="mt-1 text-sm text-gray-500 md:text-base">
-                            Generuj kody dostępu i monitoruj ich wykorzystanie w
-                            swojej organizacji.
+                            {t('generateCode.subtitle')}
                         </p>
                     </div>
                 </div>
@@ -152,7 +153,7 @@ export default function GenerateCode() {
                                 <Sparkles className="h-5 w-5" />
                             </div>
                             <h2 className="text-lg font-semibold text-gray-900">
-                                Nowy Kod
+                                {t('generateCode.newCode')}
                             </h2>
                         </div>
 
@@ -160,7 +161,7 @@ export default function GenerateCode() {
                             {/* Role Selection */}
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Rola użytkownika
+                                    {t('generateCode.roleLabel')}
                                 </label>
                                 <CustomSelect
                                     options={roleOptions}
@@ -168,14 +169,14 @@ export default function GenerateCode() {
                                     onChange={(val) =>
                                         setFormData({ ...formData, role: val })
                                     }
-                                    placeholder="Wybierz rolę"
+                                    placeholder={t('generateCode.rolePlaceholder')}
                                 />
                             </div>
 
                             {/* Type Selection */}
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Rodzaj zaproszenia
+                                    {t('generateCode.typeLabel')}
                                 </label>
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
@@ -193,7 +194,7 @@ export default function GenerateCode() {
                                     >
                                         <Users className="h-5 w-5" />
                                         <span className="text-xs font-medium">
-                                            Jednorazowe
+                                            {t('generateCode.typeSingle')}
                                         </span>
                                     </button>
                                     <button
@@ -214,7 +215,7 @@ export default function GenerateCode() {
                                             <InfinityIcon className="h-3 w-3 -ml-1 text-current" />
                                         </div>
                                         <span className="text-xs font-medium">
-                                            Wielokrotne
+                                            {t('generateCode.typeMulti')}
                                         </span>
                                     </button>
                                 </div>
@@ -225,7 +226,7 @@ export default function GenerateCode() {
                                 className={`overflow-hidden transition-all duration-300 ${formData.type === 'multi' ? 'max-h-24 opacity-100' : 'max-h-0 opacity-0'}`}
                             >
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Limit użyć
+                                    {t('generateCode.maxUsesLabel')}
                                 </label>
                                 <input
                                     type="number"
@@ -260,7 +261,7 @@ export default function GenerateCode() {
                             {/* Expiration */}
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Czas ważności
+                                    {t('generateCode.expirationLabel')}
                                 </label>
                                 <CustomSelect
                                     options={expirationOptions}
@@ -295,10 +296,10 @@ export default function GenerateCode() {
                                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:opacity-70"
                             >
                                 {loading ? (
-                                    <>Generowanie...</>
+                                    <>{t('generateCode.generating')}</>
                                 ) : (
                                     <>
-                                        Generuj kod{' '}
+                                        {t('generateCode.generateButton')}{' '}
                                         <RefreshCw className="h-4 w-4" />
                                     </>
                                 )}
@@ -311,7 +312,7 @@ export default function GenerateCode() {
                 <div className="lg:col-span-8">
                     <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-6">
                         <h3 className="mb-6 text-lg font-bold text-gray-900">
-                            Aktywne Zaproszenia ({invitations.length})
+                            {t('generateCode.activeInvitations')} ({invitations.length})
                         </h3>
 
                         {invitations.length === 0 ? (
@@ -320,11 +321,10 @@ export default function GenerateCode() {
                                     <Key className="h-7 w-7 text-gray-400" />
                                 </div>
                                 <h4 className="text-sm font-medium text-gray-900">
-                                    Brak aktywnych kodów
+                                    {t('generateCode.noActiveCodes')}
                                 </h4>
                                 <p className="mt-1 text-xs text-gray-500">
-                                    Wygenerowane kody pojawią się w tym
-                                    miejscu.
+                                    {t('generateCode.noActiveCodesDesc')}
                                 </p>
                             </div>
                         ) : (
@@ -360,7 +360,7 @@ export default function GenerateCode() {
                                                             )
                                                         }
                                                         className="rounded p-1 text-gray-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
-                                                        title="Kopiuj kod"
+                                                        title={t('generateCode.copyCode')}
                                                     >
                                                         {copiedId ===
                                                         inv._id ? (
@@ -388,14 +388,14 @@ export default function GenerateCode() {
                                                     <span className="flex items-center gap-1.5">
                                                         <Clock className="h-3 w-3" />
                                                         {isExpired
-                                                            ? 'Wygasł'
-                                                            : `Wygasa ${moment(inv.expiresAt).fromNow()}`}
+                                                            ? t('generateCode.expired')
+                                                            : `${t('generateCode.expiresIn')} ${moment(inv.expiresAt).fromNow()}`}
                                                     </span>
                                                     <span className="flex items-center gap-1.5">
                                                         <Shield className="h-3 w-3" />
                                                         {inv.createdBy
                                                             ?.username ||
-                                                            'Nieznany'}
+                                                            t('leaves.approvals.unknownUser')}
                                                     </span>
                                                 </div>
                                             </div>
@@ -425,7 +425,7 @@ export default function GenerateCode() {
                                                         handleRevoke(inv._id)
                                                     }
                                                     className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 opacity-60 transition-all hover:bg-red-100 hover:text-red-600 hover:opacity-100 group-hover:opacity-100"
-                                                    title="Unieważnij kod"
+                                                    title={t('generateCode.revokeCode')}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
@@ -450,10 +450,10 @@ export default function GenerateCode() {
                                 </div>
                                 <div>
                                     <h3 className="text-lg font-bold text-gray-900">
-                                        Środowisko Testowe (Demo)
+                                        {t('generateCode.demoWarningTitle')}
                                     </h3>
                                     <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                                        Pamiętaj, że konto Demo jest <strong>tymczasowe</strong>. 
+                                        {t('generateCode.demoWarningDesc')} <strong>{t('generateCode.demoWarningDescBold')}</strong>. 
                                     </p>
                                 </div>
                              </div>
@@ -462,15 +462,15 @@ export default function GenerateCode() {
                             <ul className="mb-4 space-y-3 text-sm text-gray-600">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 flex-shrink-0 text-emerald-500" />
-                                    <span>Wygenerowany kod <strong>zadziała poprawnie</strong> przy rejestracji.</span>
+                                    <span>{t('generateCode.demoPoint1')} <strong>{t('generateCode.demoPoint1Bold')}</strong> {t('generateCode.demoPoint1End')}</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                      <Trash2 className="h-5 w-5 flex-shrink-0 text-amber-500" />
-                                    <span>Jeżeli klikniesz "Wypróbuj Demo" ponownie, <strong>wszystkie dane (w tym ten kod i nowi użytkownicy) zostaną usunięte</strong>.</span>
+                                    <span>{t('generateCode.demoPoint2')} <strong>{t('generateCode.demoPoint2Bold')}</strong>.</span>
                                 </li>
                             </ul>
                             <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
-                                <strong>Wskazówka:</strong> Skopiuj kod, wyloguj się i użyj go od razu w formularzu rejestracji, aby przetestować proces onboardingu.
+                                <strong>{t('generateCode.demoHintLabel')}</strong> {t('generateCode.demoHint')}
                             </div>
                         </div>
                         <div className="flex justify-end gap-3 border-t bg-gray-50 px-6 py-4">
@@ -478,7 +478,7 @@ export default function GenerateCode() {
                                 onClick={() => setShowDemoWarning(false)}
                                 className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                             >
-                                Anuluj
+                                {t('generateCode.cancel')}
                             </button>
                             <button
                                 onClick={() => {
@@ -487,7 +487,7 @@ export default function GenerateCode() {
                                 }}
                                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
                             >
-                                Rozumiem, generuj kod
+                                {t('generateCode.understand')}
                             </button>
                         </div>
                     </div>

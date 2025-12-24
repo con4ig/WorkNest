@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import TaskItem from './TaskItem.jsx';
 import InlineCreateTask from './InlineCreateTask.jsx';
 
@@ -13,19 +14,20 @@ const KanbanColumn = ({
     onTaskCreated,
     isProjectEditing,
 }) => {
+    const { t } = useTranslation();
     const statusConfig = {
         todo: {
-            title: 'Do zrobienia',
+            title: t('common.taskStatus.todo'),
             color: 'bg-slate-200',
             textColor: 'text-slate-800',
         },
         'in-progress': {
-            title: 'W trakcie',
+            title: t('common.taskStatus.in-progress'),
             color: 'bg-sky-200',
             textColor: 'text-sky-800',
         },
         completed: {
-            title: 'Ukończone',
+            title: t('common.taskStatus.completed'),
             color: 'bg-green-200',
             textColor: 'text-green-800',
         },
@@ -60,7 +62,7 @@ const KanbanColumn = ({
                     ))
                 ) : (
                     <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 text-center text-sm text-gray-400">
-                        <p>Brak zadań w tej kolumnie</p>
+                        <p>{t('projects.details.kanban.noTasksInColumn')}</p>
                     </div>
                 )}
             </div>

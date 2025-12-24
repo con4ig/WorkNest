@@ -94,7 +94,7 @@ export const createComment = async (req, res) => {
     await Activity.create({
       project,
       user: req.user._id,
-      action: "comment_added",
+      action: parentComment ? "comment_replied" : "comment_added",
       description: parentComment
         ? `odpowiedział(a) na komentarz`
         : `dodał(a) komentarz`,

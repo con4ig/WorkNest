@@ -8,9 +8,12 @@ import {
     LogIn,
     LayoutDashboard,
 } from 'lucide-react';
+import LanguageSwitcher from './common/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
     const { user, logout, loading } = useAuth();
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -40,42 +43,44 @@ export default function Navbar() {
                     </Link>
 
                     {/* Desktop Navigation - Full Menu */}
-                    <div className="hidden items-center gap-1 md:flex">
+                    <div className="hidden items-center gap-4 md:flex">
+                        <LanguageSwitcher />
                         {loading ? (
                             <div className="h-10 w-48 animate-pulse rounded-full bg-gray-200"></div>
                         ) : user ? (
                             <>
                                 <Link to="/dashboard" className={navItemClass}>
                                     <LayoutDashboard className="h-4 w-4" />
-                                    Dashboard
+                                    {t('navbar.dashboard')}
                                 </Link>
                                 <button
                                     onClick={handleLogout}
                                     className={`ml-3 ${buttonSecondaryClass}`}
                                 >
                                     <LogOut className="mr-1 inline h-4 w-4" />
-                                    Wyloguj
+                                    {t('navbar.logout')}
                                 </button>
                             </>
                         ) : (
                             <>
                                 <Link to="/login" className={navItemClass}>
                                     <LogIn className="h-4 w-4" />
-                                    Zaloguj się
+                                    {t('navbar.login')}
                                 </Link>
                                 <Link
                                     to="/register"
                                     className={`ml-3 ${buttonPrimaryClass}`}
                                 >
                                     <UserPlus className="mr-1 inline h-4 w-4" />
-                                    Zarejestruj się
+                                    {t('navbar.register')}
                                 </Link>
                             </>
                         )}
                     </div>
 
                     {/* Mobile Navigation - Only Login Button */}
-                    <div className="flex items-center md:hidden">
+                    <div className="flex items-center gap-2 md:hidden">
+                        <LanguageSwitcher />
                         {loading ? (
                             <div className="h-10 w-28 animate-pulse rounded-full bg-gray-200"></div>
                         ) : user ? (
@@ -84,12 +89,12 @@ export default function Navbar() {
                                 className={buttonPrimaryClass}
                             >
                                 <LogOut className="mr-1 inline h-4 w-4" />
-                                Wyloguj
+                                {t('navbar.logout')}
                             </button>
                         ) : (
                             <Link to="/login" className={buttonPrimaryClass}>
                                 <LogIn className="mr-1 inline h-4 w-4" />
-                                Zaloguj się
+                                {t('navbar.login')}
                             </Link>
                         )}
                     </div>

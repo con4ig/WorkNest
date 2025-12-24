@@ -1,53 +1,18 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Archive, ArchiveRestore, Trash2 } from 'lucide-react';
 
 const statusStyles = {
     pending: {
         text: 'text-yellow-800',
         bg: 'bg-yellow-100',
-        label: 'Oczekujący',
     },
-    running: { text: 'text-sky-800', bg: 'bg-sky-100', label: 'W Trakcie' },
+    running: { text: 'text-sky-800', bg: 'bg-sky-100' },
     completed: {
         text: 'text-emerald-800',
         bg: 'bg-emerald-100',
-        label: 'Ukończony',
     },
-    'on-hold': { text: 'text-red-800', bg: 'bg-red-100', label: 'Wstrzymany' },
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('pl-PL', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-};
-
-const AssignedUsersAvatarGroup = ({ users }) => {
-    if (!users || users.length === 0) {
-        return <div className="text-xs text-slate-400">Brak</div>;
-    }
-
-    return (
-        <div className="flex -space-x-2">
-            {users.slice(0, 3).map((user) => (
-                <div
-                    key={user._id}
-                    title={user.username}
-                    className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-sky-100 text-xs font-bold text-sky-700"
-                >
-                    {user.username.charAt(0).toUpperCase()}
-                </div>
-            ))}
-            {users.length > 3 && (
-                <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-200 text-xs font-bold text-slate-700">
-                    +{users.length - 3}
-                </div>
-            )}
-        </div>
-    );
+    'on-hold': { text: 'text-red-800', bg: 'bg-red-100' },
 };
 
 const ProjectGridCard = ({
@@ -61,7 +26,42 @@ const ProjectGridCard = ({
     isSelected,
     onToggleSelect,
 }) => {
+    const { t, i18n } = useTranslation();
     const statusInfo = statusStyles[project.status] || statusStyles['pending'];
+
+    const formatDate = (dateString) => {
+        if (!dateString) return t('projects.projectRow.na');
+        return new Date(dateString).toLocaleDateString(i18n.language, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
+    
+    const AssignedUsersAvatarGroup = ({ users }) => {
+        if (!users || users.length === 0) {
+            return <div className="text-xs text-slate-400">{t('projects.projectRow.none')}</div>;
+        }
+    
+        return (
+            <div className="flex -space-x-2">
+                {users.slice(0, 3).map((user) => (
+                    <div
+                        key={user._id}
+                        title={user.username}
+                        className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-sky-100 text-xs font-bold text-sky-700"
+                    >
+                        {user.username.charAt(0).toUpperCase()}
+                    </div>
+                ))}
+                {users.length > 3 && (
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-200 text-xs font-bold text-slate-700">
+                        +{users.length - 3}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     const handleCardClick = (e) => {
         if (currentUserRole !== 'employee') {
@@ -124,7 +124,7 @@ const ProjectGridCard = ({
                                     e.stopPropagation();
                                     onArchive(project._id);
                                 }}
-                                title="Archiwizuj projekt"
+                                title={t('projects.projectGridCard.archiveTitle')}
                                 className="-mt-2 rounded-full p-2 text-slate-500 transition-colors hover:bg-amber-50 hover:text-amber-600"
                             >
                                 <Archive className="h-4 w-4" />
@@ -136,7 +136,7 @@ const ProjectGridCard = ({
                                         e.stopPropagation();
                                         onRestore(project._id);
                                     }}
-                                    title="Przywróć projekt"
+                                    title={t('projects.projectGridCard.restoreTitle')}
                                     className="-mt-2 rounded-full p-2 text-slate-500 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
                                 >
                                     <ArchiveRestore className="h-4 w-4" />
@@ -146,7 +146,7 @@ const ProjectGridCard = ({
                                         e.stopPropagation();
                                         onPermanentDelete(project._id);
                                     }}
-                                    title="Usuń trwale"
+                                    title={t('projects.projectGridCard.deleteTitle')}
                                     className="-mr-2 -mt-2 rounded-full p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600"
                                 >
                                     <Trash2 className="h-4 w-4" />
@@ -158,17 +158,17 @@ const ProjectGridCard = ({
             </div>
 
             <div className="mb-4">
-                <div className="mb-1 text-xs text-slate-500">Status</div>
+                <div className="mb-1 text-xs text-slate-500">{t('projects.projectGridCard.status')}</div>
                 <span
                     className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${statusInfo.bg} ${statusInfo.text}`}
                 >
-                    {statusInfo.label}
+                    {t(`common.projectStatus.${project.status}`)}
                 </span>
             </div>
 
             <div className="mb-4">
                 <div className="mb-1 flex items-center justify-between">
-                    <div className="text-xs text-slate-500">Postęp</div>
+                    <div className="text-xs text-slate-500">{t('projects.projectGridCard.progress')}</div>
                     <span className="text-xs font-medium text-slate-700">
                         {project.progress || 0}%
                     </span>
@@ -183,14 +183,14 @@ const ProjectGridCard = ({
 
             <div className="grid grid-cols-2 gap-4 border-t border-slate-200 pt-4">
                 <div>
-                    <div className="mb-1 text-xs text-slate-500">Termin</div>
+                    <div className="mb-1 text-xs text-slate-500">{t('projects.projectGridCard.deadline')}</div>
                     <div className="text-sm font-medium text-slate-700">
                         {formatDate(project.endDate)}
                     </div>
                 </div>
                 <div>
                     <div className="mb-1 text-xs text-slate-500">
-                        Przypisani
+                        {t('projects.projectGridCard.assigned')}
                     </div>
                     <AssignedUsersAvatarGroup users={project.assignedUsers} />
                 </div>

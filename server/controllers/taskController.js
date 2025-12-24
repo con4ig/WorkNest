@@ -86,7 +86,7 @@ export const createTask = async (req, res) => {
       user: req.user._id,
       action: "task_created",
       description: `utworzył(a) zadanie "${title}"`,
-      metadata: { taskId: savedTask._id },
+      metadata: { taskId: savedTask._id, title },
       company: projectDoc.company,
     });
 
@@ -134,7 +134,7 @@ export const updateTask = async (req, res) => {
         user: req.user._id,
         action: "task_completed",
         description: `ukończył(a) zadanie "${task.title}"`,
-        metadata: { taskId: task._id },
+        metadata: { taskId: task._id, title: task.title },
         company: task.company,
       });
     } else if (oldStatus !== req.body.status) {
@@ -143,7 +143,7 @@ export const updateTask = async (req, res) => {
         user: req.user._id,
         action: "task_updated",
         description: `zmienił(a) status zadania "${task.title}" z "${oldStatus}" na "${req.body.status}"`,
-        metadata: { taskId: task._id, oldStatus, newStatus: req.body.status },
+        metadata: { taskId: task._id, title: task.title, oldStatus, newStatus: req.body.status },
         company: task.company,
       });
     }
@@ -185,6 +185,7 @@ export const deleteTask = async (req, res) => {
       user: req.user._id,
       action: "task_deleted",
       description: `usunął(ęła) zadanie "${task.title}"`,
+      metadata: { title: task.title },
       company: task.company,
     });
 

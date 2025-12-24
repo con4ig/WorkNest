@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import LoadingScreen from '../components/LoadingScreen';
 import { useAuth } from '../context/AuthContext';
@@ -133,6 +134,7 @@ const RoleChangeModal = ({
     onConfirm,
     isChanging,
 }) => {
+    const { t } = useTranslation();
     const [selectedRole, setSelectedRole] = useState(currentRole);
 
     useEffect(() => {
@@ -144,24 +146,24 @@ const RoleChangeModal = ({
     const roles = [
         {
             value: 'employee',
-            label: 'Pracownik',
+            label: t('common.roles.employee'),
             icon: <Icon.Briefcase />,
             color: 'gray',
-            description: 'Podstawowe uprawnienia użytkownika',
+            description: t('employees.list.roleModal.employeeDesc'),
         },
         {
             value: 'hr',
-            label: 'Menedżer HR',
+            label: t('common.roles.hr'),
             icon: <Icon.Users />,
             color: 'blue',
-            description: 'Zarządzanie pracownikami i urlopami',
+            description: t('employees.list.roleModal.hrDesc'),
         },
         {
             value: 'admin',
-            label: 'Administrator',
+            label: t('common.roles.admin'),
             icon: <Icon.Shield />,
             color: 'purple',
-            description: 'Pełen dostęp do systemu',
+            description: t('employees.list.roleModal.adminDesc'),
         },
     ];
 
@@ -182,7 +184,7 @@ const RoleChangeModal = ({
                 <div className="flex items-start justify-between border-b border-slate-100 p-5">
                     <div>
                         <h3 className="text-lg font-semibold tracking-tight text-slate-900">
-                            Zmiana roli użytkownika
+                            {t('employees.list.roleModal.title')}
                         </h3>
                         <p className="mt-0.5 text-sm text-slate-500">
                             {user?.username}
@@ -231,7 +233,7 @@ const RoleChangeModal = ({
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
                                             <span className="font-medium text-slate-900">
-                                                {role.label}
+                                                {t(`common.roles.${role.value}`)}
                                             </span>
                                             {selectedRole === role.value && (
                                                 <div
@@ -242,7 +244,7 @@ const RoleChangeModal = ({
                                             )}
                                         </div>
                                         <p className="mt-0.5 text-xs text-slate-500">
-                                            {role.description}
+                                            {t(`employees.list.roleModal.${role.value}Desc`)}
                                         </p>
                                     </div>
                                 </div>
@@ -256,8 +258,7 @@ const RoleChangeModal = ({
                                 <Icon.AlertCircle />
                             </div>
                             <p className="leading-relaxed">
-                                Ta zmiana zostanie zastosowana natychmiast i
-                                może wpłynąć na uprawnienia użytkownika.
+                                {t('employees.list.roleModal.warning')}
                             </p>
                         </div>
                     )}
@@ -269,14 +270,14 @@ const RoleChangeModal = ({
                         disabled={isChanging}
                         className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
                     >
-                        Anuluj
+                        {t('common.cancel')}
                     </button>
                     <button
                         onClick={() => onConfirm(selectedRole)}
                         disabled={isChanging || selectedRole === currentRole}
                         className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {isChanging ? 'Zmieniam...' : 'Potwierdź zmianę'}
+                        {isChanging ? t('employees.list.roleModal.submitting') : t('employees.list.roleModal.submit')}
                     </button>
                 </div>
             </div>
@@ -286,6 +287,7 @@ const RoleChangeModal = ({
 
 // Nowe okno importu - prosi o plik hasło
 const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
+    const { t } = useTranslation();
     const [file, setFile] = useState(null);
     const [tempPassword, setTempPassword] = useState('');
     const [error, setError] = useState('');
@@ -296,11 +298,11 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
         e.preventDefault();
         setError('');
         if (!file) {
-            setError('Wybierz plik CSV');
+            setError(t('employees.list.importModal.fileRequired') || 'Wybierz plik CSV');
             return;
         }
         if (!tempPassword || tempPassword.length < 6) {
-            setError('Hasło tymczasowe musi mieć min. 6 znaków');
+            setError(t('auth.validation.passwordMin') || 'Hasło tymczasowe musi mieć min. 6 znaków');
             return;
         }
         onImport(file, tempPassword);
@@ -361,7 +363,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
             <div className="w-full max-w-2xl rounded-xl border border-slate-200/50 bg-white p-5 shadow-2xl sm:p-6">
                 <div className="mb-6 flex items-start justify-between">
                     <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
-                        Import Pracowników z CSV
+                        {t('employees.list.importModal.title')}
                     </h3>
                     <button
                         onClick={onClose}
@@ -374,36 +376,33 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                 <div className="mb-6 space-y-4 rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm text-slate-600">
                     <div>
                         <p className="mb-2 font-semibold text-slate-800">
-                            Instrukcja:
+                            {t('employees.list.importModal.instructions')}
                         </p>
                         <ul className="ml-1 list-disc list-inside space-y-1 text-slate-600">
-                            <li>
-                                Wypełnij dane w pliku CSV (wymagane:{' '}
-                                <b>email, username</b>).
+                            <li dangerouslySetInnerHTML={{ __html: t('employees.list.importModal.instruction1') }}>
                             </li>
                             <li>
-                                Każdy kolejny wiersz w pliku to nowy pracownik.
+                                {t('employees.list.importModal.instruction2')}
                             </li>
                             <li>
-                                Możesz dodać wielu pracowników naraz (np. 50+
-                                wierszy).
+                                {t('employees.list.importModal.instruction3')}
                             </li>
                         </ul>
                     </div>
 
                     <div>
                         <p className="mb-2 font-semibold text-slate-800">
-                            Dozwolone role (wpisz angielską nazwę w CSV):
+                            {t('employees.list.importModal.rolesTitle')}
                         </p>
                         <div className="overflow-x-auto rounded-lg border border-slate-200">
                             <table className="w-full text-left text-xs">
                                 <thead className="bg-slate-100 font-semibold text-slate-700">
                                     <tr>
                                         <th className="border-r border-slate-200 px-3 py-2">
-                                            Wartość w CSV (Angielski)
+                                            {t('employees.list.importModal.csvValue')}
                                         </th>
                                         <th className="px-3 py-2">
-                                            Rola w systemie (Polski)
+                                            {t('employees.list.importModal.systemRole')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -413,7 +412,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                             employee
                                         </td>
                                         <td className="px-3 py-2">
-                                            Pracownik
+                                            {t('common.roles.employee')}
                                         </td>
                                     </tr>
                                     <tr>
@@ -421,7 +420,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                             hr
                                         </td>
                                         <td className="px-3 py-2">
-                                            HR Manager
+                                            {t('common.roles.hr')}
                                         </td>
                                     </tr>
                                     <tr>
@@ -429,7 +428,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                             admin
                                         </td>
                                         <td className="px-3 py-2">
-                                            Administrator
+                                            {t('common.roles.admin')}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -442,42 +441,43 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                         onClick={handleDownloadTemplate}
                         className="mt-2 flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-600 transition-colors hover:bg-emerald-100"
                     >
-                        <Icon.Download size={16} /> Pobierz przykładowy szablon
-                        CSV
+                        <Icon.Download size={16} /> {t('employees.list.importModal.downloadTemplate')}
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
                         <label className="mb-1 block text-sm font-medium text-slate-700">
-                            Plik CSV
+                            {t('employees.list.importModal.fileLabel')}
                         </label>
-                        <input
-                            type="file"
-                            accept=".csv"
-                            onChange={(e) => setFile(e.target.files[0])}
-                            className="block w-full cursor-pointer text-sm text-slate-500 
-                                file:mr-4 file:rounded-lg file:border-0 
-                                file:bg-emerald-50 file:px-4 
-                                file:py-2.5 file:text-sm 
-                                file:font-semibold file:text-emerald-700 
-                                hover:file:bg-emerald-100"
-                        />
+                        <div className="relative flex items-center gap-3">
+                            <label className="flex cursor-pointer items-center justify-center rounded-lg bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100">
+                                <span>{t('employees.list.importModal.chooseFile')}</span>
+                                <input
+                                    type="file"
+                                    accept=".csv"
+                                    onChange={(e) => setFile(e.target.files[0])}
+                                    className="sr-only"
+                                />
+                            </label>
+                            <span className="truncate text-sm text-slate-500">
+                                {file ? file.name : t('employees.list.importModal.noFileSelected')}
+                            </span>
+                        </div>
                     </div>
                     <div>
                         <label className="mb-1 block text-sm font-medium text-slate-700">
-                            Hasło tymczasowe
+                            {t('employees.list.importModal.tempPasswordLabel')}
                         </label>
                         <input
                             type="text"
                             value={tempPassword}
                             onChange={(e) => setTempPassword(e.target.value)}
                             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:ring-2 focus:ring-emerald-500 md:text-sm"
-                            placeholder="np. Firma2024!"
+                            placeholder={t('employees.list.importModal.tempPasswordPlaceholder')}
                         />
                         <p className="mt-1 text-xs text-slate-500">
-                            Pracownik będzie musiał zmienić to hasło przy
-                            pierwszym logowaniu.
+                            {t('employees.list.importModal.tempPasswordHint')}
                         </p>
                     </div>
 
@@ -491,14 +491,14 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                             onClick={onClose}
                             className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                         >
-                            Anuluj
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading}
                             className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
                         >
-                            {isLoading ? 'Importowanie...' : 'Importuj'}
+                            {isLoading ? t('employees.list.importModal.loading') : t('employees.list.importModal.submit')}
                         </button>
                     </div>
                 </form>
@@ -508,6 +508,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
 };
 
 const ImportResultModal = ({ isOpen, onClose, results }) => {
+    const { t } = useTranslation();
     if (!isOpen || !results) return null;
 
     const hasErrors = results.failedCount > 0;
@@ -519,10 +520,10 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                     <div className="flex items-start justify-between">
                         <div>
                             <h3 className="text-lg font-semibold tracking-tight text-slate-900">
-                                Wynik Importu CSV
+                                {t('employees.list.importResult.title')}
                             </h3>
                             <p className="mt-0.5 text-sm text-slate-500">
-                                Podsumowanie operacji
+                                {t('employees.list.importResult.subtitle')}
                             </p>
                         </div>
                         <button
@@ -540,18 +541,16 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                             <Icon.AlertCircle className="flex-shrink-0" />
                             <div>
                                 <h4 className="font-bold text-sm">
-                                    Informacja o logowaniu
+                                    {t('employees.list.importResult.infoTitle')}
                                 </h4>
                                 <p className="mt-1 text-sm">
-                                    Dla nowych użytkowników ustawiono domyślne
-                                    hasło:{' '}
+                                    {t('employees.list.importResult.infoText')}{' '}
                                     <code className="rounded bg-blue-100 px-1 py-0.5 font-mono font-bold">
                                         WorkNest123!
                                     </code>
                                 </p>
                                 <p className="mt-1 text-xs text-blue-600">
-                                    Przekaż to hasło pracownikom i poproś o
-                                    jego zmianę po pierwszym logowaniu.
+                                    {t('employees.list.importResult.infoHint')}
                                 </p>
                             </div>
                         </div>
@@ -563,7 +562,7 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                                 {results.processed}
                             </div>
                             <div className="text-xs font-semibold uppercase text-slate-500">
-                                Przetworzono
+                                {t('employees.list.importResult.processed')}
                             </div>
                         </div>
                         <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4 text-center">
@@ -571,7 +570,7 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                                 {results.created}
                             </div>
                             <div className="text-xs font-semibold uppercase text-emerald-600">
-                                Utworzono
+                                {t('employees.list.importResult.created')}
                             </div>
                         </div>
                         <div
@@ -597,7 +596,7 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                                         : 'text-slate-500'
                                 }`}
                             >
-                                Błędy
+                                {t('employees.list.importResult.errors')}
                             </div>
                         </div>
                     </div>
@@ -605,19 +604,19 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                     {hasErrors && (
                         <div className="space-y-3">
                             <h4 className="flex items-center gap-2 font-semibold text-slate-800">
-                                <Icon.AlertCircle /> Szczegóły błędów
+                                <Icon.AlertCircle /> {t('employees.list.importResult.errorDetails')}
                             </h4>
                             <div className="overflow-x-auto rounded-lg border border-red-100 bg-red-50">
                                 <table className="w-full text-left text-sm">
                                     <thead className="bg-red-100/50 font-semibold text-red-800">
                                         <tr>
                                             <th className="px-4 py-2">
-                                                Wiersz
+                                                {t('employees.list.importResult.row')}
                                             </th>
                                             <th className="px-4 py-2">
-                                                Email
+                                                {t('employees.list.importResult.email')}
                                             </th>
-                                            <th className="px-4 py-2">Błąd</th>
+                                            <th className="px-4 py-2">{t('employees.list.importResult.error')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-red-100 text-red-700">
@@ -641,10 +640,7 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                                 {results.failedCount >
                                     results.failedSamples.length && (
                                     <div className="bg-red-100/30 px-4 py-2 text-center text-xs italic text-red-600">
-                                        ...i{' '}
-                                        {results.failedCount -
-                                            results.failedSamples.length}{' '}
-                                        więcej błędów
+                                        {t('employees.list.importResult.moreErrors', { count: results.failedCount - results.failedSamples.length })}
                                     </div>
                                 )}
                             </div>
@@ -657,7 +653,7 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                         onClick={onClose}
                         className="w-full rounded-lg bg-slate-900 px-5 py-2.5 font-medium text-white transition-colors hover:bg-slate-800 sm:w-auto"
                     >
-                        Zamknij
+                        {t('employees.list.importResult.close')}
                     </button>
                 </div>
             </div>
@@ -688,6 +684,7 @@ const Toast = ({ message, type = 'success', onClose }) => {
 };
 
 export default function EmployeeList() {
+    const { t, i18n } = useTranslation();
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -711,7 +708,7 @@ export default function EmployeeList() {
 
         try {
             if (currentUser.role !== 'admin') {
-                setError('Brak uprawnień do przeglądania tej strony');
+                setError(t('employees.list.noPermissions'));
                 setLoading(false);
                 return;
             }
@@ -723,11 +720,11 @@ export default function EmployeeList() {
         } catch (err) {
             console.error('Error fetching data:', err);
             if (err.response?.status === 403) {
-                setError('Brak uprawnień do przeglądania tej strony');
+                setError(t('employees.list.noPermissions'));
             } else if (err.response?.status === 401) {
                 navigate('/login');
             } else {
-                setError('Błąd ładowania danych');
+                setError(t('employees.list.error'));
             }
             setLoading(false);
         }
@@ -764,13 +761,13 @@ export default function EmployeeList() {
             await fetchData();
             setModalOpen(false);
             setToast({
-                message: 'Rola została pomyślnie zmieniona',
+                message: t('employees.list.toasts.roleSuccess'),
                 type: 'success',
             });
         } catch (err) {
             console.error('Error changing role:', err);
             setToast({
-                message: err.response?.data?.message || 'Błąd zmiany roli',
+                message: err.response?.data?.message || t('employees.list.toasts.roleError'),
                 type: 'error',
             });
         } finally {
@@ -801,7 +798,7 @@ export default function EmployeeList() {
 
         } catch (err) {
             console.error('CSV Import error:', err);
-            const msg = err.response?.data?.message || 'Błąd importu CSV';
+            const msg = err.response?.data?.message || t('employees.list.toasts.importError');
             setToast({
                 message: msg,
                 type: 'error'
@@ -825,20 +822,11 @@ export default function EmployeeList() {
     };
 
     const getRoleLabel = (role) => {
-        switch (role) {
-            case 'admin':
-                return 'Administrator';
-            case 'hr':
-                return 'Menedżer HR';
-            case 'employee':
-                return 'Pracownik';
-            default:
-                return role;
-        }
+        return t(`common.roles.${role}`);
     };
 
     if (loading) {
-        return <LoadingScreen message="Ładowanie listy pracowników..." />;
+        return <LoadingScreen message={t('employees.loadingDetails')} />;
     }
 
     if (error) {
@@ -851,7 +839,7 @@ export default function EmployeeList() {
                         </div>
                     </div>
                     <div className="mb-2 text-center text-xl font-semibold text-slate-900">
-                        Wystąpił błąd
+                        {t('common.errorOccurred')}
                     </div>
                     <div className="mb-6 text-center text-sm text-slate-600">
                         {error}
@@ -860,7 +848,7 @@ export default function EmployeeList() {
                         onClick={() => navigate('/dashboard')}
                         className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-emerald-700"
                     >
-                        Powrót do Dashboard
+                        {t('employees.list.backToDashboard')}
                     </button>
                 </div>
             </div>
@@ -882,13 +870,10 @@ export default function EmployeeList() {
                             <div className="h-7 w-px bg-slate-200"></div>
                             <div>
                                 <h1 className="text-xl font-bold text-slate-800">
-                                    Zarządzanie Zespołem
+                                    {t('employees.list.title')}
                                 </h1>
                                 <p className="mt-0.5 text-xs text-slate-500">
-                                    {filteredUsers.length}{' '}
-                                    {filteredUsers.length === 1
-                                        ? 'użytkownik'
-                                        : 'użytkowników'}
+                                    {t('employees.list.userCount', { count: filteredUsers.length })}
                                 </p>
                             </div>
                         </div>
@@ -900,13 +885,13 @@ export default function EmployeeList() {
                                     className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-200 sm:w-auto"
                                 >
                                     <Icon.Upload />
-                                    <span>Importuj CSV</span>
+                                    <span>{t('employees.list.importButton')}</span>
                                 </button>
                             )}
                             <div className="relative w-full sm:w-auto">
                                 <input
                                     className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-base shadow-sm outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 md:w-72 md:text-sm"
-                                    placeholder="Szukaj użytkownika..."
+                                    placeholder={t('employees.list.searchPlaceholder')}
                                     value={searchQuery}
                                     onChange={(e) =>
                                         setSearchQuery(e.target.value)
@@ -933,7 +918,7 @@ export default function EmployeeList() {
                             {users.length}
                         </div>
                         <div className="mt-1 text-sm font-medium text-slate-500">
-                            Wszyscy użytkownicy
+                            {t('employees.list.stats.all')}
                         </div>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -946,7 +931,7 @@ export default function EmployeeList() {
                             {users.filter((u) => u.role === 'hr').length}
                         </div>
                         <div className="mt-1 text-sm font-medium text-slate-500">
-                            Menedżerowie HR
+                            {t('employees.list.stats.hr')}
                         </div>
                     </div>
                     <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -959,7 +944,7 @@ export default function EmployeeList() {
                             {users.filter((u) => u.role === 'admin').length}
                         </div>
                         <div className="mt-1 text-sm font-medium text-slate-500">
-                            Administratorzy
+                            {t('employees.list.stats.admin')}
                         </div>
                     </div>
                 </div>
@@ -969,20 +954,20 @@ export default function EmployeeList() {
                         <thead className="border-b border-slate-200 bg-slate-50">
                             <tr>
                                 <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Użytkownik
+                                    {t('employees.list.table.user')}
                                 </th>
                                 <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Email
+                                    {t('employees.list.table.email')}
                                 </th>
                                 <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Rola
+                                    {t('employees.list.table.role')}
                                 </th>
                                 <th className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                    Data utworzenia
+                                    {t('employees.list.table.createdAt')}
                                 </th>
                                 {currentUser?.role === 'admin' && (
                                     <th className="px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
-                                        Akcje
+                                        {t('employees.list.table.actions')}
                                     </th>
                                 )}
                             </tr>
@@ -1010,7 +995,7 @@ export default function EmployeeList() {
                                                 {user._id ===
                                                     currentUser?._id && (
                                                     <div className="text-xs font-medium text-emerald-600">
-                                                        To Ty
+                                                        {t('common.itIsYou')}
                                                     </div>
                                                 )}
                                             </div>
@@ -1029,7 +1014,7 @@ export default function EmployeeList() {
                                     <td className="px-6 py-4 text-sm text-slate-500">
                                         {new Date(
                                             user.createdAt,
-                                        ).toLocaleDateString('pl-PL', {
+                                        ).toLocaleDateString(i18n.language === 'pl' ? 'pl-PL' : 'en-US', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric',
@@ -1042,8 +1027,7 @@ export default function EmployeeList() {
                                         >
                                             {user._id === currentUser?._id ? (
                                                 <div className="text-xs text-slate-400">
-                                                    Nie możesz zmienić własnej
-                                                    roli
+                                                    {t('employees.list.cannotChangeOwnRole')}
                                                 </div>
                                             ) : (
                                                 <button
@@ -1053,7 +1037,7 @@ export default function EmployeeList() {
                                                     }}
                                                     className="rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50"
                                                 >
-                                                    Zmień rolę
+                                                    {t('employees.list.changeRole')}
                                                 </button>
                                             )}
                                         </td>
@@ -1067,10 +1051,10 @@ export default function EmployeeList() {
                         <div className="py-16 text-center">
                             <div className="mb-3 text-5xl">🔍</div>
                             <div className="text-base font-semibold text-slate-900">
-                                Brak wyników
+                                {t('common.noResults')}
                             </div>
                             <div className="mt-1 text-sm text-slate-500">
-                                Spróbuj zmienić zapytanie wyszukiwania
+                                {t('common.tryDifferentSearch')}
                             </div>
                         </div>
                     )}
@@ -1094,7 +1078,7 @@ export default function EmployeeList() {
                                         </div>
                                         {user._id === currentUser?._id && (
                                             <div className="text-xs font-medium text-emerald-600">
-                                                To Ty
+                                                {t('common.itIsYou')}
                                             </div>
                                         )}
                                     </div>
@@ -1109,7 +1093,7 @@ export default function EmployeeList() {
                             <div className="space-y-2 border-t border-slate-100 pt-3">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">
-                                        Email:
+                                        {t('common.email')}:
                                     </span>
                                     <span className="ml-2 truncate font-medium text-slate-700 max-w-48">
                                         {user.email}
@@ -1117,12 +1101,12 @@ export default function EmployeeList() {
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-slate-500">
-                                        Utworzony:
+                                        {t('employees.list.table.createdAt')}:
                                     </span>
                                     <span className="font-medium text-slate-700">
                                         {new Date(
                                             user.createdAt,
-                                        ).toLocaleDateString('pl-PL')}
+                                        ).toLocaleDateString(i18n.language === 'pl' ? 'pl-PL' : 'en-US')}
                                     </span>
                                 </div>
                             </div>
@@ -1138,7 +1122,7 @@ export default function EmployeeList() {
                                             }}
                                             className="w-full rounded-lg border border-slate-200 bg-white py-2 text-sm font-medium text-slate-700 shadow-sm transition-all hover:bg-slate-50"
                                         >
-                                            Zmień rolę
+                                            {t('employees.list.changeRole')}
                                         </button>
                                     </div>
                                 )}
@@ -1146,7 +1130,7 @@ export default function EmployeeList() {
                             {currentUser?.role === 'admin' &&
                                 user._id === currentUser?._id && (
                                     <div className="mt-3 border-t border-slate-100 pt-3 text-center text-xs text-slate-400">
-                                        Nie możesz zmienić własnej roli
+                                        {t('employees.list.cannotChangeOwnRole')}
                                     </div>
                                 )}
                         </div>
@@ -1156,10 +1140,10 @@ export default function EmployeeList() {
                         <div className="rounded-lg border-2 border-dashed border-slate-200 bg-white py-16 text-center">
                             <div className="mb-3 text-5xl">🔍</div>
                             <div className="text-base font-semibold text-slate-900">
-                                Brak wyników
+                                {t('common.noResults')}
                             </div>
                             <div className="mt-1 text-sm text-slate-500">
-                                Spróbuj zmienić zapytanie wyszukiwania
+                                {t('common.tryDifferentSearch')}
                             </div>
                         </div>
                     )}

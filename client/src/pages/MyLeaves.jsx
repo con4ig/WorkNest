@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import RequestLeaveModal from '../components/RequestLeaveModal';
 import { useAuth } from '../context/AuthContext';
@@ -60,6 +61,7 @@ const Icon = {
 };
 
 export default function MyLeaves() {
+    const { t } = useTranslation();
     const [leaves, setLeaves] = useState([]);
     const [stats, setStats] = useState({
         pending: 0,
@@ -109,10 +111,9 @@ export default function MyLeaves() {
 
     const handleDeleteClick = (id) => {
         askForConfirmation({
-            title: 'Usuwanie Wniosku',
-            message:
-                'Czy na pewno chcesz usunąć ten wniosek? Ta operacja jest nieodwracalna.',
-            confirmText: 'Usuń',
+            title: t('leaves.myLeaves.deleteConfirm'),
+            message: t('leaves.myLeaves.deleteConfirmMessage'),
+            confirmText: t('common.delete'),
             confirmVariant: 'danger',
             onConfirm: () => handleDelete(id),
         });
@@ -139,9 +140,9 @@ export default function MyLeaves() {
         };
 
         const labels = {
-            pending: 'Oczekujący',
-            approved: 'Zatwierdzony',
-            rejected: 'Odrzucony',
+            pending: t('common.leaveStatus.pending'),
+            approved: t('common.leaveStatus.approved'),
+            rejected: t('common.leaveStatus.rejected'),
         };
 
         return (
@@ -154,28 +155,11 @@ export default function MyLeaves() {
     };
 
     const getLeaveTypeLabel = (type) => {
-        const labels = {
-            vacation: 'Urlop wypoczynkowy',
-            on_demand: 'Urlop na żądanie',
-            unpaid: 'Urlop bezpłatny',
-            occasional: 'Urlop okolicznościowy',
-            maternity: 'Urlop macierzyński',
-            paternity: 'Urlop ojcowski',
-            parental: 'Urlop rodzicielski',
-            childcare: 'Urlop wychowawczy',
-            care: 'Urlop opiekuńczy',
-            training: 'Urlop szkoleniowy',
-            job_search: 'Urlop na poszukiwanie pracy',
-            health: 'Urlop zdrowotny/rehabilitacyjny',
-            sick: 'Zwolnienie lekarskie',
-            personal: 'Urlop okolicznościowy (stary)',
-            other: 'Inny',
-        };
-        return labels[type] || type;
+        return t(`common.leaveType.${type}`) || type;
     };
 
     if (loading) {
-        return <LoadingScreen message="Ładowanie wniosków..." />;
+        return <LoadingScreen message={t('leaves.myLeaves.loading')} />;
     }
 
     return (
@@ -198,15 +182,15 @@ export default function MyLeaves() {
                                 className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:bg-gray-100"
                             >
                                 <Icon.ArrowLeft />
-                                <span>Dashboard</span>
+                                <span>{t('dashboard.sidebar.dashboard')}</span>
                             </button>
                             <div className="h-8 w-px bg-gray-200"></div>
                             <div>
                                 <h1 className="text-2xl font-bold">
-                                    Moje Urlopy
+                                    {t('leaves.myLeaves.title')}
                                 </h1>
                                 <p className="text-sm text-gray-500">
-                                    Zarządzaj swoimi wnioskami urlopowymi
+                                    {t('leaves.myLeaves.subtitle')}
                                 </p>
                             </div>
                         </div>
@@ -216,7 +200,7 @@ export default function MyLeaves() {
                             className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-white shadow-sm transition-colors hover:bg-emerald-700"
                         >
                             <Icon.Plus />
-                            <span>Nowy wniosek</span>
+                            <span>{t('leaves.myLeaves.newRequest')}</span>
                         </button>
                     </div>
                 </div>
@@ -227,7 +211,7 @@ export default function MyLeaves() {
                 <div className="mb-8 grid grid-cols-4 gap-4">
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="text-xs uppercase text-gray-500">
-                            Oczekujące
+                            {t('common.leaveStatus.pending')}
                         </div>
                         <div className="mt-2 text-2xl font-bold text-yellow-600">
                             {stats.pending}
@@ -235,7 +219,7 @@ export default function MyLeaves() {
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="text-xs uppercase text-gray-500">
-                            Zatwierdzone
+                            {t('common.leaveStatus.approved')}
                         </div>
                         <div className="mt-2 text-2xl font-bold text-green-600">
                             {stats.approved}
@@ -243,7 +227,7 @@ export default function MyLeaves() {
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="text-xs uppercase text-gray-500">
-                            Odrzucone
+                            {t('common.leaveStatus.rejected')}
                         </div>
                         <div className="mt-2 text-2xl font-bold text-red-600">
                             {stats.rejected}
@@ -251,7 +235,7 @@ export default function MyLeaves() {
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div className="text-xs uppercase text-gray-500">
-                            Wykorzystane dni
+                            {t('leaves.myLeaves.stats.usedDays')}
                         </div>
                         <div className="mt-2 text-2xl font-bold text-emerald-600">
                             {stats.totalDays}
@@ -265,22 +249,22 @@ export default function MyLeaves() {
                         <thead className="border-b bg-gray-50">
                             <tr>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Typ
+                                    {t('common.type')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Daty
+                                    {t('common.dates')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Dni
+                                    {t('common.days')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Status
+                                    {t('common.status')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Powód
+                                    {t('common.reason')}
                                 </th>
                                 <th className="px-6 py-4 text-right text-xs font-semibold uppercase text-gray-600">
-                                    Akcje
+                                    {t('common.actions')}
                                 </th>
                             </tr>
                         </thead>
@@ -318,7 +302,7 @@ export default function MyLeaves() {
                                                     handleDeleteClick(leave._id)
                                                 }
                                                 className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50"
-                                                title="Usuń"
+                                                title={t('common.delete')}
                                             >
                                                 <Icon.Trash />
                                             </button>
@@ -337,11 +321,10 @@ export default function MyLeaves() {
                                 </div>
                             </div>
                             <div className="text-lg font-medium">
-                                Brak wniosków urlopowych
+                                {t('leaves.myLeaves.noLeaves')}
                             </div>
                             <div className="mt-2 text-sm">
-                                Kliknij "Nowy wniosek" aby złożyć pierwszy
-                                wniosek
+                                {t('leaves.myLeaves.clickToAdd')}
                             </div>
                         </div>
                     )}

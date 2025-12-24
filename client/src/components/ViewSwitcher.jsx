@@ -1,5 +1,6 @@
 import React from 'react';
 import { LayoutList, LayoutDashboard, LayoutGrid } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ViewSwitcher = ({
     currentView,
@@ -7,16 +8,18 @@ const ViewSwitcher = ({
     showArchived = false,
     disableKanban = false,
 }) => {
+    const { t } = useTranslation();
+
     const views = [
         {
             id: 'kanban',
             icon: LayoutDashboard,
-            label: 'Kanban',
+            label: t('projects.view.kanban'),
             disabledInArchive: true,
             forceDisabled: disableKanban,
         },
-        { id: 'list', icon: LayoutList, label: 'Lista' },
-        { id: 'grid', icon: LayoutGrid, label: 'Siatka' },
+        { id: 'list', icon: LayoutList, label: t('projects.view.list') },
+        { id: 'grid', icon: LayoutGrid, label: t('projects.view.grid') },
     ];
 
     return (
@@ -46,7 +49,7 @@ const ViewSwitcher = ({
                             }`}
                             title={
                                 isDisabled
-                                    ? `${label} (niedostępne w archiwum)`
+                                    ? `${label} (${t('projects.view.notAvailableInArchive')})`
                                     : label
                             }
                         >

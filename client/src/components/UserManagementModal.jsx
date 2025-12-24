@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { translateRole } from '../utils/translations.js';
 
 const Icon = {
     Close: () => (
@@ -52,6 +52,7 @@ const Icon = {
 };
 
 export default function UserManagementModal({ project, onClose, onUpdate }) {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const companyId = user?.company?._id;
 
@@ -86,7 +87,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         } catch (err) {
             console.error('Błąd podczas wyszukiwania użytkowników:', err);
             setSearchError(
-                err.response?.data?.message || 'Błąd wyszukiwania użytkowników',
+                err.response?.data?.message || t('projects.details.userModal.errors.searchError'),
             );
         } finally {
             setLoadingSearch(false);
@@ -134,7 +135,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
             );
             alert(
                 err.response?.data?.message ||
-                    'Wystąpił błąd podczas aktualizacji użytkowników.',
+                    t('projects.details.userModal.errors.updateError'),
             );
         } finally {
             setIsUpdating(false);
@@ -148,10 +149,10 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                 <div className="flex items-center justify-between border-b border-gray-200 p-6">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800">
-                            Zarządzanie Użytkownikami
+                            {t('projects.details.userModal.title')}
                         </h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Projekt: {project.name}
+                            {t('projects.details.userModal.projectLabel')}: {project.name}
                         </p>
                     </div>
                     <button
@@ -166,7 +167,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                     {/* Sekcja Obecnych Użytkowników */}
                     <div className="mb-8">
                         <h3 className="mb-3 text-lg font-semibold text-gray-700">
-                            Obecni Użytkownicy
+                            {t('projects.details.userModal.currentUsers')}
                             <span className="ml-2 text-sm font-normal text-gray-500">
                                 ({project.assignedUsers.length})
                             </span>
@@ -175,7 +176,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                         <div className="space-y-2">
                             {project.assignedUsers.length === 0 ? (
                                 <div className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
-                                    Brak przypisanych użytkowników
+                                    {t('projects.details.userModal.noUsers')}
                                 </div>
                             ) : (
                                 project.assignedUsers.map((user) => {
@@ -206,12 +207,12 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                         {user.username}
                                                         {isCreator && (
                                                             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
-                                                                Twórca
+                                                                {t('common.creator')}
                                                             </span>
                                                         )}
                                                     </div>
                                                     <div className="text-xs text-gray-500 truncate max-w-48">
-                                                        {user.email} - {translateRole(user.role)}
+                                                        {user.email} - {t(`common.roles.${user.role}`)}
                                                     </div>
                                                 </div>
                                             </div>
@@ -232,8 +233,8 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                 }`}
                                                 title={
                                                     isCreator
-                                                        ? 'Nie można usunąć twórcy projektu'
-                                                        : 'Usuń z projektu'
+                                                        ? t('projects.details.userModal.cannotRemoveCreator')
+                                                        : t('projects.details.userModal.removeUser')
                                                 }
                                             >
                                                 <Icon.Remove />
@@ -248,13 +249,13 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                     {/* Sekcja Dodawania Użytkowników */}
                     <div>
                         <h3 className="mb-3 text-lg font-semibold text-gray-700">
-                            Dodaj Użytkownika
+                            {t('projects.details.userModal.addUserTitle')}
                         </h3>
 
                         <div className="mb-4">
                             <input
                                 type="text"
-                                placeholder="Szukaj po nazwie lub emailu..."
+                                placeholder={t('common.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
@@ -271,7 +272,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                         {loadingSearch && (
                             <div className="py-8 text-center text-gray-500">
                                 <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                                Szukam...
+                                {t('common.searching')}
                             </div>
                         )}
 
@@ -304,7 +305,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                             {user.username}
                                                         </div>
                                                         <div className="text-xs text-gray-500 truncate max-w-48">
-                                                            {user.email} - {translateRole(user.role)}
+                                                            {user.email} - {t(`common.roles.${user.role}`)}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -319,20 +320,20 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                     className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
                                                     <Icon.Add />
-                                                    <span>Dodaj</span>
+                                                    <span>{t('common.add')}</span>
                                                 </button>
                                             </div>
                                         ))}
                                         {hiddenCount > 0 && (
                                             <div className="text-center py-2 text-sm text-gray-500 bg-gray-50 rounded-lg">
-                                                ...i {hiddenCount} innych pracowników. 
-                                                <span className="font-medium text-emerald-600 ml-1">Wpisz nazwę, aby znaleźć.</span>
+                                                {t('projects.details.userModal.othersCount', { count: hiddenCount })} 
+                                                <span className="font-medium text-emerald-600 ml-1">{t('projects.details.userModal.typeToSearch')}</span>
                                             </div>
                                         )}
                                     </>
                                 ) : (
                                     <div className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
-                                        {searchTerm ? "Nie znaleziono użytkowników" : "Wszyscy użytkownicy są już przypisani"}
+                                        {searchTerm ? t('common.noUsersFound') : t('projects.details.userModal.allAssigned')}
                                     </div>
                                 )}
                             </div>
@@ -346,7 +347,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                         onClick={onClose}
                         className="rounded-lg bg-gray-200 px-6 py-2 text-gray-800 transition-colors hover:bg-gray-300"
                     >
-                        Zamknij
+                        {t('common.close')}
                     </button>
                 </div>
             </div>

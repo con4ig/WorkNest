@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
 import { useAuth } from '../context/AuthContext.jsx';
-import { translateRole } from '../utils/translations.js';
+import { useTranslation } from 'react-i18next';
 
 const Icon = {
     X: () => (
@@ -18,6 +18,7 @@ const Icon = {
 };
 
 export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const companyId = user?.company?._id;
 
@@ -101,7 +102,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
             <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white">
                 {/* Header */}
                 <div className="sticky top-0 flex items-center justify-between border-b bg-white p-6">
-                    <h2 className="text-2xl font-bold">Nowy Projekt</h2>
+                    <h2 className="text-2xl font-bold">{t('projects.addProject')}</h2>
                     <button
                         onClick={onClose}
                         className="rounded-lg p-2 transition-colors hover:bg-gray-100"
@@ -121,7 +122,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     {/* Name */}
                     <div>
                         <label className="mb-2 block text-sm font-medium text-gray-700">
-                            Nazwa projektu{' '}
+                            {t('projects.labelName')}{' '}
                             <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -130,7 +131,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                             value={formData.name}
                             onChange={handleChange}
                             className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-                            placeholder="np. Redesign strony głównej"
+                            placeholder={t('projects.placeholderName')}
                             required
                         />
                     </div>
@@ -138,7 +139,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     {/* Description */}
                     <div>
                         <label className="mb-2 block text-sm font-medium text-gray-700">
-                            Opis
+                            {t('projects.labelDescription')}
                         </label>
                         <textarea
                             name="description"
@@ -146,7 +147,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                             onChange={handleChange}
                             rows="3"
                             className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-                            placeholder="Opisz cel i zakres projektu..."
+                            placeholder={t('projects.placeholderDescription')}
                         />
                     </div>
 
@@ -154,7 +155,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Status
+                                {t('common.status')}
                             </label>
                             <select
                                 name="status"
@@ -162,16 +163,16 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 onChange={handleChange}
                                 className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="pending">Oczekujący</option>
-                                <option value="running">W trakcie</option>
-                                <option value="completed">Zakończony</option>
-                                <option value="on-hold">Wstrzymany</option>
+                                <option value="pending">{t('common.projectStatus.pending')}</option>
+                                <option value="running">{t('common.projectStatus.running')}</option>
+                                <option value="completed">{t('common.projectStatus.completed')}</option>
+                                <option value="on-hold">{t('common.projectStatus.on-hold')}</option>
                             </select>
                         </div>
 
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Priorytet
+                                {t('projects.labelPriority')}
                             </label>
                             <select
                                 name="priority"
@@ -179,10 +180,10 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 onChange={handleChange}
                                 className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="low">🟢 Niski</option>
-                                <option value="medium">🔵 Średni</option>
-                                <option value="high">🟠 Wysoki</option>
-                                <option value="critical">🔴 Krytyczny</option>
+                                <option value="low">🟢 {t('common.priority.low')}</option>
+                                <option value="medium">🔵 {t('common.priority.medium')}</option>
+                                <option value="high">🟠 {t('common.priority.high')}</option>
+                                <option value="critical">🔴 {t('common.priority.critical')}</option>
                             </select>
                         </div>
                     </div>
@@ -191,7 +192,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Data rozpoczęcia
+                                {t('projects.labelStartDate')}
                             </label>
                             <input
                                 type="date"
@@ -204,7 +205,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
-                                Data zakończenia
+                                {t('projects.labelEndDate')}
                             </label>
                             <input
                                 type="date"
@@ -219,7 +220,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     {/* Assigned Users */}
                     <div>
                         <label className="mb-2 block text-sm font-medium text-gray-700">
-                            Przypisani użytkownicy
+                            {t('projects.labelAssignedUsers')}
                         </label>
                         <div className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-gray-300 p-4">
                             {users.map((user) => (
@@ -249,7 +250,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                         </div>
                                     </div>
                                     <span className="ml-auto flex-shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                                        {translateRole(user.role)}
+                                        {t(`common.roles.${user.role}`)}
                                     </span>
                                 </label>
                             ))}
@@ -264,14 +265,14 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                             className="rounded-lg px-6 py-2 text-gray-600 transition-colors hover:bg-gray-100"
                             disabled={loading}
                         >
-                            Anuluj
+                            {t('common.cancel')}
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
                             className="rounded-lg bg-emerald-600 px-6 py-2 text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                            {loading ? 'Tworzenie...' : 'Utwórz Projekt'}
+                            {loading ? t('projects.creating') : t('projects.addProject')}
                         </button>
                     </div>
                 </form>

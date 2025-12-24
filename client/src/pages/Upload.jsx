@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Upload, X, Check, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 
 function ProfileImageUpload() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -16,13 +18,13 @@ function ProfileImageUpload() {
         if (file) {
             // Walidacja rozmiaru (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
-                setError('Plik jest za duży. Maksymalny rozmiar to 5MB.');
+                setError(t('upload.errors.tooLarge'));
                 return;
             }
 
             // Walidacja typu
             if (!file.type.startsWith('image/')) {
-                setError('Wybierz plik graficzny (jpg, png, itp.)');
+                setError(t('upload.errors.invalidType'));
                 return;
             }
 
@@ -43,7 +45,7 @@ function ProfileImageUpload() {
         e.preventDefault();
 
         if (!image) {
-            setError('Wybierz zdjęcie');
+            setError(t('upload.errors.noImage'));
             return;
         }
 
@@ -62,7 +64,7 @@ function ProfileImageUpload() {
                 navigate('/dashboard');
             }, 1500);
         } catch (err) {
-            setError('Nie udało się zaktualizować zdjęcia. Spróbuj ponownie.');
+            setError(t('upload.errors.uploadFailed'));
         } finally {
             setLoading(false);
         }
@@ -99,10 +101,10 @@ function ProfileImageUpload() {
                         <Camera className="h-7 w-7 text-emerald-600 sm:h-8 sm:w-8" />
                     </div>
                     <h2 className="mb-2 text-2xl font-bold text-gray-800 sm:text-3xl">
-                        Zmień zdjęcie profilowe
+                        {t('upload.title')}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        Dodaj lub zaktualizuj swój awatar
+                        {t('upload.subtitle')}
                     </p>
                 </div>
 
@@ -114,7 +116,7 @@ function ProfileImageUpload() {
                                 <div className="group relative">
                                     <img
                                         src={preview}
-                                        alt="Podgląd"
+                                        alt={t('upload.previewAlt')}
                                         className="h-32 w-32 rounded-full border-4 border-emerald-500 object-cover shadow-lg transition-transform group-hover:scale-105 sm:h-40 sm:w-40"
                                     />
                                     <button
@@ -143,8 +145,8 @@ function ProfileImageUpload() {
                                 <Upload className="h-5 w-5" />
                                 <span>
                                     {preview
-                                        ? 'Wybierz inne zdjęcie'
-                                        : 'Wybierz zdjęcie'}
+                                        ? t('upload.selectAnother')
+                                        : t('upload.selectImage')}
                                 </span>
                             </div>
                             <input
@@ -179,8 +181,8 @@ function ProfileImageUpload() {
                             <div className="flex items-center gap-2">
                                 <Check className="h-5 w-5 flex-shrink-0 text-emerald-500" />
                                 <p className="text-sm font-medium text-emerald-700">
-                                    Zdjęcie zostało zaktualizowane!
-                                    Przekierowywanie...
+                                    {t('upload.successMessage')}
+                                    {t('common.redirecting')}...
                                 </p>
                             </div>
                         </div>
@@ -197,12 +199,12 @@ function ProfileImageUpload() {
                                 {loading ? (
                                     <span className="flex items-center justify-center gap-2">
                                         <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                                        Wysyłanie...
+                                        {t('common.uploading')}...
                                     </span>
                                 ) : (
                                     <span className="flex items-center justify-center gap-2">
                                         <Check className="h-5 w-5" />
-                                        Zapisz zdjęcie
+                                        {t('upload.saveButton')}
                                     </span>
                                 )}
                             </button>
@@ -213,7 +215,7 @@ function ProfileImageUpload() {
                                 disabled={loading}
                                 className="rounded-xl bg-gray-100 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50 sm:order-first"
                             >
-                                Anuluj
+                                {t('common.cancel')}
                             </button>
                         </div>
                     )}
@@ -222,12 +224,12 @@ function ProfileImageUpload() {
                 {/* Tips */}
                 <div className="mt-8 rounded-xl bg-emerald-50 p-4">
                     <p className="mb-2 text-xs font-medium text-emerald-800">
-                        💡 Wskazówki:
+                        {t('upload.tips.title')}
                     </p>
                     <ul className="space-y-1 text-xs text-emerald-700">
-                        <li>• Użyj zdjęcia z dobrym oświetleniem</li>
-                        <li>• Twarz powinna być wyraźnie widoczna</li>
-                        <li>• Kwadratowe zdjęcia wyglądają najlepiej</li>
+                        <li>• {t('upload.tips.lighting')}</li>
+                        <li>• {t('upload.tips.visibility')}</li>
+                        <li>• {t('upload.tips.aspectRatio')}</li>
                     </ul>
                 </div>
             </div>
