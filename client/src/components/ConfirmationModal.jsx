@@ -1,7 +1,18 @@
 import React from 'react';
 import { X, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Potwierdź', cancelText = 'Anuluj', confirmVariant = 'danger' }) => {
+const ConfirmationModal = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title,
+    message,
+    confirmText,
+    cancelText,
+    confirmVariant = 'danger',
+}) => {
+    const { t } = useTranslation();
     if (!isOpen) return null;
 
     const confirmButtonClasses = {
@@ -9,15 +20,15 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
         primary: 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500',
         warning: 'bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-400',
     };
-    
+
     const iconClasses = {
         danger: 'bg-red-100 text-red-500',
         primary: 'bg-emerald-100 text-emerald-500',
         warning: 'bg-yellow-100 text-yellow-500',
-    }
+    };
 
     return (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4" onMouseDown={onClose}>
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm" onMouseDown={onClose}>
             <div className="relative w-full max-w-md transform rounded-2xl bg-white p-6 shadow-xl transition-all" onMouseDown={(e) => e.stopPropagation()}>
                 <button
                     onClick={onClose}
@@ -39,7 +50,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
                         onClick={onClose}
                         className="rounded-lg border border-slate-300 bg-white py-3 px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                     >
-                        {cancelText}
+                        {cancelText || t('common.cancel')}
                     </button>
                     <button
                         onClick={() => {
@@ -48,7 +59,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
                         }}
                         className={`rounded-lg py-3 px-4 text-sm font-semibold text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${confirmButtonClasses[confirmVariant] || confirmButtonClasses.primary}`}
                     >
-                        {confirmText}
+                        {confirmText || t('common.confirm')}
                     </button>
                 </div>
             </div>

@@ -15,24 +15,17 @@ import {
     Building2,
     Badge,
 } from 'lucide-react';
-import {
-    translateStatus,
-    translateContractType,
-    translateRole,
-} from '../utils/translations.js';
+import { useTranslation } from 'react-i18next';
+import moment from 'moment';
 
 import LoadingScreen from '../components/LoadingScreen';
 // --- Pomocnicze funkcje formatowania ---
-const formatDateForDisplay = (dateString) => {
-    if (!dateString) return 'Nie określono';
+const formatDateForDisplay = (dateString, language = 'pl') => {
+    if (!dateString) return null; // We'll handle 'Nie określono' with t() in component
     try {
-        return new Date(dateString).toLocaleDateString('pl-PL', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
+        return moment(dateString).locale(language).format('LL');
     } catch {
-        return 'Błędna data';
+        return null; // We'll handle 'Błędna data' with t() in component
     }
 };
 
@@ -46,19 +39,25 @@ const formatDateForInput = (dateString) => {
     }
 };
 
-const calculateWorkExperience = (hireDate) => {
-    if (!hireDate) return 'Nie określono';
+const calculateWorkExperience = (hireDate, t) => {
+    if (!hireDate) return t('common.notSpecified');
     try {
-        const hire = new Date(hireDate);
-        const now = new Date();
-        const months =
-            (now.getFullYear() - hire.getFullYear()) * 12 +
-            (now.getMonth() - hire.getMonth());
-        const years = Math.floor(months / 12);
-        const remainingMonths = months % 12;
-        return `${years} lat ${remainingMonths} m-cy`;
+        const hire = moment(hireDate);
+        const now = moment();
+        const years = now.diff(hire, 'years');
+        hire.add(years, 'years');
+        const months = now.diff(hire, 'months');
+        
+        let result = '';
+        if (years > 0) {
+            result += `${years} ${t('common.years', { count: years })} `;
+        }
+        if (months > 0 || years === 0) {
+            result += `${months} ${t('common.months', { count: months })}`;
+        }
+        return result.trim();
     } catch {
-        return 'Błędna data';
+        return t('common.invalidDate');
     }
 };
 
@@ -167,7 +166,9 @@ const EditableField = ({
     onChange,
     disabled,
     options,
-}) => (
+}) => {
+    const { t } = useTranslation();
+    return (
     <div className="flex flex-col gap-2">
         <label className="text-sm font-semibold text-slate-600">{label}</label>
         {options ? (
@@ -178,10 +179,10 @@ const EditableField = ({
                 disabled={disabled}
                 className="rounded-lg border border-slate-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
-                <option value="">-- Wybierz --</option>
+                <option value="">-- {t('common.select')} --</option>
                 {options.map((opt) => (
                     <option key={opt} value={opt}>
-                        {name === 'role' ? translateRole(opt) : opt}
+                        {name === 'role' ? t(`common.roles.${opt}`) : name === 'department' ? t(`common.departments.${opt}`) : opt}
                     </option>
                 ))}
             </select>
@@ -205,10 +206,12 @@ const EditableField = ({
             />
         )}
     </div>
-);
+    );
+};
 
 // --- Główny komponent ---
 export default function UserDetails() {
+    const { t, i18n } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
@@ -391,28 +394,28 @@ export default function UserDetails() {
         } catch (err) {
             const errorMessage =
                 err.response?.data?.message ||
-                'Wystąpił nieoczekiwany błąd. Spróbuj ponownie.';
-            alert(`Błąd podczas zapisywania zmian: ${errorMessage}`);
+                t('common.errors.unexpected');
+            alert(`${t('common.errors.saveFailed')}: ${errorMessage}`);
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (loading) return <LoadingScreen message="Ładowanie danych pracownika..." />;
+    if (loading) return <LoadingScreen message={t('employees.loadingDetails')} />;
 
     if (error)
         return (
             <div className="flex min-h-screen items-center justify-center bg-slate-50 p-8 text-center">
                 <div className="w-full max-w-lg rounded-xl border border-red-400 bg-red-50 px-8 py-6 text-red-700 shadow-lg">
                     <strong className="mb-2 block text-lg font-bold">
-                        Wystąpił błąd
+                        {t('common.error')}
                     </strong>
                     <span>{error}</span>
                     <button
                         onClick={() => navigate('/employees')}
                         className="mt-6 w-full rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700"
                     >
-                        Powrót
+                        {t('common.back')}
                     </button>
                 </div>
             </div>
@@ -437,7 +440,7 @@ export default function UserDetails() {
                         <Icon.Back />
                     </button>
                     <h2 className="text-xl font-bold tracking-tight text-slate-800">
-                        Profil Pracownika
+                        {t('employees.details.title')}
                     </h2>
                 </div>
 
@@ -449,12 +452,12 @@ export default function UserDetails() {
                         {fullName}
                     </h3>
                     <p className="mt-1 text-sm text-slate-500">
-                        {editData.position || 'Brak stanowiska'}
+                        {editData.position || t('common.noPosition')}
                     </p>
                 </div>
 
                 <div className="space-y-6">
-                    <StatCard icon={<Icon.Badge />} title="Status i Umowa">
+                    <StatCard icon={<Icon.Badge />} title={t('employees.details.statusAndContract')}>
                         {isEditing ? (
                             <div className="space-y-3">
                                 <select
@@ -465,7 +468,7 @@ export default function UserDetails() {
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
-                                            {translateStatus(s)}
+                                            {t(`common.employeeStatus.${s}`)}
                                         </option>
                                     ))}
                                 </select>
@@ -477,7 +480,7 @@ export default function UserDetails() {
                                 >
                                     {AVAILABLE_CONTRACT_TYPES.map((c) => (
                                         <option key={c} value={c}>
-                                            {translateContractType(c)}
+                                            {t(`common.contractType.${c}`)}
                                         </option>
                                     ))}
                                 </select>
@@ -487,24 +490,22 @@ export default function UserDetails() {
                                 <span
                                     className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(user.status)}`}
                                 >
-                                    {translateStatus(user.status)}
+                                    {t(`common.employeeStatus.${user.status}`)}
                                 </span>
                                 <span
                                     className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${getContractClasses(user.contractType)}`}
                                 >
-                                    {translateContractType(user.contractType)}
+                                    {t(`common.contractType.${user.contractType}`)}
                                 </span>
                             </div>
                         )}
                     </StatCard>
-
-                    <StatCard icon={<Icon.Calendar />} title="Staż pracy">
+                    <StatCard icon={<Icon.Calendar />} title={t('employees.details.workExperience')}>
                         <p className="text-lg font-bold text-slate-800">
-                            {calculateWorkExperience(user.hireDate)}
+                            {calculateWorkExperience(user.hireDate, t)}
                         </p>
                     </StatCard>
-
-                    <StatCard icon={<Icon.Briefcase />} title="Dział">
+                    <StatCard icon={<Icon.Briefcase />} title={t('common.department')}>
                         {isEditing ? (
                             <select
                                 name="department"
@@ -512,16 +513,16 @@ export default function UserDetails() {
                                 onChange={handleEditChange}
                                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 focus:ring-2 focus:ring-emerald-500"
                             >
-                                <option value="">-- Wybierz --</option>
+                                <option value="">-- {t('common.select')} --</option>
                                 {DEPARTMENTS.map((d) => (
                                     <option key={d} value={d}>
-                                        {d}
+                                        {t(`common.departments.${d}`)}
                                     </option>
                                 ))}
                             </select>
                         ) : (
                             <p className="text-lg font-bold text-slate-800">
-                                {user.department || 'Nie określono'}
+                                {user.department ? t(`common.departments.${user.department}`) : t('common.notSpecified')}
                             </p>
                         )}
                     </StatCard>
@@ -529,9 +530,9 @@ export default function UserDetails() {
 
                 <div className="mt-auto pt-8 text-center text-xs text-slate-400">
                     <p>
-                        Utworzony:{' '}
+                        {t('common.createdAt')}:{' '}
                         <span className="font-semibold text-slate-500">
-                            {formatDateForDisplay(user.createdAt)}
+                            {formatDateForDisplay(user.createdAt, i18n.language) || t('common.notSpecified')}
                         </span>
                     </p>
                 </div>
@@ -548,7 +549,7 @@ export default function UserDetails() {
                                     name="firstName"
                                     value={editData.firstName}
                                     onChange={handleEditChange}
-                                    placeholder="Imię..."
+                                    placeholder={`${t('common.firstName')}...`}
                                     className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
                                 />
                                 <input
@@ -556,7 +557,7 @@ export default function UserDetails() {
                                     name="lastName"
                                     value={editData.lastName}
                                     onChange={handleEditChange}
-                                    placeholder="Nazwisko..."
+                                    placeholder={`${t('common.lastName')}...`}
                                     className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
                                 />
                             </div>
@@ -575,10 +576,10 @@ export default function UserDetails() {
                                             className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 font-bold text-white shadow-md transition-all hover:bg-emerald-700 disabled:opacity-60"
                                         >
                                             {isSaving ? (
-                                                'Zapisywanie...'
+                                                t('common.saving')
                                             ) : (
                                                 <>
-                                                    <Icon.Save /> Zapisz zmiany
+                                                    <Icon.Save /> {t('common.saveChanges')}
                                                 </>
                                             )}
                                         </button>
@@ -589,7 +590,7 @@ export default function UserDetails() {
                                             }}
                                             className="flex items-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 font-bold text-gray-800 transition-all hover:bg-gray-300"
                                         >
-                                            <Icon.Cancel /> Anuluj
+                                            <Icon.Cancel /> {t('common.cancel')}
                                         </button>
                                     </>
                                 ) : (
@@ -597,7 +598,7 @@ export default function UserDetails() {
                                         onClick={() => setIsEditing(true)}
                                         className="flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:bg-slate-900"
                                     >
-                                        <Icon.Edit /> Edytuj dane
+                                        <Icon.Edit /> {t('common.editData')}
                                     </button>
                                 )}
                             </div>
@@ -607,19 +608,19 @@ export default function UserDetails() {
 
                 <div className="space-y-8">
                     {/* Sekcja Kontakt */}
-                    <ContentCard icon={<Icon.Mail />} title="Kontakt">
+                    <ContentCard icon={<Icon.Mail />} title={t('common.contact')}>
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {isEditing ? (
                                 <>
                                     <EditableField
-                                        label="Email"
+                                        label={t('common.email')}
                                         name="email"
                                         type="email"
                                         value={editData.email}
                                         onChange={handleEditChange}
                                     />
                                     <EditableField
-                                        label="Numer telefonu"
+                                        label={t('common.phoneNumber')}
                                         name="phoneNumber"
                                         value={editData.phoneNumber}
                                         onChange={handleEditChange}
@@ -629,7 +630,7 @@ export default function UserDetails() {
                                 <>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Email
+                                            {t('common.email')}
                                         </p>
                                         <a
                                             href={`mailto:${user.email}`}
@@ -640,10 +641,10 @@ export default function UserDetails() {
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Numer telefonu
+                                            {t('common.phoneNumber')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {user.phoneNumber || 'Nie podano'}
+                                            {user.phoneNumber || t('common.notProvided')}
                                         </p>
                                     </div>
                                 </>
@@ -654,33 +655,33 @@ export default function UserDetails() {
                     {/* Sekcja Praca */}
                     <ContentCard
                         icon={<Icon.Briefcase />}
-                        title="Informacje zawodowe"
+                        title={t('employees.details.professionalInfo')}
                     >
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {isEditing ? (
                                 <>
                                     <EditableField
-                                        label="Stanowisko"
+                                        label={t('common.position')}
                                         name="position"
                                         value={editData.position}
                                         onChange={handleEditChange}
                                     />
                                     <EditableField
-                                        label="Rola w systemie"
+                                        label={t('common.roleInSystem')}
                                         name="role"
                                         value={editData.role}
                                         options={AVAILABLE_ROLES}
                                         onChange={handleEditChange}
                                     />
                                     <EditableField
-                                        label="Data zatrudnienia"
+                                        label={t('projects.labelStartDate')}
                                         name="hireDate"
                                         type="date"
                                         value={editData.hireDate}
                                         onChange={handleEditChange}
                                     />
                                     <EditableField
-                                        label="Pensja (PLN)"
+                                        label={t('employees.details.salary')}
                                         name="salary"
                                         type="number"
                                         value={editData.salary}
@@ -691,38 +692,39 @@ export default function UserDetails() {
                                 <>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Stanowisko
+                                            {t('common.position')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {user.position || 'Nie określono'}
+                                            {user.position || t('common.notSpecified')}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Rola
+                                            {t('common.role')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {translateRole(user.role)}
+                                            {t(`common.roles.${user.role}`)}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Data zatrudnienia
+                                            {t('employees.details.hireDate')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
                                             {formatDateForDisplay(
                                                 user.hireDate,
-                                            )}
+                                                i18n.language
+                                            ) || t('common.notSpecified')}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Pensja
+                                            {t('employees.details.salaryLabel')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
                                             {user.salary > 0
                                                 ? `${user.salary} PLN`
-                                                : 'Nie określono'}
+                                                : t('common.notSpecified')}
                                         </p>
                                     </div>
                                 </>
@@ -731,18 +733,18 @@ export default function UserDetails() {
                     </ContentCard>
 
                     {/* Sekcja Adres */}
-                    <ContentCard icon={<Icon.Location />} title="Adres">
+                    <ContentCard icon={<Icon.Location />} title={t('common.address')}>
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {isEditing ? (
                                 <>
                                     <EditableField
-                                        label="Adres"
+                                        label={t('common.address')}
                                         name="address"
                                         value={editData.address}
                                         onChange={handleEditChange}
                                     />
                                     <EditableField
-                                        label="Miasto"
+                                        label={t('common.city')}
                                         name="city"
                                         value={editData.city}
                                         onChange={handleEditChange}
@@ -752,18 +754,18 @@ export default function UserDetails() {
                                 <>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Adres
+                                            {t('common.address')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {user.address || 'Nie podano'}
+                                            {user.address || t('common.notProvided')}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            Miasto
+                                            {t('common.city')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {user.city || 'Nie podano'}
+                                            {user.city || t('common.notProvided')}
                                         </p>
                                     </div>
                                 </>
@@ -772,12 +774,12 @@ export default function UserDetails() {
                     </ContentCard>
 
                     {/* Sekcja Dane osobiste */}
-                    <ContentCard icon={<Icon.Badge />} title="Dane osobiste">
+                    <ContentCard icon={<Icon.Badge />} title={t('employees.details.personalData')}>
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             {isEditing ? (
                                 <>
                                     <EditableField
-                                        label="PESEL/ID"
+                                        label={t('employees.details.peselId')}
                                         name="peselOrId"
                                         value={editData.peselOrId}
                                         onChange={handleEditChange}
@@ -787,10 +789,10 @@ export default function UserDetails() {
                                 <>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-500">
-                                            PESEL/ID
+                                            {t('employees.details.peselId')}
                                         </p>
                                         <p className="text-lg font-bold text-slate-800">
-                                            {user.peselOrId || 'Nie podano'}
+                                            {user.peselOrId || t('common.notProvided')}
                                         </p>
                                     </div>
                                 </>
@@ -799,10 +801,10 @@ export default function UserDetails() {
                     </ContentCard>
 
                     {/* Sekcja Notatki */}
-                    <ContentCard icon={<Icon.Notes />} title="Notatki">
+                    <ContentCard icon={<Icon.Notes />} title={t('common.notes')}>
                         {isEditing ? (
                             <EditableField
-                                label="Notatki pracownika"
+                                label={t('employees.details.notesLabel')}
                                 name="notes"
                                 type="textarea"
                                 value={editData.notes}
@@ -810,7 +812,7 @@ export default function UserDetails() {
                             />
                         ) : (
                             <p className="whitespace-pre-wrap leading-relaxed text-slate-600">
-                                {user.notes || 'Brak notatek'}
+                                {user.notes || t('employees.details.noNotes')}
                             </p>
                         )}
                     </ContentCard>
@@ -818,7 +820,7 @@ export default function UserDetails() {
                     {/* Sekcja Historia Zatrudnienia */}
                     <ContentCard
                         icon={<Icon.Briefcase />}
-                        title="Historia zatrudnienia"
+                        title={t('employees.details.employmentHistory')}
                     >
                         <div className="space-y-6">
                             {isEditing
@@ -830,7 +832,7 @@ export default function UserDetails() {
                                           >
                                               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                   <EditableField
-                                                      label="Firma"
+                                                      label={t('common.company')}
                                                       name="company"
                                                       value={item.company}
                                                       onChange={(e) =>
@@ -841,7 +843,7 @@ export default function UserDetails() {
                                                       }
                                                   />
                                                   <EditableField
-                                                      label="Stanowisko"
+                                                      label={t('common.position')}
                                                       name="position"
                                                       value={item.position}
                                                       onChange={(e) =>
@@ -852,7 +854,7 @@ export default function UserDetails() {
                                                       }
                                                   />
                                                   <EditableField
-                                                      label="Data rozpoczęcia"
+                                                      label={t('projects.labelStartDate')}
                                                       name="startDate"
                                                       type="date"
                                                       value={formatDateForInput(
@@ -866,7 +868,7 @@ export default function UserDetails() {
                                                       }
                                                   />
                                                   <EditableField
-                                                      label="Data zakończenia"
+                                                      label={t('projects.labelEndDate')}
                                                       name="endDate"
                                                       type="date"
                                                       value={formatDateForInput(
@@ -883,7 +885,7 @@ export default function UserDetails() {
                                               <textarea
                                                   name="description"
                                                   rows="3"
-                                                  placeholder="Opis..."
+                                                  placeholder={`${t('common.description')}...`}
                                                   value={item.description}
                                                   onChange={(e) =>
                                                       handleHistoryChange(
@@ -899,7 +901,7 @@ export default function UserDetails() {
                                                   }
                                                   className="mt-2 text-sm font-semibold text-red-600 hover:text-red-800"
                                               >
-                                                  Usuń
+                                                  {t('common.delete')}
                                               </button>
                                           </div>
                                       ),
@@ -936,13 +938,13 @@ export default function UserDetails() {
                                     onClick={handleAddHistory}
                                     className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
                                 >
-                                    + Dodaj wpis
+                                    + {t('employees.details.addHistoryEntry')}
                                 </button>
                             )}
                             {!isEditing &&
                                 employmentHistory.length === 0 && (
                                     <p className="text-slate-500">
-                                        Brak historii zatrudnienia.
+                                        {t('employees.details.noHistory')}
                                     </p>
                                 )}
                         </div>
@@ -951,7 +953,7 @@ export default function UserDetails() {
                     {/* Sekcja Dokumenty i Umowy */}
                     <ContentCard
                         icon={<Icon.Documents />}
-                        title="Dokumenty i Umowy"
+                        title={t('employees.details.documentsAndAgreements')}
                     >
                         <div className="space-y-6">
                             {isEditing
@@ -963,7 +965,7 @@ export default function UserDetails() {
                                           >
                                               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                   <EditableField
-                                                      label="Nazwa dokumentu"
+                                                      label={t('employees.details.documentName')}
                                                       name="name"
                                                       value={doc.name}
                                                       onChange={(e) =>
@@ -974,7 +976,7 @@ export default function UserDetails() {
                                                       }
                                                   />
                                                   <EditableField
-                                                      label="URL do pliku"
+                                                      label={t('employees.details.fileUrl')}
                                                       name="url"
                                                       value={doc.url}
                                                       onChange={(e) =>
@@ -985,7 +987,7 @@ export default function UserDetails() {
                                                       }
                                                   />
                                                   <EditableField
-                                                      label="Kategoria"
+                                                      label={t('employees.details.category')}
                                                       name="category"
                                                       value={doc.category}
                                                       options={[
@@ -1006,7 +1008,7 @@ export default function UserDetails() {
                                                   }
                                                   className="mt-4 text-sm font-semibold text-red-600 hover:text-red-800"
                                               >
-                                                  Usuń dokument
+                                                  {t('employees.details.removeDocument')}
                                               </button>
                                           </div>
                                       ),
@@ -1027,12 +1029,12 @@ export default function UserDetails() {
                                               </a>
                                               <span className="text-sm text-slate-500">
                                                   {doc.category === 'agreement'
-                                                      ? 'Umowa'
-                                                      : 'Dokumentacja'}
+                                                      ? t('employees.details.agreement')
+                                                      : t('employees.details.documentation')}
                                               </span>
                                           </div>
                                           <span className="text-xs text-slate-400">
-                                              Dodano:{' '}
+                                              {t('common.Added')}:{' '}
                                               {formatDateForDisplay(
                                                   doc.uploadedAt,
                                               )}
@@ -1045,7 +1047,7 @@ export default function UserDetails() {
                                     onClick={handleAddDocument}
                                     className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
                                 >
-                                    + Dodaj dokument
+                                    + {t('employees.details.addDocument')}
                                 </button>
                             )}
 
@@ -1053,7 +1055,7 @@ export default function UserDetails() {
                                 (!user.documents ||
                                     user.documents.length === 0) && (
                                     <p className="text-slate-500">
-                                        Brak dokumentów i umów.
+                                        {t('employees.details.noDocuments')}
                                     </p>
                                 )}
                         </div>

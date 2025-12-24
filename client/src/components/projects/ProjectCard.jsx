@@ -2,13 +2,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Archive, Trash2, Eye } from 'lucide-react';
-
-const priorityStyles = {
-    low: { bg: 'bg-slate-100', text: 'text-slate-700', label: 'Niski' },
-    medium: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Średni' },
-    high: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Wysoki' },
-    critical: { bg: 'bg-red-100', text: 'text-red-700', label: 'Krytyczny' },
-};
+import { useTranslation } from 'react-i18next';
 
 const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -20,6 +14,8 @@ const formatDate = (dateString) => {
 };
 
 const AssignedUsersAvatarGroup = ({ users }) => {
+    const { t } = useTranslation();
+
     // Zabezpieczenie przed undefined
     if (!users || users.length === 0) {
         return <div className="text-xs text-slate-400">Brak</div>;
@@ -52,6 +48,15 @@ const ProjectCard = ({
     onPermanentDelete,
     currentUserRole,
 }) => {
+    const { t } = useTranslation();
+
+    const priorityStyles = {
+        low: { bg: 'bg-slate-100', text: 'text-slate-700', label: t('common.priority.low') },
+        medium: { bg: 'bg-blue-100', text: 'text-blue-700', label: t('common.priority.medium') },
+        high: { bg: 'bg-orange-100', text: 'text-orange-700', label: t('common.priority.high') },
+        critical: { bg: 'bg-red-100', text: 'text-red-700', label: t('common.priority.critical') },
+    };
+
     const {
         attributes,
         listeners,
@@ -144,7 +149,7 @@ const ProjectCard = ({
             {/* Progress bar */}
             <div className="mb-3">
                 <div className="mb-1 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">Postęp</span>
+                    <span className="text-xs text-slate-500">{t('projects.card.progress')}</span>
                     <span className="text-xs font-medium text-slate-700">
                         {project.progress || 0}%
                     </span>

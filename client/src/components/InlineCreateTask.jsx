@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import { Plus, X } from 'lucide-react';
 
 const InlineCreateTask = ({ projectId, onTaskCreated }) => {
+    const { t } = useTranslation();
     const [isCreating, setIsCreating] = useState(false);
     const [title, setTitle] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +26,7 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
             setIsCreating(false);
             onTaskCreated(); // Notify parent to refetch tasks
         } catch (err) {
-            alert(`Błąd podczas dodawania zadania: ${err.message}`);
+            alert(`${t('projects.details.kanban.errors.addError')}: ${err.message}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -37,7 +39,7 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800"
             >
                 <Plus size={18} className="font-bold" />
-                Dodaj nowe zadanie
+                {t('projects.details.kanban.addNewTask')}
             </button>
         );
     }
@@ -47,7 +49,7 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
             <textarea
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Wprowadź tytuł zadania..."
+                placeholder={t('projects.details.kanban.taskTitlePlaceholder')}
                 className="w-full resize-none border-none p-1 text-sm placeholder-gray-500 focus:ring-0"
                 autoFocus
                 onKeyDown={(e) => {
@@ -79,7 +81,7 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
                         disabled={isSubmitting || !title.trim()}
                         className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {isSubmitting ? 'Dodawanie...' : 'Dodaj'}
+                        {isSubmitting ? t('projects.details.kanban.adding') : t('common.add')}
                     </button>
                 </div>
             </div>

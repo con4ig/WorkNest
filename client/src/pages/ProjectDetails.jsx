@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 import api from '../services/api.js';
 import UserManagementModal from '../components/UserManagementModal.jsx';
 import moment from 'moment';
@@ -21,19 +23,20 @@ import {
 import { ChevronRight } from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
 
-moment.locale('pl');
+// Moment locale is set dynamically in the component
 
-const formatDateForDisplay = (dateString) => {
+const formatDateForDisplay = (dateString, language = 'pl') => {
     if (!dateString) return null;
     try {
-        return new Date(dateString).toLocaleDateString('pl-PL', {
+        const date = new Date(dateString);
+        return date.toLocaleDateString(language === 'pl' ? 'pl-PL' : 'en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
         });
     } catch (e) {
         console.error('Error formatting date', e);
-        return 'Błędna data';
+        return i18n.t('common.invalidDate');
     }
 };
 
@@ -135,6 +138,7 @@ const CommentItem = ({
     onReply,
     currentUserId,
     isAdmin,
+    t,
 }) => {
     const [showReplies, setShowReplies] = useState(false);
     const [replyText, setReplyText] = useState('');
@@ -185,7 +189,7 @@ const CommentItem = ({
                             onClick={() => setIsReplying(!isReplying)}
                             className="text-emerald-600 hover:text-emerald-700"
                         >
-                            Odpowiedz
+                            {t('projects.details.reply')}
                         </button>
                         {comment.replies && comment.replies.length > 0 && (
                             <button
@@ -198,9 +202,9 @@ const CommentItem = ({
                                     <Icon.ChevronRight />
                                 )}
                                 {comment.replies.length}{' '}
-                                {comment.replies.length === 1
-                                    ? 'odpowiedź'
-                                    : 'odpowiedzi'}
+                                {t('projects.details.replies', {
+                                    count: comment.replies.length,
+                                })}
                             </button>
                         )}
                     </div>
@@ -214,7 +218,7 @@ const CommentItem = ({
                                 onKeyPress={(e) =>
                                     e.key === 'Enter' && handleReply()
                                 }
-                                placeholder="Napisz odpowiedź..."
+                                placeholder={t('projects.details.replyPlaceholder')}
                                 className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
                             />{' '}
                             <button
@@ -266,10 +270,15 @@ const CommentItem = ({
 
 // Główny komponent
 export default function ProjectDetails() {
+    const { t, i18n: i18nInstance } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const [project, setProject] = useState(null);
     const { user: currentUser } = useAuth(); // Use currentUser from AuthContext
+
+    useEffect(() => {
+        moment.locale(i18nInstance.language);
+    }, [i18nInstance.language]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showUserModal, setShowUserModal] = useState(false);
@@ -318,7 +327,7 @@ export default function ProjectDetails() {
             } catch (err) {
                 console.error('Błąd pobierania projektu:', err);
                 setError(
-                    `Nie udało się załadować danych projektu: ${err.response?.data?.message || err.message}`,
+                    `${t('projects.details.errors.fetchErrorDetail')}: ${err.response?.data?.message || err.message}`,
                 );
             } finally {
                 if (showLoader) setLoading(false);
@@ -389,7 +398,7 @@ export default function ProjectDetails() {
             setIsEditing(false);
             setIsEditing(false);
         } catch (err) {
-            error(`Błąd: ${err.message}`, 'error');
+            error(`${t('common.error')}: ${err.message}`, 'error');
         } finally {
             setIsSaving(false);
         }
@@ -397,10 +406,9 @@ export default function ProjectDetails() {
 
     const handleDeleteTask = async (taskId) => {
         askForConfirmation({
-            title: 'Usuwanie Zadania',
-            message:
-                'Czy na pewno chcesz usunąć to zadanie? Ta operacja jest nieodwracalna.',
-            confirmText: 'Usuń',
+            title: t('projects.details.errors.deleteTaskTitle'),
+            message: t('projects.details.errors.deleteTaskMessage'),
+            confirmText: t('common.delete'),
             confirmVariant: 'danger',
             onConfirm: async () => {
                 try {
@@ -410,7 +418,7 @@ export default function ProjectDetails() {
                     fetchTasks();
                     fetchActivities();
                 } catch (err) {
-                    error(`Błąd: ${err.message}`, 'error');
+                    error(`${t('common.error')}: ${err.message}`, 'error');
                 }
             },
         });
@@ -428,7 +436,7 @@ export default function ProjectDetails() {
             fetchComments();
             fetchActivities();
         } catch (err) {
-            error(`Błąd: ${err.message}`, 'error');
+            error(`${t('common.error')}: ${err.message}`, 'error');
         }
     };
 
@@ -441,15 +449,15 @@ export default function ProjectDetails() {
             });
             fetchComments();
         } catch (err) {
-            error(`Błąd: ${err.message}`, 'error');
+            error(`${t('common.error')}: ${err.message}`, 'error');
         }
     };
 
     const handleDeleteComment = async (commentId) => {
         askForConfirmation({
-            title: 'Usuwanie Komentarza',
-            message: 'Czy na pewno chcesz usunąć ten komentarz?',
-            confirmText: 'Usuń',
+            title: t('projects.details.errors.deleteCommentTitle'),
+            message: t('projects.details.errors.deleteCommentMessage'),
+            confirmText: t('common.delete'),
             confirmVariant: 'danger',
             onConfirm: async () => {
                 try {
@@ -457,7 +465,7 @@ export default function ProjectDetails() {
                     fetchComments();
                     fetchActivities();
                 } catch (err) {
-                    error(`Błąd: ${err.message}`, 'error');
+                    error(`${t('common.error')}: ${err.message}`, 'error');
                 }
             },
         });
@@ -469,7 +477,7 @@ export default function ProjectDetails() {
     }, [fetchData, fetchActivities]);
 
     if (loading || !currentUser) {
-        return <LoadingScreen message="Ładowanie projektu..." />;
+        return <LoadingScreen message={t('projects.details.loading')} />;
     }
 
     // Calculate task statistics
@@ -496,6 +504,34 @@ export default function ProjectDetails() {
     const isAdmin =
         currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
 
+    const renderActivityDescription = (activity) => {
+        if (!activity.action) return activity.description;
+
+        const { action, metadata } = activity;
+        const translateStatus = (status) => t(`common.taskStatus.${status}`) || status;
+
+        switch (action) {
+            case 'task_created':
+            case 'task_completed':
+            case 'task_deleted':
+                return t(`projects.details.activities.${action}`, {
+                    title: metadata?.title || '...',
+                });
+            case 'task_updated':
+                return t('projects.details.activities.task_updated', {
+                    title: metadata?.title || '...',
+                    oldStatus: translateStatus(metadata?.oldStatus),
+                    newStatus: translateStatus(metadata?.newStatus),
+                });
+            case 'comment_added':
+            case 'comment_replied':
+            case 'comment_deleted':
+                return t(`projects.details.activities.${action}`);
+            default:
+                return activity.description;
+        }
+    };
+
     if (error) {
         return <div className="py-10 text-center text-red-600">{error}</div>;
     }
@@ -521,21 +557,21 @@ export default function ProjectDetails() {
                         <Icon.Back />
                     </button>
                     <h2 className="text-lg font-bold tracking-tight text-slate-800 sm:text-xl">
-                        Szczegóły Projektu
+                        {t('projects.details.title')}
                     </h2>
                 </div>
 
                 <div className="flex flex-col items-center text-center">
                     <CircularProgress progress={calculatedProgress} />
                     <p className="mt-3 text-base font-semibold text-slate-600 sm:text-lg">
-                        Postęp projektu
+                        {t('projects.details.progress')}
                     </p>
                 </div>
 
                 <div className="mt-8 space-y-6 sm:mt-10">
                     <StatCard
                         icon={<Icon.Calendar />}
-                        title="Okres trwania projektu"
+                        title={t('projects.details.duration')}
                     >
                         {isEditing && isAdmin ? (
                             <div className="space-y-2">
@@ -556,10 +592,10 @@ export default function ProjectDetails() {
                             </div>
                         ) : (
                             <p className="text-base font-bold text-gray-800 sm:text-lg">
-                                {formatDateForDisplay(project.startDate) &&
-                                formatDateForDisplay(project.endDate)
-                                    ? `${formatDateForDisplay(project.startDate)} - ${formatDateForDisplay(project.endDate)}`
-                                    : 'Nieokreślono'}
+                                {formatDateForDisplay(project.startDate, i18nInstance.language) &&
+                                formatDateForDisplay(project.endDate, i18nInstance.language)
+                                    ? `${formatDateForDisplay(project.startDate, i18nInstance.language)} - ${formatDateForDisplay(project.endDate, i18nInstance.language)}`
+                                    : t('projects.details.notSpecified')}
                             </p>
                         )}
                     </StatCard>
@@ -567,7 +603,7 @@ export default function ProjectDetails() {
                         icon={
                             <ChevronRight className="h-6 w-6 text-emerald-500" />
                         }
-                        title="Status i priorytet"
+                        title={t('projects.details.statusAndPriority')}
                     >
                         {isEditing && isAdmin ? (
                             <div className="flex flex-wrap gap-2">
@@ -579,7 +615,7 @@ export default function ProjectDetails() {
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
-                                            {translateProjectStatus(s)}
+                                            {t(`common.projectStatus.${s}`)}
                                         </option>
                                     ))}
                                 </select>
@@ -591,7 +627,7 @@ export default function ProjectDetails() {
                                 >
                                     {AVAILABLE_PRIORITIES.map((p) => (
                                         <option key={p} value={p}>
-                                            {translatePriority(p)}
+                                            {t(`common.priority.${p}`)}
                                         </option>
                                     ))}
                                 </select>
@@ -601,23 +637,23 @@ export default function ProjectDetails() {
                                 <span
                                     className={`rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(project.status)}`}
                                 >
-                                    {translateProjectStatus(project.status)}
+                                    {t(`common.projectStatus.${project.status}`)}
                                 </span>
                                 <span
                                     className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${getPriorityClasses(project.priority)}`}
                                 >
-                                    {translatePriority(project.priority)}
+                                    {t(`common.priority.${project.priority}`)}
                                 </span>
                             </div>
                         )}
                     </StatCard>
 
                     {/* Statystyki zadań */}
-                    <StatCard icon={<Icon.ListTodo />} title="Statystyki zadań">
+                    <StatCard icon={<Icon.ListTodo />} title={t('projects.details.statCardTitle')}>
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">
-                                    Wszystkie:
+                                    {t('projects.details.totalTasks')}:
                                 </span>
                                 <span className="font-bold">
                                     {taskStats.total}
@@ -625,7 +661,7 @@ export default function ProjectDetails() {
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">
-                                    Ukończone:
+                                    {t('projects.details.completedTasks')}:
                                 </span>
                                 <span className="font-bold text-green-600">
                                     {taskStats.completed}
@@ -633,7 +669,7 @@ export default function ProjectDetails() {
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">
-                                    W trakcie:
+                                    {t('projects.details.inProgressTasks')}:
                                 </span>
                                 <span className="font-bold text-sky-600">
                                     {taskStats.inProgress}
@@ -641,7 +677,7 @@ export default function ProjectDetails() {
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">
-                                    Do zrobienia:
+                                    {t('projects.details.todoTasks')}:
                                 </span>
                                 <span className="font-bold text-gray-600">
                                     {taskStats.todo}
@@ -652,12 +688,12 @@ export default function ProjectDetails() {
                 </div>
                 <div className="mt-auto pt-8 text-center text-xs text-gray-400">
                     <p>
-                        Utworzony przez{' '}
+                        {t('projects.details.createdBy')}{' '}
                         <span className="font-semibold text-gray-500">
                             {project.createdBy.username}
                         </span>
                     </p>
-                    <p>{formatDateForDisplay(project.createdAt)}</p>
+                    <p>{formatDateForDisplay(project.createdAt, i18nInstance.language)}</p>
                 </div>
             </aside>
 
@@ -672,7 +708,7 @@ export default function ProjectDetails() {
                                 value={editData.name}
                                 onChange={handleEditChange}
                                 className="w-full border-b-2 border-white/50 bg-transparent text-3xl font-extrabold tracking-tight text-white placeholder:text-white/70 focus:outline-none sm:text-4xl lg:text-5xl"
-                                placeholder="Nazwa projektu..."
+                                placeholder={t('projects.details.projectNamePlaceholder')}
                             />
                         ) : (
                             <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
@@ -689,10 +725,10 @@ export default function ProjectDetails() {
                                             className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-bold text-emerald-700 shadow-md transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-gray-200 disabled:opacity-60 sm:px-5 sm:py-2.5"
                                         >
                                             {isSaving ? (
-                                                'Zapisywanie...'
+                                                t('projects.details.saving')
                                             ) : (
                                                 <>
-                                                    <Icon.Save /> Zapisz zmiany
+                                                    <Icon.Save /> {t('projects.details.saveChanges')}
                                                 </>
                                             )}
                                         </button>
@@ -703,7 +739,7 @@ export default function ProjectDetails() {
                                             }}
                                             className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-black/30 sm:px-5 sm:py-2.5"
                                         >
-                                            <Icon.Cancel /> Anuluj
+                                            <Icon.Cancel /> {t('projects.details.cancel')}
                                         </button>
                                     </>
                                 ) : (
@@ -712,7 +748,7 @@ export default function ProjectDetails() {
                                             onClick={() => setIsEditing(true)}
                                             className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-bold text-slate-800 shadow-lg transition-all hover:bg-slate-200 sm:px-5 sm:py-2.5"
                                         >
-                                            <Icon.Edit /> Edytuj
+                                            <Icon.Edit /> {t('projects.details.edit')}
                                         </button>
                                         <button
                                             onClick={() =>
@@ -720,7 +756,7 @@ export default function ProjectDetails() {
                                             }
                                             className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all hover:bg-black/30 sm:px-5 sm:py-2.5"
                                         >
-                                            <Icon.User /> Zarządzaj zespołem
+                                            <Icon.User /> {t('projects.details.manageTeam')}
                                         </button>
                                     </>
                                 )}
@@ -731,7 +767,7 @@ export default function ProjectDetails() {
 
                 <div className="animate-fade-in space-y-8">
                     {/* OPIS PROJEKTU */}
-                    <ContentCard icon={<Icon.Info />} title="Opis projektu">
+                    <ContentCard icon={<Icon.Info />} title={t('projects.details.description')}>
                         {isEditing && isAdmin ? (
                             <textarea
                                 name="description"
@@ -739,12 +775,12 @@ export default function ProjectDetails() {
                                 onChange={handleEditChange}
                                 rows="6"
                                 className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                placeholder="Dodaj szczegółowy opis..."
+                                placeholder={t('projects.details.addDescriptionPlaceholder')}
                             />
                         ) : (
                             <p className="whitespace-pre-wrap leading-relaxed text-gray-600">
                                 {project.description ||
-                                    'Ten projekt nie ma jeszcze szczegółowego opisu.'}
+                                    t('projects.details.noDescription')}
                             </p>
                         )}
                     </ContentCard>
@@ -752,7 +788,7 @@ export default function ProjectDetails() {
                     {/* ZADANIA */}
                     <ContentCard
                         icon={<Icon.ListTodo />}
-                        title={`Zadania (${tasks.length})`}
+                        title={`${t('projects.details.tasksTitle')} (${tasks.length})`}
                     >
                         <KanbanBoard
                             tasks={tasks}
@@ -769,7 +805,7 @@ export default function ProjectDetails() {
                     {/* ZESPÓŁ PROJEKTOWY */}
                     <ContentCard
                         icon={<Icon.Users />}
-                        title={`Zespół projektowy (${project.assignedUsers.length})`}
+                        title={`${t('projects.details.teamTitle')} (${project.assignedUsers.length})`}
                     >
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                             {project.assignedUsers.map((user) => (
@@ -794,8 +830,7 @@ export default function ProjectDetails() {
                             ))}
                             {project.assignedUsers.length === 0 && (
                                 <p className="col-span-full text-center text-gray-500 sm:text-left">
-                                    Do tego projektu nie przypisano jeszcze
-                                    żadnych użytkowników.
+                                    {t('projects.details.noUsers')}
                                 </p>
                             )}
                         </div>
@@ -804,7 +839,7 @@ export default function ProjectDetails() {
                     {/* KOMENTARZE */}
                     <ContentCard
                         icon={<Icon.Message />}
-                        title={`Komentarze (${comments.length})`}
+                        title={`${t('projects.details.commentsTitle')} (${comments.length})`}
                     >
                         <div className="mb-6">
                             <div className="flex gap-2">
@@ -817,7 +852,7 @@ export default function ProjectDetails() {
                                     onKeyPress={(e) =>
                                         e.key === 'Enter' && handleAddComment()
                                     }
-                                    placeholder="Dodaj komentarz..."
+                                    placeholder={t('projects.details.addCommentPlaceholder')}
                                     className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none"
                                 />
                                 <button
@@ -832,7 +867,7 @@ export default function ProjectDetails() {
                         <div className="space-y-4">
                             {comments.length === 0 ? (
                                 <p className="py-8 text-center text-gray-500">
-                                    Brak komentarzy. Bądź pierwszy!
+                                    {t('projects.details.noComments')}
                                 </p>
                             ) : (
                                 comments.map((comment) => (
@@ -843,6 +878,7 @@ export default function ProjectDetails() {
                                         onReply={handleReplyComment}
                                         currentUserId={currentUser._id}
                                         isAdmin={isAdmin}
+                                        t={t}
                                     />
                                 ))
                             )}
@@ -852,7 +888,7 @@ export default function ProjectDetails() {
                     {/* HISTORIA AKTYWNOŚCI */}
                     <ContentCard
                         icon={<Icon.Activity />}
-                        title={`Historia aktywności (${activities.length})`}
+                        title={`${t('projects.details.activityTitle')} (${activities.length})`}
                         actions={
                             <button
                                 onClick={() =>
@@ -860,7 +896,7 @@ export default function ProjectDetails() {
                                 }
                                 className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
                             >
-                                {showActivities ? 'Ukryj' : 'Pokaż'}
+                                {showActivities ? t('projects.details.hide') : t('projects.details.show')}
                                 {showActivities ? (
                                     <Icon.ChevronDown />
                                 ) : (
@@ -873,7 +909,7 @@ export default function ProjectDetails() {
                             <div className="space-y-3">
                                 {activities.length === 0 ? (
                                     <p className="py-4 text-center text-gray-500">
-                                        Brak aktywności
+                                        {t('projects.details.noActivity')}
                                     </p>
                                 ) : (
                                     activities.map((activity) => (
@@ -894,7 +930,7 @@ export default function ProjectDetails() {
                                                     <span className="font-semibold">
                                                         {activity.user.username}
                                                     </span>{' '}
-                                                    {activity.description}
+                                                    {renderActivityDescription(activity)}
                                                 </p>
                                                 <p className="mt-1 text-xs text-gray-400">
                                                     {moment(

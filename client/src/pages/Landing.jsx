@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { useTranslation, Trans } from 'react-i18next';
 import {
     Zap,
     Users,
@@ -19,45 +20,43 @@ import {
 } from 'lucide-react';
 
 function Landing() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { demoLogin } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
 
     const features = [
         {
-            title: 'Zarządzanie Projektami',
-            description:
-                'Intuicyjne narzędzia do planowania, przypisywania zadań i śledzenia postępów w czasie rzeczywistym.',
+            title: t('landing.features.Management.Title'),
+            description: t('landing.features.Management.Desc'),
             icon: Zap,
         },
         {
-            title: 'Współpraca Zespołowa',
-            description:
-                'Komunikacja, udostępnianie dokumentów i wymiana wiedzy w jednym, zorganizowanym hubie.',
+            title: t('landing.features.Collaboration.Title'),
+            description: t('landing.features.Collaboration.Desc'),
             icon: Users,
         },
         {
-            title: 'Analityka i Raporty',
-            description:
-                'Szczegółowe statystyki wydajności i wizualne raporty do optymalizacji procesów HR.',
+            title: t('landing.features.Analytics.Title'),
+            description: t('landing.features.Analytics.Desc'),
             icon: Play,
         },
     ];
 
     const values = [
         {
-            value: 'Intuicyjność',
-            label: 'Prosty interfejs bez skomplikowanego wdrożenia',
+            value: t('landing.values.Intuitive.Title'),
+            label: t('landing.values.Intuitive.Desc'),
             icon: Layout,
         },
         {
-            value: 'Szybkość',
-            label: 'Błyskawiczne działanie i natychmiastowe aktualizacje',
+            value: t('landing.values.Fast.Title'),
+            label: t('landing.values.Fast.Desc'),
             icon: Zap,
         },
         {
-            value: 'Bezpieczeństwo',
-            label: 'Twoje dane są chronione nowoczesnymi standardami',
+            value: t('landing.values.Secure.Title'),
+            label: t('landing.values.Secure.Desc'),
             icon: Lock,
         },
     ];
@@ -79,18 +78,20 @@ function Landing() {
                 {/* Główna zawartość */}
                 <main className="container relative z-10 mx-auto px-4 py-16 lg:py-24">
                     {/* 1. Sekcja Hero - PRZYWRÓCONY DUŻY NAGŁÓWEK */}
-                    <div className="mx-auto mb-16 max-w-7xl px-4 text-center md:mb-24">
+                    <div className="mx-auto mb-16 max-w-screen-2xl px-4 text-center md:mb-24">
                         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-600 md:text-sm">
-                            SYSTEM HR NEXT-GEN
+                            {t('landing.hero.Badge')}
                         </p>
                         <h1 className="mb-6 text-3xl font-extrabold leading-tight tracking-tighter text-gray-900 sm:text-4xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl">
-                            Odkryj nowy wymiar
-                            <span className="block bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
-                                efektywności w Twoim HR
-                            </span>
+                            <Trans i18nKey="landing.hero.Title">
+                                Odkryj nowy wymiar
+                                <span className="block bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+                                    efektywności w Twoim HR
+                                </span>
+                            </Trans>
                         </h1>
                         <p className="mx-auto mb-8 max-w-3xl px-4 text-base font-light text-gray-600 sm:text-lg md:mb-10 md:text-xl lg:text-2xl">
-                            Zarządzaj zespołem i automatyzuj procesy HR w jednym, nowoczesnym narzędziu.
+                            {t('landing.hero.Subtitle')}
                         </p>
                         <div className="flex justify-center px-4">
                             <button
@@ -116,10 +117,10 @@ function Landing() {
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="h-5 w-5 animate-spin" />
-                                        Ładowanie...
+                                        {t('landing.hero.Loading')}
                                     </>
                                 ) : (
-                                    'Zobacz demo'
+                                    t('landing.hero.Cta')
                                 )}
                             </button>
                         </div>
@@ -153,22 +154,19 @@ function Landing() {
                             {/* Opis */}
                             <div className="text-left lg:w-1/2">
                                 <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-teal-600">
-                                    PŁYNNA INTEGRACJA
+                                    {t('landing.integration.Badge')}
                                 </p>
                                 <h2 className="mb-6 text-4xl font-bold text-gray-900 lg:text-5xl">
-                                    Zautomatyzuj HR i skup się na rozwoju
+                                    {t('landing.integration.Title')}
                                 </h2>
                                 <p className="mb-8 text-xl text-gray-600">
-                                    WorkNest to nie tylko narzędzie, to Twój
-                                    cyfrowy asystent. Uprość onboarding,
-                                    zarządzanie urlopami i ocenę wydajności
-                                    dzięki intuicyjnemu interfejsowi.
+                                    {t('landing.integration.Desc')}
                                 </p>
                                 <ul className="space-y-4">
                                     {[
-                                        'Szybki dostęp do danych pracownika',
-                                        'Bezpieczne przechowywanie dokumentacji',
-                                        'Automatyczne powiadomienia i alerty',
+                                        t('landing.integration.List.1'),
+                                        t('landing.integration.List.2'),
+                                        t('landing.integration.List.3'),
                                     ].map((item, i) => (
                                         <li
                                             key={i}
@@ -206,10 +204,10 @@ function Landing() {
                     {/* 4. Sekcja Funkcji - Grid Cards */}
                     <div className="mx-auto mb-16 max-w-4xl text-center">
                         <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-emerald-600">
-                            KLUCZOWE NARZĘDZIA
+                            {t('landing.features.Title')}
                         </p>
                         <h2 className="text-4xl font-bold text-gray-900">
-                            Wszystko, czego potrzebuje Twój HR
+                            {t('landing.features.Subtitle')}
                         </h2>
                     </div>
                     <div className="mx-auto mb-32 grid max-w-7xl gap-8 md:grid-cols-3">
@@ -236,10 +234,10 @@ function Landing() {
                     <div className="mb-32 rounded-3xl border border-gray-100 bg-white p-12 shadow-xl">
                         <div className="mx-auto mb-12 max-w-4xl text-center">
                             <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-emerald-600">
-                                PROSTY PROCES
+                                {t('landing.howItWorks.Badge')}
                             </p>
                             <h2 className="text-4xl font-bold text-gray-900">
-                                Zacznij w 3 prostych krokach
+                                {t('landing.howItWorks.Title')}
                             </h2>
                         </div>
 
@@ -248,27 +246,27 @@ function Landing() {
                                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
                                     1
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold text-gray-900">Utwórz konto</h3>
+                                <h3 className="mb-3 text-xl font-bold text-gray-900">{t('landing.howItWorks.Step1.Title')}</h3>
                                 <p className="text-gray-600">
-                                    Zarejestruj swoją firmę w mniej niż minutę. Bez zbędnych formalności i kart kredytowych na start.
+                                    {t('landing.howItWorks.Step1.Desc')}
                                 </p>
                             </div>
                             <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
                                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
                                     2
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold text-gray-900">Zaproś zespół</h3>
+                                <h3 className="mb-3 text-xl font-bold text-gray-900">{t('landing.howItWorks.Step2.Title')}</h3>
                                 <p className="text-gray-600">
-                                    Dodaj pracowników i przypisz im role. Stwórz strukturę, która odpowiada Twojej organizacji.
+                                    {t('landing.howItWorks.Step2.Desc')}
                                 </p>
                             </div>
                             <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
                                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
                                     3
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold text-gray-900">Zarządzaj projektami</h3>
+                                <h3 className="mb-3 text-xl font-bold text-gray-900">{t('landing.howItWorks.Step3.Title')}</h3>
                                 <p className="text-gray-600">
-                                    Twórz tablice Kanban, śledź postępy i ciesz się zorganizowaną pracą od pierwszego dnia.
+                                    {t('landing.howItWorks.Step3.Desc')}
                                 </p>
                             </div>
                         </div>
@@ -280,22 +278,21 @@ function Landing() {
             <footer className="mt-16 bg-gray-800 py-8">
                 <div className="container mx-auto px-4 text-center text-gray-400">
                     <p>
-                        &copy; {new Date().getFullYear()} WorkNest. Wszelkie
-                        prawa zastrzeżone.
+                        &copy; {new Date().getFullYear()} WorkNest. {t('landing.footer.Rights')}
                     </p>
                     <div className="mt-2 text-sm">
                         <Link
                             to="/polityka-prywatnosci"
                             className="mx-2 hover:text-emerald-400"
                         >
-                            Polityka Prywatności
+                            {t('landing.footer.Privacy')}
                         </Link>
                         <span className="text-gray-600">|</span>
                         <Link
                             to="/regulamin"
                             className="mx-2 hover:text-emerald-400"
                         >
-                            Regulamin
+                            {t('landing.footer.Terms')}
                         </Link>
                     </div>
                 </div>

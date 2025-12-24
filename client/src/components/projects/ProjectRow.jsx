@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     Calendar,
     MoreVertical,
@@ -12,49 +12,13 @@ const statusStyles = {
     pending: {
         text: 'text-yellow-800',
         bg: 'bg-yellow-100',
-        label: 'Oczekujący',
     },
-    running: { text: 'text-sky-800', bg: 'bg-sky-100', label: 'W Trakcie' },
+    running: { text: 'text-sky-800', bg: 'bg-sky-100' },
     completed: {
         text: 'text-emerald-800',
         bg: 'bg-emerald-100',
-        label: 'Ukończony',
     },
-    'on-hold': { text: 'text-red-800', bg: 'bg-red-100', label: 'Wstrzymany' },
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('pl-PL', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-    });
-};
-
-const AssignedUsersAvatarGroup = ({ users }) => {
-    if (!users || users.length === 0) {
-        return <div className="text-xs text-slate-400">Brak</div>;
-    }
-
-    return (
-        <div className="flex -space-x-2">
-            {users.slice(0, 3).map((user) => (
-                <div
-                    key={user._id}
-                    title={user.username}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-sky-100 text-xs font-bold text-sky-700"
-                >
-                    {user.username.charAt(0).toUpperCase()}
-                </div>
-            ))}
-            {users.length > 3 && (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-slate-200 text-xs font-bold text-slate-700">
-                    +{users.length - 3}
-                </div>
-            )}
-        </div>
-    );
+    'on-hold': { text: 'text-red-800', bg: 'bg-red-100' },
 };
 
 const ProjectRow = ({
@@ -67,10 +31,45 @@ const ProjectRow = ({
     isSelected,
     onToggleSelect,
 }) => {
+    const { t, i18n } = useTranslation();
     const [showMenu, setShowMenu] = useState(false);
     const menuRef = useRef(null);
 
     const statusInfo = statusStyles[project.status] || statusStyles['pending'];
+
+    const formatDate = (dateString) => {
+        if (!dateString) return t('projects.projectRow.na');
+        return new Date(dateString).toLocaleDateString(i18n.language, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
+    
+    const AssignedUsersAvatarGroup = ({ users }) => {
+        if (!users || users.length === 0) {
+            return <div className="text-xs text-slate-400">{t('projects.projectRow.none')}</div>;
+        }
+    
+        return (
+            <div className="flex -space-x-2">
+                {users.slice(0, 3).map((user) => (
+                    <div
+                        key={user._id}
+                        title={user.username}
+                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-sky-100 text-xs font-bold text-sky-700"
+                    >
+                        {user.username.charAt(0).toUpperCase()}
+                    </div>
+                ))}
+                {users.length > 3 && (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-slate-200 text-xs font-bold text-slate-700">
+                        +{users.length - 3}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -127,7 +126,7 @@ const ProjectRow = ({
                 <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusInfo.bg} ${statusInfo.text}`}
                 >
-                    {statusInfo.label}
+                    {t(`common.projectStatus.${project.status}`)}
                 </span>
             </td>
             <td className="hidden px-6 py-4 md:table-cell">
@@ -162,7 +161,7 @@ const ProjectRow = ({
                         <MoreVertical className="h-5 w-5" />
                     </button>
                     {showMenu && (
-                        <div className="absolute right-0 top-full z-10 mt-1 w-48 rounded-lg border border-slate-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                        <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-lg border border-slate-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
                             <div className="py-1">
                                 {project.isArchived ? (
                                     <button
@@ -171,10 +170,10 @@ const ProjectRow = ({
                                             onRestore(project._id);
                                             setShowMenu(false);
                                         }}
-                                        className="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                                        className="flex w-full items-center px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
                                     >
-                                        <ArchiveRestore className="mr-2 h-4 w-4" />
-                                        Przywróć
+                                        <ArchiveRestore className="mr-2.5 h-4 w-4" />
+                                        {t('projects.projectRow.restore')}
                                     </button>
                                 ) : (
                                     <button
@@ -183,10 +182,10 @@ const ProjectRow = ({
                                             onArchive(project._id);
                                             setShowMenu(false);
                                         }}
-                                        className="group flex w-full items-center px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                                        className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
                                     >
-                                        <Archive className="mr-2 h-4 w-4 text-slate-500 transition-colors group-hover:text-slate-700" />
-                                        Archiwizuj
+                                        <Archive className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-slate-700" />
+                                        {t('projects.projectRow.archive')}
                                     </button>
                                 )}
                                 {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
@@ -196,10 +195,10 @@ const ProjectRow = ({
                                             onPermanentDelete(project._id);
                                             setShowMenu(false);
                                         }}
-                                        className="group flex w-full items-center px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-red-50 hover:text-red-700"
+                                        className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-red-50 hover:text-red-700"
                                     >
-                                        <Trash2 className="mr-2 h-4 w-4 text-slate-500 transition-colors group-hover:text-red-600" />
-                                        Usuń trwale
+                                        <Trash2 className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-red-600" />
+                                        {t('projects.projectRow.delete')}
                                     </button>
                                 )}
                             </div>

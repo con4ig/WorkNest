@@ -1,0 +1,892 @@
+{
+  "landing": {
+    "hero": {
+      "Badge": "SYSTEM HR NEXT-GEN",
+      "Title": "Odkryj nowy wymiar <1>efektywności w Twoim HR</1>",
+      "Subtitle": "Zarządzaj zespołem i automatyzuj procesy HR w jednym, nowoczesnym narzędziu.",
+      "Cta": "Zobacz demo",
+      "Loading": "Ładowanie..."
+    },
+    "features": {
+      "Title": "Kluczowe narzędzia",
+      "Subtitle": "Wszystko, czego potrzebuje Twój HR",
+      "Management": {
+        "Title": "Zarządzanie Projektami",
+        "Desc": "Intuicyjne narzędzia do planowania, przypisywania zadań i śledzenia postępów w czasie rzeczywistym."
+      },
+      "Collaboration": {
+        "Title": "Współpraca Zespołowa",
+        "Desc": "Komunikacja, udostępnianie dokumentów i wymiana wiedzy w jednym, zorganizowanym hubie."
+      },
+      "Analytics": {
+        "Title": "Analityka i Raporty",
+        "Desc": "Szczegółowe statystyki wydajności i wizualne raporty do optymalizacji procesów HR."
+      }
+    },
+    "values": {
+      "Intuitive": {
+        "Title": "Intuicyjność",
+        "Desc": "Prosty interfejs bez skomplikowanego wdrożenia"
+      },
+      "Fast": {
+        "Title": "Szybkość",
+        "Desc": "Błyskawiczne działanie i natychmiastowe aktualizacje"
+      },
+      "Secure": {
+        "Title": "Bezpieczeństwo",
+        "Desc": "Twoje dane są chronione nowoczesnymi standardami"
+      }
+    },
+    "integration": {
+      "Badge": "PŁYNNA INTEGRACJA",
+      "Title": "Zautomatyzuj HR i skup się na rozwoju",
+      "Desc": "WorkNest to nie tylko narzędzie, to Twój cyfrowy asystent. Uprość onboarding, zarządzanie urlopami i ocenę wydajności dzięki intuicyjnemu interfejsowi.",
+      "List": {
+        "1": "Szybki dostęp do danych pracownika",
+        "2": "Bezpieczne przechowywanie dokumentacji",
+        "3": "Automatyczne powiadomienia i alerty"
+      }
+    },
+    "howItWorks": {
+      "Badge": "PROSTY PROCES",
+      "Title": "Zacznij w 3 prostych krokach",
+      "Step1": {
+        "Title": "Utwórz konto",
+        "Desc": "Zarejestruj swoją firmę w mniej niż minutę. Bez zbędnych formalności i kart kredytowych na start."
+      },
+      "Step2": {
+        "Title": "Zaproś zespół",
+        "Desc": "Dodaj pracowników i przypisz im role. Stwórz strukturę, która odpowiada Twojej organizacji."
+      },
+      "Step3": {
+        "Title": "Zarządzaj projektami",
+        "Desc": "Twórz tablice Kanban, śledź postępy i ciesz się zorganizowaną pracą od pierwszego dnia."
+      }
+    },
+    "footer": {
+      "Rights": "Wszelkie prawa zastrzeżone.",
+      "Privacy": "Polityka Prywatności",
+      "Terms": "Regulamin"
+    }
+  },
+  "auth": {
+    "welcome": {
+      "title": "Witaj w WorkNest",
+      "subtitle": "Platforma, która pomoże Ci zarządzać projektami i zespołem w jednym miejscu."
+    },
+    "login": {
+      "title": "Zaloguj się do konta",
+      "noAccount": "Nie masz jeszcze konta?",
+      "registerLink": "Zarejestruj się za darmo",
+      "demoBtn": "🚀 Wypróbuj Demo (1-Click)",
+      "emailLabel": "Adres email",
+      "emailPlaceholder": "jan.kowalski@firma.pl",
+      "passwordLabel": "Hasło",
+      "forgotPassword": "Masz problem z logowaniem?",
+      "recoverAccess": "Odzyskaj dostęp do konta",
+      "submit": "Zaloguj się",
+      "loading": "Logowanie...",
+      "error": "Błąd logowania",
+      "demoError": "Błąd logowania do demo"
+    },
+    "register": {
+      "title": "Zarejestruj się do konta",
+      "hasAccount": "Masz już konto?",
+      "loginLink": "Zaloguj się",
+      "usernameLabel": "Nazwa użytkownika",
+      "usernamePlaceholder": "Jan.Kowalski",
+      "roleLabel": "Kim jesteś?",
+      "roleAdmin": "Zakładam konto dla mojej firmy",
+      "roleEmployee": "Dołączam do istniejącej firmy",
+      "companyLabel": "Nazwa firmy",
+      "companyPlaceholder": "Nazwa Twojej firmy",
+      "codeLabel": "Kod zaproszenia",
+      "codePlaceholder": "Wprowadź kod zaproszenia",
+      "submit": "Zarejestruj się",
+      "loading": "Rejestrowanie...",
+      "success": "Rejestracja zakończona sukcesem!",
+      "error": "Błąd rejestracji"
+    },
+    "validation": {
+      "emailRequired": "Email jest wymagany",
+      "emailInvalid": "Nieprawidłowy format email",
+      "passwordMin": "Hasło musi mieć co najmniej 6 znaków",
+      "confirmPasswordRequired": "Potwierdzenie hasła jest wymagane",
+      "passwordsMustMatch": "Hasła muszą być identyczne",
+      "usernameRequired": "Nazwa użytkownika jest wymagana",
+      "companyRequired": "Nazwa firmy jest wymagana",
+      "codeRequired": "Kod zaproszenia jest wymagany"
+    },
+    "forcePasswordChange": {
+      "title": "Zmiana hasła wymagana",
+      "subtitle": "Ze względów bezpieczeństwa musisz zmienić swoje hasło przed pierwszym logowaniem.",
+      "newPasswordLabel": "Nowe hasło",
+      "newPasswordPlaceholder": "Nowe silne hasło",
+      "confirmPasswordLabel": "Potwierdź hasło",
+      "confirmPasswordPlaceholder": "Powtórz nowe hasło",
+      "submit": "Zmień hasło i zaloguj",
+      "loading": "Zmienianie...",
+      "logout": "Wyloguj się",
+      "successToast": "Hasło zostało zmienione. Możesz teraz w pełni korzystać z konta.",
+      "errorToast": "Błąd zmiany hasła"
+    }
+  },
+  "navbar": {
+    "dashboard": "Dashboard",
+    "logout": "Wyloguj",
+    "login": "Zaloguj się",
+    "register": "Zarejestruj się"
+  },
+  "common": {
+    "errorBoundary": {
+      "title": "Coś poszło nie tak 😕",
+      "description": "Wystąpił nieoczekiwany błąd.",
+      "button": "Wróć do logowania",
+      "contactSupport": "Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną"
+    },
+    "loading": "Ładowanie...",
+    "loadingApp": "Przygotowujemy dla Ciebie aplikację...",
+    "loadingQuotes": [
+      "Organizowanie to to, co robisz, zanim coś zrobisz, aby kiedy to zrobisz, nie było bałaganu.",
+      "Kluczem nie jest priorytetyzacja tego, co jest w harmonogramie, ale zaplanowanie swoich priorytetów.",
+      "Wielkie rzeczy w biznesie nigdy nie są dziełem jednej osoby. Są dziełem zespołu ludzi.",
+      "Sposobem na rozpoczęcie jest rzucenie gadania i rozpoczęcie działania."
+    ],
+    "error": "Błąd",
+    "seeAll": "Zobacz wszystkie",
+    "added": "Dodano",
+    "type": "Typ",
+    "dates": "Daty",
+    "days": "Dni",
+    "status": "Status",
+    "reason": "Powód",
+    "confirm": "Potwierdź",
+    "roles": {
+      "admin": "Administrator",
+      "employee": "Pracownik",
+      "hr": "HR Manager",
+      "superadmin": "Super Admin"
+    },
+    "employeeStatus": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny",
+      "on-leave": "Na urlopie",
+      "terminated": "Zwolniony"
+    },
+    "contractType": {
+      "full-time": "Pełny etat",
+      "part-time": "Część etatu",
+      "contract": "Kontrakt",
+      "temporary": "Tymczasowy"
+    },
+    "projectStatus": {
+      "pending": "Oczekujący",
+      "running": "W trakcie",
+      "completed": "Zakończony",
+      "on-hold": "Wstrzymany"
+    },
+    "taskStatus": {
+      "todo": "Do zrobienia",
+      "in-progress": "W trakcie",
+      "completed": "Ukończone"
+    },
+    "priority": {
+      "low": "Niski",
+      "medium": "Średni",
+      "high": "Wysoki",
+      "critical": "Krytyczny"
+    },
+    "leaveStatus": {
+      "pending": "Oczekujący",
+      "approved": "Zatwierdzony",
+      "rejected": "Odrzucony"
+    },
+    "leaveType": {
+      "vacation": "Urlop wypoczynkowy",
+      "on_demand": "Urlop na żądanie",
+      "unpaid": "Urlop bezpłatny",
+      "occasional": "Urlop okolicznościowy",
+      "maternity": "Urlop macierzyński",
+      "paternity": "Urlop ojcowski",
+      "parental": "Urlop rodzicielski",
+      "childcare": "Urlop wychowawczy",
+      "care": "Urlop opiekuńczy",
+      "training": "Urlop szkoleniowy",
+      "job_search": "Urlop na poszukiwanie pracy",
+      "health": "Urlop zdrowotny/rehabilitacyjny",
+      "sick": "Zwolnienie lekarskie",
+      "personal": "Urlop osobisty",
+      "old_personal": "Urlop okolicznościowy (stary)",
+      "other": "Inny"
+    },
+    "ongoing": "Obecnie",
+    "notSpecified": "Nie określono",
+    "invalidDate": "Błędna data",
+    "Added": "Dodano",
+    "errorOccurred": "Wystąpił błąd",
+    "itIsYou": "To Ty",
+    "noResults": "Brak wyników",
+    "tryDifferentSearch": "Spróbuj zmienić zapytanie wyszukiwania",
+    "redirecting": "Przekierowywanie",
+    "close": "Zamknij",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "actions": "Akcje",
+    "search": "Szukaj",
+    "searching": "Szukam...",
+    "searchPlaceholder": "Szukaj...",
+    "noUsersFound": "Nie znaleziono użytkowników",
+    "add": "Dodaj",
+    "creator": "Twórca",
+    "unassigned": "Nie przypisano",
+    "selectDate": "Wybierz datę",
+    "uploading": "Wysyłanie",
+    "years_one": "rok",
+    "years_few": "lata",
+    "years_many": "lat",
+    "years_other": "lat",
+    "months_one": "miesiąc",
+    "months_few": "miesiące",
+    "months_many": "miesięcy",
+    "months_other": "miesięcy",
+    "select": "Wybierz",
+    "department": "Dział",
+    "createdAt": "Utworzono",
+    "editData": "Edytuj dane",
+    "contact": "Kontakt",
+    "email": "Email",
+    "phoneNumber": "Numer telefonu",
+    "notProvided": "Nie podano",
+    "position": "Stanowisko",
+    "noPosition": "Brak stanowiska",
+    "role": "Rola",
+    "roleInSystem": "Rola w systemie",
+    "address": "Adres",
+    "city": "Miasto",
+    "notes": "Notatki",
+    "description": "Opis",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "saving": "Zapisywanie...",
+    "saveChanges": "Zapisz zmiany",
+    "company": "Firma",
+    "departments": {
+      "IT": "IT",
+      "HR": "HR",
+      "Sales": "Sprzedaż",
+      "Marketing": "Marketing",
+      "Finance": "Finanse",
+      "Operations": "Operacje",
+      "Management": "Zarząd"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Witaj, {{name}}! Masz szybki przegląd ostatnich projektów.",
+    "generateCode": "Generuj Kod",
+    "loading": "Przygotowujemy Twój pulpit...",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "projects": "Projekty",
+      "team": "Zespół",
+      "approvals": "Zatwierdzanie Urlopów",
+      "leaves": "Moje Urlopy",
+      "home": "Strona główna",
+      "expand": "Rozwiń menu",
+      "collapse": "Zwiń menu",
+      "logout": "Wyloguj"
+    },
+    "stats": {
+      "allProjects": "Wszystkie Projekty",
+      "myProjects": "Moje Projekty",
+      "completed": "Zakończone",
+      "completedFull": "Zakończone Projekty",
+      "inProgress": "W Trakcie",
+      "pending": "Oczekujące",
+      "projectCount_one": "projekt",
+      "projectCount_other": "projektów",
+      "projectCount_few": "projekty"
+    },
+    "charts": {
+      "activityTitle": "Aktywność w ostatnim tygodniu",
+      "newProjects": "Nowo dodane projekty",
+      "noData": "Brak danych do wykresu",
+      "tooltipProject": "Nowe projekty",
+      "progressTitle": "Postęp Projektu",
+      "general": "Ogólnie"
+    },
+    "reminders": {
+      "title": "Przypomnienia",
+      "meeting": "Spotkanie z firmą XYZ",
+      "startBtn": "Rozpocznij Spotkanie"
+    },
+    "recentProjects": {
+      "title": "Ostatnio dodane projekty",
+      "seeAll": "Zobacz wszystkie →"
+    }
+  },
+  "employees": {
+    "loadingDetails": "Ładowanie danych pracownika...",
+    "details": {
+      "title": "Profil Pracownika",
+      "statusAndContract": "Status i Umowa",
+      "workExperience": "Staż pracy",
+      "professionalInfo": "Informacje zawodowe",
+      "hireDate": "Data zatrudnienia",
+      "salary": "Pensja (PLN)",
+      "salaryLabel": "Pensja",
+      "personalData": "Dane osobiste",
+      "notesLabel": "Notatki pracownika",
+      "noNotes": "Brak notatek",
+      "peselId": "PESEL/ID",
+      "employmentHistory": "Historia zatrudnienia",
+      "addHistoryEntry": "Dodaj wpis",
+      "noHistory": "Brak historii zatrudnienia.",
+      "documentsAndAgreements": "Dokumenty i Umowy",
+      "documentName": "Nazwa dokumentu",
+      "category": "Kategoria",
+      "removeDocument": "Usuń dokument",
+      "agreement": "Umowa",
+      "documentation": "Dokumentacja",
+      "noDocuments": "Brak dokumentów i umów.",
+      "addDocument": "Dodaj dokument",
+      "fileUrl": "URL do pliku"
+    },
+    "list": {
+      "title": "Lista Pracowników",
+      "searchPlaceholder": "Szukaj pracownika...",
+      "addButton": "Dodaj",
+      "importButton": "Importuj CSV",
+      "noPermissions": "Brak uprawnień do przeglądania tej strony",
+      "error": "Błąd ładowania danych",
+      "backToDashboard": "Wróć do dashboardu",
+      "noCompany": "Brak firmy",
+      "noEmployees": "Brak pracowników",
+      "userCount_one": "{{count}} użytkownik",
+      "userCount_few": "{{count}} użytkowników",
+      "userCount_many": "{{count}} użytkowników",
+      "userCount_other": "{{count}} użytkowników",
+      "stats": {
+        "all": "Wszyscy użytkownicy",
+        "hr": "Menedżerowie HR",
+        "admin": "Administratorzy"
+      },
+      "table": {
+        "user": "Użytkownik",
+        "email": "Email",
+        "role": "Rola",
+        "createdAt": "Data utworzenia",
+        "actions": "Akcje"
+      },
+      "cannotChangeOwnRole": "Nie możesz zmienić własnej roli",
+      "changeRole": "Zmień rolę",
+      "importModal": {
+        "title": "Import Pracowników z CSV",
+        "instructions": "Instrukcja:",
+        "instruction1": "Wypełnij dane w pliku CSV (wymagane: <b>email, username</b>).",
+        "instruction2": "Każdy kolejny wiersz w pliku to nowy pracownik.",
+        "instruction3": "Możesz dodać wielu pracowników naraz (np. 50+ wierszy).",
+        "rolesTitle": "Dozwolone role (wpisz angielską nazwę w CSV):",
+        "csvValue": "Wartość w CSV (Angielski)",
+        "systemRole": "Rola w systemie (Polski)",
+        "downloadTemplate": "Pobierz przykładowy szablon CSV",
+        "fileLabel": "Plik CSV",
+        "tempPasswordLabel": "Hasło tymczasowe",
+        "tempPasswordPlaceholder": "np. Firma2024!",
+        "tempPasswordHint": "Pracownik będzie musiał zmienić to hasło przy pierwszym logowaniu.",
+        "submit": "Importuj",
+        "loading": "Importowanie...",
+        "fileRequired": "Proszę wybrać plik CSV",
+        "noFileSelected": "Nie wybrano pliku",
+        "chooseFile": "Wybierz plik"
+      },
+      "importResult": {
+        "title": "Wynik Importu CSV",
+        "subtitle": "Podsumowanie operacji",
+        "infoTitle": "Informacja o logowaniu",
+        "infoText": "Dla nowych użytkowników ustawiono domyślne hasło:",
+        "infoHint": "Przekaż to hasło pracownikom i poproś o jego zmianę po pierwszym logowaniu.",
+        "processed": "Przetworzono",
+        "created": "Utworzono",
+        "errors": "Błędy",
+        "errorDetails": "Szczegóły błędów",
+        "row": "Wiersz",
+        "email": "Email",
+        "error": "Błąd",
+        "moreErrors": "...i {{count}} więcej błędów",
+        "close": "Zamknij"
+      },
+      "roleModal": {
+        "title": "Zmiana roli użytkownika",
+        "employeeTitle": "Pracownik",
+        "employeeDesc": "Podstawowe uprawnienia użytkownika",
+        "hrTitle": "Menedżer HR",
+        "hrDesc": "Zarządzanie pracownikami i urlopami",
+        "adminTitle": "Administrator",
+        "adminDesc": "Pełen dostęp do systemu",
+        "warning": "Ta zmiana zostanie zastosowana natychmiast i może wpłynąć na uprawnienia użytkownika.",
+        "submit": "Potwierdź zmianę",
+        "submitting": "Zmieniam..."
+      },
+      "toasts": {
+        "roleSuccess": "Rola została zaktualizowana",
+        "roleError": "Błąd podczas aktualizacji roli",
+        "importSuccess": "Import CSV zakończony",
+        "importError": "Błąd podczas importu CSV"
+      }
+    }
+  },
+  "leaves": {
+    "myLeaves": {
+      "title": "Moje Urlopy",
+      "subtitle": "Zarządzaj swoimi wnioskami urlopowymi",
+      "newRequest": "Nowy Wniosek",
+      "noLeaves": "Nie masz jeszcze żadnych wniosków urlopowych",
+      "clickToAdd": "Kliknij \"Nowy wniosek\" aby złożyć pierwszy wniosek",
+      "backToDashboard": "Wróć do dashboardu",
+      "loading": "Ładowanie wniosków urlopowych...",
+      "deleteConfirm": "Czy na pewno chcesz usunąć ten wniosek?",
+      "deleteConfirmMessage": "Ta operacja jest nieodwracalna.",
+      "deleteSuccess": "Wniosek usunięty",
+      "deleteError": "Nie udało się usunąć wniosku",
+      "stats": {
+        "usedDays": "Wykorzystane dni"
+      }
+    },
+    "approvals": {
+      "title": "Zatwierdzanie Urlopów",
+      "subtitle": "Przeglądaj i zatwierdzaj wnioski urlopowe",
+      "pending": "Oczekujące",
+      "pendingShort": "Oczek.",
+      "all": "Wszystkie",
+      "backToDashboard": "Wróć do dashboardu",
+      "loading": "Ładowanie wniosków...",
+      "noLeaves": "Brak wniosków urlopowych",
+      "approve": "Zatwierdź",
+      "reject": "Odrzuć",
+      "approveSuccess": "Wniosek zatwierdzony",
+      "approveError": "Nie udało się zatwierdzić wniosku",
+      "rejectSuccess": "Wniosek odrzucony",
+      "rejectError": "Nie udało się odrzucić wniosku",
+      "authError": "Błąd autoryzacji:",
+      "fetchError": "Błąd pobierania urlopów:",
+      "noPermissions": "Nie masz uprawnień do przeglądania tej strony",
+      "rejectReasonRequired": "Proszę podać powód odrzucenia",
+      "searchPlaceholder": "Szukaj pracownika...",
+      "listView": "Lista",
+      "calendarView": "Kalendarz",
+      "leaveRequestStatus": "Status wniosku: {{status}}",
+      "approvedShort": "Zatw.",
+      "rejectedShort": "Odrz.",
+      "allShort": "Wszyst.",
+      "employee": "Pracownik",
+      "type": "Typ",
+      "dates": "Daty",
+      "days": "Dni",
+      "status": "Status",
+      "reason": "Powód",
+      "actions": "Akcje",
+      "unknownUser": "Nieznany",
+      "usedDaysThisYear": "Wykorzystane: {{days}} dni (w tym roku)",
+      "to": "do",
+      "note": "Notatka:",
+      "reviewedBy": "Przez: {{username}}",
+      "noRequests": "Brak wniosków urlopowych",
+      "noPending": "Brak oczekujących wniosków do zatwierdzenia",
+      "noApproved": "Brak zatwierdzonych wniosków",
+      "noRejected": "Brak odrzuconych wniosków",
+      "noLeaveRequests": "Nie ma żadnych wniosków urlopowych",
+      "typeLabel": "Typ:",
+      "fromLabel": "Od:",
+      "toLabel": "Do:",
+      "daysLabel": "Dni:",
+      "reasonLabel": "Powód:",
+      "approveModalTitle": "Zatwierdzić wniosek?",
+      "approveModalMessage": "Tej operacji nie można cofnąć.",
+      "cancel": "Anuluj",
+      "confirm": "Potwierdź",
+      "rejectModalTitle": "Odrzuć wniosek",
+      "rejectModalMessage": "Proszę podać powód odrzucenia wniosku",
+      "rejectPlaceholder": "np. Brak dostępności kadrowej w tym terminie...",
+      "rejectButton": "Odrzuć wniosek",
+      "stats": {
+        "all": "Wszystkie",
+        "pending": "Oczekujące",
+        "approved": "Zatwierdzone",
+        "rejected": "Odrzucone"
+      }
+    },
+    "form": {
+      "type": "Typ urlopu",
+      "startDate": "Data rozpoczęcia",
+      "endDate": "Data zakończenia",
+      "reason": "Powód",
+      "submit": "Wyślij wniosek",
+      "cancel": "Anuluj",
+      "selectType": "Wybierz typ urlopu",
+      "submitting": "Wysyłanie...",
+      "success": "Wniosek wysłany pomyślnie",
+      "error": "Nie udało się wysłać wniosku"
+    }
+  },
+  "projects": {
+    "list": {
+      "title": "Projekty",
+      "add": "Dodaj projekt",
+      "active": "Aktywne",
+      "archived": "Archiwum"
+    },
+    "addProject": "Utwórz Projekt",
+    "creating": "Tworzenie...",
+    "labelName": "Nazwa projektu",
+    "placeholderName": "np. Redesign strony głównej",
+    "labelDescription": "Opis",
+    "placeholderDescription": "Opisz cel i zakres projektu...",
+    "labelPriority": "Priorytet",
+    "labelStartDate": "Data rozpoczęcia",
+    "labelEndDate": "Data zakończenia",
+    "labelAssignedUsers": "Przypisani użytkownicy",
+    "card": {
+      "progress": "Postęp"
+    },
+    "filter": {
+      "searchPlaceholder": "Szukaj projektu...",
+      "allStatuses": "Wszystkie statusy",
+      "refresh": "Odśwież listę"
+    },
+    "bulkActions": {
+      "clearSelection": "Anuluj zaznaczenie",
+      "selectedCount": "Zaznaczono",
+      "restoreTitleShort": "Przywróć zaznaczone",
+      "deleteTitleShort": "Usuń zaznaczone",
+      "archiveTitle": "Archiwizacja Grupowa",
+      "archiveMessage": "Czy na pewno chcesz zarchiwizować {{count}} zaznaczonych projektów?",
+      "archiveConfirm": "Archiwizuj",
+      "restoreTitle": "Przywracanie Grupowe",
+      "restoreMessage": "Czy na pewno chcesz przywrócić {{count}} zaznaczonych projektów?",
+      "restoreConfirm": "Przywróć",
+      "deleteTitle": "Usuwanie Grupowe",
+      "deleteMessage": "UWAGA: Trwale usuniesz {{count}} projektów. Ta operacja jest nieodwracalna. Kontynuować?",
+      "deleteConfirm": "Usuń Trwale"
+    },
+    "singleActions": {
+      "archiveTitle": "Archiwizacja Projektu",
+      "archiveMessage": "Czy na pewno chcesz zarchiwizować ten projekt?",
+      "restoreTitle": "Przywracanie Projektu",
+      "restoreMessage": "Czy na pewno chcesz przywrócić ten projekt?",
+      "deleteTitle": "Usuwanie Projektu",
+      "deleteMessage": "UWAGA: Ten projekt zostanie trwale usunięty. Kontynuować?",
+      "deleteConfirm": "Usuń Trwale"
+    },
+    "errors": {
+      "loadingError": "Błąd ładowania projektów",
+      "loadingErrorLog": "Błąd ładowania projektów:",
+      "bulkActionError": "Błąd operacji masowej"
+    },
+    "confirmation": {
+      "archiveProjectTitle": "Archiwizacja Projektu",
+      "archiveProjectMessage": "Czy na pewno chcesz przenieść ten projekt do archiwum? Będziesz mógł go później przywrócić.",
+      "archiveButton": "Archiwizuj",
+      "deleteProjectTitle": "Usuwanie Projektu",
+      "deleteProjectMessage": "UWAGA: Ten projekt zostanie trwale usunięty. Ta operacja jest nieodwracalna. Kontynuować?",
+      "deleteButton": "Usuń Trwale",
+      "restoreProjectTitle": "Przywracanie Projektu",
+      "restoreProjectMessage": "Czy na pewno chcesz przywrócić ten projekt z archiwum?",
+      "restoreButton": "Przywróć"
+    },
+    "misc": {
+      "loadingProjects": "Ładowanie projektów...",
+      "error": "Błąd",
+      "backToDashboard": "Powrót do Dashboard",
+      "noCompanyAssigned": "Brak przypisanej firmy",
+      "noCompanyAssignedMessage": "Nie jesteś przypisany do żadnej firmy. Skontaktuj się z administratorem.",
+      "active": "Aktywne",
+      "archive": "Archiwum",
+      "noArchivedProjects": "Brak zarchiwizowanych projektów.",
+      "noProjectsFound": "Nie znaleziono projektów."
+    },
+    "tableHeaders": {
+      "projectName": "Nazwa Projektu",
+      "status": "Status",
+      "progress": "Postęp",
+      "deadline": "Termin",
+      "assigned": "Przypisani",
+      "actions": "Akcje"
+    },
+    "projectListHeader": {
+      "dashboard": "Dashboard",
+      "title": "Przegląd Projektów",
+      "subtitle": "Zarządzaj wszystkimi projektami w jednym miejscu.",
+      "addProject": "Dodaj Projekt"
+    },
+    "projectRow": {
+      "na": "N/A",
+      "none": "Brak",
+      "restore": "Przywróć",
+      "archive": "Archiwizuj",
+      "delete": "Usuń trwale"
+    },
+    "projectGridCard": {
+      "archiveTitle": "Zarchiwizuj projekt",
+      "restoreTitle": "Przywróć projekt",
+      "deleteTitle": "Usuń trwale",
+      "status": "Status",
+      "progress": "Postęp",
+      "deadline": "Termin",
+      "assigned": "Przypisani"
+    },
+    "kanban": {
+      "dropHere": "Upuść tutaj",
+      "noProjects": "Brak projektów"
+    },
+    "view": {
+      "kanban": "Kanban",
+      "list": "Lista",
+      "grid": "Siatka",
+      "notAvailableInArchive": "niedostępne w archiwum"
+    },
+    "details": {
+      "back": "Wróć",
+      "title": "Szczegóły Projektu",
+      "progress": "Postęp projektu",
+      "duration": "Okres trwania projektu",
+      "notSpecified": "Nie określono",
+      "statusAndPriority": "Status i priorytet",
+      "statCardTitle": "Statystyki zadań",
+      "totalTasks": "Wszystkie",
+      "completedTasks": "Ukończone",
+      "inProgressTasks": "W trakcie",
+      "todoTasks": "Do zrobienia",
+      "createdBy": "Utworzony przez",
+      "edit": "Edytuj",
+      "manageTeam": "Zarządzaj zespołem",
+      "description": "Opis projektu",
+      "noDescription": "Ten projekt nie ma jeszcze szczegółowego opisu.",
+      "tasksTitle": "Zadania",
+      "teamTitle": "Zespół projektowy",
+      "noUsers": "Do tego projektu nie przypisano jeszcze żadnych użytkowników.",
+      "commentsTitle": "Komentarze",
+      "addCommentPlaceholder": "Dodaj komentarz...",
+      "noComments": "Brak komentarzy. Bądź pierwszy!",
+      "activityTitle": "Historia aktywności",
+      "hide": "Ukryj",
+      "show": "Pokaż",
+      "noActivity": "Brak aktywności",
+      "reply": "Odpowiedz",
+      "replies_one": "odpowiedź",
+      "replies_few": "odpowiedzi",
+      "replies_many": "odpowiedzi",
+      "replyPlaceholder": "Napisz odpowiedź...",
+      "kanban": {
+        "addNewTask": "Dodaj nowe zadanie",
+        "taskTitlePlaceholder": "Wprowadź tytuł zadania...",
+        "adding": "Dodawanie...",
+        "noTasksInColumn": "Brak zadań w tej kolumnie",
+        "errors": {
+          "addError": "Błąd podczas dodawania zadania"
+        }
+      },
+      "userModal": {
+        "title": "Zarządzanie Użytkownikami",
+        "projectLabel": "Projekt",
+        "currentUsers": "Obecni Użytkownicy",
+        "noUsers": "Brak przypisanych użytkowników",
+        "addUserTitle": "Dodaj Użytkownika",
+        "allAssigned": "Wszyscy użytkownicy są już przypisani",
+        "othersCount": "...i {{count}} innych pracowników.",
+        "typeToSearch": "Wpisz nazwę, aby znaleźć.",
+        "cannotRemoveCreator": "Nie można usunąć twórcy projektu",
+        "removeUser": "Usuń z projektu",
+        "errors": {
+          "searchError": "Błąd wyszukiwania użytkowników",
+          "updateError": "Wystąpił błąd podczas aktualizacji użytkowników"
+        }
+      },
+      "activities": {
+        "task_created": "utworzył(a) zadanie \"{{title}}\"",
+        "task_completed": "ukończył(a) zadanie \"{{title}}\"",
+        "task_updated": "zmienił(a) status zadania \"{{title}}\" z {{oldStatus}} na {{newStatus}}",
+        "task_deleted": "usunął(ęła) zadanie \"{{title}}\"",
+        "comment_added": "dodał(a) komentarz",
+        "comment_replied": "odpowiedział(a) na komentarz",
+        "comment_deleted": "usunął(a) komentarz"
+      },
+      "saving": "Zapisywanie...",
+      "saveChanges": "Zapisz zmiany",
+      "cancel": "Anuluj",
+      "projectNamePlaceholder": "Nazwa projektu...",
+      "addDescriptionPlaceholder": "Dodaj szczegółowy opis...",
+      "loading": "Ładowanie projektu...",
+      "errors": {
+        "fetchError": "Błąd pobierania projektu",
+        "fetchErrorDetail": "Nie udało się załadować danych projektu",
+        "saveError": "Błąd zapisu",
+        "deleteTaskTitle": "Usuwanie Zadania",
+        "deleteTaskMessage": "Czy na pewno chcesz usunąć to zadanie? Ta operacja jest nieodwracalna.",
+        "deleteCommentTitle": "Usuwanie Komentarza",
+        "deleteCommentMessage": "Czy na pewno chcesz usunąć ten komentarz?"
+      }
+    }
+  },
+  "generateCode": {
+    "backToDashboard": "Wróć do dashboardu",
+    "title": "Zarządzanie Zaproszeniami",
+    "subtitle": "Generuj kody dostępu i monitoruj ich wykorzystanie w swojej organizacji.",
+    "newCode": "Nowy Kod",
+    "roleLabel": "Rola użytkownika",
+    "rolePlaceholder": "Wybierz rolę",
+    "typeLabel": "Rodzaj zaproszenia",
+    "typeSingle": "Jednorazowe",
+    "typeMulti": "Wielokrotne",
+    "maxUsesLabel": "Limit użyć",
+    "expirationLabel": "Czas ważności",
+    "generating": "Generowanie...",
+    "generateButton": "Generuj kod",
+    "activeInvitations": "Aktywne Zaproszenia",
+    "noActiveCodes": "Brak aktywnych kodów",
+    "noActiveCodesDesc": "Wygenerowane kody pojawią się w tym miejscu.",
+    "copyCode": "Kopiuj kod",
+    "expired": "Wygasł",
+    "expiresIn": "Wygasa",
+    "revokeCode": "Unieważnij kod",
+    "revokeConfirm": "Czy na pewno chcesz unieważnić ten kod?",
+    "revokeError": "Nie udało się usunąć zaproszenia",
+    "demoWarningTitle": "Środowisko Testowe (Demo)",
+    "demoWarningDesc": "Pamiętaj, że konto Demo jest",
+    "demoWarningDescBold": "tymczasowe",
+    "demoPoint1": "Wygenerowany kod",
+    "demoPoint1Bold": "zadziała poprawnie",
+    "demoPoint1End": "przy rejestracji.",
+    "demoPoint2": "Jeżeli klikniesz \"Wypróbuj Demo\" ponownie,",
+    "demoPoint2Bold": "wszystkie dane (w tym ten kod i nowi użytkownicy) zostaną usunięte",
+    "demoHintLabel": "Wskazówka:",
+    "demoHint": "Skopiuj kod, wyloguj się i użyj go od razu w formularzu rejestracji, aby przetestować proces onboardingu.",
+    "cancel": "Anuluj",
+    "understand": "Rozumiem, generuj kod",
+    "loading": "Ładowanie panelu...",
+    "expirations": {
+      "5m": "5 minut",
+      "30m": "30 minut",
+      "1h": "1 godzina",
+      "24h": "24 godziny",
+      "7d": "7 dni",
+      "30d": "30 dni"
+    }
+  },
+  "footer": {
+    "Rights": "Wszelkie prawa zastrzeżone."
+  },
+  "upload": {
+    "title": "Zmień zdjęcie profilowe",
+    "subtitle": "Dodaj lub zaktualizuj swój awatar",
+    "previewAlt": "Podgląd",
+    "selectImage": "Wybierz zdjęcie",
+    "selectAnother": "Wybierz inne zdjęcie",
+    "successMessage": "Zdjęcie zostało zaktualizowane!",
+    "saveButton": "Zapisz zdjęcie",
+    "errors": {
+      "tooLarge": "Plik jest za duży. Maksymalny rozmiar to 5MB.",
+      "invalidType": "Wybierz plik graficzny (jpg, png, itp.)",
+      "noImage": "Wybierz zdjęcie",
+      "uploadFailed": "Nie udało się zaktualizować zdjęcia. Spróbuj ponownie."
+    },
+    "tips": {
+      "title": "💡 Wskazówki:",
+      "lighting": "Użyj zdjęcia z dobrym oświetleniem",
+      "visibility": "Twarz powinna być wyraźnie widoczna",
+      "aspectRatio": "Kwadratowe zdjęcia wyglądają najlepiej"
+    }
+  },
+  "terms": {
+    "title": "Regulamin Serwisu WorkNest",
+    "effectiveDate": "Obowiązuje od: 5.11.2025r.",
+    "adminInfo": {
+      "title": "Informacje o Właścicielu Serwisu",
+      "description": "Właścicielem i administratorem serwisu WorkNest jest:",
+      "owner": "Szymon Wira"
+    },
+    "section1": {
+      "title": "§ 1. Postanowienia Ogólne",
+      "point1": "Niniejszy regulamin określa zasady korzystania z serwisu WorkNest, który jest projektem portfolio i ma charakter demonstracyjny.",
+      "point2": "Serwis WorkNest jest platformą demonstracyjną, prezentującą możliwości technologiczne i funkcjonalne, a nie komercyjną usługą.",
+      "point3": "Korzystanie z Serwisu jest równoznaczne z akceptacją niniejszego Regulaminu."
+    },
+    "section2": {
+      "title": "§ 2. Warunki Korzystania",
+      "tech": {
+        "title": "Wymagania Techniczne",
+        "description": "Dostęp do Serwisu wymaga urządzenia z dostępem do Internetu oraz aktualnej przeglądarki internetowej."
+      },
+      "user": {
+        "title": "Obowiązki Użytkownika",
+        "description": "Użytkownik zobowiązuje się do korzystania z Serwisu w sposób zgodny z prawem i dobrymi obyczajami, a w szczególności do nieumieszczania w nim treści o charakterze bezprawnym, obraźliwym lub naruszającym prawa osób trzecich."
+      }
+    },
+    "section3": {
+      "title": "§ 3. Odpowiedzialność",
+      "liability": {
+        "title": "Wyłączenie Odpowiedzialności",
+        "description": "Serwis jest udostępniany w celach demonstracyjnych \"tak jak jest\". Właściciel serwisu nie ponosi odpowiedzialności za jakiekolwiek szkody wynikające z jego użytkowania, w tym za utratę danych. Użytkownik korzysta z serwisu na własne ryzyko."
+      },
+      "copyright": {
+        "title": "Prawa Autorskie",
+        "description": "Wszelkie prawa do Serwisu, w tym do jego kodu, wyglądu i treści, należą do Właściciela serwisu."
+      }
+    },
+    "section4": {
+      "title": "§ 4. Postanowienia Końcowe",
+      "point1": "W sprawach nieuregulowanych niniejszym Regulaminem mają zastosowanie przepisy prawa polskiego.",
+      "point2": "Właściciel serwisu zastrzega sobie prawo do zmiany Regulaminu w dowolnym czasie."
+    }
+  },
+  "privacy": {
+    "title": "Polityka Prywatności",
+    "effectiveDate": "Obowiązuje od: {{date}}",
+    "section1": {
+      "title": "I. Informacje Ogólne",
+      "description": "Niniejsza Polityka Prywatności określa zasady przetwarzania i ochrony danych osobowych zbieranych od Użytkowników w związku z korzystaniem z serwisu internetowego WorkNest, działającego pod adresem {{url}}.",
+      "ado": {
+        "title": "Administrator Danych Osobowych (ADO)",
+        "description": "Administratorem Twoich danych osobowych jest:",
+        "contact": "Kontakt e-mail w sprawach RODO:"
+      }
+    },
+    "section2": {
+      "title": "II. Cele i Podstawy Przetwarzania Danych",
+      "description": "Twoje dane osobowe przetwarzane są w następujących celach:",
+      "point1": {
+        "title": "Rejestracja i prowadzenie konta w serwisie WorkNest",
+        "description": "Podstawa prawna: Art. 6 ust. 1 lit. b) RODO (niezbędność do wykonania umowy o świadczenie usług drogą elektroniczną)."
+      },
+      "point2": {
+        "title": "Obsługa zapytań i zgłoszeń",
+        "description": "Podstawa prawna: Art. 6 ust. 1 lit. f) RODO (prawnie uzasadniony interes administratora, polegający na komunikacji z użytkownikami)."
+      }
+    },
+    "section3": {
+      "title": "III. Twoje Prawa",
+      "description": "Posiadasz prawo do:",
+      "rights": {
+        "point1": "Dostępu do treści swoich danych oraz ich sprostowania.",
+        "point2": "Usunięcia danych (\"prawo do bycia zapomnianym\").",
+        "point3": "Ograniczenia przetwarzania danych.",
+        "point4": "Przenoszenia danych.",
+        "point5": "Wniesienia sprzeciwu wobec przetwarzania.",
+        "point6": "Wniesienia skargi do organu nadzorczego (Prezes Urzędu Ochrony Danych Osobowych – PUODO).",
+        "point7": "Cofnięcia zgody na przetwarzanie danych w dowolnym momencie, jeśli przetwarzanie odbywa się na podstawie zgody.",
+        "footer": "Wnioski dotyczące Twoich praw prosimy kierować na adres e-mail Administratora:"
+      }
+    },
+    "section4": {
+      "title": "IV. Pliki Cookies",
+      "description": "Serwis WorkNest wykorzystuje pliki cookies (ciasteczka) wyłącznie w celu zapewnienia prawidłowego działania strony (logowanie, utrzymanie sesji). Pliki cookies to małe pliki tekstowe, przechowywane na Twoim urządzeniu końcowym (np. komputerze, tablecie, smartfonie).",
+      "manage": "Możesz zarządzać plikami cookies z poziomu ustawień swojej przeglądarki internetowej. Pamiętaj, że ograniczenie stosowania plików cookies może wpłynąć na niektóre funkcjonalności dostępne w serwisie."
+    },
+    "section5": {
+      "title": "V. Postanowienia Końcowe",
+      "description": "Zastrzegamy sobie prawo do wprowadzania zmian w Polityce Prywatności. O wszelkich zmianach będziemy informować poprzez publikację nowej treści Polityki Prywatności na tej stronie. Zmiany wchodzą w życie z dniem ich publikacji."
+    }
+  }
+}

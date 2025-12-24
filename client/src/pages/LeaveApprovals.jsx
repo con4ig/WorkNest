@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import CalendarComponent from '../components/CalendarComponent.jsx';
@@ -94,6 +95,7 @@ const Icon = {
 };
 
 export default function LeaveApprovals() {
+    const { t, i18n } = useTranslation();
     const [leaves, setLeaves] = useState([]);
     const [filter, setFilter] = useState('pending');
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
@@ -115,7 +117,7 @@ export default function LeaveApprovals() {
                 const res = await api.get('/users/me');
                 setCurrentUser(res.data);
             } catch (err) {
-                console.error('Błąd autoryzacji:', err);
+                console.error(t('leaves.approvals.authError'), err);
                 navigate('/login');
             }
         };
@@ -139,7 +141,7 @@ export default function LeaveApprovals() {
             const res = await api.get('/leaves', { params });
             setLeaves(res.data.leaves);
         } catch (err) {
-            console.error('Error fetching leaves:', err);
+            console.error(t('leaves.approvals.fetchError'), err);
             if (err.response?.status === 401) navigate('/login');
         } finally {
             if (showLoader) setLoading(false);
@@ -151,7 +153,7 @@ export default function LeaveApprovals() {
         if (currentUser.role === 'admin' || currentUser.role === 'hr') {
             fetchLeaves(true);
         } else {
-            setError('Brak uprawnień do przeglądania tej strony');
+            setError(t('leaves.approvals.noPermissions'));
         }
     }, [currentUser, fetchLeaves]);
 
@@ -173,14 +175,14 @@ export default function LeaveApprovals() {
             setShowApproveModal(false);
             setLeaveToApprove(null);
         } catch (err) {
-            console.error('Error approving leave:', err);
-            showNotification(err.response?.data?.message || 'Błąd zatwierdzania', 'error');
+            console.error(t('leaves.approvals.approveError'), err);
+            showNotification(err.response?.data?.message || t('leaves.approvals.approveError'), 'error');
         }
     };
 
     const handleReject = async () => {
         if (!rejectNote.trim()) {
-            showNotification('Podaj powód odrzucenia', 'error');
+            showNotification(t('leaves.approvals.rejectReasonRequired'), 'error');
             return;
         }
         try {
@@ -189,10 +191,10 @@ export default function LeaveApprovals() {
             setShowRejectModal(false);
             setRejectNote('');
             setSelectedLeave(null);
-            showNotification('Wniosek odrzucony pomyślnie');
+            showNotification(t('leaves.approvals.rejectSuccess'));
         } catch (err) {
-            console.error('Error rejecting leave:', err);
-            showNotification(err.response?.data?.message || 'Błąd odrzucania', 'error');
+            console.error(t('leaves.approvals.rejectError'), err);
+            showNotification(err.response?.data?.message || t('leaves.approvals.rejectError'), 'error');
         }
     };
 
@@ -203,9 +205,9 @@ export default function LeaveApprovals() {
             rejected: 'bg-red-100 text-red-700',
         };
         const labels = {
-            pending: 'Oczekujący',
-            approved: 'Zatwierdzony',
-            rejected: 'Odrzucony',
+            pending: t('common.leaveStatus.pending'),
+            approved: t('common.leaveStatus.approved'),
+            rejected: t('common.leaveStatus.rejected'),
         };
         return (
             <span
@@ -217,37 +219,20 @@ export default function LeaveApprovals() {
     };
 
     const getLeaveTypeLabel = (type) => {
-        const labels = {
-            vacation: 'Urlop wypoczynkowy',
-            on_demand: 'Urlop na żądanie',
-            unpaid: 'Urlop bezpłatny',
-            occasional: 'Urlop okolicznościowy',
-            maternity: 'Urlop macierzyński',
-            paternity: 'Urlop ojcowski',
-            parental: 'Urlop rodzicielski',
-            childcare: 'Urlop wychowawczy',
-            care: 'Urlop opiekuńczy',
-            training: 'Urlop szkoleniowy',
-            job_search: 'Na poszukiwanie pracy',
-            health: 'Zdrowotny/Rehabilitacyjny',
-            sick: 'Zwolnienie lekarskie',
-            personal: 'Urlop okolicznościowy (stary)',
-            other: 'Inny',
-        };
-        return labels[type] || type;
+        return t(`common.leaveType.${type}`);
     };
 
     if (error) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
                 <div className="w-full max-w-md rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-red-700 shadow-sm">
-                    <div className="mb-2 text-lg font-semibold">Błąd</div>
+                    <div className="mb-2 text-lg font-semibold">{t('common.error')}</div>
                     <div className="text-sm">{error}</div>
                     <button
                         onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto"
                     >
-                        Powrót do Dashboard
+                        {t('leaves.approvals.backToDashboard')}
                     </button>
                 </div>
             </div>
@@ -255,7 +240,7 @@ export default function LeaveApprovals() {
     }
 
     if (loading) {
-        return <LoadingScreen message="Ładowanie wniosków do zatwierdzenia..." />;
+        return <LoadingScreen message={t('leaves.approvals.loading')} />;
     }
 
     const stats = {
@@ -266,10 +251,10 @@ export default function LeaveApprovals() {
     };
 
     const filterTabs = [
-        { value: 'pending', label: 'Oczekujące', shortLabel: 'Oczek.' },
-        { value: 'approved', label: 'Zatwierdzone', shortLabel: 'Zatw.' },
-        { value: 'rejected', label: 'Odrzucone', shortLabel: 'Odrz.' },
-        { value: 'all', label: 'Wszystkie', shortLabel: 'Wsz.' },
+        { value: 'pending', label: t('leaves.approvals.pending'), shortLabel: t('leaves.approvals.pendingShort') },
+        { value: 'approved', label: t('common.leaveStatus.approved'), shortLabel: t('leaves.approvals.approvedShort') },
+        { value: 'rejected', label: t('common.leaveStatus.rejected'), shortLabel: t('leaves.approvals.rejectedShort') },
+        { value: 'all', label: t('leaves.approvals.all'), shortLabel: t('leaves.approvals.allShort') },
     ];
 
     return (
@@ -293,7 +278,7 @@ export default function LeaveApprovals() {
                             <Icon.ArrowLeft />
                         </button>
                         <h1 className="text-lg font-bold">
-                            Zarządzanie Urlopami
+                            {t('leaves.approvals.title')}
                         </h1>
                         <button
                             onClick={() => setShowFilterMenu(!showFilterMenu)}
@@ -311,15 +296,15 @@ export default function LeaveApprovals() {
                                 className="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-600 transition-colors hover:bg-gray-100"
                             >
                                 <Icon.ArrowLeft />
-                                <span>Dashboard</span>
+                                <span>{t('dashboard.sidebar.dashboard')}</span>
                             </button>
                             <div className="h-8 w-px bg-gray-200"></div>
                             <div>
                                 <h1 className="text-2xl font-bold">
-                                    Zarządzanie Urlopami
+                                    {t('leaves.approvals.title')}
                                 </h1>
                                 <p className="text-sm text-gray-500">
-                                    Przeglądaj i zatwierdzaj wnioski urlopowe
+                                    {t('leaves.approvals.subtitle')}
                                 </p>
                             </div>
                         </div>
@@ -329,7 +314,7 @@ export default function LeaveApprovals() {
                              <div className="relative">
                                 <input
                                     type="text"
-                                    placeholder="Szukaj pracownika..."
+                                    placeholder={t('leaves.approvals.searchPlaceholder')}
                                     className="w-64 rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-base focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 md:text-sm"
                                     onChange={(e) => {
                                         const val = e.target.value;
@@ -369,14 +354,14 @@ export default function LeaveApprovals() {
                                     <button
                                         onClick={() => setViewMode('list')}
                                         className={`rounded-md p-2 transition-colors ${viewMode === 'list' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        title="Lista"
+                                        title={t('leaves.approvals.listView')}
                                     >
                                         <Icon.List />
                                     </button>
                                     <button
                                         onClick={() => setViewMode('calendar')}
                                         className={`rounded-md p-2 transition-colors ${viewMode === 'calendar' ? 'bg-white text-emerald-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                        title="Kalendarz"
+                                        title={t('leaves.approvals.calendarView')}
                                     >
                                         <Icon.Calendar />
                                     </button>
@@ -428,7 +413,7 @@ export default function LeaveApprovals() {
                                  setShowApproveModal(true);
                              } else {
                                 // show info notification?
-                                showNotification(`Wniosek: ${leave.status}`, 'success');
+                                showNotification(t('leaves.approvals.leaveRequestStatus', { status: leave.status }), 'success');
                              }
                         }}
                      />
@@ -438,7 +423,7 @@ export default function LeaveApprovals() {
                 <div className="mb-6 grid grid-cols-2 gap-3 md:mb-8 md:grid-cols-4 md:gap-4">
                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                         <div className="text-xs uppercase text-gray-500">
-                            Wszystkie
+                            {t('leaves.approvals.stats.all')}
                         </div>
                         <div className="mt-2 text-xl font-bold md:text-2xl">
                             {stats.total}
@@ -446,7 +431,7 @@ export default function LeaveApprovals() {
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                         <div className="text-xs uppercase text-gray-500">
-                            Oczekujące
+                            {t('leaves.approvals.stats.pending')}
                         </div>
                         <div className="mt-2 text-xl font-bold text-yellow-600 md:text-2xl">
                             {stats.pending}
@@ -454,7 +439,7 @@ export default function LeaveApprovals() {
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                         <div className="text-xs uppercase text-gray-500">
-                            Zatwierdzone
+                            {t('leaves.approvals.stats.approved')}
                         </div>
                         <div className="mt-2 text-xl font-bold text-green-600 md:text-2xl">
                             {stats.approved}
@@ -462,7 +447,7 @@ export default function LeaveApprovals() {
                     </div>
                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                         <div className="text-xs uppercase text-gray-500">
-                            Odrzucone
+                            {t('leaves.approvals.stats.rejected')}
                         </div>
                         <div className="mt-2 text-xl font-bold text-red-600 md:text-2xl">
                             {stats.rejected}
@@ -476,25 +461,25 @@ export default function LeaveApprovals() {
                         <thead className="border-b bg-gray-50">
                             <tr>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Pracownik
+                                    {t('leaves.approvals.employee')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Typ
+                                    {t('leaves.approvals.type')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Daty
+                                    {t('leaves.approvals.dates')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Dni
+                                    {t('leaves.approvals.days')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Status
+                                    {t('leaves.approvals.status')}
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold uppercase text-gray-600">
-                                    Powód
+                                    {t('leaves.approvals.reason')}
                                 </th>
                                 <th className="px-6 py-4 text-right text-xs font-semibold uppercase text-gray-600">
-                                    Akcje
+                                    {t('leaves.approvals.actions')}
                                 </th>
                             </tr>
                         </thead>
@@ -514,14 +499,14 @@ export default function LeaveApprovals() {
                                             <div>
                                                 <div className="font-medium text-gray-900">
                                                     {leave.user?.username ||
-                                                        'Nieznany'}
+                                                        t('leaves.approvals.unknownUser')}
                                                 </div>
                                                 <div className="text-xs text-gray-500">
                                                     {leave.user?.email}
                                                 </div>
                                                 {leave.user?.stats && (
                                                     <div className="mt-0.5 text-xs font-semibold text-emerald-600">
-                                                       Wykorzystano: {leave.user.stats.usedDaysThisYear} dni (w tym roku)
+                                                       {t('leaves.approvals.usedDaysThisYear', { days: leave.user.stats.usedDaysThisYear })}
                                                     </div>
                                                 )}
                                             </div>
@@ -534,13 +519,13 @@ export default function LeaveApprovals() {
                                         <div>
                                             {new Date(
                                                 leave.startDate,
-                                            ).toLocaleDateString('pl-PL')}
+                                            ).toLocaleDateString(i18n.language)}
                                         </div>
                                         <div className="text-xs text-gray-400">
-                                            do{' '}
+                                            {t('leaves.approvals.to')}{' '}
                                             {new Date(
                                                 leave.endDate,
-                                            ).toLocaleDateString('pl-PL')}
+                                            ).toLocaleDateString(i18n.language)}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-sm font-medium">
@@ -558,7 +543,7 @@ export default function LeaveApprovals() {
                                         </div>
                                         {leave.reviewNote && (
                                             <div className="mt-1 text-xs text-red-600">
-                                                Notatka: {leave.reviewNote}
+                                                {t('leaves.approvals.note')}{' '} {leave.reviewNote}
                                             </div>
                                         )}
                                     </td>
@@ -570,10 +555,10 @@ export default function LeaveApprovals() {
                                                         handleApproveClick(leave._id)
                                                     }
                                                     className="flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-all hover:bg-emerald-100 hover:shadow-sm"
-                                                    title="Zatwierdź"
+                                                    title={t('leaves.approvals.approve')}
                                                 >
                                                     <Icon.Check />
-                                                    <span>Zatwierdź</span>
+                                                    <span>{t('leaves.approvals.approve')}</span>
                                                 </button>
                                                 <button
                                                     onClick={() => {
@@ -585,16 +570,16 @@ export default function LeaveApprovals() {
                                                         );
                                                     }}
                                                     className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 hover:shadow-sm"
-                                                    title="Odrzuć"
+                                                    title={t('leaves.approvals.reject')}
                                                 >
                                                     <Icon.X />
-                                                    <span>Odrzuć</span>
+                                                    <span>{t('leaves.approvals.reject')}</span>
                                                 </button>
                                             </div>
                                         ) : (
                                             <div className="text-right text-xs text-gray-400">
                                                 {leave.reviewedBy &&
-                                                    `Przez: ${leave.reviewedBy.username}`}
+                                                    t('leaves.approvals.reviewedBy', { username: leave.reviewedBy.username })}
                                             </div>
                                         )}
                                     </td>
@@ -611,17 +596,17 @@ export default function LeaveApprovals() {
                                 </div>
                             </div>
                             <div className="text-lg font-medium">
-                                Brak wniosków
+                                {t('leaves.approvals.noRequests')}
                             </div>
                             <div className="mt-2 text-sm">
                                 {filter === 'pending' &&
-                                    'Nie ma oczekujących wniosków do zatwierdzenia'}
+                                    t('leaves.approvals.noPending')}
                                 {filter === 'approved' &&
-                                    'Brak zatwierdzonych wniosków'}
+                                    t('leaves.approvals.noApproved')}
                                 {filter === 'rejected' &&
-                                    'Brak odrzuconych wniosków'}
+                                    t('leaves.approvals.noRejected')}
                                 {filter === 'all' &&
-                                    'Nie ma żadnych wniosków urlopowych'}
+                                    t('leaves.approvals.noLeaveRequests')}
                             </div>
                         </div>
                     )}
@@ -644,14 +629,14 @@ export default function LeaveApprovals() {
                                     </div>
                                     <div>
                                         <div className="font-medium text-gray-900">
-                                            {leave.user?.username || 'Nieznany'}
+                                            {leave.user?.username || t('leaves.approvals.unknownUser')}
                                         </div>
                                         <div className="text-xs text-gray-500">
                                             {leave.user?.email}
                                         </div>
                                         {leave.user?.stats && (
                                              <div className="mt-1 text-xs font-semibold text-emerald-600">
-                                                 Wykorzystano: {leave.user.stats.usedDaysThisYear} dni
+                                                 {t('leaves.approvals.usedDaysThisYear', { days: leave.user.stats.usedDaysThisYear })}
                                              </div>
                                          )}
                                      </div>
@@ -662,36 +647,36 @@ export default function LeaveApprovals() {
                             {/* Szczegóły */}
                             <div className="space-y-2 border-t pt-3">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">Typ:</span>
+                                    <span className="text-gray-500">{t('leaves.approvals.typeLabel')}</span>
                                     <span className="font-medium">
                                         {getLeaveTypeLabel(leave.leaveType)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">Od:</span>
+                                    <span className="text-gray-500">{t('leaves.approvals.fromLabel')}</span>
                                     <span className="font-medium">
                                         {new Date(
                                             leave.startDate,
-                                        ).toLocaleDateString('pl-PL')}
+                                        ).toLocaleDateString(i18n.language)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">Do:</span>
+                                    <span className="text-gray-500">{t('leaves.approvals.toLabel')}</span>
                                     <span className="font-medium">
                                         {new Date(
                                             leave.endDate,
-                                        ).toLocaleDateString('pl-PL')}
+                                        ).toLocaleDateString(i18n.language)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">Dni:</span>
+                                    <span className="text-gray-500">{t('leaves.approvals.daysLabel')}</span>
                                     <span className="font-medium">
                                         {leave.days}
                                     </span>
                                 </div>
                                 <div className="text-sm">
                                     <span className="text-gray-500">
-                                        Powód:
+                                        {t('leaves.approvals.reasonLabel')}
                                     </span>
                                     <p className="mt-1 text-gray-700">
                                         {leave.reason}
@@ -699,14 +684,14 @@ export default function LeaveApprovals() {
                                 </div>
                                 {leave.reviewNote && (
                                     <div className="rounded-lg bg-red-50 p-2 text-xs text-red-600">
-                                        <strong>Notatka:</strong>{' '}
+                                        <strong>{t('leaves.approvals.note')}</strong>{' '}
                                         {leave.reviewNote}
                                     </div>
                                 )}
                                 {leave.reviewedBy &&
                                     leave.status !== 'pending' && (
                                         <div className="text-xs text-gray-400">
-                                            Przez: {leave.reviewedBy.username}
+                                            {t('leaves.approvals.reviewedBy', { username: leave.reviewedBy.username })}
                                         </div>
                                     )}
                             </div>
@@ -719,7 +704,7 @@ export default function LeaveApprovals() {
                                         className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 active:scale-95"
                                     >
                                         <Icon.Check />
-                                        Zatwierdź
+                                        {t('leaves.approvals.approve')}
                                     </button>
                                     <button
                                         onClick={() => {
@@ -729,7 +714,7 @@ export default function LeaveApprovals() {
                                         className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-600 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95"
                                     >
                                         <Icon.X />
-                                        Odrzuć
+                                        {t('leaves.approvals.reject')}
                                     </button>
                                 </div>
                             )}
@@ -744,16 +729,16 @@ export default function LeaveApprovals() {
                                 </div>
                             </div>
                             <div className="text-lg font-medium">
-                                Brak wniosków
+                                {t('leaves.approvals.noRequests')}
                             </div>
                             <div className="mt-2 text-sm">
                                 {filter === 'pending' &&
-                                    'Nie ma oczekujących wniosków'}
+                                    t('leaves.approvals.noPending')}
                                 {filter === 'approved' &&
-                                    'Brak zatwierdzonych wniosków'}
+                                    t('leaves.approvals.noApproved')}
                                 {filter === 'rejected' &&
-                                    'Brak odrzuconych wniosków'}
-                                {filter === 'all' && 'Nie ma żadnych wniosków'}
+                                    t('leaves.approvals.noRejected')}
+                                {filter === 'all' && t('leaves.approvals.noLeaveRequests')}
                             </div>
                         </div>
                     )}
@@ -771,8 +756,8 @@ export default function LeaveApprovals() {
                                 <Icon.Check />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">Zatwierdzić wniosek?</h3>
-                                <p className="text-sm text-gray-500">Tej operacji nie można cofnąć.</p>
+                                <h3 className="text-lg font-bold text-gray-900">{t('leaves.approvals.approveModalTitle')}</h3>
+                                <p className="text-sm text-gray-500">{t('leaves.approvals.approveModalMessage')}</p>
                             </div>
                         </div>
                         <div className="flex gap-3">
@@ -783,13 +768,13 @@ export default function LeaveApprovals() {
                                 }}
                                 className="flex-1 rounded-xl px-4 py-2.5 font-medium text-gray-600 transition-colors hover:bg-gray-100"
                             >
-                                Anuluj
+                                {t('leaves.approvals.cancel')}
                             </button>
                             <button
                                 onClick={confirmApprove}
                                 className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 font-bold text-white shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 hover:scale-[1.02]"
                             >
-                                Potwierdź
+                                {t('leaves.approvals.confirm')}
                             </button>
                         </div>
                     </div>
@@ -802,10 +787,10 @@ export default function LeaveApprovals() {
                     <div className="w-full max-w-md rounded-xl bg-white">
                         <div className="border-b p-4 md:p-6">
                             <h3 className="text-lg font-bold md:text-xl">
-                                Odrzuć wniosek
+                                {t('leaves.approvals.rejectModalTitle')}
                             </h3>
                             <p className="mt-1 text-sm text-gray-500">
-                                Podaj powód odrzucenia wniosku
+                                {t('leaves.approvals.rejectModalMessage')}
                             </p>
                         </div>
                         <div className="p-4 md:p-6">
@@ -814,7 +799,7 @@ export default function LeaveApprovals() {
                                 onChange={(e) => setRejectNote(e.target.value)}
                                 rows="4"
                                 className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-base outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500 md:px-4 md:text-sm"
-                                placeholder="np. Brak dostępności personelu w tym okresie..."
+                                placeholder={t('leaves.approvals.rejectPlaceholder')}
                             />
                         </div>
                         <div className="flex flex-col gap-2 border-t p-4 md:flex-row md:items-center md:justify-end md:gap-3 md:p-6">
@@ -826,13 +811,13 @@ export default function LeaveApprovals() {
                                 }}
                                 className="order-2 rounded-lg px-6 py-2 text-gray-600 transition-colors hover:bg-gray-100 md:order-1"
                             >
-                                Anuluj
+                                {t('leaves.approvals.cancel')}
                             </button>
                             <button
                                 onClick={handleReject}
                                 className="order-1 rounded-lg bg-red-600 px-6 py-2 text-white transition-colors hover:bg-red-700 md:order-2"
                             >
-                                Odrzuć wniosek
+                                {t('leaves.approvals.rejectButton')}
                             </button>
                         </div>
                     </div>

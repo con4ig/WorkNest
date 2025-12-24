@@ -1,8 +1,14 @@
 import React, { useState, useEffect, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../src/services/api.js';
 import moment from 'moment';
 import 'moment/locale/pl';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from 'react-datepicker';
+import { pl } from 'date-fns/locale/pl';
+import { enGB } from 'date-fns/locale/en-GB';
+
+registerLocale('pl', pl);
+registerLocale('en', enGB);
 
 import { translateTaskStatus, translatePriority } from '../utils/translations';
 import {
@@ -13,12 +19,10 @@ import {
     AVAILABLE_PRIORITIES,
     TASK_STATUSES,
 } from './projects/ProjectTaskShared.jsx';
-import CustomSelect from './common/CustomSelect.jsx';
 
-moment.locale('pl');
-
-// Custom Input for DatePicker
-const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
+// Custom Input for DatePicker - defined outside to avoid re-renders if possible, 
+// but it needs t() so let's move it into the component or pass t as prop
+const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <button
         type="button"
         className="flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200 w-40"
@@ -26,13 +30,14 @@ const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
         ref={ref}
     >
         <Icon.Calendar size={12} />
-        {value || 'Wybierz datę'}
+        {value || placeholder}
     </button>
 ));
 CustomDateInput.displayName = 'CustomDateInput';
 
 
 const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEditing }) => {
+    const { t, i18n } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
         title: task.title,
@@ -42,6 +47,10 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
         assignedTo: task.assignedTo?._id || '',
         dueDate: formatDateForInput(task.dueDate),
     });
+
+    useEffect(() => {
+        moment.locale(i18n.language);
+    }, [i18n.language]);
 
     useEffect(() => {
         if (!isEditing) {
@@ -67,24 +76,21 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
             setIsEditing(false);
             onUpdate();
         } catch (err) {
-            alert(`Błąd: ${err.message}`);
-        }
-    };
-
-    const handleStatusChange = async (newStatus) => {
-        try {
-            await api.patch(`/tasks/${task._id}`, { status: newStatus });
-            onUpdate();
-        } catch (err) {
-            alert(`Błąd: ${err.message}`);
+            alert(`${t('common.error')}: ${err.message}`);
         }
     };
 
     // Data mapping for CustomSelect
-    const statusOptions = TASK_STATUSES.map(s => ({ id: s, name: translateTaskStatus(s) }));
-    const priorityOptions = AVAILABLE_PRIORITIES.map(p => ({ id: p, name: translatePriority(p) }));
+    const statusOptions = TASK_STATUSES.map(s => ({ 
+        id: s, 
+        name: t(`common.taskStatus.${s}`) 
+    }));
+    const priorityOptions = AVAILABLE_PRIORITIES.map(p => ({ 
+        id: p, 
+        name: t(`common.priority.${p}`) 
+    }));
     const userOptions = [
-        { id: '', name: 'Nie przypisano' },
+        { id: '', name: t('common.unassigned') },
         ...projectUsers.map(u => ({ id: u._id, name: u.username }))
     ];
 
@@ -106,7 +112,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 setEditData({ ...editData, title: e.target.value })
                             }
                             className="mb-1 w-full rounded-md border-gray-300 bg-gray-50 px-2 py-1 text-base font-semibold text-gray-800 focus:border-emerald-500 focus:ring-emerald-500"
-                            placeholder="Tytuł zadania"
+                            placeholder={t('projects.details.kanban.taskTitlePlaceholder')}
                         />
                         <textarea
                             value={editData.description}
@@ -118,7 +124,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                             }
                             className="w-full rounded-md border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-600 focus:border-emerald-500 focus:ring-emerald-500"
                             rows="2"
-                            placeholder="Dodaj opis..."
+                            placeholder={t('projects.details.addDescriptionPlaceholder')}
                         />
                     </div>
                 ) : (
@@ -188,7 +194,9 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                         setEditData({ ...editData, dueDate: formattedDate });
                                     }}
                                     dateFormat="dd MMM yyyy"
+                                    locale={i18n.language}
                                     isClearable
+                                    placeholderText={t('common.selectDate')}
                                     customInput={<CustomDateInput />}
                                     popperPlacement="top-start"
                                 />
@@ -202,14 +210,14 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                         task.status,
                                     )}`}
                                 >
-                                    {translateTaskStatus(task.status)}
+                                    {t(`common.taskStatus.${task.status}`)}
                                 </span>
                                 <span
                                     className={`rounded-full px-2 py-1 ${getPriorityClasses(
                                         task.priority,
                                     )}`}
                                 >
-                                    {translatePriority(task.priority)}
+                                    {t(`common.priority.${task.priority}`)}
                                 </span>
                             </div>
                             <div className="flex items-center gap-2">
@@ -242,14 +250,14 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                     onClick={handleSave}
                                     className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
                                 >
-                                    <Icon.Save size={14} /> Zapisz
+                                    <Icon.Save size={14} /> {t('common.save')}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setIsEditing(false)}
                                     className="flex items-center gap-1.5 rounded-md bg-gray-200 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-300"
                                 >
-                                    <Icon.Cancel size={14} /> Anuluj
+                                    <Icon.Cancel size={14} /> {t('common.cancel')}
                                 </button>
                             </div>
                         ) : (

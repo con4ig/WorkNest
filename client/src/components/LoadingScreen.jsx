@@ -1,18 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { LayoutDashboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const LoadingScreen = ({
-    message = 'Przygotowujemy dla Ciebie aplikację...',
+    message,
     quote,
 }) => {
-    const quotes = [
-        'Organizowanie to to, co robisz, zanim coś zrobisz, aby kiedy to zrobisz, nie było bałaganu.',
-        'Kluczem nie jest priorytetyzacja tego, co jest w harmonogramie, ale zaplanowanie swoich priorytetów.',
-        'Wielkie rzeczy w biznesie nigdy nie są dziełem jednej osoby. Są dziełem zespołu ludzi.',
-        'Sposobem na rozpoczęcie jest rzucenie gadania i rozpoczęcie działania.',
-    ];
+    const { t } = useTranslation();
+    const quotes = useMemo(() => [
+        t('common.loadingQuotes.0'),
+        t('common.loadingQuotes.1'),
+        t('common.loadingQuotes.2'),
+        t('common.loadingQuotes.3'),
+    ], [t]);
+    
     const randomQuote =
         quote || quotes[Math.floor(Math.random() * quotes.length)];
+
+    const displayMessage = message || t('common.loadingApp');
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-4 text-center">
@@ -23,7 +28,7 @@ const LoadingScreen = ({
                 </div>
             </div>
             <h2 className="mb-2 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent">
-                {message}
+                {displayMessage}
             </h2>
             <p className="max-w-sm text-gray-500">{randomQuote}</p>
             <div className="mt-8 h-2 w-32 overflow-hidden rounded-full bg-gray-200">

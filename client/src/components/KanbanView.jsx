@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     DndContext,
     closestCorners,
@@ -12,9 +13,6 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Archive, Trash2 } from 'lucide-react';
 
 import ProjectCard from './projects/ProjectCard';
 
@@ -22,6 +20,7 @@ import ProjectCard from './projects/ProjectCard';
 
 // Komponent droppable area dla pustej kolumny
 const DroppableArea = ({ status }) => {
+    const { t } = useTranslation();
     const { setNodeRef, isOver } = useDroppable({ id: status });
 
     return (
@@ -33,7 +32,7 @@ const DroppableArea = ({ status }) => {
                     : 'border-slate-300 text-slate-400'
             }`}
         >
-            {isOver ? 'Upuść tutaj' : 'Brak projektów'}
+            {isOver ? t('projects.kanban.dropHere') : t('projects.kanban.noProjects')}
         </div>
     );
 };
@@ -96,6 +95,7 @@ const KanbanView = ({
     onPermanentDelete,
     currentUserRole,
 }) => {
+    const { t } = useTranslation();
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -106,10 +106,10 @@ const KanbanView = ({
     );
 
     const columns = [
-        { status: 'pending', title: 'Oczekujące', color: 'bg-yellow-500' },
-        { status: 'running', title: 'W Trakcie', color: 'bg-sky-500' },
-        { status: 'completed', title: 'Ukończone', color: 'bg-emerald-500' },
-        { status: 'on-hold', title: 'Wstrzymane', color: 'bg-red-500' },
+        { status: 'pending', title: t('common.projectStatus.pending'), color: 'bg-yellow-500' },
+        { status: 'running', title: t('common.projectStatus.running'), color: 'bg-sky-500' },
+        { status: 'completed', title: t('common.projectStatus.completed'), color: 'bg-emerald-500' },
+        { status: 'on-hold', title: t('common.projectStatus.on-hold'), color: 'bg-red-500' },
     ];
 
     // Grupowanie projektów po statusie

@@ -12,6 +12,7 @@ import {
     ChevronLeft,
     Key,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
     Bar,
     BarChart,
@@ -94,6 +95,7 @@ const Icon = {
 };
 
 // Hook do animacji liczenia w górę
+// Hook do animacji liczenia w górę
 const useCountUp = (endValue, duration = 1500) => {
     const [count, setCount] = useState(0);
     const frameRate = 1000 / 60;
@@ -104,7 +106,9 @@ const useCountUp = (endValue, duration = 1500) => {
         const counter = setInterval(() => {
             frame++;
             const progress = frame / totalFrames;
-            const currentCount = Math.round(endValue * (1 - Math.pow(1 - progress, 3)));
+            const currentCount = Math.round(
+                endValue * (1 - Math.pow(1 - progress, 3)),
+            );
 
             if (frame === totalFrames) {
                 clearInterval(counter);
@@ -128,6 +132,7 @@ const AnimatedNumber = ({ value }) => {
 
 // Komponent do wyświetlania wykresu postępu projektu
 const ProjectProgressChart = ({ stats }) => {
+    const { t } = useTranslation();
     const [hoveredSection, setHoveredSection] = useState(null);
     
     const totalProjects = Number(stats[0]?.value || 0);
@@ -143,20 +148,21 @@ const ProjectProgressChart = ({ stats }) => {
     // Dane dla wykresu kołowego z wszystkimi statusami
     const chartData = totalProjects > 0 
         ? [
-            { name: 'Zakończone', value: completedProjects, color: '#10B981' },
-            { name: 'W Trakcie', value: runningProjects, color: '#F59E0B' },
-            { name: 'Oczekujące', value: pendingProjects, color: '#94A3B8' }
+            { name: t('dashboard.stats.completed'), value: completedProjects, color: '#10B981' },
+            { name: t('dashboard.stats.inProgress'), value: runningProjects, color: '#F59E0B' },
+            { name: t('dashboard.stats.pending'), value: pendingProjects, color: '#94A3B8' }
           ].filter(item => item.value > 0)
-        : [{ name: 'Brak danych', value: 1, color: '#E5E7EB' }];
+        : [{ name: t('dashboard.charts.noData'), value: 1, color: '#E5E7EB' }];
 
     const CustomTooltip = ({ active, payload }) => {
+        const { t } = useTranslation();
         if (active && payload && payload.length) {
             const data = payload[0];
             return (
                 <div className="bg-white px-3 py-2 shadow-lg rounded-lg border border-gray-200">
                     <p className="font-semibold text-sm">{data.name}</p>
                     <p className="text-gray-600 text-xs">
-                        {data.value} {data.value === 1 ? 'projekt' : 'projektów'}
+                        {data.value} {t('dashboard.stats.projectCount', { count: data.value })}
                     </p>
                 </div>
             );
@@ -202,15 +208,15 @@ const ProjectProgressChart = ({ stats }) => {
             <div className="text-sm flex-1">
                 <div className="flex items-center gap-2 text-gray-500">
                     <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                    Zakończone: <strong>{stats[1]?.value || '0'}</strong>
+                    {t('dashboard.stats.completed')}: <strong>{stats[1]?.value || '0'}</strong>
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-gray-500">
                     <span className="h-2 w-2 rounded-full bg-yellow-500"></span>
-                    W Trakcie: <strong>{stats[2]?.value || '0'}</strong>
+                    {t('dashboard.stats.inProgress')}: <strong>{stats[2]?.value || '0'}</strong>
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-gray-500">
                     <span className="h-2 w-2 rounded-full bg-gray-400"></span>
-                    Oczekujące: <strong>{stats[3]?.value || '0'}</strong>
+                    {t('dashboard.stats.pending')}: <strong>{stats[3]?.value || '0'}</strong>
                 </div>
             </div>
         </div>
@@ -218,8 +224,8 @@ const ProjectProgressChart = ({ stats }) => {
 };
 
 export default function Dashboard() {
+    const { t, i18n } = useTranslation();
     const [projects, setProjects] = useState([]);
-    const [message, setMessage] = useState('');
     const [username, setUsername] = useState('');
     const [role, setRole] = useState('');
     const [stats, setStats] = useState([]);
@@ -232,6 +238,10 @@ export default function Dashboard() {
     const { user, logout } = useAuth();
     const [weeklyActivity, setWeeklyActivity] = useState([]);
     
+    useEffect(() => {
+        moment.locale(i18n.language);
+    }, [i18n.language]);
+
     // Wykrywanie rozmiaru ekranu
     useEffect(() => {
         const checkMobile = () => {
@@ -256,9 +266,6 @@ export default function Dashboard() {
         setLoading(true);
         try {
             // Dane użytkownika są już w 'user' z AuthContext
-            setMessage(
-                `Witaj, ${user.username}! Masz szybki przegląd ostatnich projektów.`,
-            );
             setUsername(user.username);
             setRole(user.role);
             setProfileImage(user.profileImage);
@@ -284,34 +291,82 @@ export default function Dashboard() {
                 }),
             ];
 
-            if (user.role === 'admin' || user.role === 'hr' || user.role === 'superadmin') {
-                dataPromises.push(api.get(`/projects/stats/summary`, {
-                    params: { company: companyId },
-                }));
+            if (
+                user.role === 'admin' ||
+                user.role === 'hr' ||
+                user.role === 'superadmin'
+            ) {
+                dataPromises.push(
+                    api.get(`/projects/stats/summary`, {
+                        params: { company: companyId },
+                    }),
+                );
             } else {
-                dataPromises.push(api.get(`/projects/users/${user._id}/assigned-projects/summary`, {
-                    params: { company: companyId },
-                }));
+                dataPromises.push(
+                    api.get(
+                        `/projects/users/${user._id}/assigned-projects/summary`,
+                        {
+                            params: { company: companyId },
+                        },
+                    ),
+                );
             }
 
-            const [projectsRes, activityRes, statsRes] = await Promise.all(dataPromises);
+            const [projectsRes, activityRes, statsRes] =
+                await Promise.all(dataPromises);
 
             // Ustaw statystyki
-            if (user.role === 'admin' || user.role === 'hr' || user.role === 'superadmin') {
+            if (
+                user.role === 'admin' ||
+                user.role === 'hr' ||
+                user.role === 'superadmin'
+            ) {
                 const { total, running, pending, completed } = statsRes.data;
                 setStats([
-                    { id: 1, title: 'Wszystkie Projekty', value: total.toString() },
-                    { id: 2, title: 'Zakończone Projekty', value: completed.toString() },
-                    { id: 3, title: 'W trakcie', value: running.toString() },
-                    { id: 4, title: 'Oczekujące', value: pending.toString() },
+                    {
+                        id: 1,
+                        titleKey: 'allProjects',
+                        value: total.toString(),
+                    },
+                    {
+                        id: 2,
+                        titleKey: 'completedFull',
+                        value: completed.toString(),
+                    },
+                    {
+                        id: 3,
+                        titleKey: 'inProgress',
+                        value: running.toString(),
+                    },
+                    {
+                        id: 4,
+                        titleKey: 'pending',
+                        value: pending.toString(),
+                    },
                 ]);
             } else {
                 const { assigned, completed, running, pending } = statsRes.data;
                 setStats([
-                    { id: 1, title: 'Moje Projekty', value: assigned.toString() },
-                    { id: 2, title: 'Zakończone', value: completed.toString() },
-                    { id: 3, title: 'W Trakcie', value: running.toString() },
-                    { id: 4, title: 'Oczekujące', value: pending.toString() },
+                    {
+                        id: 1,
+                        titleKey: 'myProjects',
+                        value: assigned.toString(),
+                    },
+                    {
+                        id: 2,
+                        titleKey: 'completed',
+                        value: completed.toString(),
+                    },
+                    {
+                        id: 3,
+                        titleKey: 'inProgress',
+                        value: running.toString(),
+                    },
+                    {
+                        id: 4,
+                        titleKey: 'pending',
+                        value: pending.toString(),
+                    },
                 ]);
             }
 
@@ -337,7 +392,6 @@ export default function Dashboard() {
                 });
             }
             setWeeklyActivity(processedActivityData);
-        
         } catch {
             // Silent error handling
         } finally {
@@ -349,7 +403,7 @@ export default function Dashboard() {
         if (user) {
             fetchDashboardData();
         }
-    }, [user]);
+    }, [user, i18n.language]); // dodano i18n.language jako zależność, żeby odświeżyć daty (jeśli formatowane przy renderze)
 
     const handleLogout = () => {
         navigate('/');
@@ -357,7 +411,7 @@ export default function Dashboard() {
     };
 
     if (loading) {
-        return <LoadingScreen message="Przygotowujemy Twój pulpit..." />;
+        return <LoadingScreen message={t('dashboard.loading')} />;
     }
 
     return (
@@ -382,7 +436,7 @@ export default function Dashboard() {
                                     <button
                                         onClick={() => setIsSidebarOpen(true)}
                                         className="text-gray-500 transition hover:text-gray-700"
-                                        title="Rozwiń menu"
+                                        title={t('dashboard.sidebar.expand')}
                                     >
                                         <Icon.ChevronRight />
                                     </button>
@@ -420,7 +474,7 @@ export default function Dashboard() {
                                                 {username}
                                             </div>
                                             <div className="text-xs text-gray-500">
-                                                {translateRole(role)}
+                                                {t(`common.roles.${role}`)}
                                             </div>
                                         </div>
                                     </div>
@@ -432,7 +486,7 @@ export default function Dashboard() {
                                                 setIsSidebarOpen(false)
                                             }
                                             className="text-gray-500 transition hover:text-gray-700"
-                                            title="Zwiń menu"
+                                            title={t('dashboard.sidebar.collapse')}
                                         >
                                             <Icon.ChevronLeft />
                                         </button>
@@ -455,7 +509,7 @@ export default function Dashboard() {
                                     <Icon.Dashboard />
                                     {isSidebarOpen && (
                                         <span className="font-medium">
-                                            Dashboard
+                                            {t('dashboard.sidebar.dashboard')}
                                         </span>
                                     )}
                                 </li>
@@ -471,7 +525,7 @@ export default function Dashboard() {
                                     <Icon.Projects />
                                     {isSidebarOpen && (
                                         <span className="font-medium">
-                                            Projekty
+                                            {t('dashboard.sidebar.projects')}
                                         </span>
                                     )}
                                 </li>
@@ -489,7 +543,7 @@ export default function Dashboard() {
                                         <Icon.Users />
                                         {isSidebarOpen && (
                                             <span className="font-medium">
-                                                Zespół
+                                                {t('dashboard.sidebar.team')}
                                             </span>
                                         )}
                                     </li>
@@ -508,7 +562,7 @@ export default function Dashboard() {
                                         <Icon.Check />
                                         {isSidebarOpen && (
                                             <span className="font-medium">
-                                                Zatwierdzanie Urlopów
+                                                {t('dashboard.sidebar.approvals')}
                                             </span>
                                         )}
                                     </li>
@@ -527,7 +581,7 @@ export default function Dashboard() {
                                         <Icon.Check />
                                         {isSidebarOpen && (
                                             <span className="font-medium">
-                                                Rejestracja Urlopu
+                                                {t('dashboard.sidebar.leaves')}
                                             </span>
                                         )}
                                     </li>
@@ -544,7 +598,7 @@ export default function Dashboard() {
                                     <Icon.Home />
                                     {isSidebarOpen && (
                                         <span className="font-medium">
-                                            Strona główna
+                                            {t('dashboard.sidebar.home')}
                                         </span>
                                     )}
                                 </li>
@@ -557,7 +611,7 @@ export default function Dashboard() {
                                     onClick={handleLogout}
                                     className="w-full rounded-lg bg-red-50 px-4 py-3 text-left text-sm text-red-700 transition-colors hover:bg-red-100"
                                 >
-                                    Wyloguj
+                                    {t('dashboard.sidebar.logout')}
                                 </button>
                             )}
                         </div>
@@ -600,7 +654,7 @@ export default function Dashboard() {
                                         Dashboard
                                     </h1>
                                     <p className="hidden text-xs text-gray-500 sm:block md:text-sm">
-                                        {message}
+                                        {t('dashboard.welcome', { name: username })}
                                     </p>
                                 </div>
                             </div>
@@ -615,7 +669,7 @@ export default function Dashboard() {
                                     >
                                         <Icon.Key />
                                         <span className="hidden text-sm sm:inline">
-                                            Generuj Kod
+                                            {t('dashboard.generateCode')}
                                         </span>
                                     </button>
                                 )}
@@ -631,8 +685,12 @@ export default function Dashboard() {
                                 <div className="flex max-h-36 items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg md:p-6">
                                     <div>
                                         <div className="text-xs opacity-90 md:text-sm">
-                                            {stats[0]?.title ||
-                                                'Wszystkie Projekty'}
+                                            {t(
+                                                `dashboard.stats.${stats[0]?.titleKey}`,
+                                            ) ||
+                                                t(
+                                                    'dashboard.stats.allProjects',
+                                                )}
                                         </div>
                                         <div className="mt-2 min-h-[48px] text-3xl font-bold md:text-4xl">
                                             <AnimatedNumber value={Number(stats[0]?.value || 0)} />
@@ -644,8 +702,12 @@ export default function Dashboard() {
                                     {/* Stat 2 */}
                                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
-                                            {stats[1]?.title ||
-                                                'Zakończone Projekty'}
+                                            {t(
+                                                `dashboard.stats.${stats[1]?.titleKey}`,
+                                            ) ||
+                                                t(
+                                                    'dashboard.stats.completedFull',
+                                                )}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
                                             <AnimatedNumber value={Number(stats[1]?.value || 0)} />
@@ -658,7 +720,10 @@ export default function Dashboard() {
                                     {/* Stat 3 */}
                                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
-                                            {stats[2]?.title || 'W trakcie'}
+                                            {t(
+                                                `dashboard.stats.${stats[2]?.titleKey}`,
+                                            ) ||
+                                                t('dashboard.stats.inProgress')}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
                                             <AnimatedNumber value={Number(stats[2]?.value || 0)} />
@@ -671,7 +736,9 @@ export default function Dashboard() {
                                     {/* Stat 4 */}
                                     <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
                                         <div className="text-xs text-gray-500">
-                                            {stats[3]?.title || 'Oczekujące'}
+                                            {t(
+                                                `dashboard.stats.${stats[3]?.titleKey}`,
+                                            ) || t('dashboard.stats.pending')}
                                         </div>
                                         <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
                                             <AnimatedNumber value={Number(stats[3]?.value || 0)} />
@@ -686,16 +753,16 @@ export default function Dashboard() {
                                 <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6">
                                     <div className="mb-4">
                                         <div className="text-base font-medium">
-                                            Aktywność w ostatnim tygodniu
+                                            {t('dashboard.charts.activityTitle')}
                                         </div>
                                         <div className="text-xs text-gray-500">
-                                            Nowo dodane projekty
+                                            {t('dashboard.charts.newProjects')}
                                         </div>
                                     </div>
                                     <div className="h-48 w-full select-none outline-none [&_*]:outline-none [&_.recharts-wrapper]:outline-none [&_.recharts-surface]:outline-none">
                                         {weeklyActivity.length === 0 ? (
                                             <div className="flex h-full items-center justify-center text-sm text-gray-500">
-                                                Brak danych do wykresu
+                                                {t('dashboard.charts.noData')}
                                             </div>
                                         ) : (
                                             <ResponsiveContainer width="100%" height="100%">
@@ -710,7 +777,7 @@ export default function Dashboard() {
                                                         cursor={{ fill: 'rgba(52, 211, 153, 0.2)' }}
                                                         contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}
                                                         labelStyle={{ fontWeight: 'bold' }}
-                                                        formatter={(value) => [value, 'Nowe projekty']}
+                                                        formatter={(value) => [value, t('dashboard.charts.tooltipProject')]}
                                                         labelFormatter={(label) => {
                                                             const item = weeklyActivity.find((d) => d.day === label);
                                                             return item ? moment(item.fullDate).format('DD MMM YYYY') : label;
@@ -729,21 +796,21 @@ export default function Dashboard() {
                                 <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
                                     <div className="mb-3 flex items-center justify-between">
                                         <div className="text-sm font-medium md:text-base">
-                                            Przypomnienia
+                                            {t('dashboard.reminders.title')}
                                         </div>
                                         <button className="text-xs text-emerald-600 hover:text-emerald-700 transition-colors">
-                                            Zobacz wszystkie
+                                            {t('common.seeAll')}
                                         </button>
                                     </div>
                                     <div className="text-sm text-gray-600">
-                                        Spotkanie z firmą XYZ
+                                        {t('dashboard.reminders.meeting')}
                                     </div>
                                     <div className="mt-1 text-xs text-gray-400">
                                         18:00 - 20:00
                                     </div>
                                     <div className="mt-4">
                                         <button className="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white sm:w-auto hover:bg-emerald-700 transition-colors">
-                                            Rozpocznij Spotkanie
+                                            {t('dashboard.reminders.startBtn')}
                                         </button>
                                     </div>
                                 </div>
@@ -751,10 +818,10 @@ export default function Dashboard() {
                                 <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
                                     <div className="mb-3 flex items-center justify-between">
                                         <div className="text-sm font-medium md:text-base">
-                                            Postęp Projektu
+                                            {t('dashboard.charts.progressTitle')}
                                         </div>
                                         <div className="text-xs text-gray-400 md:text-sm">
-                                            Ogólnie
+                                            {t('dashboard.charts.general')}
                                         </div>
                                     </div>
                                     <ProjectProgressChart stats={stats} />
@@ -766,7 +833,9 @@ export default function Dashboard() {
                                     <div className="rounded-xl bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
                                         <div className="mb-4 flex items-center justify-between">
                                             <div className="text-base font-medium">
-                                                Ostatnio dodane projekty
+                                                {t(
+                                                    'dashboard.recentProjects.title',
+                                                )}
                                             </div>
                                             <button
                                                 onClick={() =>
@@ -774,7 +843,9 @@ export default function Dashboard() {
                                                 }
                                                 className="text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
                                             >
-                                                Zobacz wszystkie →
+                                                {t(
+                                                    'dashboard.recentProjects.seeAll',
+                                                )}
                                             </button>
                                         </div>
                                         <ul className="space-y-3">
@@ -793,7 +864,7 @@ export default function Dashboard() {
                                                             {project.name}
                                                         </div>
                                                         <div className="mt-1 text-xs text-gray-500">
-                                                            Dodano{' '}
+                                                            {t('common.added')}{' '}
                                                             {moment(
                                                                 project.createdAt,
                                                             ).fromNow()}
@@ -811,8 +882,7 @@ export default function Dashboard() {
                         </div>
                     </main>
                     <footer className="flex-shrink-0 p-3 text-center text-xs text-gray-400 md:text-sm">
-                        © {new Date().getFullYear()} WorkNest — Wszelkie prawa
-                        zastrzeżone
+                        © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
                     </footer>
                 </div>
             </div>

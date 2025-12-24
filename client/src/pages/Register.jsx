@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api.js';
 import { ArrowRight } from 'lucide-react';
@@ -11,18 +12,18 @@ const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
 };
 
-const registrationSchema = z
+const createRegistrationSchema = (t) => z
     .object({
         email: z
             .string()
-            .min(1, { message: 'Email jest wymagany' })
-            .email({ message: 'Nieprawidłowy format email' }),
+            .min(1, { message: t('auth.validation.emailRequired') })
+            .email({ message: t('auth.validation.emailInvalid') }),
         username: z
             .string()
-            .min(1, { message: 'Nazwa użytkownika jest wymagana' }),
+            .min(1, { message: t('auth.validation.usernameRequired') }),
         password: z
             .string()
-            .min(6, { message: 'Hasło musi mieć co najmniej 6 znaków' }),
+            .min(6, { message: t('auth.validation.passwordMin') }),
         role: z.enum(['admin', 'employee']),
         companyName: z.string().optional(),
         invitationCode: z.string().optional(),
@@ -35,7 +36,7 @@ const registrationSchema = z
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ['companyName'],
-                message: 'Nazwa firmy jest wymagana',
+                message: t('auth.validation.companyRequired'),
             });
         }
         if (
@@ -45,19 +46,20 @@ const registrationSchema = z
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ['invitationCode'],
-                message: 'Kod zaproszenia jest wymagany',
+                message: t('auth.validation.codeRequired'),
             });
         }
     });
 
 export default function Register() {
+    const { t } = useTranslation();
     const {
         register,
         handleSubmit,
         formState: { errors },
         watch,
     } = useForm({
-        resolver: zodResolver(registrationSchema),
+        resolver: zodResolver(createRegistrationSchema(t)),
         defaultValues: {
             role: 'admin',
             email: '',
@@ -92,10 +94,10 @@ export default function Register() {
 
             await api.post('/auth/register', registrationData);
 
-            toast.success('Rejestracja zakończona sukcesem!');
+            toast.success(t('auth.register.success'));
             navigate('/login');
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Błąd rejestracji');
+            toast.error(err.response?.data?.message || t('auth.register.error'));
         } finally {
             setIsLoading(false);
         }
@@ -107,11 +109,10 @@ export default function Register() {
             <div className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-12 md:flex md:w-1/2">
                 <div className="relative z-10 mt-auto">
                     <h2 className="mb-6 text-4xl font-bold text-white">
-                        Witaj w WorkNest
+                        {t('auth.welcome.title')}
                     </h2>
                     <p className="max-w-md text-lg text-emerald-50">
-                        Platforma, która pomoże Ci zarządzać projektami i
-                        zespołem w jednym miejscu.
+                        {t('auth.welcome.subtitle')}
                     </p>
 
                     {/* Decorative elements */}
@@ -136,15 +137,15 @@ export default function Register() {
                             </div>
                         </Link>
                         <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                            Zarejestruj się do konta
+                            {t('auth.register.title')}
                         </h2>
                         <p className="mt-3 text-base text-gray-500">
-                            Masz już konto?{' '}
+                            {t('auth.register.hasAccount')}{' '}
                             <Link
                                 to="/login"
                                 className="font-medium text-emerald-600 transition-colors hover:text-emerald-500"
                             >
-                                Zaloguj się
+                                {t('auth.register.loginLink')}
                             </Link>
                         </p>
                     </div>
@@ -156,13 +157,13 @@ export default function Register() {
                         <div className="space-y-5">
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Adres email
+                                    {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         {...register('email')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                                        placeholder="jan.kowalski@firma.pl"
+                                        placeholder={t('auth.login.emailPlaceholder')}
                                     />
                                     {errors.email && (
                                         <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -184,13 +185,13 @@ export default function Register() {
 
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Nazwa użytkownika
+                                    {t('auth.register.usernameLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         {...register('username')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                                        placeholder="Jan.Kowalski"
+                                        placeholder={t('auth.register.usernamePlaceholder')}
                                     />
                                     {errors.username && (
                                         <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -212,7 +213,7 @@ export default function Register() {
 
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Hasło
+                                    {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
@@ -242,17 +243,17 @@ export default function Register() {
                             {/* Role Selection */}
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Kim jesteś?
+                                    {t('auth.register.roleLabel')}
                                 </label>
                                 <select
                                     {...register('role')}
                                     className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                 >
                                     <option value="admin">
-                                        Zakładam konto dla mojej firmy
+                                        {t('auth.register.roleAdmin')}
                                     </option>
                                     <option value="employee">
-                                        Dołączam do istniejącej firmy
+                                        {t('auth.register.roleEmployee')}
                                     </option>
                                 </select>
                             </div>
@@ -260,13 +261,13 @@ export default function Register() {
                             {selectedRole === 'admin' ? (
                                 <div>
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                        Nazwa firmy
+                                        {t('auth.register.companyLabel')}
                                     </label>
                                     <div className="group relative">
                                         <input
                                             {...register('companyName')}
                                             className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                                            placeholder="Nazwa Twojej firmy"
+                                            placeholder={t('auth.register.companyPlaceholder')}
                                         />
                                         {errors.companyName && (
                                             <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -288,13 +289,13 @@ export default function Register() {
                             ) : (
                                 <div>
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                        Kod zaproszenia
+                                        {t('auth.register.codeLabel')}
                                     </label>
                                     <div className="group relative">
                                         <input
                                             {...register('invitationCode')}
                                             className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                                            placeholder="Wprowadź kod zaproszenia"
+                                            placeholder={t('auth.register.codePlaceholder')}
                                         />
                                         {errors.invitationCode && (
                                             <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -321,7 +322,7 @@ export default function Register() {
                             disabled={isLoading}
                             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                         >
-                            {isLoading ? 'Rejestrowanie...' : 'Zarejestruj się'}
+                            {isLoading ? t('auth.register.loading') : t('auth.register.submit')}
                             {!isLoading && <Icon.ArrowRight />}
                         </button>
                     </form>

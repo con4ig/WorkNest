@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -12,23 +13,24 @@ const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
 };
 
-const loginSchema = z.object({
+const LoginSchema = (t) => z.object({
     email: z
         .string()
-        .min(1, { message: 'Email jest wymagany' })
-        .email({ message: 'Nieprawidłowy format email' }),
+        .min(1, { message: t('auth.validation.emailRequired') })
+        .email({ message: t('auth.validation.emailInvalid') }),
     password: z
         .string()
-        .min(6, { message: 'Hasło musi mieć co najmniej 6 znaków' }),
+        .min(6, { message: t('auth.validation.passwordMin') }),
 });
 
 export default function Login() {
+    const { t } = useTranslation();
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(loginSchema),
+        resolver: zodResolver(LoginSchema(t)),
         defaultValues: {
             email: '',
             password: '',
@@ -49,7 +51,7 @@ export default function Login() {
                 navigate('/dashboard');
             }
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Błąd logowania');
+            toast.error(err.response?.data?.message || t('auth.login.error'));
         } finally {
             setIsLoading(false);
         }
@@ -61,11 +63,10 @@ export default function Login() {
             <div className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-12 md:flex md:w-1/2">
                 <div className="relative z-10 mt-auto">
                     <h2 className="mb-6 text-4xl font-bold text-white">
-                        Witaj w WorkNest
+                        {t('auth.welcome.title')}
                     </h2>
                     <p className="max-w-md text-lg text-emerald-50">
-                        Platforma, która pomoże Ci zarządzać projektami i
-                        zespołem w jednym miejscu.
+                        {t('auth.welcome.subtitle')}
                     </p>
 
                     {/* Decorative elements */}
@@ -91,15 +92,15 @@ export default function Login() {
                             </div>
                         </Link>
                         <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                            Zaloguj się do konta
+                             {t('auth.login.title')}
                         </h2>
                         <p className="mt-3 text-base text-gray-500">
-                            Nie masz jeszcze konta?{' '}
+                            {t('auth.login.noAccount')}{' '}
                             <Link
                                 to="/register"
                                 className="font-medium text-emerald-600 transition-colors hover:text-emerald-500"
                             >
-                                Zarejestruj się za darmo
+                                {t('auth.login.registerLink')}
                             </Link>
                         </p>
                     </div>
@@ -113,7 +114,7 @@ export default function Login() {
                                 await demoLogin();
                                 navigate('/dashboard');
                             } catch (err) {
-                                toast.error('Błąd logowania do demo');
+                                toast.error(t('auth.login.demoError'));
                                 console.error(err);
                             } finally {
                                 setIsLoading(false);
@@ -121,7 +122,7 @@ export default function Login() {
                         }}
                         className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-emerald-50 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                     >
-                        🚀 Wypróbuj Demo (1-Click)
+                        {t('auth.login.demoBtn')}
                     </button>
 
 
@@ -132,13 +133,13 @@ export default function Login() {
                         <div className="space-y-5">
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Adres email
+                                    {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         {...register('email')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                                        placeholder="jan.kowalski@firma.pl"
+                                        placeholder={t('auth.login.emailPlaceholder')}
                                     />
                                     {errors.email && (
                                         <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -160,7 +161,7 @@ export default function Login() {
 
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                    Hasło
+                                     {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
@@ -190,13 +191,13 @@ export default function Login() {
 
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-500">
-                                Masz problem z logowaniem?
+                                {t('auth.login.forgotPassword')}
                             </span>
                             <Link
                                 to="/forgot-password"
                                 className="text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-500"
                             >
-                                Odzyskaj dostęp do konta
+                                {t('auth.login.recoverAccess')}
                             </Link>
                         </div>
 
@@ -212,11 +213,11 @@ export default function Login() {
                             {isLoading ? (
                                 <>
                                     <Loader2 className="h-5 w-5 animate-spin" />
-                                    Logowanie
+                                    {t('auth.login.loading')}
                                 </>
                             ) : (
                                 <>
-                                    Zaloguj się
+                                    {t('auth.login.submit')}
                                     <Icon.ArrowRight />
                                 </>
                             )}

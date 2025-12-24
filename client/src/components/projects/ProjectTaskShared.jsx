@@ -77,6 +77,7 @@ export const getStatusClasses = (status) => {
 
 export const getPriorityClasses = (priority) => {
     switch (priority) {
+        case 'critical':
         case 'high':
             return 'bg-red-100 text-red-800';
         case 'medium':
@@ -96,6 +97,6 @@ export const formatDateForInput = (dateString) => {
     }
 };
 
-export const AVAILABLE_PRIORITIES = ['low', 'medium', 'high'];
+export const AVAILABLE_PRIORITIES = ['low', 'medium', 'high', 'critical'];
 export const TASK_STATUSES = ['todo', 'in-progress', 'completed'];
 export const AVAILABLE_STATUSES = ['pending', 'running', 'on-hold', 'completed'];

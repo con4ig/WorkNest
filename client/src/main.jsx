@@ -1,4 +1,6 @@
-import { StrictMode, useEffect } from 'react';
+import { StrictMode, useEffect, Suspense } from 'react';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './styles/fonts.css';
@@ -15,7 +17,7 @@ import ProjectDetails from './pages/ProjectDetails.jsx';
 import MyLeaves from './pages/MyLeaves.jsx';
 import LeaveApprovals from './pages/LeaveApprovals.jsx';
 import Regulamin from './pages/Regulamin.jsx';
-import Polityka from './pages/Poltyka_prywatnosc.jsx';
+import Polityka from './pages/Polityka_prywatnosc.jsx';
 import UserDetails from './pages/UserDetails.jsx';
 import Upload from './pages/Upload.jsx';
 import GenerateCode from './pages/GenerateCode.jsx';
@@ -24,6 +26,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './pages/ErrorBoundary.jsx';
+import LoadingScreen from './components/LoadingScreen.jsx';
 
 // Komponent do obsługi globalnych błędów autoryzacji
 const AuthErrorHandler = () => {
@@ -55,9 +58,11 @@ createRoot(document.getElementById('root')).render(
     <StrictMode>
         <ErrorBoundary>
             <AuthProvider>
-                <Router>
-                    <AuthErrorHandler />
-                    <Toaster
+                <I18nextProvider i18n={i18n}>
+                    <Suspense fallback={<LoadingScreen />}>
+                    <Router>
+                        <AuthErrorHandler />
+                        <Toaster
                         containerStyle={{ zIndex: 9999 }}
                         position="top-center"
                         reverseOrder={false}
@@ -89,6 +94,8 @@ createRoot(document.getElementById('root')).render(
                         </Route>
                     </Routes>
                 </Router>
+                </Suspense>
+                </I18nextProvider>
             </AuthProvider>
         </ErrorBoundary>
     </StrictMode>

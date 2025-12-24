@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import { useNavigate } from 'react-router-dom';
 import { FolderKanban, Archive } from 'lucide-react';
@@ -17,6 +18,7 @@ import ProjectRow from '../components/projects/ProjectRow';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
 
 export default function Projekty() {
+    const { t } = useTranslation();
     const { user, loading: authLoading } = useAuth();
     const companyId = user?.company?._id;
     const currentUserRole = user?.role;
@@ -88,21 +90,21 @@ export default function Projekty() {
 
         const actionConfig = {
             archive: {
-                title: 'Archiwizacja Grupowa',
-                message: `Czy na pewno chcesz zarchiwizować ${selectedProjects.length} zaznaczonych projektów?`,
-                confirmText: 'Archiwizuj',
+                title: t('projects.bulkActions.archiveTitle'),
+                message: t('projects.bulkActions.archiveMessage', { count: selectedProjects.length }),
+                confirmText: t('projects.bulkActions.archiveConfirm'),
                 confirmVariant: 'primary',
             },
             restore: {
-                title: 'Przywracanie Grupowe',
-                message: `Czy na pewno chcesz przywrócić ${selectedProjects.length} zaznaczonych projektów?`,
-                confirmText: 'Przywróć',
+                title: t('projects.bulkActions.restoreTitle'),
+                message: t('projects.bulkActions.restoreMessage', { count: selectedProjects.length }),
+                confirmText: t('projects.bulkActions.restoreConfirm'),
                 confirmVariant: 'primary',
             },
             delete: {
-                title: 'Usuwanie Grupowe',
-                message: `UWAGA: Trwale usuniesz ${selectedProjects.length} projektów. Ta operacja jest nieodwracalna. Kontynuować?`,
-                confirmText: 'Usuń Trwale',
+                title: t('projects.bulkActions.deleteTitle'),
+                message: t('projects.bulkActions.deleteMessage', { count: selectedProjects.length }),
+                confirmText: t('projects.bulkActions.deleteConfirm'),
                 confirmVariant: 'danger',
             },
         };
@@ -119,7 +121,7 @@ export default function Projekty() {
                     setRefreshKey((prev) => prev + 1);
                     setSelectedProjects([]);
                 } catch (error) {
-                    console.error('Błąd operacji masowej:', error);
+                    console.error(t('projects.errors.bulkActionError'), error);
                 }
             },
         });
@@ -145,13 +147,14 @@ export default function Projekty() {
                 });
                 setProjects(response.data.projects);
             } catch (err) {
-                console.error('Błąd ładowania projektów:', err);
+                console.error(t('projects.errors.loadingErrorLog'), err);
+                setError(t('projects.errors.loadingError'));
                 if (
                     err.response?.status === 401 ||
                     err.response?.status === 403
                 )
                     navigate('/login');
-                else setError('Nie udało się załadować listy projektów.');
+                else setError(t('projects.errors.loadingError'));
             } finally {
                 setIsInitialLoading(false);
                 setIsFiltering(false);
@@ -183,10 +186,9 @@ export default function Projekty() {
 
     const handleArchive = (projectId) => {
         askForConfirmation({
-            title: 'Archiwizacja Projektu',
-            message:
-                'Czy na pewno chcesz przenieść ten projekt do archiwum? Będziesz mógł go później przywrócić.',
-            confirmText: 'Archiwizuj',
+            title: t('projects.confirmation.archiveProjectTitle'),
+            message: t('projects.confirmation.archiveProjectMessage'),
+            confirmText: t('projects.confirmation.archiveButton'),
             confirmVariant: 'warning',
             onConfirm: async () => {
                 try {
@@ -203,10 +205,9 @@ export default function Projekty() {
 
     const handlePermanentDelete = (projectId) => {
         askForConfirmation({
-            title: 'Trwałe Usunięcie Projektu',
-            message:
-                'Czy na pewno chcesz TRWALE usunąć ten projekt? Ta operacja jest nieodwracalna!',
-            confirmText: 'Usuń Trwale',
+            title: t('projects.singleActions.deleteTitle'),
+            message: t('projects.singleActions.deleteMessage'),
+            confirmText: t('projects.singleActions.deleteConfirm'),
             confirmVariant: 'danger',
             onConfirm: async () => {
                 try {
@@ -225,9 +226,9 @@ export default function Projekty() {
 
     const handleRestore = (projectId) => {
         askForConfirmation({
-            title: 'Przywracanie Projektu',
-            message: 'Czy na pewno chcesz przywrócić ten projekt z archiwum?',
-            confirmText: 'Przywróć',
+            title: t('projects.singleActions.restoreTitle'),
+            message: t('projects.singleActions.restoreMessage'),
+            confirmText: t('projects.singleActions.restoreConfirm'),
             confirmVariant: 'primary',
             onConfirm: async () => {
                 try {
@@ -259,14 +260,14 @@ export default function Projekty() {
     };
 
     const tableHeaders = [
-        'Nazwa Projektu',
-        'Status',
-        'Postęp',
-        'Termin',
-        'Przypisani',
+        t('projects.tableHeaders.projectName'),
+        t('projects.tableHeaders.status'),
+        t('projects.tableHeaders.progress'),
+        t('projects.tableHeaders.deadline'),
+        t('projects.tableHeaders.assigned'),
     ];
     if (currentUserRole !== 'employee') {
-        tableHeaders.push('Akcje');
+        tableHeaders.push(t('projects.tableHeaders.actions'));
     }
 
     const handleStatusChange = async (projectId, newStatus) => {
@@ -288,19 +289,19 @@ export default function Projekty() {
     };
 
     if (isInitialLoading || authLoading)
-        return <LoadingScreen message="Ładowanie projektów..." />;
+        return <LoadingScreen message={t('projects.misc.loadingProjects')} />;
 
     if (error) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
                 <div className="w-full max-w-md rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-red-700 shadow-sm">
-                    <div className="mb-2 text-lg font-semibold">Błąd</div>
+                    <div className="mb-2 text-lg font-semibold">{t('projects.misc.error')}</div>
                     <div className="text-sm">{error}</div>
                     <button
                         onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto"
                     >
-                        Powrót do Dashboard
+                        {t('projects.misc.backToDashboard')}
                     </button>
                 </div>
             </div>
@@ -312,17 +313,16 @@ export default function Projekty() {
             <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
                 <div className="w-full max-w-md rounded-xl border border-yellow-200 bg-yellow-50 px-6 py-6 text-yellow-700 shadow-sm">
                     <div className="mb-2 text-lg font-semibold">
-                        Brak przypisanej firmy
+                        {t('projects.misc.noCompanyAssigned')}
                     </div>
                     <div className="text-sm">
-                        Nie jesteś przypisany do żadnej firmy. Skontaktuj się z
-                        administratorem
+                        {t('projects.misc.noCompanyAssignedMessage')}
                     </div>
                     <button
                         onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-yellow-600 px-4 py-2 text-white transition-colors hover:bg-yellow-700 sm:w-auto"
                     >
-                        Powrót do Dashboard
+                        {t('projects.misc.backToDashboard')}
                     </button>
                 </div>
             </div>
@@ -382,13 +382,13 @@ export default function Projekty() {
                                         className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${!showArchived ? 'bg-emerald-100 text-emerald-700' : 'text-slate-600 hover:bg-slate-100'}`}
                                     >
                                         <FolderKanban className="h-4 w-4" />{' '}
-                                        Aktywne
+                                        {t('projects.misc.active')}
                                     </button>
                                     <button
                                         onClick={() => setShowArchived(true)}
                                         className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${showArchived ? 'bg-slate-600 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
                                     >
-                                        <Archive className="h-4 w-4" /> Archiwum
+                                        <Archive className="h-4 w-4" /> {t('projects.misc.archive')}
                                     </button>
                                 </div>
                                 {screenSize !== 'mobile' && (
@@ -406,8 +406,8 @@ export default function Projekty() {
                 {projects.length === 0 ? (
                     <div className="py-10 text-center text-slate-500">
                         {showArchived
-                            ? 'Brak zarchiwizowanych projektów.'
-                            : 'Nie znaleziono projektów.'}
+                            ? t('projects.misc.noArchivedProjects')
+                            : t('projects.misc.noProjectsFound')}
                     </div>
                 ) : screenSize === 'mobile' ||
                   currentView === 'grid' ||
@@ -507,8 +507,7 @@ export default function Projekty() {
                 )}
             </div>
             <footer className="mt-8 text-center text-sm text-slate-400">
-                © {new Date().getFullYear()} WorkNest — Wszelkie prawa
-                zastrzeżone
+                © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
             </footer>
             <AddProjectModal
                 isOpen={isModalOpen}
