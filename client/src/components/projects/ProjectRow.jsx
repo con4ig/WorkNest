@@ -45,12 +45,16 @@ const ProjectRow = ({
             day: 'numeric',
         });
     };
-    
+
     const AssignedUsersAvatarGroup = ({ users }) => {
         if (!users || users.length === 0) {
-            return <div className="text-xs text-slate-400">{t('projects.projectRow.none')}</div>;
+            return (
+                <div className="text-xs text-slate-400">
+                    {t('projects.projectRow.none')}
+                </div>
+            );
         }
-    
+
         return (
             <div className="flex -space-x-2">
                 {users.slice(0, 3).map((user) => (
@@ -98,19 +102,22 @@ const ProjectRow = ({
             onClick={() => onRowClick(project._id)}
         >
             {currentUserRole !== 'employee' && (
-            <td className="w-4 px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                <div
-                    className="flex h-5 w-5 cursor-pointer items-center justify-center rounded transition-transform active:scale-90"
-                    onClick={() => onToggleSelect(project._id)}
+                <td
+                    className="w-4 px-6 py-4"
+                    onClick={(e) => e.stopPropagation()}
                 >
-                    <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => {}} // Zmiana stanu w divie wyżej
-                        className="h-4 w-4 cursor-pointer rounded border-slate-300 text-emerald-600 transition-all checked:bg-emerald-600 hover:border-emerald-500 focus:ring-emerald-500"
-                    />
-                </div>
-            </td>
+                    <div
+                        className="flex h-5 w-5 cursor-pointer items-center justify-center rounded transition-transform active:scale-90"
+                        onClick={() => onToggleSelect(project._id)}
+                    >
+                        <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => {}} // Zmiana stanu w divie wyżej
+                            className="h-4 w-4 cursor-pointer rounded border-slate-300 text-emerald-600 transition-all checked:bg-emerald-600 hover:border-emerald-500 focus:ring-emerald-500"
+                        />
+                    </div>
+                </td>
             )}
             <td className="px-6 py-4">
                 <div className="font-semibold text-slate-800">
@@ -132,7 +139,10 @@ const ProjectRow = ({
             <td className="hidden px-6 py-4 md:table-cell">
                 <div className="flex w-full min-w-[100px] flex-col gap-1">
                     <span className="text-xs font-medium text-slate-700">
-                        {project.progress || 0}%
+                        {project.progress || 0}% (
+                        {project.tasks?.filter((t) => t.status === 'completed')
+                            .length || 0}
+                        /{project.tasks?.length || 0})
                     </span>
                     <div className="h-1.5 w-full rounded-full bg-slate-200">
                         <div
@@ -152,60 +162,61 @@ const ProjectRow = ({
                 <AssignedUsersAvatarGroup users={project.assignedUsers} />
             </td>
             {currentUserRole !== 'employee' && (
-            <td className="px-6 py-4">
-                <div className="relative flex" ref={menuRef}>
-                    <button
-                        onClick={handleMenuClick}
-                        className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                    >
-                        <MoreVertical className="h-5 w-5" />
-                    </button>
-                    {showMenu && (
-                        <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-lg border border-slate-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                            <div className="py-1">
-                                {project.isArchived ? (
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onRestore(project._id);
-                                            setShowMenu(false);
-                                        }}
-                                        className="flex w-full items-center px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
-                                    >
-                                        <ArchiveRestore className="mr-2.5 h-4 w-4" />
-                                        {t('projects.projectRow.restore')}
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onArchive(project._id);
-                                            setShowMenu(false);
-                                        }}
-                                        className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
-                                    >
-                                        <Archive className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-slate-700" />
-                                        {t('projects.projectRow.archive')}
-                                    </button>
-                                )}
-                                {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onPermanentDelete(project._id);
-                                            setShowMenu(false);
-                                        }}
-                                        className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-red-50 hover:text-red-700"
-                                    >
-                                        <Trash2 className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-red-600" />
-                                        {t('projects.projectRow.delete')}
-                                    </button>
-                                )}
+                <td className="px-6 py-4">
+                    <div className="relative flex" ref={menuRef}>
+                        <button
+                            onClick={handleMenuClick}
+                            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                        >
+                            <MoreVertical className="h-5 w-5" />
+                        </button>
+                        {showMenu && (
+                            <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-lg border border-slate-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                                <div className="py-1">
+                                    {project.isArchived ? (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onRestore(project._id);
+                                                setShowMenu(false);
+                                            }}
+                                            className="flex w-full items-center px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                                        >
+                                            <ArchiveRestore className="mr-2.5 h-4 w-4" />
+                                            {t('projects.projectRow.restore')}
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onArchive(project._id);
+                                                setShowMenu(false);
+                                            }}
+                                            className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                                        >
+                                            <Archive className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-slate-700" />
+                                            {t('projects.projectRow.archive')}
+                                        </button>
+                                    )}
+                                    {(currentUserRole === 'admin' ||
+                                        currentUserRole === 'owner') && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onPermanentDelete(project._id);
+                                                setShowMenu(false);
+                                            }}
+                                            className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-red-50 hover:text-red-700"
+                                        >
+                                            <Trash2 className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-red-600" />
+                                            {t('projects.projectRow.delete')}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
-            </td>
+                        )}
+                    </div>
+                </td>
             )}
         </tr>
     );

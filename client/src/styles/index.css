@@ -15,3 +15,47 @@ body {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --font-heading: 'Poppins', sans-serif;
+        --font-body: 'Poppins', sans-serif;
+
+        /* Enterprise SaaS Colors - Slate/Blue/Emerald theme */
+        --primary: 222.2 47.4% 11.2%; /* Slate 900 */
+        --primary-foreground: 210 40% 98%; /* Slate 50 */
+
+        --secondary: 210 40% 96.1%; /* Slate 100 */
+        --secondary-foreground: 222.2 47.4% 11.2%; /* Slate 900 */
+
+        --muted: 210 40% 96.1%; /* Slate 100 */
+        --muted-foreground: 215.4 16.3% 46.9%; /* Slate 500 */
+
+        --accent: 210 40% 96.1%; /* Slate 100 */
+        --accent-foreground: 222.2 47.4% 11.2%; /* Slate 900 */
+
+        --destructive: 0 84.2% 60.2%; /* Red 500 */
+        --destructive-foreground: 210 40% 98%; /* Slate 50 */
+
+        --border: 214.3 31.8% 91.4%; /* Slate 200 */
+        --input: 214.3 31.8% 91.4%;
+        --ring: 215 20.2% 65.1%; /* Slate 400 */
+
+        --radius: 0.5rem;
+    }
+}
+
+@layer components {
+    .glass-panel {
+        @apply border border-white/20 bg-white/80 shadow-sm backdrop-blur-md;
+    }
+
+    .glass-panel-dark {
+        @apply border border-slate-700/50 bg-slate-900/80 shadow-sm backdrop-blur-md;
+    }
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    @apply bg-slate-50 text-slate-900 antialiased;
+}

@@ -1,17 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api.js';
-import {
-    LayoutDashboard,
-    FolderKanban,
-    Users,
-    ChartLine,
-    Home,
-    CalendarCheck,
-    ChevronRight,
-    ChevronLeft,
-    Key,
-} from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     Bar,
@@ -26,143 +16,79 @@ import {
     YAxis,
 } from 'recharts';
 
-import moment from 'moment';
+import { format } from 'date-fns';
+import { pl } from 'date-fns/locale';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import { useAuth } from '../context/AuthContext';
-import { translateRole } from '../utils/translations.js';
-
-// Funkcja do obsługi polskich form liczby mnogiej
-function polishPlural(n, singular, few, many) {
-    if (n === 1) return singular;
-    const lastDigit = n % 10;
-    const lastTwoDigits = n % 100;
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return many;
-    if (lastDigit >= 2 && lastDigit <= 4) return few;
-    return many;
-}
-
-// Konfiguracja polskiej lokalizacji dla moment.js
-moment.updateLocale('pl', {
-    relativeTime: {
-        future: 'za %s',
-        past: '%s temu',
-        s: 'kilka sekund',
-        ss: '%d sekund',
-        m: 'minutę',
-        mm: function (number) {
-            return (
-                number + ' ' + polishPlural(number, 'minuta', 'minuty', 'minut')
-            );
-        },
-        h: 'godzinę',
-        hh: function (number) {
-            return (
-                number +
-                ' ' +
-                polishPlural(number, 'godzina', 'godziny', 'godzin')
-            );
-        },
-        d: 'dzień',
-        dd: function (number) {
-            return number + ' ' + polishPlural(number, 'dzień', 'dni', 'dni');
-        },
-        M: 'miesiąc',
-        MM: function (number) {
-            return (
-                number +
-                ' ' +
-                polishPlural(number, 'miesiąc', 'miesiące', 'miesięcy')
-            );
-        },
-        y: 'rok',
-        yy: function (number) {
-            return number + ' ' + polishPlural(number, 'rok', 'lata', 'lat');
-        },
-    },
-});
-moment.locale('pl');
-
-const Icon = {
-    Dashboard: () => <LayoutDashboard className="h-5 w-5" />,
-    Projects: () => <FolderKanban className="h-5 w-5" />,
-    Users: () => <Users className="h-5 w-5" />,
-    Analytics: () => <ChartLine className="h-5 w-5" />,
-    Home: () => <Home className="h-5 w-5" />,
-    Check: () => <CalendarCheck className="h-5 w-5" />,
-    ChevronRight: () => <ChevronRight className="h-5 w-5" />,
-    ChevronLeft: () => <ChevronLeft className="h-5 w-5" />,
-    Key: () => <Key className="h-4 w-4" />,
-};
-
-// Hook do animacji liczenia w górę
-// Hook do animacji liczenia w górę
-const useCountUp = (endValue, duration = 1500) => {
-    const [count, setCount] = useState(0);
-    const frameRate = 1000 / 60;
-    const totalFrames = Math.round(duration / frameRate);
-
-    useEffect(() => {
-        let frame = 0;
-        const counter = setInterval(() => {
-            frame++;
-            const progress = frame / totalFrames;
-            const currentCount = Math.round(
-                endValue * (1 - Math.pow(1 - progress, 3)),
-            );
-
-            if (frame === totalFrames) {
-                clearInterval(counter);
-                setCount(endValue);
-            } else {
-                setCount(currentCount);
-            }
-        }, frameRate);
-
-        return () => clearInterval(counter);
-    }, [endValue, duration]);
-
-    return count;
-};
-
-// Helper component dla animowanych liczb
-const AnimatedNumber = ({ value }) => {
-    const animatedValue = useCountUp(value, 1000);
-    return <span>{animatedValue}</span>;
-};
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardDescription,
+} from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import AnimatedNumber from '../components/ui/AnimatedNumber';
+import { useCountUp } from '../hooks/useCountUp';
 
 // Komponent do wyświetlania wykresu postępu projektu
 const ProjectProgressChart = ({ stats }) => {
     const { t } = useTranslation();
     const [hoveredSection, setHoveredSection] = useState(null);
-    
+
     const totalProjects = Number(stats[0]?.value || 0);
     const completedProjects = Number(stats[1]?.value || 0);
     const runningProjects = Number(stats[2]?.value || 0);
     const pendingProjects = Number(stats[3]?.value || 0);
 
-    const targetPercentage = totalProjects > 0 
-        ? Math.round((completedProjects / totalProjects) * 100) 
-        : 0;
+    const targetPercentage =
+        totalProjects > 0
+            ? Math.round((completedProjects / totalProjects) * 100)
+            : 0;
     const animatedPercentage = useCountUp(targetPercentage);
 
     // Dane dla wykresu kołowego z wszystkimi statusami
-    const chartData = totalProjects > 0 
-        ? [
-            { name: t('dashboard.stats.completed'), value: completedProjects, color: '#10B981' },
-            { name: t('dashboard.stats.inProgress'), value: runningProjects, color: '#F59E0B' },
-            { name: t('dashboard.stats.pending'), value: pendingProjects, color: '#94A3B8' }
-          ].filter(item => item.value > 0)
-        : [{ name: t('dashboard.charts.noData'), value: 1, color: '#E5E7EB' }];
+    const chartData =
+        totalProjects > 0
+            ? [
+                  {
+                      name: t('dashboard.stats.completed'),
+                      value: completedProjects,
+                      color: '#10B981', // Emerald 500
+                  },
+                  {
+                      name: t('dashboard.stats.inProgress'),
+                      value: runningProjects,
+                      color: '#F59E0B', // Amber 500
+                  },
+                  {
+                      name: t('dashboard.stats.pending'),
+                      value: pendingProjects,
+                      color: '#94A3B8', // Slate 400
+                  },
+              ].filter((item) => item.value > 0)
+            : [
+                  {
+                      name: t('dashboard.charts.noData'),
+                      value: 1,
+                      color: '#E2E8F0', // Slate 200
+                  },
+              ];
 
     const CustomTooltip = ({ active, payload }) => {
         const { t } = useTranslation();
         if (active && payload && payload.length) {
             const data = payload[0];
             return (
-                <div className="bg-white px-3 py-2 shadow-lg rounded-lg border border-gray-200">
-                    <p className="font-semibold text-sm">{data.name}</p>
-                    <p className="text-gray-600 text-xs">
-                        {data.value} {t('dashboard.stats.projectCount', { count: data.value })}
+                <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg">
+                    <p className="text-sm font-semibold text-slate-900">
+                        {data.name}
+                    </p>
+                    <p className="text-xs text-slate-600">
+                        {data.value}{' '}
+                        {t('dashboard.stats.projectCount', {
+                            count: data.value,
+                        })}
                     </p>
                 </div>
             );
@@ -171,52 +97,105 @@ const ProjectProgressChart = ({ stats }) => {
     };
 
     return (
-        <div className="flex items-center gap-4">
-            {/* Wykres kołowy */}
-            <div className="relative h-24 w-24 flex-shrink-0">
-                <ResponsiveContainer width={96} height={96}>
-                    <PieChart>
-                        <Pie
-                            data={chartData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius="60%"
-                            outerRadius="90%"
-                            dataKey="value"
-                            stroke="none"
-                            onMouseEnter={(_, index) => setHoveredSection(index)}
-                            onMouseLeave={() => setHoveredSection(null)}
-                        >
-                            {chartData.map((entry, index) => (
-                                <Cell 
-                                    key={`cell-${index}`} 
-                                    fill={entry.color}
-                                    opacity={hoveredSection === null || hoveredSection === index ? 1 : 0.5}
-                                    style={{ transition: 'all 0.3s ease' }}
-                                />
-                            ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex items-center justify-center text-xl font-bold">
-                    {animatedPercentage}%
-                </div>
-            </div>
+        <div className="flex w-full flex-col gap-6 p-4">
+            {/* Tytuł z podkreśleniem */}
+            <h3 className="w-fit text-xl font-bold text-slate-900">
+                Postęp Projektów
+            </h3>
 
-            {/* Legenda */}
-            <div className="text-sm flex-1">
-                <div className="flex items-center gap-2 text-gray-500">
-                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                    {t('dashboard.stats.completed')}: <strong>{stats[1]?.value || '0'}</strong>
+            {/* Kontener wykresu i legendy obok siebie */}
+            <div className="flex items-center justify-start gap-8">
+                {/* Wykres kołowy */}
+                <div className="relative flex-shrink-0">
+                    <div className="h-32 w-32">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={chartData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={45}
+                                    outerRadius={60}
+                                    dataKey="value"
+                                    stroke="none"
+                                    onMouseEnter={(_, index) =>
+                                        setHoveredSection(index)
+                                    }
+                                    onMouseLeave={() => setHoveredSection(null)}
+                                >
+                                    {chartData.map((entry, index) => (
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={entry.color}
+                                            opacity={
+                                                hoveredSection === null ||
+                                                hoveredSection === index
+                                                    ? 1
+                                                    : 0.6
+                                            }
+                                            style={{
+                                                transition: 'opacity 0.3s ease',
+                                            }}
+                                        />
+                                    ))}
+                                </Pie>
+                                <Tooltip content={<CustomTooltip />} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                    {/* Central percentage stats */}
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-xl font-bold tracking-tight text-slate-900">
+                            {animatedPercentage}%
+                        </span>
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                            OGÓLNIE
+                        </span>
+                    </div>
                 </div>
-                <div className="mt-2 flex items-center gap-2 text-gray-500">
-                    <span className="h-2 w-2 rounded-full bg-yellow-500"></span>
-                    {t('dashboard.stats.inProgress')}: <strong>{stats[2]?.value || '0'}</strong>
-                </div>
-                <div className="mt-2 flex items-center gap-2 text-gray-500">
-                    <span className="h-2 w-2 rounded-full bg-gray-400"></span>
-                    {t('dashboard.stats.pending')}: <strong>{stats[3]?.value || '0'}</strong>
+
+                {/* Legenda po prawej */}
+                <div className="flex min-w-[140px] flex-col space-y-4">
+                    {/* Reference: "zakonczone w trakc" -> Keeping consistent with translation keys but styling as requested */}
+
+                    {/* Completed */}
+                    <div className="group flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2">
+                            <div className="h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+                            <span className="text-sm font-semibold text-slate-600">
+                                {t('dashboard.stats.completed')}
+                            </span>
+                        </div>
+                        <span className="text-sm font-bold text-slate-900">
+                            {stats[1]?.value || '1'}
+                        </span>
+                    </div>
+
+                    {/* In Progress */}
+                    <div className="group flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2">
+                            <div className="h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.4)]" />
+                            <span className="text-sm font-semibold text-slate-600">
+                                {t('dashboard.stats.inProgress')}
+                            </span>
+                        </div>
+                        <span className="text-sm font-bold text-slate-900">
+                            {stats[2]?.value || '1'}
+                        </span>
+                    </div>
+
+                    {/* Pending */}
+                    <div className="group flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2">
+                            <div className="h-3 w-3 rounded-full bg-slate-400 shadow-[0_0_6px_rgba(148,163,184,0.4)]" />
+                            <span className="text-sm font-semibold text-slate-600">
+                                {t('dashboard.stats.pending')}
+                            </span>
+                        </div>
+                        <span className="text-sm font-bold text-slate-900">
+                            {stats[3]?.value || '1'}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -229,35 +208,15 @@ export default function Dashboard() {
     const [username, setUsername] = useState('');
     const [role, setRole] = useState('');
     const [stats, setStats] = useState([]);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
     const [profileImage, setProfileImage] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const location = useLocation();
     const { user, logout } = useAuth();
     const [weeklyActivity, setWeeklyActivity] = useState([]);
-    
+
     useEffect(() => {
-        moment.locale(i18n.language);
+        // moment.locale(i18n.language); // Removed as we switched to date-fns
     }, [i18n.language]);
-
-    // Wykrywanie rozmiaru ekranu
-    useEffect(() => {
-        const checkMobile = () => {
-            const mobile = window.innerWidth < 768;
-            setIsMobile(mobile);
-            if (!mobile) {
-                setIsSidebarOpen(true);
-            } else {
-                setIsSidebarOpen(false);
-            }
-        };
-
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
 
     // Połączona funkcja do pobierania wszystkich danych
     const fetchDashboardData = async () => {
@@ -265,7 +224,6 @@ export default function Dashboard() {
 
         setLoading(true);
         try {
-            // Dane użytkownika są już w 'user' z AuthContext
             setUsername(user.username);
             setRole(user.role);
             setProfileImage(user.profileImage);
@@ -276,7 +234,6 @@ export default function Dashboard() {
                 return;
             }
 
-            // Pobieranie wszystkich danych równolegle
             const dataPromises = [
                 api.get('/projects', {
                     params: {
@@ -315,7 +272,6 @@ export default function Dashboard() {
             const [projectsRes, activityRes, statsRes] =
                 await Promise.all(dataPromises);
 
-            // Ustaw statystyki
             if (
                 user.role === 'admin' ||
                 user.role === 'hr' ||
@@ -372,7 +328,7 @@ export default function Dashboard() {
 
             setProjects(projectsRes.data.projects);
 
-            // Przetwarzanie danych aktywności, aby pokazać ostatnie 7 dni
+            // Przetwarzanie danych aktywności
             const rawActivity = activityRes.data;
             const activityMap = rawActivity.reduce((acc, item) => {
                 acc[item.date] = item.count;
@@ -384,9 +340,11 @@ export default function Dashboard() {
             for (let i = 6; i >= 0; i--) {
                 const day = new Date(today);
                 day.setDate(today.getDate() - i);
-                const dayString = moment(day).format('YYYY-MM-DD');
+                const dayString = format(day, 'yyyy-MM-dd');
                 processedActivityData.push({
-                    day: moment(day).format('ddd'),
+                    day: format(day, 'EEE', {
+                        locale: i18n.language === 'pl' ? pl : undefined,
+                    }),
                     fullDate: dayString,
                     val: activityMap[dayString] || 0,
                 });
@@ -403,489 +361,222 @@ export default function Dashboard() {
         if (user) {
             fetchDashboardData();
         }
-    }, [user, i18n.language]); // dodano i18n.language jako zależność, żeby odświeżyć daty (jeśli formatowane przy renderze)
-
-    const handleLogout = () => {
-        navigate('/');
-        setTimeout(logout, 0);
-    };
+    }, [user, i18n.language]);
 
     if (loading) {
         return <LoadingScreen message={t('dashboard.loading')} />;
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 select-none">
-            {/* Overlay dla mobile gdy sidebar otwarty */}
-            {isMobile && isSidebarOpen && (
-                <div
-                    className="fixed inset-0 z-10 bg-black bg-opacity-50"
-                    onClick={() => setIsSidebarOpen(false)}
-                />
-            )}
-
-            <div className="flex">
-                <aside
-                    className={`${isSidebarOpen ? 'w-64' : isMobile ? '-translate-x-full' : 'w-20'} ${isMobile ? 'fixed' : 'fixed'} z-20 h-screen overflow-hidden bg-white shadow-lg transition-all duration-300`}
-                >
-                    <div className="flex h-full flex-col p-6">
-                        <div className="mb-8">
-                            {!isMobile && !isSidebarOpen ? (
-                                /* Zwinięty sidebar (desktop) - TYLKO strzałka */
-                                <div className="flex justify-center">
-                                    <button
-                                        onClick={() => setIsSidebarOpen(true)}
-                                        className="text-gray-500 transition hover:text-gray-700"
-                                        title={t('dashboard.sidebar.expand')}
-                                    >
-                                        <Icon.ChevronRight />
-                                    </button>
-                                </div>
-                            ) : (
-                                /* Rozwinięty sidebar - Avatar + username + strzałka */
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        {/* Avatar */}
-                                        {profileImage ? (
-                                            <img
-                                                src={profileImage}
-                                                alt="Avatar"
-                                                className="h-10 w-10 cursor-pointer rounded-full object-cover"
-                                                onClick={() =>
-                                                    navigate('/upload')
-                                                }
-                                            />
-                                        ) : (
-                                            <div
-                                                onClick={() =>
-                                                    navigate('/upload')
-                                                }
-                                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-emerald-600 font-bold text-white"
-                                            >
-                                                {username
-                                                    .charAt(0)
-                                                    .toUpperCase()}
-                                            </div>
-                                        )}
-
-                                        {/* Username i role */}
-                                        <div>
-                                            <div className="font-semibold">
-                                                {username}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {t(`common.roles.${role}`)}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Strzałka do zwijania - tylko desktop */}
-                                    {!isMobile && (
-                                        <button
-                                            onClick={() =>
-                                                setIsSidebarOpen(false)
-                                            }
-                                            className="text-gray-500 transition hover:text-gray-700"
-                                            title={t('dashboard.sidebar.collapse')}
-                                        >
-                                            <Icon.ChevronLeft />
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Reszta sidebaru */}
-                        <nav className="flex-1">
-                            <ul className="space-y-2">
-                                {/* Dashboard */}
-                                <li
-                                    onClick={() => {
-                                        navigate('/dashboard');
-                                        if (isMobile) setIsSidebarOpen(false);
-                                    }}
-                                    className={`flex cursor-pointer items-center rounded-lg transition-colors ${isSidebarOpen ? 'justify-start gap-3 px-4' : 'justify-center px-0'} ${location.pathname === '/dashboard' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'} py-3`}
-                                >
-                                    <Icon.Dashboard />
-                                    {isSidebarOpen && (
-                                        <span className="font-medium">
-                                            {t('dashboard.sidebar.dashboard')}
-                                        </span>
-                                    )}
-                                </li>
-
-                                {/* Projekty */}
-                                <li
-                                    onClick={() => {
-                                        navigate('/projekty');
-                                        if (isMobile) setIsSidebarOpen(false);
-                                    }}
-                                    className={`flex cursor-pointer items-center rounded-lg transition-colors ${isSidebarOpen ? 'justify-start gap-3 px-4' : 'justify-center px-0'} ${location.pathname.startsWith('/projekty') ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'} py-3`}
-                                >
-                                    <Icon.Projects />
-                                    {isSidebarOpen && (
-                                        <span className="font-medium">
-                                            {t('dashboard.sidebar.projects')}
-                                        </span>
-                                    )}
-                                </li>
-
-                                {/* Zespół */}
-                                {(role === 'hr' || role === 'admin') && (
-                                    <li
-                                        onClick={() => {
-                                            navigate('/employees');
-                                            if (isMobile)
-                                                setIsSidebarOpen(false);
-                                        }}
-                                        className={`flex cursor-pointer items-center rounded-lg transition-colors ${isSidebarOpen ? 'justify-start gap-3 px-4' : 'justify-center px-0'} ${location.pathname.startsWith('/employees') ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'} py-3`}
-                                    >
-                                        <Icon.Users />
-                                        {isSidebarOpen && (
-                                            <span className="font-medium">
-                                                {t('dashboard.sidebar.team')}
-                                            </span>
-                                        )}
-                                    </li>
-                                )}
-
-                                {/* Zatwierdzanie Urlopów */}
-                                {(role === 'hr' || role === 'admin') && (
-                                    <li
-                                        onClick={() => {
-                                            navigate('/leave-approvals');
-                                            if (isMobile)
-                                                setIsSidebarOpen(false);
-                                        }}
-                                        className={`flex cursor-pointer items-center rounded-lg transition-colors ${isSidebarOpen ? 'justify-start gap-3 px-4' : 'justify-center px-0'} ${location.pathname.startsWith('/leave-approvals') ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'} py-3`}
-                                    >
-                                        <Icon.Check />
-                                        {isSidebarOpen && (
-                                            <span className="font-medium">
-                                                {t('dashboard.sidebar.approvals')}
-                                            </span>
-                                        )}
-                                    </li>
-                                )}
-
-                                {/* Rejestracja Urlopu */}
-                                {(role === 'employee' || role === 'hr') && (
-                                    <li
-                                        onClick={() => {
-                                            navigate('/myleaves');
-                                            if (isMobile)
-                                                setIsSidebarOpen(false);
-                                        }}
-                                        className={`flex cursor-pointer items-center rounded-lg transition-colors ${isSidebarOpen ? 'justify-start gap-3 px-4' : 'justify-center px-0'} ${location.pathname.startsWith('/myleaves') ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'} py-3`}
-                                    >
-                                        <Icon.Check />
-                                        {isSidebarOpen && (
-                                            <span className="font-medium">
-                                                {t('dashboard.sidebar.leaves')}
-                                            </span>
-                                        )}
-                                    </li>
-                                )}
-
-                                {/* Home */}
-                                <li
-                                    onClick={() => {
-                                        navigate('/');
-                                        if (isMobile) setIsSidebarOpen(false);
-                                    }}
-                                    className={`flex cursor-pointer items-center rounded-lg transition-colors ${isSidebarOpen ? 'justify-start gap-3 px-4' : 'justify-center px-0'} ${location.pathname === '/' ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50'} py-3`}
-                                >
-                                    <Icon.Home />
-                                    {isSidebarOpen && (
-                                        <span className="font-medium">
-                                            {t('dashboard.sidebar.home')}
-                                        </span>
-                                    )}
-                                </li>
-                            </ul>
-                        </nav>
-
-                        <div className="mt-auto">
-                            {isSidebarOpen && (
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full rounded-lg bg-red-50 px-4 py-3 text-left text-sm text-red-700 transition-colors hover:bg-red-100"
-                                >
-                                    {t('dashboard.sidebar.logout')}
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </aside>
-
-                {/* Main content wrapper */}
-                <div
-                    className={`flex h-screen w-full flex-col transition-all duration-300 ${isMobile ? 'pl-0' : isSidebarOpen ? 'pl-64' : 'pl-20'}`}
-                >
-                    {/* Topbar */}
-                    <div className="sticky top-0 z-10 w-full bg-white shadow-sm">
-                        <div className="flex items-center justify-between px-4 py-4 md:px-8">
-                            <div className="flex items-center gap-3">
-                                {/* Hamburger menu na mobile */}
-                                {isMobile && (
-                                    <button
-                                        onClick={() =>
-                                            setIsSidebarOpen(!isSidebarOpen)
-                                        }
-                                        className="text-gray-600 hover:text-gray-800"
-                                    >
-                                        <svg
-                                            className="h-6 w-6"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M4 6h16M4 12h16M4 18h16"
-                                            />
-                                        </svg>
-                                    </button>
-                                )}
-                                <div>
-                                    <h1 className="text-xl font-bold md:text-2xl">
-                                        Dashboard
-                                    </h1>
-                                    <p className="hidden text-xs text-gray-500 sm:block md:text-sm">
-                                        {t('dashboard.welcome', { name: username })}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3 md:gap-6">
-                                {role === 'admin' && (
-                                    <button
-                                        onClick={() =>
-                                            navigate('/generate-code')
-                                        }
-                                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white shadow-sm transition-colors hover:bg-blue-700 md:px-5"
-                                    >
-                                        <Icon.Key />
-                                        <span className="hidden text-sm sm:inline">
-                                            {t('dashboard.generateCode')}
-                                        </span>
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Page content */}
-                    <main className="flex-grow overflow-y-auto">
-                        <div className="grid grid-cols-1 gap-4 p-4 md:gap-4 md:p-6 lg:grid-cols-12">
-                            {/* Stats big card */}
-                            <div className="flex flex-col gap-4 md:gap-4 lg:col-span-8">
-                                <div className="flex max-h-36 items-start justify-between rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 text-white shadow-lg md:p-6">
-                                    <div>
-                                        <div className="text-xs opacity-90 md:text-sm">
-                                            {t(
-                                                `dashboard.stats.${stats[0]?.titleKey}`,
-                                            ) ||
-                                                t(
-                                                    'dashboard.stats.allProjects',
-                                                )}
-                                        </div>
-                                        <div className="mt-2 min-h-[48px] text-3xl font-bold md:text-4xl">
-                                            <AnimatedNumber value={Number(stats[0]?.value || 0)} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-4">
-                                    {/* Stat 2 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
-                                        <div className="text-xs text-gray-500">
-                                            {t(
-                                                `dashboard.stats.${stats[1]?.titleKey}`,
-                                            ) ||
-                                                t(
-                                                    'dashboard.stats.completedFull',
-                                                )}
-                                        </div>
-                                        <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
-                                            <AnimatedNumber value={Number(stats[1]?.value || 0)} />
-                                        </div>
-                                        <div className="mt-2 text-xs text-gray-400 md:text-sm">
-                                            {stats[1]?.hint}
-                                        </div>
-                                    </div>
-
-                                    {/* Stat 3 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
-                                        <div className="text-xs text-gray-500">
-                                            {t(
-                                                `dashboard.stats.${stats[2]?.titleKey}`,
-                                            ) ||
-                                                t('dashboard.stats.inProgress')}
-                                        </div>
-                                        <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
-                                            <AnimatedNumber value={Number(stats[2]?.value || 0)} />
-                                        </div>
-                                        <div className="mt-2 text-xs text-gray-400 md:text-sm">
-                                            {stats[2]?.hint}
-                                        </div>
-                                    </div>
-
-                                    {/* Stat 4 */}
-                                    <div className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm md:p-4">
-                                        <div className="text-xs text-gray-500">
-                                            {t(
-                                                `dashboard.stats.${stats[3]?.titleKey}`,
-                                            ) || t('dashboard.stats.pending')}
-                                        </div>
-                                        <div className="text mt-2 min-h-[28px] font-semibold md:text-xl">
-                                            <AnimatedNumber value={Number(stats[3]?.value || 0)} />
-                                        </div>
-                                        <div className="mt-2 text-xs text-gray-400 md:text-sm">
-                                            {stats[3]?.hint}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Weekly Activity Chart */}
-                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6">
-                                    <div className="mb-4">
-                                        <div className="text-base font-medium">
-                                            {t('dashboard.charts.activityTitle')}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {t('dashboard.charts.newProjects')}
-                                        </div>
-                                    </div>
-                                    <div className="h-48 w-full select-none outline-none [&_*]:outline-none [&_.recharts-wrapper]:outline-none [&_.recharts-surface]:outline-none">
-                                        {weeklyActivity.length === 0 ? (
-                                            <div className="flex h-full items-center justify-center text-sm text-gray-500">
-                                                {t('dashboard.charts.noData')}
-                                            </div>
-                                        ) : (
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart
-                                                    data={weeklyActivity}
-                                                    margin={{ top: 5, right: 10, left: -25, bottom: 5 }}
-                                                >
-                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                                                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#6b7280' }} stroke="#e5e7eb" axisLine={false} tickLine={false} />
-                                                    <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#6b7280' }} stroke="#e5e7eb" axisLine={false} tickLine={false} tickCount={6} interval={0} />
-                                                    <Tooltip
-                                                        cursor={{ fill: 'rgba(52, 211, 153, 0.2)' }}
-                                                        contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}
-                                                        labelStyle={{ fontWeight: 'bold' }}
-                                                        formatter={(value) => [value, t('dashboard.charts.tooltipProject')]}
-                                                        labelFormatter={(label) => {
-                                                            const item = weeklyActivity.find((d) => d.day === label);
-                                                            return item ? moment(item.fullDate).format('DD MMM YYYY') : label;
-                                                        }}
-                                                    />
-                                                    <Bar dataKey="val" fill="#34d399" radius={[10, 10, 0, 0]} barSize={120} />
-                                                </BarChart>
-                                            </ResponsiveContainer>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right column */}
-                            <aside className="space-y-4 md:space-y-4 lg:col-span-4">
-                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-                                    <div className="mb-3 flex items-center justify-between">
-                                        <div className="text-sm font-medium md:text-base">
-                                            {t('dashboard.reminders.title')}
-                                        </div>
-                                        <button className="text-xs text-emerald-600 hover:text-emerald-700 transition-colors">
-                                            {t('common.seeAll')}
-                                        </button>
-                                    </div>
-                                    <div className="text-sm text-gray-600">
-                                        {t('dashboard.reminders.meeting')}
-                                    </div>
-                                    <div className="mt-1 text-xs text-gray-400">
-                                        18:00 - 20:00
-                                    </div>
-                                    <div className="mt-4">
-                                        <button className="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white sm:w-auto hover:bg-emerald-700 transition-colors">
-                                            {t('dashboard.reminders.startBtn')}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-                                    <div className="mb-3 flex items-center justify-between">
-                                        <div className="text-sm font-medium md:text-base">
-                                            {t('dashboard.charts.progressTitle')}
-                                        </div>
-                                        <div className="text-xs text-gray-400 md:text-sm">
-                                            {t('dashboard.charts.general')}
-                                        </div>
-                                    </div>
-                                    <ProjectProgressChart stats={stats} />
-                                </div>
-
-                                {/* Ostatnio dodane projekty lub Moje aktywności */}
-                                {(role === 'hr' || role === 'admin') &&
-                                projects.length > 0 ? (
-                                    <div className="rounded-xl bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-                                        <div className="mb-4 flex items-center justify-between">
-                                            <div className="text-base font-medium">
-                                                {t(
-                                                    'dashboard.recentProjects.title',
-                                                )}
-                                            </div>
-                                            <button
-                                                onClick={() =>
-                                                    navigate('/projekty')
-                                                }
-                                                className="text-xs text-emerald-600 hover:text-emerald-700 transition-colors"
-                                            >
-                                                {t(
-                                                    'dashboard.recentProjects.seeAll',
-                                                )}
-                                            </button>
-                                        </div>
-                                        <ul className="space-y-3">
-                                            {projects.map((project) => (
-                                                <li
-                                                    key={project._id}
-                                                    className="flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors hover:bg-gray-50"
-                                                    onClick={() =>
-                                                        navigate(
-                                                            `/projects/${project._id}`,
-                                                        )
-                                                    }
-                                                >
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="truncate text-sm font-medium">
-                                                            {project.name}
-                                                        </div>
-                                                        <div className="mt-1 text-xs text-gray-500">
-                                                            {t('common.added')}{' '}
-                                                            {moment(
-                                                                project.createdAt,
-                                                            ).fromNow()}
-                                                        </div>
-                                                    </div>
-                                                    <span className="ml-2 text-sm text-gray-400">
-                                                        →
-                                                    </span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ) : null}
-                            </aside>
-                        </div>
-                    </main>
-                    <footer className="flex-shrink-0 p-3 text-center text-xs text-gray-400 md:text-sm">
-                        © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
-                    </footer>
+        <div className="flex h-full flex-col space-y-6 p-6 md:p-8">
+            {/* Header */}
+            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
+                        {t('dashboard.welcome', {
+                            name: user?.firstName || user?.username,
+                        })}
+                    </h1>
+                    <p className="mt-1 text-slate-500">
+                        {t('dashboard.overview')}
+                    </p>
+                </div>
+                <div className="text-sm font-medium text-slate-500">
+                    {format(new Date(), 'EEEE, d MMMM yyyy', {
+                        locale: i18n.language === 'pl' ? pl : undefined,
+                    })}
                 </div>
             </div>
+
+            {/* Top Section: Stats Cards + Project Progress */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                {/* Stats Cards (Left Side) */}
+                <div className="col-span-1 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-8 lg:grid-cols-4">
+                    {stats.map((stat) => (
+                        <Card
+                            key={stat.id}
+                            className="border-slate-200 shadow-sm transition-all hover:shadow-md"
+                        >
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium text-slate-600">
+                                    {t(`dashboard.stats.${stat.titleKey}`)}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-slate-900">
+                                    <AnimatedNumber value={stat.value} />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Project Progress Chart (Right Side) */}
+                <Card className="col-span-1 border-slate-200 shadow-sm lg:col-span-4">
+                    <CardContent className="flex h-full items-center justify-center p-0">
+                        <ProjectProgressChart stats={stats} />
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Middle Section: Weekly Activity */}
+            <Card className="border-slate-200 shadow-sm">
+                <CardHeader>
+                    <CardTitle>{t('dashboard.charts.activity')}</CardTitle>
+                    <CardDescription>
+                        {t('dashboard.charts.activityDesc')}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="pl-0">
+                    <div className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={weeklyActivity}>
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                    stroke="#e2e8f0"
+                                />
+                                <XAxis
+                                    dataKey="day"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                    dy={10}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                />
+                                <Tooltip
+                                    cursor={{ fill: '#f1f5f9' }}
+                                    contentStyle={{
+                                        backgroundColor: '#fff',
+                                        border: '1px solid #e2e8f0',
+                                        borderRadius: '8px',
+                                        boxShadow:
+                                            '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                                    }}
+                                />
+                                <Bar
+                                    dataKey="val"
+                                    fill="#10B981"
+                                    radius={[4, 4, 0, 0]}
+                                    barSize={40}
+                                />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Recent Projects */}
+            <Card className="border-slate-200 shadow-sm">
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>
+                            {t('dashboard.recentProjects.title')}
+                        </CardTitle>
+                        <CardDescription>
+                            {t('dashboard.recentProjects.desc')}
+                        </CardDescription>
+                    </div>
+                    <Button
+                        variant="ghost"
+                        className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                        onClick={() => navigate('/projects')}
+                    >
+                        {t('common.viewAll')}{' '}
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {projects.length > 0 ? (
+                            projects.map((project) => (
+                                <div
+                                    key={project._id}
+                                    className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-100 p-4 transition-colors hover:bg-slate-50"
+                                    onClick={() =>
+                                        navigate(`/projects/${project._id}`)
+                                    }
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div
+                                            className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                                                project.status === 'completed'
+                                                    ? 'bg-emerald-100 text-emerald-600'
+                                                    : project.status ===
+                                                        'in_progress'
+                                                      ? 'bg-amber-100 text-amber-600'
+                                                      : 'bg-slate-100 text-slate-600'
+                                            }`}
+                                        >
+                                            <div className="h-2 w-2 rounded-full bg-current" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-medium text-slate-900">
+                                                {project.name}
+                                            </h3>
+                                            <p className="text-sm text-slate-500">
+                                                {t('common.deadline')}:{' '}
+                                                {(() => {
+                                                    try {
+                                                        return project.endDate
+                                                            ? format(
+                                                                  new Date(
+                                                                      project.endDate,
+                                                                  ),
+                                                                  'dd MMM yyyy',
+                                                                  {
+                                                                      locale:
+                                                                          i18n.language ===
+                                                                          'pl'
+                                                                              ? pl
+                                                                              : undefined,
+                                                                  },
+                                                              )
+                                                            : t(
+                                                                  'common.notSpecified',
+                                                              );
+                                                    } catch (e) {
+                                                        return t(
+                                                            'common.invalidDate',
+                                                        );
+                                                    }
+                                                })()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-sm font-medium text-slate-900">
+                                            {
+                                                project.tasks?.filter(
+                                                    (t) =>
+                                                        t.status ===
+                                                        'completed',
+                                                ).length
+                                            }
+                                            /{project.tasks?.length || 0}
+                                        </div>
+                                        <p className="text-xs text-slate-500">
+                                            {t('common.tasks')}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="py-8 text-center text-slate-500">
+                                {t('dashboard.noProjects')}
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            <footer className="mt-8 text-center text-xs text-slate-400">
+                © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
+            </footer>
         </div>
     );
 }
