@@ -2,7 +2,12 @@ import { StrictMode, useEffect, Suspense } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    useNavigate,
+} from 'react-router-dom';
 import './styles/fonts.css';
 import './styles/index.css';
 import Login from './pages/Login.jsx';
@@ -27,6 +32,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './pages/ErrorBoundary.jsx';
 import LoadingScreen from './components/LoadingScreen.jsx';
+import Layout from './components/layout/Layout.jsx';
 
 // Komponent do obsługi globalnych błędów autoryzacji
 const AuthErrorHandler = () => {
@@ -35,7 +41,9 @@ const AuthErrorHandler = () => {
 
     useEffect(() => {
         const handleAuthError = () => {
-            console.log("Wykryto błąd autoryzacji. Wylogowywanie i przekierowywanie.");
+            console.log(
+                'Wykryto błąd autoryzacji. Wylogowywanie i przekierowywanie.',
+            );
             logout();
             navigate('/login');
         };
@@ -50,7 +58,6 @@ const AuthErrorHandler = () => {
     return null; // Ten komponent niczego nie renderuje
 };
 
-
 // ====================================================================
 // Główny komponent aplikacji
 // ====================================================================
@@ -60,43 +67,90 @@ createRoot(document.getElementById('root')).render(
             <AuthProvider>
                 <I18nextProvider i18n={i18n}>
                     <Suspense fallback={<LoadingScreen />}>
-                    <Router>
-                        <AuthErrorHandler />
-                        <Toaster
-                        containerStyle={{ zIndex: 9999 }}
-                        position="top-center"
-                        reverseOrder={false}
-                        toastOptions={{
-                            duration: 5000,
-                            style: { background: '#333', color: '#fff' },
-                        }}
-                    />
-                    <Routes>
-                        <Route path="/" element={<App />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/forgot-password" element={<Forgot />} />
-                        <Route path="/regulamin" element={<Regulamin />} />
-                        <Route path="/polityka-prywatnosci" element={<Polityka />} />
-                    
-                        <Route element={<ProtectedRoute />}>
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/employees" element={<EmployeeList />} />
-                            <Route path="/projekty" element={<Projekty />} />
-                            
-                            <Route path="/projects/:id" element={<ProjectDetails />} />
-                            <Route path="/employees/:id" element={<UserDetails />} />
-                            <Route path="/myleaves" element={<MyLeaves />} />
-                            <Route path="/leave-approvals" element={<LeaveApprovals />} />
-                            <Route path="/upload" element={<Upload />} />
-                            <Route path="/generate-code" element={<GenerateCode />} />
-                            <Route path="/force-password-change" element={<ForcePasswordChange />} />
-                        </Route>
-                    </Routes>
-                </Router>
-                </Suspense>
+                        <Router>
+                            <AuthErrorHandler />
+                            <Toaster
+                                containerStyle={{ zIndex: 9999 }}
+                                position="top-center"
+                                reverseOrder={false}
+                                toastOptions={{
+                                    duration: 5000,
+                                    style: {
+                                        background: '#333',
+                                        color: '#fff',
+                                    },
+                                }}
+                            />
+                            <Routes>
+                                <Route path="/" element={<App />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route
+                                    path="/register"
+                                    element={<Register />}
+                                />
+                                <Route
+                                    path="/forgot-password"
+                                    element={<Forgot />}
+                                />
+                                <Route
+                                    path="/regulamin"
+                                    element={<Regulamin />}
+                                />
+                                <Route
+                                    path="/polityka-prywatnosci"
+                                    element={<Polityka />}
+                                />
+
+                                <Route element={<ProtectedRoute />}>
+                                    <Route element={<Layout />}>
+                                        <Route
+                                            path="/dashboard"
+                                            element={<Dashboard />}
+                                        />
+                                        <Route
+                                            path="/employees"
+                                            element={<EmployeeList />}
+                                        />
+                                        <Route
+                                            path="/projects"
+                                            element={<Projekty />}
+                                        />
+
+                                        <Route
+                                            path="/projects/:id"
+                                            element={<ProjectDetails />}
+                                        />
+                                        <Route
+                                            path="/employees/:id"
+                                            element={<UserDetails />}
+                                        />
+                                        <Route
+                                            path="/myleaves"
+                                            element={<MyLeaves />}
+                                        />
+                                        <Route
+                                            path="/leave-approvals"
+                                            element={<LeaveApprovals />}
+                                        />
+                                        <Route
+                                            path="/upload"
+                                            element={<Upload />}
+                                        />
+                                        <Route
+                                            path="/generate-code"
+                                            element={<GenerateCode />}
+                                        />
+                                        <Route
+                                            path="/force-password-change"
+                                            element={<ForcePasswordChange />}
+                                        />
+                                    </Route>
+                                </Route>
+                            </Routes>
+                        </Router>
+                    </Suspense>
                 </I18nextProvider>
             </AuthProvider>
         </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
 );

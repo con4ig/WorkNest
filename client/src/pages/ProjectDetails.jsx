@@ -218,7 +218,9 @@ const CommentItem = ({
                                 onKeyPress={(e) =>
                                     e.key === 'Enter' && handleReply()
                                 }
-                                placeholder={t('projects.details.replyPlaceholder')}
+                                placeholder={t(
+                                    'projects.details.replyPlaceholder',
+                                )}
                                 className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
                             />{' '}
                             <button
@@ -508,7 +510,8 @@ export default function ProjectDetails() {
         if (!activity.action) return activity.description;
 
         const { action, metadata } = activity;
-        const translateStatus = (status) => t(`common.taskStatus.${status}`) || status;
+        const translateStatus = (status) =>
+            t(`common.taskStatus.${status}`) || status;
 
         switch (action) {
             case 'task_created':
@@ -551,7 +554,7 @@ export default function ProjectDetails() {
             <aside className="flex w-full flex-col border-r border-gray-200 bg-white p-4 lg:min-h-screen lg:w-[380px] lg:p-8">
                 <div className="mb-8 flex items-center gap-3">
                     <button
-                        onClick={() => navigate('/projekty')}
+                        onClick={() => navigate('/projects')}
                         className="rounded-lg bg-slate-100 p-2.5 transition-colors hover:bg-slate-200"
                     >
                         <Icon.Back />
@@ -592,8 +595,14 @@ export default function ProjectDetails() {
                             </div>
                         ) : (
                             <p className="text-base font-bold text-gray-800 sm:text-lg">
-                                {formatDateForDisplay(project.startDate, i18nInstance.language) &&
-                                formatDateForDisplay(project.endDate, i18nInstance.language)
+                                {formatDateForDisplay(
+                                    project.startDate,
+                                    i18nInstance.language,
+                                ) &&
+                                formatDateForDisplay(
+                                    project.endDate,
+                                    i18nInstance.language,
+                                )
                                     ? `${formatDateForDisplay(project.startDate, i18nInstance.language)} - ${formatDateForDisplay(project.endDate, i18nInstance.language)}`
                                     : t('projects.details.notSpecified')}
                             </p>
@@ -637,7 +646,9 @@ export default function ProjectDetails() {
                                 <span
                                     className={`rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(project.status)}`}
                                 >
-                                    {t(`common.projectStatus.${project.status}`)}
+                                    {t(
+                                        `common.projectStatus.${project.status}`,
+                                    )}
                                 </span>
                                 <span
                                     className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${getPriorityClasses(project.priority)}`}
@@ -649,7 +660,10 @@ export default function ProjectDetails() {
                     </StatCard>
 
                     {/* Statystyki zadań */}
-                    <StatCard icon={<Icon.ListTodo />} title={t('projects.details.statCardTitle')}>
+                    <StatCard
+                        icon={<Icon.ListTodo />}
+                        title={t('projects.details.statCardTitle')}
+                    >
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">
@@ -693,7 +707,12 @@ export default function ProjectDetails() {
                             {project.createdBy.username}
                         </span>
                     </p>
-                    <p>{formatDateForDisplay(project.createdAt, i18nInstance.language)}</p>
+                    <p>
+                        {formatDateForDisplay(
+                            project.createdAt,
+                            i18nInstance.language,
+                        )}
+                    </p>
                 </div>
             </aside>
 
@@ -708,7 +727,9 @@ export default function ProjectDetails() {
                                 value={editData.name}
                                 onChange={handleEditChange}
                                 className="w-full border-b-2 border-white/50 bg-transparent text-3xl font-extrabold tracking-tight text-white placeholder:text-white/70 focus:outline-none sm:text-4xl lg:text-5xl"
-                                placeholder={t('projects.details.projectNamePlaceholder')}
+                                placeholder={t(
+                                    'projects.details.projectNamePlaceholder',
+                                )}
                             />
                         ) : (
                             <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
@@ -728,7 +749,10 @@ export default function ProjectDetails() {
                                                 t('projects.details.saving')
                                             ) : (
                                                 <>
-                                                    <Icon.Save /> {t('projects.details.saveChanges')}
+                                                    <Icon.Save />{' '}
+                                                    {t(
+                                                        'projects.details.saveChanges',
+                                                    )}
                                                 </>
                                             )}
                                         </button>
@@ -739,7 +763,8 @@ export default function ProjectDetails() {
                                             }}
                                             className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-black/30 sm:px-5 sm:py-2.5"
                                         >
-                                            <Icon.Cancel /> {t('projects.details.cancel')}
+                                            <Icon.Cancel />{' '}
+                                            {t('projects.details.cancel')}
                                         </button>
                                     </>
                                 ) : (
@@ -748,7 +773,8 @@ export default function ProjectDetails() {
                                             onClick={() => setIsEditing(true)}
                                             className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-bold text-slate-800 shadow-lg transition-all hover:bg-slate-200 sm:px-5 sm:py-2.5"
                                         >
-                                            <Icon.Edit /> {t('projects.details.edit')}
+                                            <Icon.Edit />{' '}
+                                            {t('projects.details.edit')}
                                         </button>
                                         <button
                                             onClick={() =>
@@ -756,7 +782,8 @@ export default function ProjectDetails() {
                                             }
                                             className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all hover:bg-black/30 sm:px-5 sm:py-2.5"
                                         >
-                                            <Icon.User /> {t('projects.details.manageTeam')}
+                                            <Icon.User />{' '}
+                                            {t('projects.details.manageTeam')}
                                         </button>
                                     </>
                                 )}
@@ -767,7 +794,10 @@ export default function ProjectDetails() {
 
                 <div className="animate-fade-in space-y-8">
                     {/* OPIS PROJEKTU */}
-                    <ContentCard icon={<Icon.Info />} title={t('projects.details.description')}>
+                    <ContentCard
+                        icon={<Icon.Info />}
+                        title={t('projects.details.description')}
+                    >
                         {isEditing && isAdmin ? (
                             <textarea
                                 name="description"
@@ -775,7 +805,9 @@ export default function ProjectDetails() {
                                 onChange={handleEditChange}
                                 rows="6"
                                 className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                placeholder={t('projects.details.addDescriptionPlaceholder')}
+                                placeholder={t(
+                                    'projects.details.addDescriptionPlaceholder',
+                                )}
                             />
                         ) : (
                             <p className="whitespace-pre-wrap leading-relaxed text-gray-600">
@@ -852,7 +884,9 @@ export default function ProjectDetails() {
                                     onKeyPress={(e) =>
                                         e.key === 'Enter' && handleAddComment()
                                     }
-                                    placeholder={t('projects.details.addCommentPlaceholder')}
+                                    placeholder={t(
+                                        'projects.details.addCommentPlaceholder',
+                                    )}
                                     className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none"
                                 />
                                 <button
@@ -896,7 +930,9 @@ export default function ProjectDetails() {
                                 }
                                 className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
                             >
-                                {showActivities ? t('projects.details.hide') : t('projects.details.show')}
+                                {showActivities
+                                    ? t('projects.details.hide')
+                                    : t('projects.details.show')}
                                 {showActivities ? (
                                     <Icon.ChevronDown />
                                 ) : (
@@ -930,7 +966,9 @@ export default function ProjectDetails() {
                                                     <span className="font-semibold">
                                                         {activity.user.username}
                                                     </span>{' '}
-                                                    {renderActivityDescription(activity)}
+                                                    {renderActivityDescription(
+                                                        activity,
+                                                    )}
                                                 </p>
                                                 <p className="mt-1 text-xs text-gray-400">
                                                     {moment(
