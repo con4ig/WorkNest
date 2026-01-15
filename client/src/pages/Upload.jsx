@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Upload, X, Check, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api.js';
 
 function ProfileImageUpload() {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { refreshUser } = useAuth();
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -60,6 +62,11 @@ function ProfileImageUpload() {
 
             setSuccess(true);
 
+            // Odśwież dane użytkownika (w tym zdjęcie)
+            await refreshUser();
+
+            setSuccess(true);
+
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1500);
@@ -80,11 +87,6 @@ function ProfileImageUpload() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-50 p-4">
             {/* Floating shapes for decoration */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="animate-blob absolute left-20 top-20 h-64 w-64 rounded-full bg-emerald-200 opacity-20 mix-blend-multiply blur-xl filter"></div>
-                <div className="animate-blob animation-delay-2000 absolute right-20 top-40 h-64 w-64 rounded-full bg-emerald-300 opacity-20 mix-blend-multiply blur-xl filter"></div>
-                <div className="animate-blob animation-delay-4000 absolute -bottom-8 left-1/2 h-64 w-64 rounded-full bg-emerald-100 opacity-20 mix-blend-multiply blur-xl filter"></div>
-            </div>
 
             <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
                 {/* Back button */}
@@ -133,15 +135,15 @@ function ProfileImageUpload() {
                                     )}
                                 </div>
                             ) : (
-                                <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-dashed border-gray-300 bg-gray-50 sm:h-40 sm:w-40">
-                                    <Upload className="h-10 w-10 text-gray-400 sm:h-12 sm:w-12" />
+                                <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-dashed border-slate-200 bg-slate-50 transition-colors duration-300 hover:border-emerald-400 hover:bg-emerald-50 sm:h-40 sm:w-40">
+                                    <Upload className="h-10 w-10 text-slate-400 sm:h-12 sm:w-12" />
                                 </div>
                             )}
                         </div>
 
                         {/* File input - styled */}
                         <label className="group relative block cursor-pointer">
-                            <div className="flex transform items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-md transition-all hover:scale-105 hover:shadow-lg group-hover:from-emerald-600 group-hover:to-emerald-700 sm:text-base">
+                            <div className="flex transform items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow-md active:scale-95 sm:text-base">
                                 <Upload className="h-5 w-5" />
                                 <span>
                                     {preview
@@ -165,10 +167,12 @@ function ProfileImageUpload() {
 
                     {/* Error message */}
                     {error && (
-                        <div className="animate-shake rounded-lg border-l-4 border-red-500 bg-red-50 p-4">
-                            <div className="flex items-center gap-2">
-                                <X className="h-5 w-5 flex-shrink-0 text-red-500" />
-                                <p className="text-sm font-medium text-red-700">
+                        <div className="animate-in fade-in slide-in-from-bottom-2 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 shadow-sm duration-300">
+                            <div className="flex items-center gap-3">
+                                <div className="rounded-full bg-red-100 p-1">
+                                    <X className="h-4 w-4 text-red-600" />
+                                </div>
+                                <p className="text-sm font-medium text-red-800">
                                     {error}
                                 </p>
                             </div>
@@ -177,12 +181,16 @@ function ProfileImageUpload() {
 
                     {/* Success message */}
                     {success && (
-                        <div className="rounded-lg border-l-4 border-emerald-500 bg-emerald-50 p-4">
-                            <div className="flex items-center gap-2">
-                                <Check className="h-5 w-5 flex-shrink-0 text-emerald-500" />
-                                <p className="text-sm font-medium text-emerald-700">
+                        <div className="animate-in fade-in slide-in-from-bottom-2 rounded-lg border-l-4 border-emerald-500 bg-emerald-50 p-4 shadow-sm duration-300">
+                            <div className="flex items-center gap-3">
+                                <div className="rounded-full bg-emerald-100 p-1">
+                                    <Check className="h-4 w-4 text-emerald-600" />
+                                </div>
+                                <p className="text-sm font-medium text-emerald-800">
                                     {t('upload.successMessage')}
-                                    {t('common.redirecting')}...
+                                    <span className="ml-1 opacity-75">
+                                        {t('common.redirecting')}...
+                                    </span>
                                 </p>
                             </div>
                         </div>
@@ -194,7 +202,7 @@ function ProfileImageUpload() {
                             <button
                                 type="submit"
                                 disabled={loading || !image}
-                                className="flex-1 transform rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 font-medium text-white shadow-md transition-all hover:scale-105 hover:from-emerald-600 hover:to-emerald-700 hover:shadow-lg disabled:transform-none disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-400"
+                                className="flex-1 transform rounded-xl bg-emerald-600 px-6 py-3 font-medium text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
                             >
                                 {loading ? (
                                     <span className="flex items-center justify-center gap-2">
@@ -234,35 +242,7 @@ function ProfileImageUpload() {
                 </div>
             </div>
 
-            <style>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-        
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-10px); }
-          75% { transform: translateX(10px); }
-        }
-        
-        .animate-shake {
-          animation: shake 0.4s ease-in-out;
-        }
-      `}</style>
+            {/* Simple professional background subtle pattern/gradient is handled by parent classes */}
         </div>
     );
 }
