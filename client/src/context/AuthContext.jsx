@@ -6,69 +6,81 @@ export const AuthContext = createContext();
 
 // Dodaj ten hook, aby ułatwić dostęp do kontekstu
 export const useAuth = () => {
-  return useContext(AuthContext);
+    return useContext(AuthContext);
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  // Sprawdzanie stanu zalogowania przy starcie aplikacji
-  useEffect(() => {
-    const checkLoggedIn = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
+    // Sprawdzanie stanu zalogowania przy starcie aplikacji
+    useEffect(() => {
+        const checkLoggedIn = async () => {
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+                try {
+                    // 2. UŻYJ `api` ZAMIAST `axios`
+                    const { data } = await api.get('/users/me'); // POPRAWNY ENDPOINT: /users/me
+                    setUser(data);
+                } catch (error) {
+                    console.error('Sesja wygasła lub błąd tokenu', error);
+                    localStorage.removeItem('accessToken'); // Czyścimy zły token
+                }
+            }
+            setLoading(false);
+        };
+        checkLoggedIn();
+    }, []);
+
+    const login = async (email, password) => {
         try {
-          // 2. UŻYJ `api` ZAMIAST `axios`
-          const { data } = await api.get('/users/me'); // POPRAWNY ENDPOINT: /users/me
-          setUser(data);
+            // 3. UŻYJ `api` ZAMIAST `axios`
+            const { data } = await api.post('/auth/login', { email, password });
+            localStorage.setItem('accessToken', data.accessToken);
+            setUser(data.user);
+            return data;
         } catch (error) {
-          console.error("Sesja wygasła lub błąd tokenu", error);
-          localStorage.removeItem('accessToken'); // Czyścimy zły token
+            console.error('Błąd logowania:', error);
+            throw error; // Rzuć błąd dalej, aby komponent logowania mógł go obsłużyć
         }
-      }
-      setLoading(false);
     };
-    checkLoggedIn();
-  }, []);
 
-  const login = async (email, password) => {
-    try {
-      // 3. UŻYJ `api` ZAMIAST `axios`
-      const { data } = await api.post('/auth/login', { email, password });
-      localStorage.setItem('accessToken', data.accessToken);
-      setUser(data.user);
-      return data;
-    } catch (error) {
-      console.error("Błąd logowania:", error);
-      throw error; // Rzuć błąd dalej, aby komponent logowania mógł go obsłużyć
-    }
-  };
+    const logout = () => {
+        localStorage.removeItem('accessToken');
+        setUser(null);
+        // Opcjonalnie wywołanie endpointu wylogowującego na backendzie
+        // api.post('/auth/logout');
+    };
 
-  const logout = () => {
-    localStorage.removeItem('accessToken');
-    setUser(null);
-    // Opcjonalnie wywołanie endpointu wylogowującego na backendzie
-    // api.post('/auth/logout');
-  };
+    const demoLogin = async () => {
+        try {
+            const { data } = await api.post('/auth/demo-login');
+            localStorage.setItem('accessToken', data.accessToken);
+            setUser(data.user);
+            setUser(data.user);
+            return data;
+        } catch (error) {
+            console.error('Błąd logowania demo:', error);
+            throw error;
+        }
+    };
 
-  const demoLogin = async () => {
-    try {
-      const { data } = await api.post('/auth/demo-login');
-      localStorage.setItem('accessToken', data.accessToken);
-      setUser(data.user);
-      return data;
-    } catch (error) {
-      console.error("Błąd logowania demo:", error);
-      throw error;
-    }
-  };
+    // Funkcja do odświeżania danych użytkownika (np. po zmianie zdjęcia profilowego)
+    const refreshUser = async () => {
+        try {
+            const { data } = await api.get('/users/me');
+            setUser(data);
+            return data;
+        } catch (error) {
+            console.error('Błąd odświeżania danych użytkownika:', error);
+        }
+    };
 
-  const value = { user, loading, login, logout, demoLogin };
+    const value = { user, loading, login, logout, demoLogin, refreshUser };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider value={value}>
+            {!loading && children}
+        </AuthContext.Provider>
+    );
 };
