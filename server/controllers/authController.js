@@ -124,19 +124,19 @@ export const register = async (req, res) => {
 
       // Sprawdź czy kod nie został zużyty (dla bezpieczeństwa, choć expiresAt powinno wystarczyć, jeśli usuwamy)
       if (invitation.maxUses > 0 && invitation.uses >= invitation.maxUses) {
-         return res.status(400).json({ message: "Limit użyć tego kodu został wyczerpany" });
+        return res.status(400).json({ message: "Limit użyć tego kodu został wyczerpany" });
       }
 
       companyId = invitation.company;
-      
+
       // Zwiększ licznik użyć
       invitation.uses += 1;
-      
+
       // Jeśli osiągnięto limit -> usuń kod, w przeciwnym razie zapisz zaktualizowany licznik
       if (invitation.maxUses > 0 && invitation.uses >= invitation.maxUses) {
-         await Invitation.findByIdAndDelete(invitation._id);
+        await Invitation.findByIdAndDelete(invitation._id);
       } else {
-         await invitation.save();
+        await invitation.save();
       }
 
       const newUser = new User({
@@ -267,7 +267,7 @@ export const refresh = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -275,283 +275,217 @@ export const logout = (req, res) => {
     path: "/",
   };
 
+  try {
+    // Jeśli to użytkownik demo, wyczyść cały sandbox przy wylogowaniu
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken) {
+      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      const user = await User.findById(decoded._id);
+      if (user && user.isDemo && user.company) {
+        const companyId = user.company;
+        console.log(`🧹 Czyszczenie sandboxu demo dla firmy: ${companyId}`);
+        await User.deleteMany({ company: companyId, isDemo: true });
+        await Leave.deleteMany({ company: companyId });
+        await Project.deleteMany({ company: companyId });
+        await Task.deleteMany({ company: companyId });
+        await Company.deleteOne({ _id: companyId, isDemo: true });
+        console.log(`✅ Sandbox demo wyczyszczony.`);
+      }
+    }
+  } catch (err) {
+    // Błąd czyszczenia nie powinien blokować wylogowania
+    console.warn("Błąd podczas czyszczenia sandboxu demo:", err.message);
+  }
+
   res.clearCookie("refreshToken", cookieOptions);
   res.clearCookie("token", cookieOptions);
-
   res.json({ message: "Wylogowano pomyślnie" });
 };
 
 export const changePassword = async (req, res) => {
-    try {
-        const { newPassword } = req.body;
-        const userId = req.user._id;
+  try {
+    const { newPassword } = req.body;
+    const userId = req.user._id;
 
-        if (!newPassword || newPassword.length < 6) {
-            return res.status(400).json({ message: "Hasło musi mieć co najmniej 6 znaków" });
-        }
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: "Użytkownik nie znaleziony" });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-        user.password = hashedPassword;
-        user.mustChangePassword = false;
-        await user.save();
-
-        res.json({ message: "Hasło zostało zmienione pomyślnie" });
-
-    } catch (err) {
-        console.error("Change password error:", err);
-        res.status(500).json({ message: "Błąd serwera podczas zmiany hasła" });
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: "Hasło musi mieć co najmniej 6 znaków" });
     }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.mustChangePassword = false;
+    await user.save();
+
+    res.json({ message: "Hasło zostało zmienione pomyślnie" });
+
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ message: "Błąd serwera podczas zmiany hasła" });
+  }
 };
 
 export const demoLogin = async (req, res) => {
+  try {
+    // 1. Generate unique suffix for this demo session
+    const demoSuffix = crypto.randomBytes(4).toString("hex");
+    const DEMO_EMAIL = `demo-${demoSuffix}@worknest.com`;
+    const DEMO_COMPANY_NAME = `Demo Company ${demoSuffix}`;
+
+    // TTL: 24 godziny jako fallback (cleanup przy wylogowaniu jest główną metodą)
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    const session = await mongoose.startSession();
+
     try {
-        const DEMO_EMAIL = 'demo@worknest.com';
-        const DEMO_COMPANY_NAME = 'Demo Company';
+      await session.withTransaction(async () => {
+        // DO NOT wipe anymore - we create unique sessions
 
-        const session = await mongoose.startSession();
-        
-        try {
-            await session.withTransaction(async () => {
-                // 1. Find existing Demo Company
-                const existingCompany = await Company.findOne({ name: DEMO_COMPANY_NAME }).session(session);
-                
-                if (existingCompany) {
-                    // Wipe everything related to this company
-                    const companyId = existingCompany._id;
-                    await User.deleteMany({ company: companyId }).session(session);
-                    await Leave.deleteMany({ company: companyId }).session(session);
-                    await Project.deleteMany({ company: companyId }).session(session);
-                    await Task.deleteMany({ company: companyId }).session(session);
-                    await Company.deleteOne({ _id: companyId }).session(session);
-                }
+        // 2. Create Fresh Demo Environment & Users
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash('demo123', salt);
+        const invitationCode = crypto.randomBytes(8).toString("hex");
 
-                // 2. Create Fresh Demo Environment & Users (Circular dependency handling)
-                const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash('demo123', salt);
-                const invitationCode = crypto.randomBytes(8).toString("hex");
-
-                // Prepare Company instance (do not save yet)
-                const newCompany = new Company({
-                    name: DEMO_COMPANY_NAME,
-                    invitationCode,
-                    // owner will be set below
-                });
-
-                // Prepare Admin instance
-                const demoAdmin = new User({
-                    username: 'Demo Admin',
-                    email: DEMO_EMAIL,
-                    password: hashedPassword,
-                    role: 'admin',
-                    company: newCompany._id,
-                    position: 'CEO',
-                    department: 'Management'
-                });
-
-                // Link Owner to Company
-                newCompany.owner = demoAdmin._id;
-
-                // Save both (order doesn't strict matter for validation as long as fields are set)
-                await newCompany.save({ session });
-                await demoAdmin.save({ session });
-
-                // HR
-                const demoHR = new User({
-                    username: 'Anna HR',
-                    email: 'hr@demo.com',
-                    password: hashedPassword,
-                    role: 'hr',
-                    company: newCompany._id,
-                    position: 'HR Manager',
-                    department: 'HR'
-                });
-                await demoHR.save({ session });
-
-                // Employee
-                const demoEmp = new User({
-                    username: 'Jan Pracownik',
-                    email: 'employee@demo.com',
-                    password: hashedPassword,
-                    role: 'employee',
-                    company: newCompany._id,
-                    position: 'Developer',
-                    department: 'IT',
-                    salary: 8000
-                });
-                await demoEmp.save({ session });
-
-                // 4. Create Sample Data (Leaves)
-                const today = new Date();
-                
-                // Active leave for employee (Approved)
-                const approvedLeave = new Leave({
-                    user: demoEmp._id,
-                    company: newCompany._id,
-                    leaveType: 'vacation',
-                    startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
-                    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5),
-                    days: 5,
-                    reason: 'Wakacje na Majorce',
-                    status: 'approved',
-                    reviewedBy: demoHR._id,
-                    reviewedAt: new Date()
-                });
-                await approvedLeave.save({ session });
-
-                // Pending leave for employee
-                const pendingLeave = new Leave({
-                    user: demoEmp._id,
-                    company: newCompany._id,
-                    leaveType: 'sick',
-                    startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 10),
-                    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 12),
-                    days: 3,
-                    reason: 'Planowany zabieg',
-                    status: 'pending'
-                });
-                await pendingLeave.save({ session });
-
-                 // Rejected leave for employee
-                 const rejectedLeave = new Leave({
-                    user: demoEmp._id,
-                    company: newCompany._id,
-                    leaveType: 'on_demand',
-                    startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 5),
-                    endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 4),
-                    days: 2,
-                    reason: 'Nagła sprawa',
-                    status: 'rejected',
-                    reviewedBy: demoAdmin._id,
-                    reviewedAt: new Date(),
-                    reviewNote: 'Brak dostępnych dni'
-                });
-                await rejectedLeave.save({ session });
-                // 5. Create Sample Projects
-                const projectWeb = new Project({
-                    name: 'Nowa Strona Internetowa',
-                    description: 'Kompleksowa przebudowa strony firmowej z nowym designem i funkcjonalnościami e-commerce.',
-                    status: 'running',
-                    priority: 'high',
-                    startDate: new Date(),
-                    endDate: new Date(today.getFullYear(), today.getMonth() + 2, today.getDate()),
-                    createdBy: demoAdmin._id,
-                    company: newCompany._id,
-                    assignedUsers: [demoAdmin._id, demoEmp._id],
-                    progress: 35
-                });
-                await projectWeb.save({ session });
-
-                const projectMarketing = new Project({
-                    name: 'Kampania Q4',
-                    description: 'Przygotowanie materiałów promocyjnych na czwarty kwartał.',
-                    status: 'pending',
-                    priority: 'medium',
-                    startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5),
-                    endDate: new Date(today.getFullYear(), today.getMonth() + 1, today.getDate()),
-                    createdBy: demoAdmin._id,
-                    company: newCompany._id,
-                    assignedUsers: [demoHR._id],
-                    progress: 0
-                });
-                await projectMarketing.save({ session });
-
-                const projectLegacy = new Project({
-                    name: 'Migracja Bazy Danych',
-                    description: 'Przeniesienie danych ze starego systemu ERP. Projekt zakończony sukcesem.',
-                    status: 'completed',
-                    priority: 'critical',
-                    startDate: new Date(today.getFullYear(), today.getMonth() - 2, today.getDate()),
-                    endDate: new Date(today.getFullYear(), today.getMonth() - 1, today.getDate()),
-                    createdBy: demoAdmin._id,
-                    company: newCompany._id,
-                    assignedUsers: [demoAdmin._id],
-                    progress: 100
-                });
-                await projectLegacy.save({ session });
-
-                // 6. Create Sample Tasks
-                const task1 = new Task({
-                    title: 'Przygotowanie makiet UX',
-                    description: 'Stworzenie wstępnych makiet strony głównej i podstrony oferty.',
-                    status: 'in-progress',
-                    priority: 'high',
-                    dueDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7),
-                    project: projectWeb._id,
-                    assignedUser: demoEmp._id,
-                    createdBy: demoAdmin._id,
-                    company: newCompany._id
-                });
-                await task1.save({ session });
-
-                const task2 = new Task({
-                    title: 'Konfiguracja serwera',
-                    description: 'Postawienie środowiska deweloperskiego i konfiguracja bazy danych.',
-                    status: 'completed',
-                    priority: 'medium',
-                    dueDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2),
-                    project: projectWeb._id,
-                    assignedUser: demoEmp._id,
-                    createdBy: demoAdmin._id,
-                    company: newCompany._id
-                });
-                await task2.save({ session });
-
-                const task3 = new Task({
-                    title: 'Lista słów kluczowych',
-                    description: 'Analiza słów kluczowych pod kątem SEO.',
-                    status: 'todo',
-                    priority: 'low',
-                    dueDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14),
-                    project: projectMarketing._id,
-                    assignedUser: demoHR._id,
-                    createdBy: demoAdmin._id,
-                    company: newCompany._id
-                });
-                await task3.save({ session });
-            });
-        } finally {
-            session.endSession();
-        }
-
-        // 5. Login as Demo Admin
-        const user = await User.findOne({ email: DEMO_EMAIL }).populate("company", "name");
-        
-        const accessToken = generateAccessToken(user);
-        const refreshToken = generateRefreshToken(user);
-
-        const cookieOptions = {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: "/",
-        };
-
-        res.cookie("refreshToken", refreshToken, cookieOptions);
-
-        res.json({
-            message: "Zalogowano do wersji Demo",
-            accessToken,
-            user: {
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                company: user.company,
-                profileImage: user.profileImage || "",
-                mustChangePassword: false,
-            },
+        const newCompany = new Company({
+          name: DEMO_COMPANY_NAME,
+          invitationCode,
+          isDemo: true,
+          expiresAt
         });
 
-    } catch (err) {
-        console.error("Demo login error:", err);
-        res.status(500).json({ message: "Błąd podczas generowania wersji demo" });
+        const demoAdmin = new User({
+          username: `Demo Admin ${demoSuffix}`,
+          email: DEMO_EMAIL,
+          password: hashedPassword,
+          role: 'admin',
+          company: newCompany._id,
+          position: 'CEO',
+          department: 'Management',
+          isDemo: true,
+          expiresAt
+        });
+
+        newCompany.owner = demoAdmin._id;
+
+        await newCompany.save({ session });
+        await demoAdmin.save({ session });
+
+        // Create auxiliary demo users
+        const demoHR = new User({
+          username: `Anna HR (Demo ${demoSuffix})`,
+          email: `hr-${demoSuffix}@demo.com`,
+          password: hashedPassword,
+          role: 'hr',
+          company: newCompany._id,
+          position: 'HR Manager',
+          department: 'HR',
+          isDemo: true,
+          expiresAt
+        });
+        await demoHR.save({ session });
+
+        const demoEmp = new User({
+          username: `Jan Pracownik (Demo ${demoSuffix})`,
+          email: `employee-${demoSuffix}@demo.com`,
+          password: hashedPassword,
+          role: 'employee',
+          company: newCompany._id,
+          position: 'Developer',
+          department: 'IT',
+          salary: 8000,
+          isDemo: true,
+          expiresAt
+        });
+        await demoEmp.save({ session });
+
+        // 3. Create Sample Data (Leads, Projects, Tasks etc.)
+        const today = new Date();
+
+        const approvedLeave = new Leave({
+          user: demoEmp._id,
+          company: newCompany._id,
+          leaveType: 'vacation',
+          startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+          endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5),
+          days: 5,
+          reason: 'Wakacje w sandboxie',
+          status: 'approved',
+          reviewedBy: demoHR._id,
+          reviewedAt: new Date(),
+          expiresAt // Ensure related data also has TTL if needed (or it will just be orphaned and harmless)
+        });
+        await approvedLeave.save({ session });
+
+        const projectWeb = new Project({
+          name: 'Budowa Portfolia',
+          description: 'Projekt demonstracyjny pomyślnie wyizolowany w Twoim własnym sandboxie!',
+          status: 'running',
+          priority: 'high',
+          startDate: new Date(),
+          endDate: new Date(today.getFullYear(), today.getMonth() + 2, today.getDate()),
+          createdBy: demoAdmin._id,
+          company: newCompany._id,
+          assignedUsers: [demoAdmin._id, demoEmp._id],
+          progress: 75
+        });
+        await projectWeb.save({ session });
+
+        const task1 = new Task({
+          title: 'Weryfikacja Izolacji',
+          description: 'Sprawdź, czy Twoje zmiany nie są widoczne dla innych użytkowników demo.',
+          status: 'in-progress',
+          priority: 'high',
+          dueDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+          project: projectWeb._id,
+          assignedUser: demoEmp._id,
+          createdBy: demoAdmin._id,
+          company: newCompany._id
+        });
+        await task1.save({ session });
+      });
+    } finally {
+      session.endSession();
     }
+
+    // 4. Return Login Response
+    const user = await User.findOne({ email: DEMO_EMAIL }).populate("company", "name");
+
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+    };
+
+    res.cookie("refreshToken", refreshToken, cookieOptions);
+
+    res.json({
+      message: "Uruchomiono Twój osobisty sandbox Demo. Dane wygasną za 2 godziny.",
+      accessToken,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        company: user.company,
+        profileImage: user.profileImage || "",
+        mustChangePassword: false,
+        isDemo: true
+      },
+    });
+
+  } catch (err) {
+    console.error("Demo login error:", err);
+    res.status(500).json({ message: "Błąd podczas generowania wersji demo" });
+  }
 };

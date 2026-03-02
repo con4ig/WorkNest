@@ -17,10 +17,11 @@ import activityRoutes from "./routes/activity.js";
 dotenv.config();
 
 const app = express();
+const envOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://worknest.totalh.net",
-  "https://worknest-1.onrender.com",
+  "http://localhost:5500",
+  ...envOrigins
 ];
 
 // Helmet configuration
@@ -105,10 +106,22 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/activities", activityRoutes);
 
-// Prosta trasa do sprawdzenia, czy API działa
-app.get("/", (req, res) => {
-  res.send("API działa poprawnie.");
+// Health check endpoint (required by Docker)
+app.get("/api/health", (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+  res.status(dbStatus === "connected" ? 200 : 503).json({
+    status: dbStatus === "connected" ? "ok" : "unhealthy",
+    db: dbStatus,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
 });
+
+// Root route
+app.get("/", (req, res) => {
+  res.send("WorkNest API działa poprawnie.");
+});
+
 
 const PORT = process.env.PORT || 5500;
 

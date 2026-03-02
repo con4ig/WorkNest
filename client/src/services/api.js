@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// Pobierz URL API ze zmiennych środowiskowych lub użyj wartości domyślnej
-const API_URL = import.meta.env.PROD ? 'https://worknest-qpsw.onrender.com/api' : 'http://localhost:5500/api';
+// W trybie produkcyjnym Nginx obsługuje proxy /api do backendu, 
+// więc używamy ścieżki relatywnej.
+const API_URL = '/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -12,7 +13,7 @@ const api = axios.create({
 // Ten interceptor dodaje token autoryzacyjny do każdego wychodzącego żądania.
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken'); 
+    const token = localStorage.getItem('accessToken');
     // Nie dodawaj tokenu do żądania odświeżającego!
     if (token && config.url !== '/auth/refresh') {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -52,26 +53,26 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && originalRequest.url === '/auth/refresh') {
       console.error("🔴 Refresh token wygasł. Wylogowywanie...");
-      localStorage.removeItem('accessToken'); 
+      localStorage.removeItem('accessToken');
       window.dispatchEvent(new Event('auth-error'));
       return Promise.reject(error);
     }
 
     // Sprawdzamy, czy błąd to 401 i czy nie jest to ponowna próba po odświeżeniu
     if (error.response?.status === 401 && !originalRequest._retry) {
-      
+
       // Jeśli inny proces już odświeża token, dodaj to zapytanie do kolejki
       if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
-        .then(token => {
-          originalRequest.headers['Authorization'] = 'Bearer ' + token;
-          return api(originalRequest);
-        })
-        .catch(err => {
-          return Promise.reject(err);
-        });
+          .then(token => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            return api(originalRequest);
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
       }
 
       originalRequest._retry = true;
@@ -79,12 +80,12 @@ api.interceptors.response.use(
 
       try {
         // Wywołaj endpoint do odświeżania tokenu. Zakładam, że używasz ciasteczek httpOnly dla refresh tokenu.
-        const { data } = await api.post('/auth/refresh'); 
+        const { data } = await api.post('/auth/refresh');
         const newAccessToken = data.accessToken;
 
         localStorage.setItem('accessToken', newAccessToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-        
+
         // Ponów wszystkie zapytania z kolejki z nowym tokenem
         processQueue(null, newAccessToken);
 
