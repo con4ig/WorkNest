@@ -175,6 +175,14 @@ const schema = new mongoose.Schema(
       type: String,
       default: "", // lub np. null
     },
+    isDemo: {
+      type: Boolean,
+      default: false,
+    },
+    expiresAt: {
+      type: Date,
+      index: { expires: 0 }, // TTL index
+    },
   },
 
   {

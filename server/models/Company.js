@@ -20,6 +20,14 @@ const companySchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  isDemo: {
+    type: Boolean,
+    default: false,
+  },
+  expiresAt: {
+    type: Date,
+    index: { expires: 0 },
+  },
 });
 
 export default mongoose.model("Company", companySchema);
