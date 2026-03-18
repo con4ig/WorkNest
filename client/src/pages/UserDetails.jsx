@@ -20,13 +20,14 @@ import moment from 'moment';
 import { clsx } from 'clsx';
 
 import LoadingScreen from '../components/LoadingScreen';
+
 // --- Pomocnicze funkcje formatowania ---
 const formatDateForDisplay = (dateString, language = 'pl') => {
-    if (!dateString) return null; // We'll handle 'Nie określono' with t() in component
+    if (!dateString) return null;
     try {
         return moment(dateString).locale(language).format('LL');
     } catch {
-        return null; // We'll handle 'Błędna data' with t() in component
+        return null;
     }
 };
 
@@ -64,36 +65,36 @@ const calculateWorkExperience = (hireDate, t) => {
 
 // --- Komponenty Ikon ---
 const Icon = {
-    Mail: ({ className = 'text-primary' }) => (
-        <Mail className={`h-6 w-6 ${className}`} />
+    Mail: ({ className = '' }) => (
+        <Mail className={`h-5 w-5 ${className}`} />
     ),
-    Phone: ({ className = 'text-primary' }) => (
-        <Phone className={`h-6 w-6 ${className}`} />
+    Phone: ({ className = '' }) => (
+        <Phone className={`h-5 w-5 ${className}`} />
     ),
-    Briefcase: ({ className = 'text-primary' }) => (
-        <Briefcase className={`h-6 w-6 ${className}`} />
+    Briefcase: ({ className = '' }) => (
+        <Briefcase className={`h-5 w-5 ${className}`} />
     ),
-    Building: ({ className = 'text-primary' }) => (
-        <Building2 className={`h-6 w-6 ${className}`} />
+    Building: ({ className = '' }) => (
+        <Building2 className={`h-5 w-5 ${className}`} />
     ),
-    Location: ({ className = 'text-primary' }) => (
-        <MapPin className={`h-6 w-6 ${className}`} />
+    Location: ({ className = '' }) => (
+        <MapPin className={`h-5 w-5 ${className}`} />
     ),
-    Calendar: ({ className = 'text-primary' }) => (
-        <Calendar className={`h-6 w-6 ${className}`} />
+    Calendar: ({ className = '' }) => (
+        <Calendar className={`h-5 w-5 ${className}`} />
     ),
-    Edit: () => <SquarePen className="h-5 w-5" />,
-    Save: () => <Save className="h-5 w-5" />,
-    Cancel: () => <X className="h-5 w-5" />,
-    Back: () => <ArrowLeft className="h-5 w-5" />,
-    Badge: ({ className = 'text-primary' }) => (
-        <Badge className={`h-6 w-6 ${className}`} />
+    Edit: () => <SquarePen className="h-4 w-4" />,
+    Save: () => <Save className="h-4 w-4" />,
+    Cancel: () => <X className="h-4 w-4" />,
+    Back: () => <ArrowLeft className="h-4 w-4" />,
+    Badge: ({ className = '' }) => (
+        <Badge className={`h-5 w-5 ${className}`} />
     ),
-    Notes: ({ className = 'text-primary' }) => (
-        <FileText className={`h-6 w-6 ${className}`} />
+    Notes: ({ className = '' }) => (
+        <FileText className={`h-5 w-5 ${className}`} />
     ),
-    Documents: ({ className = 'text-primary' }) => (
-        <FileText className={`h-6 w-6 ${className}`} />
+    Documents: ({ className = '' }) => (
+        <FileText className={`h-5 w-5 ${className}`} />
     ),
 };
 
@@ -140,33 +141,31 @@ const DEPARTMENTS = ['IT', 'HR', 'Sales', 'Marketing', 'Finance', 'Operations'];
 
 // --- Sub-komponenty ---
 const StatCard = ({ icon, title, children }) => (
-    <div className="group relative flex items-start gap-4 rounded-2xl border border-border/50 bg-card/30 p-4 transition-all hover:bg-card/50 backdrop-blur-sm">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm transition-transform group-hover:scale-110">
+    <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:bg-muted/50">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
             {icon}
         </div>
-        <div className="flex-1 min-w-0">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-                {title}
-            </h3>
-            <div className="mt-1 font-bold text-foreground truncate">
-                {children}
-            </div>
+        <div className="min-w-0 flex-1">
+            <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{title}</h3>
+            <div className="mt-0.5 text-sm font-semibold tracking-tight text-foreground">{children}</div>
         </div>
     </div>
 );
 
 const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="rounded-3xl border border-border/50 bg-card/30 shadow-sm backdrop-blur-sm overflow-hidden transition-all hover:border-primary/20 hover:shadow-md">
-        <div className="flex items-center justify-between border-b border-border/30 bg-muted/20 px-6 py-4">
-            <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm">
+    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3 sm:px-6 sm:py-4">
+            <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
                     {icon}
                 </div>
-                <h2 className="text-lg font-bold tracking-tight text-foreground">{title}</h2>
+                <h2 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                    {title}
+                </h2>
             </div>
-            {actions && <div className="flex items-center gap-2">{actions}</div>}
+            {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
         </div>
-        <div className="p-6 sm:p-8">
+        <div className="p-4 sm:p-6">
             {children}
         </div>
     </div>
@@ -182,11 +181,11 @@ const EditableField = ({
     options,
 }) => {
     const { t } = useTranslation();
-    const inputClasses = "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:opacity-50 placeholder:text-muted-foreground/30";
+    const inputClasses = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none placeholder:text-muted-foreground/40";
 
     return (
         <div className="flex flex-col gap-2">
-            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+            <label className="ml-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 {label}
             </label>
             {options ? (
@@ -453,154 +452,139 @@ export default function UserDetails() {
     return (
         <div className="flex min-h-screen flex-col bg-background font-sans text-foreground lg:flex-row">
             {/* --- SIDEBAR --- */}
-            <aside className="relative flex w-full flex-col border-r border-border/50 bg-card/30 p-6 lg:min-h-screen lg:w-[380px] lg:p-10 backdrop-blur-md">
-                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-50" />
-                
-                <div className="relative z-10">
-                    <div className="mb-10 flex items-center gap-4">
-                        <button
-                            onClick={() => navigate('/employees')}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50 text-foreground transition-all hover:bg-muted active:scale-95 shadow-sm border border-border/50"
-                        >
-                            <Icon.Back />
-                        </button>
-                        <div>
-                            <h2 className="text-xl font-black tracking-tight text-foreground">
-                                {t('employees.details.title')}
-                            </h2>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
-                                Management Panel
-                            </p>
+            <aside className="flex w-full flex-col border-r border-border bg-card p-6 lg:min-h-screen lg:w-[360px] lg:p-8">
+                <div className="mb-10 flex items-center gap-4">
+                    <button
+                        onClick={() => navigate('/employees')}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground transition-all hover:bg-secondary active:scale-95"
+                    >
+                        <Icon.Back />
+                    </button>
+                    <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            {t('employees.details.title')}
+                        </p>
+                        <h2 className="text-xl font-bold tracking-tight text-foreground">
+                            {user.username}
+                        </h2>
+                    </div>
+                </div>
+
+                <div className="mb-10 flex flex-col items-center text-center">
+                    <div className="relative mb-6">
+                        <div className="flex h-32 w-32 items-center justify-center rounded-full bg-primary/10 text-4xl font-black text-primary border-4 border-background shadow-lg">
+                            {fullName.charAt(0).toUpperCase()}
                         </div>
                     </div>
-
-                    <div className="mb-10 flex flex-col items-center text-center">
-                        <div className="relative">
-                            <div className="absolute inset-0 animate-pulse rounded-full bg-primary/20 blur-xl" />
-                            <div className="relative flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-primary/80 text-4xl font-black text-white shadow-2xl shadow-primary/30">
-                                {fullName.charAt(0).toUpperCase()}
-                            </div>
-                        </div>
-                        <h3 className="mt-6 text-2xl font-black tracking-tighter text-foreground">
-                            {fullName}
-                        </h3>
-                        <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                            <Icon.Briefcase className="h-3 w-3" />
-                            {editData.position || t('common.noPosition')}
-                        </div>
+                    <h3 className="text-2xl font-bold tracking-tight text-foreground">
+                        {fullName}
+                    </h3>
+                    <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-bold text-muted-foreground">
+                        <Icon.Briefcase className="h-3 w-3" />
+                        {editData.position || t('common.noPosition')}
                     </div>
+                </div>
 
-                    <div className="space-y-4">
-                        <StatCard
-                            icon={<Icon.Badge className="h-5 w-5" />}
-                            title={t('employees.details.statusAndContract')}
-                        >
-                            {isEditing ? (
-                                <div className="space-y-2 mt-2">
-                                    <select
-                                        name="status"
-                                        value={editData.status}
-                                        onChange={handleEditChange}
-                                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none"
-                                    >
-                                        {AVAILABLE_STATUSES.map((s) => (
-                                            <option key={s} value={s}>
-                                                {t(`common.employeeStatus.${s}`)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <select
-                                        name="contractType"
-                                        value={editData.contractType}
-                                        onChange={handleEditChange}
-                                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none"
-                                    >
-                                        {AVAILABLE_CONTRACT_TYPES.map((c) => (
-                                            <option key={c} value={c}>
-                                                {t(`common.contractType.${c}`)}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            ) : (
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    <span className={clsx(
-                                        "rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-widest border",
-                                        getStatusClasses(user.status)
-                                    )}>
-                                        {t(`common.employeeStatus.${user.status}`)}
-                                    </span>
-                                    <span className={clsx(
-                                        "rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-widest border",
-                                        getContractClasses(user.contractType)
-                                    )}>
-                                        {t(`common.contractType.${user.contractType}`)}
-                                    </span>
-                                </div>
-                            )}
-                        </StatCard>
-                        <StatCard
-                            icon={<Icon.Calendar className="h-5 w-5" />}
-                            title={t('employees.details.workExperience')}
-                        >
-                            <span className="text-lg font-black tracking-tight text-foreground">
-                                {calculateWorkExperience(user.hireDate, t)}
-                            </span>
-                        </StatCard>
-                        <StatCard
-                            icon={<Icon.Briefcase className="h-5 w-5" />}
-                            title={t('common.department')}
-                        >
-                            {isEditing ? (
+                <div className="space-y-4">
+                    <StatCard
+                        icon={<Icon.Badge />}
+                        title={t('employees.details.statusAndContract')}
+                    >
+                        {isEditing ? (
+                            <div className="space-y-2 mt-2">
                                 <select
-                                    name="department"
-                                    value={editData.department}
+                                    name="status"
+                                    value={editData.status}
                                     onChange={handleEditChange}
-                                    className="w-full mt-2 rounded-xl border border-border bg-background px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                                 >
-                                    <option value="">-- {t('common.select')} --</option>
-                                    {DEPARTMENTS.map((d) => (
-                                        <option key={d} value={d}>
-                                            {t(`common.departments.${d}`)}
+                                    {AVAILABLE_STATUSES.map((s) => (
+                                        <option key={s} value={s}>
+                                            {t(`common.employeeStatus.${s}`)}
                                         </option>
                                     ))}
                                 </select>
-                            ) : (
-                                <span className="text-lg font-black tracking-tight text-foreground italic opacity-80">
-                                    {user.department
-                                        ? t(`common.departments.${user.department}`)
-                                        : t('common.notSpecified')}
+                                <select
+                                    name="contractType"
+                                    value={editData.contractType}
+                                    onChange={handleEditChange}
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                                >
+                                    {AVAILABLE_CONTRACT_TYPES.map((c) => (
+                                        <option key={c} value={c}>
+                                            {t(`common.contractType.${c}`)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ) : (
+                            <div className="flex flex-wrap gap-2 mt-1">
+                                <span className={clsx(
+                                    "rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider border",
+                                    getStatusClasses(user.status)
+                                )}>
+                                    {t(`common.employeeStatus.${user.status}`)}
                                 </span>
-                            )}
-                        </StatCard>
-                    </div>
-
-                    <div className="mt-10 pt-10 border-t border-border/30 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30">
-                        <div className="flex justify-between items-center">
-                            <span>{t('common.createdAt')}</span>
-                            <span className="text-foreground/40">
-                                {formatDateForDisplay(user.createdAt, i18n.language) || t('common.notSpecified')}
+                                <span className={clsx(
+                                    "rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider border",
+                                    getContractClasses(user.contractType)
+                                )}>
+                                    {t(`common.contractType.${user.contractType}`)}
+                                </span>
+                            </div>
+                        )}
+                    </StatCard>
+                    <StatCard
+                        icon={<Icon.Calendar />}
+                        title={t('employees.details.workExperience')}
+                    >
+                        <span className="text-sm font-bold tracking-tight text-foreground">
+                            {calculateWorkExperience(user.hireDate, t)}
+                        </span>
+                    </StatCard>
+                    <StatCard
+                        icon={<Icon.Briefcase />}
+                        title={t('common.department')}
+                    >
+                        {isEditing ? (
+                            <select
+                                name="department"
+                                value={editData.department}
+                                onChange={handleEditChange}
+                                className="w-full mt-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                            >
+                                <option value="">-- {t('common.select')} --</option>
+                                {DEPARTMENTS.map((d) => (
+                                    <option key={d} value={d}>
+                                        {t(`common.departments.${d}`)}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <span className="text-sm font-bold tracking-tight text-foreground">
+                                {user.department
+                                    ? t(`common.departments.${user.department}`)
+                                    : t('common.notSpecified')}
                             </span>
-                        </div>
-                    </div>
+                        )}
+                    </StatCard>
+                </div>
+
+                <div className="mt-auto pt-8 text-center text-xs text-muted-foreground">
+                    <p>
+                        {t('common.createdAt')}{' '}
+                        <span className="font-semibold text-foreground">
+                            {formatDateForDisplay(user.createdAt, i18n.language) || t('common.notSpecified')}
+                        </span>
+                    </p>
                 </div>
             </aside>
 
             {/* --- MAIN CONTENT --- */}
-            <main className="flex-1 overflow-y-auto bg-background/50 p-6 lg:p-10">
-                <div className="mx-auto max-w-6xl space-y-10">
-                    <header className="relative overflow-hidden rounded-[2.5rem] bg-zinc-950 p-10 shadow-2xl sm:p-12">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-50" />
-                        <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-primary/10 blur-[100px]" />
-                        
+            <main className="flex-1 overflow-y-auto bg-background p-6 lg:p-10">
+                <div className="space-y-10">
+                    <header className="relative rounded-lg border border-border bg-card p-10 sm:p-12 shadow-sm">
                         <div className="relative z-10">
-                            <div className="mb-4 flex items-center gap-2">
-                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
-                                    Employee Profile
-                                </span>
-                            </div>
-                            
                             {isEditing ? (
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <input
@@ -609,7 +593,7 @@ export default function UserDetails() {
                                         value={editData.firstName}
                                         onChange={handleEditChange}
                                         placeholder={`${t('common.firstName')}...`}
-                                        className="w-full border-b-2 border-primary/30 bg-transparent text-4xl font-black tracking-tighter text-white placeholder:text-zinc-700 focus:border-primary focus:outline-none sm:text-5xl lg:text-6xl"
+                                        className="w-full border-b border-border bg-transparent text-3xl font-bold tracking-tight text-foreground focus:border-primary focus:outline-none sm:text-4xl lg:text-5xl"
                                     />
                                     <input
                                         type="text"
@@ -617,11 +601,11 @@ export default function UserDetails() {
                                         value={editData.lastName}
                                         onChange={handleEditChange}
                                         placeholder={`${t('common.lastName')}...`}
-                                        className="w-full border-b-2 border-primary/30 bg-transparent text-4xl font-black tracking-tighter text-white placeholder:text-zinc-700 focus:border-primary focus:outline-none sm:text-5xl lg:text-6xl"
+                                        className="w-full border-b border-border bg-transparent text-3xl font-bold tracking-tight text-foreground focus:border-primary focus:outline-none sm:text-4xl lg:text-5xl"
                                     />
                                 </div>
                             ) : (
-                                <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl lg:text-6xl">
+                                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
                                     {fullName}
                                 </h1>
                             )}
@@ -633,7 +617,7 @@ export default function UserDetails() {
                                             <button
                                                 onClick={handleSave}
                                                 disabled={isSaving}
-                                                className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95"
+                                                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95"
                                             >
                                                 {isSaving ? (
                                                     <div className="flex items-center gap-2">
@@ -642,7 +626,7 @@ export default function UserDetails() {
                                                     </div>
                                                 ) : (
                                                     <>
-                                                        <Icon.Save className="h-4 w-4" />
+                                                        <Icon.Save />
                                                         {t('common.saveChanges')}
                                                     </>
                                                 )}
@@ -652,18 +636,18 @@ export default function UserDetails() {
                                                     setIsEditing(false);
                                                     fetchData();
                                                 }}
-                                                className="flex items-center gap-2 rounded-2xl bg-white/10 px-6 py-3 font-bold text-white backdrop-blur-md transition-all hover:bg-white/20 active:scale-95"
+                                                className="flex items-center gap-2 rounded-lg border border-border bg-muted px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
                                             >
-                                                <Icon.Cancel className="h-4 w-4" />
+                                                <Icon.Cancel />
                                                 {t('common.cancel')}
                                             </button>
                                         </>
                                     ) : (
                                         <button
                                             onClick={() => setIsEditing(true)}
-                                            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-3 font-bold text-black shadow-xl transition-all hover:bg-zinc-200 active:scale-95"
+                                            className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
                                         >
-                                            <Icon.Edit className="h-4 w-4" />
+                                            <Icon.Edit />
                                             {t('common.editData')}
                                         </button>
                                     )}
@@ -695,21 +679,21 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('common.email')}
                                         </p>
                                         <a
                                             href={`mailto:${user.email}`}
-                                            className="text-lg font-bold text-primary hover:underline hover:text-primary/80"
+                                            className="text-base font-semibold text-primary hover:underline"
                                         >
                                             {user.email}
                                         </a>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('common.phoneNumber')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {user.phoneNumber || t('common.notProvided')}
                                         </p>
                                     </div>
@@ -757,26 +741,26 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('common.position')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {user.position || t('common.notSpecified')}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('common.role')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {t(`common.roles.${user.role}`)}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('employees.details.hireDate')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {formatDateForDisplay(
                                                 user.hireDate,
                                                 i18n.language
@@ -784,10 +768,10 @@ export default function UserDetails() {
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('employees.details.salaryLabel')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {user.salary > 0
                                                 ? `${user.salary} PLN`
                                                 : t('common.notSpecified')}
@@ -819,18 +803,18 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('common.address')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {user.address || t('common.notProvided')}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('common.city')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {user.city || t('common.notProvided')}
                                         </p>
                                     </div>
@@ -854,10 +838,10 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-muted-foreground">
+                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
                                             {t('employees.details.peselId')}
                                         </p>
-                                        <p className="text-lg font-bold text-foreground">
+                                        <p className="text-base font-semibold text-foreground">
                                             {user.peselOrId ||
                                                 t('common.notProvided')}
                                         </p>
@@ -878,7 +862,7 @@ export default function UserDetails() {
                                 onChange={handleEditChange}
                             />
                         ) : (
-                            <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
+                            <p className="whitespace-pre-wrap leading-relaxed text-sm text-muted-foreground/80">
                                 {user.notes || t('employees.details.noNotes')}
                             </p>
                         )}
@@ -960,7 +944,7 @@ export default function UserDetails() {
                                                           e,
                                                       )
                                                   }
-                                                  className="mt-4 w-full rounded-lg border border-input bg-card px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                                  className="mt-4 w-full rounded-lg border border-input bg-card px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                                               ></textarea>
                                               <button
                                                   onClick={() =>
@@ -976,26 +960,26 @@ export default function UserDetails() {
                                 : employmentHistory.map((item, index) => (
                                       <div
                                           key={index}
-                                          className="group relative pl-10 pb-10 last:pb-0"
+                                          className="group relative pl-8 pb-8 last:pb-0"
                                       >
                                           {/* Timeline line */}
-                                          <div className="absolute left-0 top-2 h-full w-[2px] bg-gradient-to-b from-primary/30 to-border/10 last:hidden" />
+                                          <div className="absolute left-0 top-2 h-full w-[2px] bg-border last:hidden" />
                                           
                                           {/* Timeline dot */}
-                                          <div className="absolute left-[-5px] top-1.5 flex h-3 w-3 items-center justify-center rounded-full bg-background border-2 border-primary shadow-[0_0_10px_rgba(var(--primary),0.5)] transition-transform group-hover:scale-125" />
+                                          <div className="absolute left-[-5px] top-1.5 h-3 w-3 rounded-full bg-background border-2 border-primary" />
                                           
-                                          <div className="transition-transform group-hover:translate-x-1">
-                                            <p className="text-lg font-black tracking-tight text-foreground">
+                                          <div>
+                                            <p className="text-base font-bold text-foreground">
                                                 {item.position}
                                             </p>
-                                            <p className="flex items-center gap-2 text-sm font-bold text-primary italic">
-                                                <Icon.Building className="h-3 w-3" />
+                                            <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                                                <Icon.Building className="h-4 w-4" />
                                                 {item.company}
                                             </p>
-                                            <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                                            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                                 {formatDateForDisplay(item.startDate)} — {formatDateForDisplay(item.endDate)}
                                             </p>
-                                            <p className="mt-3 leading-relaxed text-muted-foreground/80 bg-muted/20 p-4 rounded-2xl border border-border/10">
+                                            <p className="mt-2 text-sm leading-relaxed text-muted-foreground/80 bg-muted/20 p-3 rounded-lg border border-border/10">
                                                 {item.description}
                                             </p>
                                           </div>
@@ -1011,7 +995,7 @@ export default function UserDetails() {
                             )}
                             {!isEditing &&
                                 employmentHistory.length === 0 && (
-                                    <p className="text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         {t('employees.details.noHistory')}
                                     </p>
                                 )}
@@ -1023,7 +1007,7 @@ export default function UserDetails() {
                         icon={<Icon.Documents />}
                         title={t('employees.details.documentsAndAgreements')}
                     >
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {isEditing
                                 ? (editData.documents || []).map(
                                       (doc, index) => (
@@ -1084,10 +1068,10 @@ export default function UserDetails() {
                                 : (user.documents || []).map((doc, index) => (
                                       <div
                                           key={index}
-                                          className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-border/30 bg-muted/10 p-5 transition-all hover:bg-muted/20 hover:border-primary/20"
+                                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:bg-muted/30"
                                       >
                                           <div className="flex items-center gap-4">
-                                              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary border border-border">
                                                   <Icon.Documents />
                                               </div>
                                               <div className="flex flex-col">
@@ -1095,17 +1079,17 @@ export default function UserDetails() {
                                                       href={doc.url}
                                                       target="_blank"
                                                       rel="noopener noreferrer"
-                                                      className="text-lg font-black tracking-tight text-foreground hover:text-primary transition-colors"
+                                                      className="text-base font-bold text-foreground hover:text-primary transition-colors"
                                                   >
                                                       {doc.name}
                                                   </a>
-                                                  <div className="flex items-center gap-2 mt-1">
-                                                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 px-2 py-0.5 rounded-md border border-border/30">
+                                                  <div className="flex items-center gap-2 mt-0.5">
+                                                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1.5 py-0.5 rounded border border-border">
                                                           {doc.category === 'agreement'
                                                               ? t('employees.details.agreement')
                                                               : t('employees.details.documentation')}
                                                       </span>
-                                                      <span className="text-[10px] font-bold text-muted-foreground/30">
+                                                      <span className="text-[10px] font-medium text-muted-foreground/60">
                                                           {t('common.Added')}: {formatDateForDisplay(doc.uploadedAt)}
                                                       </span>
                                                   </div>
@@ -1115,7 +1099,7 @@ export default function UserDetails() {
                                               href={doc.url}
                                               target="_blank"
                                               rel="noopener noreferrer"
-                                              className="flex items-center justify-center rounded-xl bg-primary/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all active:scale-95"
+                                              className="flex items-center justify-center rounded-lg bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary hover:text-white transition-all active:scale-95"
                                           >
                                               Open
                                           </a>
@@ -1134,7 +1118,7 @@ export default function UserDetails() {
                             {!isEditing &&
                                 (!user.documents ||
                                     user.documents.length === 0) && (
-                                    <p className="text-muted-foreground">
+                                    <p className="text-muted-foreground text-sm">
                                         {t('employees.details.noDocuments')}
                                     </p>
                                 )}
