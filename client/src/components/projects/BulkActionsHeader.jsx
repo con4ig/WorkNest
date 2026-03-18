@@ -11,20 +11,20 @@ const BulkActionsHeader = ({
 }) => {
     const { t } = useTranslation();
     return (
-        <div className="flex h-[72px] items-center justify-between rounded-xl border border-emerald-100/50 bg-white px-4 text-slate-800 shadow-lg shadow-emerald-500/5 ring-1 ring-black/5 transition-all sm:px-6">
+        <div className="flex h-[72px] items-center justify-between rounded-xl border border-border bg-card px-4 text-foreground shadow-lg shadow-primary/5 ring-1 ring-black/5 transition-all sm:px-6">
             <div className="flex items-center gap-4">
                 <button
                     onClick={onClearSelection}
-                    className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                    className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                     title={t('projects.bulkActions.clearSelection')}
                 >
                     <X className="h-5 w-5" />
                 </button>
                 <div className="flex flex-col">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600/80">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-primary/80">
                         {t('projects.bulkActions.selectedCount')}
                     </span>
-                    <span className="text-xl font-bold text-slate-900">
+                    <span className="text-xl font-bold text-foreground">
                         {selectedCount}
                     </span>
                 </div>
@@ -34,7 +34,7 @@ const BulkActionsHeader = ({
                 {!showArchived ? (
                     <button
                         onClick={onArchive}
-                        className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition-all hover:bg-emerald-100 hover:ring-1 hover:ring-emerald-200 active:scale-95"
+                        className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary/20 hover:ring-1 hover:ring-primary/30 active:scale-95"
                         title={t('projects.bulkActions.archiveTitle')}
                     >
                         <Archive className="h-4 w-4" />
@@ -43,7 +43,7 @@ const BulkActionsHeader = ({
                 ) : (
                     <button
                         onClick={onRestore}
-                        className="flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition-all hover:bg-emerald-100 hover:ring-1 hover:ring-emerald-200 active:scale-95"
+                        className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary/20 hover:ring-1 hover:ring-primary/30 active:scale-95"
                         title={t('projects.bulkActions.restoreTitleShort')}
                     >
                         <ArchiveRestore className="h-4 w-4" />
@@ -53,7 +53,7 @@ const BulkActionsHeader = ({
 
                 <button
                     onClick={onDelete}
-                    className="flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition-all hover:bg-red-100 hover:ring-1 hover:ring-red-200 active:scale-95"
+                    className="flex items-center gap-2 rounded-lg bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive transition-all hover:bg-destructive/20 hover:ring-1 hover:ring-destructive/30 active:scale-95"
                     title={t('projects.bulkActions.deleteTitleShort')}
                 >
                     <Trash2 className="h-4 w-4" />

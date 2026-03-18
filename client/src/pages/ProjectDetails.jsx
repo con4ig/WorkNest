@@ -6,6 +6,7 @@ import api from '../services/api.js';
 import UserManagementModal from '../components/UserManagementModal.jsx';
 import moment from 'moment';
 import 'moment/locale/pl';
+import clsx from 'clsx';
 import {
     translateProjectStatus,
     translatePriority,
@@ -17,6 +18,8 @@ import {
     Icon,
     getPriorityClasses,
     getStatusClasses,
+    getStatusColor,
+    getPriorityColor,
     AVAILABLE_STATUSES,
     AVAILABLE_PRIORITIES,
 } from '../components/projects/ProjectTaskShared.jsx';
@@ -51,18 +54,20 @@ const formatDateForInput = (dateString) => {
 };
 
 const StatCard = ({ icon, title, children }) => (
-    <div className="flex items-start gap-3 sm:gap-4">
-        <div className="mt-1 flex-shrink-0">{icon}</div>
-        <div className="w-full min-w-0">
-            <h3 className="truncate font-semibold text-gray-500">{title}</h3>
-            <div className="mt-1">{children}</div>
+    <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:bg-muted/50">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
+            {icon}
+        </div>
+        <div className="min-w-0 flex-1">
+            <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{title}</h3>
+            <div className="mt-0.5 text-xl font-semibold tracking-tight text-foreground">{children}</div>
         </div>
     </div>
 );
 
 const CircularProgress = ({ progress }) => {
     const radius = 60,
-        stroke = 12;
+        stroke = 10;
     const normalizedRadius = radius - stroke;
     const circumference = normalizedRadius * 2 * Math.PI;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -75,15 +80,16 @@ const CircularProgress = ({ progress }) => {
                 className="-rotate-90 transform"
             >
                 <circle
-                    stroke="#e2e8f0"
+                    stroke="currentColor"
                     fill="transparent"
                     strokeWidth={stroke}
                     r={normalizedRadius}
                     cx={radius}
                     cy={radius}
+                    className="text-border/40"
                 />
                 <circle
-                    stroke="url(#progressGradientLight)"
+                    stroke="url(#progressGradient)"
                     fill="transparent"
                     strokeWidth={stroke}
                     strokeLinecap="round"
@@ -92,42 +98,49 @@ const CircularProgress = ({ progress }) => {
                     r={normalizedRadius}
                     cx={radius}
                     cy={radius}
-                    className="transition-all duration-500 ease-in-out"
+                    className="transition-all duration-1000 ease-in-out"
                 />
                 <defs>
                     <linearGradient
-                        id="progressGradientLight"
+                        id="progressGradient"
                         x1="0%"
                         y1="0%"
-                        x2="0%"
+                        x2="100%"
                         y2="100%"
                     >
-                        <stop offset="0%" stopColor="#10b981" />
-                        <stop offset="100%" stopColor="#059669" />
+                        <stop offset="0%" style={{ stopColor: 'var(--primary)' }} />
+                        <stop offset="100%" style={{ stopColor: 'rgb(var(--primary-rgb), 0.6)' }} />
                     </linearGradient>
                 </defs>
             </svg>
-            <div className="absolute text-2xl font-bold text-emerald-600 sm:text-3xl">
-                {progress}%
+            <div className="absolute flex flex-col items-center justify-center">
+                <span className="text-2xl font-black tracking-tighter text-foreground sm:text-3xl">
+                    {progress}%
+                </span>
+                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                    Done
+                </span>
             </div>
         </div>
     );
 };
 
 const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-md sm:rounded-3xl sm:p-6">
-        <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-4 sm:mb-5">
-            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                {icon}
-                <h2 className="truncate text-xl font-bold text-gray-800 sm:text-2xl">
+    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3 sm:px-6 sm:py-4">
+            <div className="flex min-w-0 items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
+                    {icon}
+                </div>
+                <h2 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
                     {title}
                 </h2>
             </div>
             {actions && (
-                <div className="flex flex-shrink-0 gap-2">{actions}</div>
+                <div className="flex shrink-0 gap-2">{actions}</div>
             )}
         </div>
-        {children}
+        <div className="p-4 sm:p-6">{children}</div>
     </div>
 );
 
@@ -155,51 +168,54 @@ const CommentItem = ({
     };
 
     return (
-        <div className="border-l-2 border-gray-200 pl-4">
-            <div className="mb-3 flex gap-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 font-bold text-white">
+        <div className="relative border-l-2 border-border pl-6 pb-6">
+            <div className="absolute left-[-5px] top-2 h-2.5 w-2.5 rounded-full border border-border bg-muted-foreground" />
+            
+            <div className="flex gap-4">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground font-semibold border border-border">
                     {comment.author.username.charAt(0).toUpperCase()}
                 </div>
-                <div className="flex-1">
-                    <div className="rounded-lg bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:scale-[1.005] hover:shadow-sm">
-                        <div className="mb-1 flex items-center justify-between">
-                            <span className="font-semibold text-gray-800">
-                                {comment.author.username}
-                            </span>
-                            <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-400">
+                <div className="flex-1 min-w-0">
+                    <div className="rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:bg-muted/30">
+                        <div className="mb-2 flex items-center justify-between">
+                            <div className="flex flex-col">
+                                <span className="text-sm font-bold text-foreground">
+                                    {comment.author.username}
+                                </span>
+                                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
                                     {moment(comment.createdAt).fromNow()}
                                 </span>
-                                {canDelete && (
-                                    <button
-                                        onClick={() => onDelete(comment._id)}
-                                        className="text-slate-400 hover:text-red-600"
-                                    >
-                                        <Icon.Trash />
-                                    </button>
-                                )}
                             </div>
+                            {canDelete && (
+                                <button
+                                    onClick={() => onDelete(comment._id)}
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
+                                >
+                                    <Icon.Trash className="h-4 w-4" />
+                                </button>
+                            )}
                         </div>
-                        <p className="whitespace-pre-wrap text-slate-700">
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
                             {comment.content}
                         </p>
                     </div>
-                    <div className="mt-2 flex gap-3 text-sm">
+
+                    <div className="mt-3 flex items-center gap-4">
                         <button
                             onClick={() => setIsReplying(!isReplying)}
-                            className="text-emerald-600 hover:text-emerald-700"
+                            className="text-[11px] font-bold uppercase tracking-widest text-primary hover:underline"
                         >
                             {t('projects.details.reply')}
                         </button>
                         {comment.replies && comment.replies.length > 0 && (
                             <button
                                 onClick={() => setShowReplies(!showReplies)}
-                                className="flex items-center gap-1 text-slate-600 hover:text-slate-700"
+                                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground"
                             >
                                 {showReplies ? (
-                                    <Icon.ChevronDown />
+                                    <Icon.ChevronDown className="h-3.5 w-3.5" />
                                 ) : (
-                                    <Icon.ChevronRight />
+                                    <Icon.ChevronRight className="h-3.5 w-3.5" />
                                 )}
                                 {comment.replies.length}{' '}
                                 {t('projects.details.replies', {
@@ -221,11 +237,11 @@ const CommentItem = ({
                                 placeholder={t(
                                     'projects.details.replyPlaceholder',
                                 )}
-                                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
                             />{' '}
                             <button
                                 onClick={handleReply}
-                                className="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+                                className="rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
                             >
                                 <Icon.Send />
                             </button>
@@ -238,24 +254,24 @@ const CommentItem = ({
                             <div className="mt-3 space-y-3">
                                 {comment.replies.map((reply) => (
                                     <div key={reply._id} className="flex gap-2">
-                                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-400 text-sm font-bold text-white">
+                                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted text-sm font-bold text-muted-foreground">
                                             {reply.author.username
                                                 .charAt(0)
                                                 .toUpperCase()}
                                         </div>
                                         <div className="flex-1">
-                                            <div className="rounded-lg border border-gray-200 bg-white p-2">
+                                            <div className="rounded-lg border border-border bg-card p-2">
                                                 <div className="mb-1 flex items-center justify-between">
-                                                    <span className="text-sm font-semibold text-gray-800">
+                                                    <span className="text-sm font-semibold text-foreground">
                                                         {reply.author.username}
                                                     </span>
-                                                    <span className="text-xs text-gray-400">
+                                                    <span className="text-xs text-muted-foreground">
                                                         {moment(
                                                             reply.createdAt,
                                                         ).fromNow()}
                                                     </span>
                                                 </div>
-                                                <p className="text-sm text-gray-700">
+                                                <p className="text-sm text-foreground/80">
                                                     {reply.content}
                                                 </p>
                                             </div>{' '}
@@ -536,11 +552,11 @@ export default function ProjectDetails() {
     };
 
     if (error) {
-        return <div className="py-10 text-center text-red-600">{error}</div>;
+        return <div className="py-10 text-center text-destructive">{error}</div>;
     }
 
     return (
-        <div className="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-800 lg:flex-row">
+        <div className="flex min-h-screen flex-col bg-background font-sans text-foreground lg:flex-row">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
@@ -550,81 +566,75 @@ export default function ProjectDetails() {
                     })
                 }
             />
-            {/* LEWY PANEL (SIDEBAR) */}
-            <aside className="flex w-full flex-col border-r border-gray-200 bg-white p-4 lg:min-h-screen lg:w-[380px] lg:p-8">
-                <div className="mb-8 flex items-center gap-3">
+            {/* Sidebar - Left Panel */}
+            <aside className="flex w-full flex-col border-r border-border bg-card p-6 lg:min-h-screen lg:w-[360px] lg:p-8">
+                <div className="mb-10 flex items-center gap-4">
                     <button
                         onClick={() => navigate('/projects')}
-                        className="rounded-lg bg-slate-100 p-2.5 transition-colors hover:bg-slate-200"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground transition-all hover:bg-secondary active:scale-95"
                     >
-                        <Icon.Back />
+                        <Icon.Back size={18} />
                     </button>
-                    <h2 className="text-lg font-bold tracking-tight text-slate-800 sm:text-xl">
-                        {t('projects.details.title')}
-                    </h2>
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            {t('projects.details.title')}
+                        </span>
+                        <h2 className="text-xl font-bold tracking-tight text-foreground">
+                            {project.name}
+                        </h2>
+                    </div>
                 </div>
 
-                <div className="flex flex-col items-center text-center">
+                <div className="flex flex-col items-center justify-center py-6 bg-muted/40 rounded-lg border border-border relative overflow-hidden group">
                     <CircularProgress progress={calculatedProgress} />
-                    <p className="mt-3 text-base font-semibold text-slate-600 sm:text-lg">
+                    <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                         {t('projects.details.progress')}
                     </p>
                 </div>
 
-                <div className="mt-8 space-y-6 sm:mt-10">
+                <div className="mt-10 space-y-4">
                     <StatCard
-                        icon={<Icon.Calendar />}
+                        icon={<Icon.Calendar className="h-5 w-5" />}
                         title={t('projects.details.duration')}
                     >
                         {isEditing && isAdmin ? (
-                            <div className="space-y-2">
+                            <div className="flex flex-col gap-2">
                                 <input
                                     type="date"
                                     name="startDate"
                                     value={editData.startDate}
                                     onChange={handleEditChange}
-                                    className="w-full rounded-md border border-gray-300 bg-gray-50 p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                                 />
                                 <input
                                     type="date"
                                     name="endDate"
                                     value={editData.endDate}
                                     onChange={handleEditChange}
-                                    className="w-full rounded-md border border-gray-300 bg-gray-50 p-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                                 />
                             </div>
                         ) : (
-                            <p className="text-base font-bold text-gray-800 sm:text-lg">
-                                {formatDateForDisplay(
-                                    project.startDate,
-                                    i18nInstance.language,
-                                ) &&
-                                formatDateForDisplay(
-                                    project.endDate,
-                                    i18nInstance.language,
-                                )
-                                    ? `${formatDateForDisplay(project.startDate, i18nInstance.language)} - ${formatDateForDisplay(project.endDate, i18nInstance.language)}`
-                                    : t('projects.details.notSpecified')}
-                            </p>
+                            <div className="text-sm font-bold tracking-tight">
+                                {formatDateForDisplay(project.startDate, i18nInstance.language)} — {formatDateForDisplay(project.endDate, i18nInstance.language)}
+                            </div>
                         )}
                     </StatCard>
                     <StatCard
-                        icon={
-                            <ChevronRight className="h-6 w-6 text-emerald-500" />
-                        }
+                        icon={<Icon.Status className="h-5 w-5" />}
                         title={t('projects.details.statusAndPriority')}
                     >
                         {isEditing && isAdmin ? (
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-col gap-2">
                                 <select
                                     name="status"
                                     value={editData.status}
                                     onChange={handleEditChange}
-                                    className={`w-full rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold capitalize ring-1 ring-inset ring-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:w-auto`}
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer"
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
-                                            {t(`common.projectStatus.${s}`)}
+                                            {translateProjectStatus(s, i18nInstance.language)}
                                         </option>
                                     ))}
                                 </select>
@@ -632,78 +642,67 @@ export default function ProjectDetails() {
                                     name="priority"
                                     value={editData.priority}
                                     onChange={handleEditChange}
-                                    className={`w-full rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold capitalize ring-1 ring-inset ring-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 sm:w-auto`}
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer"
                                 >
                                     {AVAILABLE_PRIORITIES.map((p) => (
                                         <option key={p} value={p}>
-                                            {t(`common.priority.${p}`)}
+                                            {translatePriority(p, i18nInstance.language)}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                         ) : (
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span
-                                    className={`rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(project.status)}`}
-                                >
-                                    {t(
-                                        `common.projectStatus.${project.status}`,
-                                    )}
-                                </span>
-                                <span
-                                    className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${getPriorityClasses(project.priority)}`}
-                                >
-                                    {t(`common.priority.${project.priority}`)}
-                                </span>
+                            <div className="mt-2 flex flex-wrap items-center gap-2">
+                                <div className={clsx(
+                                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
+                                    getStatusClasses(project.status)
+                                )}>
+                                    <div className={clsx(
+                                        'h-1.5 w-1.5 rounded-full', 
+                                        getStatusColor(project.status),
+                                        project.status === 'running' && 'animate-pulse'
+                                    )} />
+                                    {translateProjectStatus(project.status, i18nInstance.language)}
+                                </div>
+                                <div className={clsx(
+                                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
+                                    getPriorityClasses(project.priority)
+                                )}>
+                                    <div className={clsx('h-1.5 w-1.5 rounded-full', getPriorityColor(project.priority))} />
+                                    {translatePriority(project.priority, i18nInstance.language)}
+                                </div>
                             </div>
                         )}
                     </StatCard>
 
                     {/* Statystyki zadań */}
                     <StatCard
-                        icon={<Icon.ListTodo />}
+                        icon={<Icon.ListTodo className="h-5 w-5" />}
                         title={t('projects.details.statCardTitle')}
                     >
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">
-                                    {t('projects.details.totalTasks')}:
-                                </span>
-                                <span className="font-bold">
-                                    {taskStats.total}
-                                </span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">
-                                    {t('projects.details.completedTasks')}:
-                                </span>
-                                <span className="font-bold text-green-600">
-                                    {taskStats.completed}
-                                </span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">
-                                    {t('projects.details.inProgressTasks')}:
-                                </span>
-                                <span className="font-bold text-sky-600">
-                                    {taskStats.inProgress}
-                                </span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">
-                                    {t('projects.details.todoTasks')}:
-                                </span>
-                                <span className="font-bold text-gray-600">
-                                    {taskStats.todo}
-                                </span>
-                            </div>
+                        <div className="mt-2 space-y-2.5">
+                            {[
+                                { label: t('projects.details.totalTasks'), value: taskStats.total, color: 'text-foreground' },
+                                { label: t('projects.details.completedTasks'), value: taskStats.completed, color: 'text-primary' },
+                                { label: t('projects.details.inProgressTasks'), value: taskStats.inProgress, color: 'text-blue-500' },
+                                { label: t('projects.details.todoTasks'), value: taskStats.todo, color: 'text-muted-foreground' }
+                            ].map((stat) => (
+                                <div key={stat.label} className="flex items-center justify-between group">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-dotted border-border flex-1 mr-4">
+                                        {stat.label}
+                                    </span>
+                                    <span className={clsx('text-sm font-bold tabular-nums', stat.color)}>
+                                        {stat.value}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
                     </StatCard>
                 </div>
-                <div className="mt-auto pt-8 text-center text-xs text-gray-400">
+                <div className="mt-auto pt-8 text-center text-xs text-muted-foreground">
                     <p>
                         {t('projects.details.createdBy')}{' '}
-                        <span className="font-semibold text-gray-500">
+                        <span className="font-semibold text-foreground">
                             {project.createdBy.username}
                         </span>
                     </p>
@@ -716,86 +715,86 @@ export default function ProjectDetails() {
                 </div>
             </aside>
 
-            {/* GŁÓWNA ZAWARTOŚĆ */}
-            <main className="w-full flex-grow p-4 lg:p-10">
-                <header className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 p-6 shadow-xl shadow-emerald-300/50 sm:rounded-3xl sm:p-8">
-                    <div className="relative z-10">
-                        {isEditing && isAdmin ? (
-                            <input
-                                type="text"
-                                name="name"
-                                value={editData.name}
-                                onChange={handleEditChange}
-                                className="w-full border-b-2 border-white/50 bg-transparent text-3xl font-extrabold tracking-tight text-white placeholder:text-white/70 focus:outline-none sm:text-4xl lg:text-5xl"
-                                placeholder={t(
-                                    'projects.details.projectNamePlaceholder',
-                                )}
-                            />
-                        ) : (
-                            <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                                {project.name}
-                            </h1>
-                        )}
-                        {isAdmin && (
-                            <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
-                                {isEditing && isAdmin ? (
-                                    <>
-                                        <button
-                                            onClick={handleSave}
-                                            disabled={isSaving}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-bold text-emerald-700 shadow-md transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-gray-200 disabled:opacity-60 sm:px-5 sm:py-2.5"
-                                        >
-                                            {isSaving ? (
-                                                t('projects.details.saving')
-                                            ) : (
-                                                <>
-                                                    <Icon.Save />{' '}
-                                                    {t(
-                                                        'projects.details.saveChanges',
-                                                    )}
-                                                </>
-                                            )}
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setIsEditing(false);
-                                                fetchData();
-                                            }}
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all duration-200 ease-in-out hover:scale-[1.02] hover:bg-black/30 sm:px-5 sm:py-2.5"
-                                        >
-                                            <Icon.Cancel />{' '}
-                                            {t('projects.details.cancel')}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            onClick={() => setIsEditing(true)}
-                                            className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-bold text-slate-800 shadow-lg transition-all hover:bg-slate-200 sm:px-5 sm:py-2.5"
-                                        >
-                                            <Icon.Edit />{' '}
-                                            {t('projects.details.edit')}
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                setShowUserModal(true)
-                                            }
-                                            className="flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-bold text-white transition-all hover:bg-black/30 sm:px-5 sm:py-2.5"
-                                        >
-                                            <Icon.User />{' '}
-                                            {t('projects.details.manageTeam')}
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </header>
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto bg-background p-6 lg:p-10">
+                <div className="space-y-10">
+                    <header className="relative rounded-lg border border-border bg-card p-10 sm:p-12 shadow-sm">
+                        <div className="relative z-10">
+                            
+                            {isEditing && isAdmin ? (
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={editData.name}
+                                    onChange={handleEditChange}
+                                    className="w-full border-b border-border bg-transparent text-3xl font-bold tracking-tight text-foreground focus:border-primary focus:outline-none sm:text-4xl lg:text-5xl"
+                                    placeholder={t('projects.details.projectNamePlaceholder')}
+                                />
+                            ) : (
+                                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+                                    {project.name}
+                                </h1>
+                            )}
 
-                <div className="animate-fade-in space-y-8">
-                    {/* OPIS PROJEKTU */}
+                            {isAdmin && (
+                                <div className="mt-8 flex flex-wrap gap-3">
+                                    {isEditing ? (
+                                        <>
+                                            <button
+                                                onClick={handleSave}
+                                                disabled={isSaving}
+                                                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95"
+                                            >
+                                                {isSaving ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                                                        {t('projects.details.saving')}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <Icon.Save size={16} />
+                                                        {t('projects.details.saveChanges')}
+                                                    </>
+                                                )}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setIsEditing(false);
+                                                    fetchData();
+                                                }}
+                                                className="flex items-center gap-2 rounded-lg border border-border bg-muted px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
+                                            >
+                                                <Icon.Cancel size={16} />
+                                                {t('projects.details.cancel')}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={() => setIsEditing(true)}
+                                                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
+                                            >
+                                                <Icon.Edit size={16} />
+                                                {t('projects.details.edit')}
+                                            </button>
+                                            <button
+                                                onClick={() => setShowUserModal(true)}
+                                                className="flex items-center gap-2 rounded-lg border border-border bg-muted px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
+                                            >
+                                                <Icon.User size={16} />
+                                                {t('projects.details.manageTeam')}
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </header>
+
+                    <div className="animate-fade-in space-y-8 pb-20">
+                    {/* PROJECT DESCRIPTION */}
                     <ContentCard
-                        icon={<Icon.Info />}
+                        icon={<Icon.Description className="h-5 w-5" />}
                         title={t('projects.details.description')}
                     >
                         {isEditing && isAdmin ? (
@@ -803,67 +802,80 @@ export default function ProjectDetails() {
                                 name="description"
                                 value={editData.description}
                                 onChange={handleEditChange}
-                                rows="6"
-                                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                placeholder={t(
-                                    'projects.details.addDescriptionPlaceholder',
-                                )}
+                                rows={6}
+                                className="w-full rounded-lg border border-border bg-background p-4 text-sm font-medium focus:border-primary focus:outline-none placeholder:text-muted-foreground/40"
+                                placeholder={t('projects.details.addDescriptionPlaceholder')}
                             />
                         ) : (
-                            <p className="whitespace-pre-wrap leading-relaxed text-gray-600">
-                                {project.description ||
-                                    t('projects.details.noDescription')}
+                            <p className="whitespace-pre-wrap text-sm leading-loose text-muted-foreground/80">
+                                {project.description || t('projects.details.noDescription')}
                             </p>
                         )}
                     </ContentCard>
 
-                    {/* ZADANIA */}
-                    <ContentCard
-                        icon={<Icon.ListTodo />}
-                        title={`${t('projects.details.tasksTitle')} (${tasks.length})`}
-                    >
-                        <KanbanBoard
-                            tasks={tasks}
-                            onUpdate={fetchTasks}
-                            onDelete={handleDeleteTask}
-                            projectUsers={project.assignedUsers}
-                            isAdmin={isAdmin}
-                            projectId={id}
-                            onTaskCreated={fetchTasks}
-                            isProjectEditing={isEditing}
-                        />
-                    </ContentCard>
+                    {/* TASKS KANBAN */}
+                    <div className="rounded-xl border border-border/50 bg-card overflow-hidden shadow-sm">
+                        <div className="flex items-center justify-between border-b border-border bg-muted/20 px-8 py-5">
+                            <div className="flex items-center gap-3">
+                                <Icon.ListTodo className="h-4 w-4 text-primary" />
+                                <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                                    {t('projects.details.tasksTitle')}
+                                    <span className="ml-2 text-primary/60">({tasks.length})</span>
+                                </h2>
+                            </div>
+                        </div>
+                        <div className="p-2 sm:p-4">
+                            <KanbanBoard
+                                tasks={tasks}
+                                onUpdate={fetchTasks}
+                                onDelete={handleDeleteTask}
+                                projectUsers={project.assignedUsers}
+                                isAdmin={isAdmin}
+                                projectId={id}
+                                onTaskCreated={fetchTasks}
+                                isProjectEditing={isEditing}
+                            />
+                        </div>
+                    </div>
 
-                    {/* ZESPÓŁ PROJEKTOWY */}
+                    {/* PROJECT TEAM */}
                     <ContentCard
-                        icon={<Icon.Users />}
+                        icon={<Icon.Users className="h-5 w-5" />}
                         title={`${t('projects.details.teamTitle')} (${project.assignedUsers.length})`}
                     >
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {project.assignedUsers.map((user) => (
                                 <div
                                     key={user._id}
-                                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 transition-colors hover:border-emerald-400 hover:bg-emerald-50 sm:gap-4 sm:p-4"
+                                    className="group relative flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:bg-muted/40"
                                 >
-                                    <div
-                                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-base font-bold text-white sm:h-11 sm:w-11 ${user.role === 'admin' ? 'bg-purple-500' : 'bg-emerald-500'}`}
-                                    >
+                                    <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100 rounded-lg" />
+                                    
+                                    <div className={clsx(
+                                        "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white",
+                                        user.role === 'admin' ? "bg-amber-500" : "bg-primary"
+                                    )}>
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
-                                    <div className="min-w-0">
-                                        <p className="truncate font-semibold text-gray-800">
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-bold text-foreground">
                                             {user.username}
                                         </p>
-                                        <p className="max-w-48 truncate text-sm text-gray-500">
-                                            {user.email}
+                                        <p className="truncate text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                                            {user.role}
                                         </p>
                                     </div>
                                 </div>
                             ))}
                             {project.assignedUsers.length === 0 && (
-                                <p className="col-span-full text-center text-gray-500 sm:text-left">
-                                    {t('projects.details.noUsers')}
-                                </p>
+                                <div className="col-span-full py-10 text-center">
+                                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground/40 border border-border">
+                                        <Icon.Users className="h-8 w-8" />
+                                    </div>
+                                    <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
+                                        {t('projects.details.noUsers')}
+                                    </p>
+                                </div>
                             )}
                         </div>
                     </ContentCard>
@@ -887,11 +899,11 @@ export default function ProjectDetails() {
                                     placeholder={t(
                                         'projects.details.addCommentPlaceholder',
                                     )}
-                                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-emerald-500 focus:outline-none"
+                                    className="flex-1 rounded-lg border border-input bg-background px-4 py-2 focus:border-primary focus:outline-none"
                                 />
                                 <button
                                     onClick={handleAddComment}
-                                    className="flex-shrink-0 rounded-lg bg-emerald-600 p-3 text-white hover:bg-emerald-700 sm:p-2 sm:px-4"
+                                    className="flex-shrink-0 rounded-lg bg-primary p-3 text-primary-foreground hover:bg-primary/90 sm:p-2 sm:px-4"
                                 >
                                     <Icon.Send />
                                 </button>
@@ -900,7 +912,7 @@ export default function ProjectDetails() {
 
                         <div className="space-y-4">
                             {comments.length === 0 ? (
-                                <p className="py-8 text-center text-gray-500">
+                                <p className="py-8 text-center text-muted-foreground">
                                     {t('projects.details.noComments')}
                                 </p>
                             ) : (
@@ -928,7 +940,7 @@ export default function ProjectDetails() {
                                 onClick={() =>
                                     setShowActivities(!showActivities)
                                 }
-                                className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
+                                className="flex items-center gap-1 text-sm text-primary hover:text-primary/80"
                             >
                                 {showActivities
                                     ? t('projects.details.hide')
@@ -942,38 +954,38 @@ export default function ProjectDetails() {
                         }
                     >
                         {showActivities && (
-                            <div className="space-y-3">
+                            <div className="divide-y divide-border/20">
                                 {activities.length === 0 ? (
-                                    <p className="py-4 text-center text-gray-500">
-                                        {t('projects.details.noActivity')}
-                                    </p>
+                                    <div className="py-20 text-center">
+                                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-muted text-muted-foreground/30 border border-border">
+                                            <Icon.Activity className="h-8 w-8" />
+                                        </div>
+                                        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
+                                            {t('projects.details.noActivity')}
+                                        </p>
+                                    </div>
                                 ) : (
                                     activities.map((activity) => (
                                         <div
                                             key={activity._id}
-                                            className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 transition-all duration-200 ease-in-out hover:scale-[1.005] hover:shadow-sm"
+                                            className="group relative flex items-start gap-4 p-5 transition-colors hover:bg-muted/30"
                                         >
-                                            {' '}
-                                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100">
-                                                <span className="text-xs font-bold text-emerald-600">
-                                                    {activity.user.username
-                                                        .charAt(0)
-                                                        .toUpperCase()}
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-primary border border-border group-hover:bg-primary group-hover:text-white transition-colors">
+                                                <span className="text-sm font-black">
+                                                    {activity.user.username.charAt(0).toUpperCase()}
                                                 </span>
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="text-sm text-gray-700">
-                                                    <span className="font-semibold">
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center justify-between gap-4">
+                                                    <p className="text-sm font-bold text-foreground">
                                                         {activity.user.username}
-                                                    </span>{' '}
-                                                    {renderActivityDescription(
-                                                        activity,
-                                                    )}
-                                                </p>
-                                                <p className="mt-1 text-xs text-gray-400">
-                                                    {moment(
-                                                        activity.createdAt,
-                                                    ).fromNow()}
+                                                    </p>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                                                        {moment(activity.createdAt).fromNow()}
+                                                    </span>
+                                                </div>
+                                                <p className="mt-1 text-sm leading-relaxed text-muted-foreground/70">
+                                                    {renderActivityDescription(activity)}
                                                 </p>
                                             </div>
                                         </div>
@@ -983,7 +995,8 @@ export default function ProjectDetails() {
                         )}
                     </ContentCard>
                 </div>
-                {showUserModal && (
+            </div>
+            {showUserModal && (
                     <UserManagementModal
                         project={project}
                         onClose={() => setShowUserModal(false)}

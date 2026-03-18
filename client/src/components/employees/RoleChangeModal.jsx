@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Briefcase, Users, Shield, Check, AlertCircle } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { 
+    X, 
+    Briefcase, 
+    Users, 
+    Shield, 
+    Check, 
+    AlertCircle, 
+    ShieldAlert,
+    UserCircle2,
+    ChevronRight,
+    Sparkles
+} from 'lucide-react';
+import clsx from 'clsx';
 
 const RoleChangeModal = ({
     isOpen,
@@ -24,9 +35,14 @@ const RoleChangeModal = ({
         {
             value: 'employee',
             label: t('common.roles.employee'),
-            icon: Briefcase,
-            color: 'gray',
+            icon: UserCircle2,
+            color: 'zinc',
             description: t('employees.list.roleModal.employeeDesc'),
+            glowColor: 'shadow-zinc-500/10',
+            activeBorder: 'border-zinc-500/30',
+            activeBg: 'bg-zinc-500/10',
+            iconBg: 'bg-zinc-500/20',
+            iconColor: 'text-zinc-400'
         },
         {
             value: 'hr',
@@ -34,113 +50,108 @@ const RoleChangeModal = ({
             icon: Users,
             color: 'blue',
             description: t('employees.list.roleModal.hrDesc'),
+            glowColor: 'shadow-blue-500/10',
+            activeBorder: 'border-blue-500/30',
+            activeBg: 'bg-blue-500/10',
+            iconBg: 'bg-blue-500/20',
+            iconColor: 'text-blue-400'
         },
         {
             value: 'admin',
             label: t('common.roles.admin'),
             icon: Shield,
-            color: 'purple',
+            color: 'indigo',
             description: t('employees.list.roleModal.adminDesc'),
+            glowColor: 'shadow-indigo-500/10',
+            activeBorder: 'border-indigo-500/30',
+            activeBg: 'bg-indigo-500/10',
+            iconBg: 'bg-indigo-500/20',
+            iconColor: 'text-indigo-400'
         },
     ];
 
-    const getRoleColor = (role) => {
-        switch (role) {
-            case 'admin':
-                return 'border-purple-500/20 bg-purple-50 text-purple-700';
-            case 'hr':
-                return 'border-blue-500/20 bg-blue-50 text-blue-700';
-            default:
-                return 'border-slate-300/50 bg-slate-50 text-slate-700';
-        }
-    };
-
     return (
-        <div className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm duration-200">
-            <div className="animate-in zoom-in-95 w-full max-w-md rounded-xl border border-slate-200/50 bg-white shadow-2xl duration-200">
-                <div className="flex items-start justify-between border-b border-slate-100 p-5">
-                    <div>
-                        <h3 className="text-lg font-semibold tracking-tight text-slate-900">
-                            {t('employees.list.roleModal.title')}
-                        </h3>
-                        <p className="mt-0.5 text-sm text-slate-500">
-                            {user?.username}
-                        </p>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            {/* Full-screen Backdrop */}
+            <div 
+                className="fixed inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300"
+                onClick={onClose}
+            />
+
+            {/* Modal Card */}
+            <div className="relative w-full max-w-md flex flex-col overflow-hidden bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300">
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-black/5 dark:border-white/5">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
+                            <ShieldAlert size={20} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                                {t('employees.list.roleModal.title')}
+                            </h2>
+                            <p className="mt-1 text-zinc-500 dark:text-zinc-400 text-xs font-medium">
+                                {user?.username || user?.email}
+                            </p>
+                        </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="-mt-1 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                        className="p-2 rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
-                        <X className="h-5 w-5" />
+                        <X size={20} />
                     </button>
                 </div>
 
-                <div className="p-5">
-                    <div className="space-y-2.5">
+                <div className="p-6 space-y-4">
+                    <div className="space-y-3">
                         {roles.map((role) => {
                             const Icon = role.icon;
+                            const isActive = selectedRole === role.value;
+                            
                             return (
                                 <button
                                     key={role.value}
                                     onClick={() => setSelectedRole(role.value)}
-                                    className={cn(
-                                        'w-full rounded-lg border-2 p-4 text-left transition-all',
-                                        selectedRole === role.value
-                                            ? cn(
-                                                  getRoleColor(role.value),
-                                                  'shadow-sm ring-2 ring-offset-1 ring-offset-white',
-                                                  role.value === 'admin'
-                                                      ? 'ring-purple-400'
-                                                      : role.value === 'hr'
-                                                        ? 'ring-blue-400'
-                                                        : 'ring-slate-400',
-                                              )
-                                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50',
+                                    className={clsx(
+                                        "w-full p-4 rounded-xl text-left transition-all relative border",
+                                        isActive 
+                                            ? clsx("border-primary/30 bg-primary/5 shadow-lg", role.glowColor)
+                                            : "border-black/5 dark:border-white/5 bg-black/[0.03] dark:bg-white/5 hover:border-black/10 dark:hover:border-white/10 hover:bg-black/[0.05] dark:hover:bg-white/10"
                                     )}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div
-                                            className={cn(
-                                                'rounded-lg p-2',
-                                                selectedRole === role.value
-                                                    ? role.value === 'admin'
-                                                        ? 'bg-purple-100 text-purple-600'
-                                                        : role.value === 'hr'
-                                                          ? 'bg-blue-100 text-blue-600'
-                                                          : 'bg-slate-200 text-slate-600'
-                                                    : 'bg-slate-100 text-slate-500',
-                                            )}
-                                        >
-                                            <Icon className="h-5 w-5" />
+                                    {isActive && (
+                                        <div className="absolute top-0 right-0 p-3">
+                                            <div className={clsx("w-5 h-5 rounded-full flex items-center justify-center text-black", 
+                                                "bg-primary")}>
+                                                <Check size={12} />
+                                            </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-medium text-slate-900">
-                                                    {t(
-                                                        `common.roles.${role.value}`,
-                                                    )}
+                                    )}
+                                    
+                                    <div className="flex items-start gap-4">
+                                        <div className={clsx(
+                                            "p-2.5 rounded-lg shrink-0",
+                                            isActive ? "bg-primary text-black" : "bg-black/5 dark:bg-white/5 text-zinc-400 dark:text-zinc-500"
+                                        )}>
+                                            <Icon size={18} />
+                                        </div>
+                                        <div className="pr-6">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className={clsx(
+                                                    "text-sm font-bold transition-colors",
+                                                    isActive ? "text-zinc-900 dark:text-white" : "text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-300"
+                                                )}>
+                                                    {t(`common.roles.${role.value}`)}
                                                 </span>
-                                                {selectedRole ===
-                                                    role.value && (
-                                                    <div
-                                                        className={
-                                                            role.value ===
-                                                            'admin'
-                                                                ? 'text-purple-600'
-                                                                : role.value ===
-                                                                    'hr'
-                                                                  ? 'text-blue-600'
-                                                                  : 'text-slate-600'
-                                                        }
-                                                    >
-                                                        <Check className="h-4 w-4" />
-                                                    </div>
+                                                {role.value === 'admin' && (
+                                                    <span className="text-[10px] font-black bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/10 uppercase tracking-widest">
+                                                        SYSTEM
+                                                    </span>
                                                 )}
                                             </div>
-                                            <p className="mt-0.5 text-xs text-slate-500">
-                                                {t(
-                                                    `employees.list.roleModal.${role.value}Desc`,
-                                                )}
+                                            <p className="text-[10px] text-zinc-500 dark:text-zinc-500 font-bold uppercase tracking-tighter leading-relaxed">
+                                                {t(`employees.list.roleModal.${role.value}Desc`)}
                                             </p>
                                         </div>
                                     </div>
@@ -150,33 +161,35 @@ const RoleChangeModal = ({
                     </div>
 
                     {selectedRole !== currentRole && (
-                        <div className="mt-4 flex items-start gap-2.5 rounded-lg border border-amber-200/50 bg-amber-50 p-3 text-sm text-amber-800">
-                            <div className="mt-0.5 flex-shrink-0 text-amber-600">
-                                <AlertCircle className="h-5 w-5" />
-                            </div>
-                            <p className="leading-relaxed">
+                        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-2">
+                            <AlertCircle size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                            <p className="text-[10px] text-amber-500 font-bold uppercase tracking-tighter leading-relaxed">
                                 {t('employees.list.roleModal.warning')}
                             </p>
                         </div>
                     )}
                 </div>
 
-                <div className="flex gap-3 border-t border-slate-100 p-4">
+                {/* Footer */}
+                <div className="p-6 border-t border-black/5 dark:border-white/5 flex gap-3">
                     <button
                         onClick={onClose}
                         disabled={isChanging}
-                        className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
+                        className="flex-1 py-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-zinc-900 dark:text-white font-bold rounded-xl transition-all disabled:opacity-50"
                     >
                         {t('common.cancel')}
                     </button>
                     <button
                         onClick={() => onConfirm(selectedRole)}
                         disabled={isChanging || selectedRole === currentRole}
-                        className="flex-1 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex-1 py-2 bg-primary text-black font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50"
                     >
-                        {isChanging
-                            ? t('employees.list.roleModal.submitting')
-                            : t('employees.list.roleModal.submit')}
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="text-sm font-bold">
+                                {isChanging ? t('employees.list.roleModal.submitting') : t('employees.list.roleModal.submit')}
+                            </span>
+                            {!isChanging && selectedRole !== currentRole && <ChevronRight size={16} />}
+                        </div>
                     </button>
                 </div>
             </div>

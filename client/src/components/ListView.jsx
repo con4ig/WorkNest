@@ -35,32 +35,33 @@ const ListView = ({
         projects.length > 0 && selectedProjects.length === projects.length;
 
     return (
-        <>
-            <div className="hidden overflow-x-auto lg:block">
-                <table className="min-w-full divide-y divide-slate-200 text-left text-sm text-slate-500">
-                    <thead className="bg-slate-50">
-                        <tr>
-                            {currentUserRole !== 'employee' && (
-                                <th className="w-4 px-6 py-3">
-                                    <input
-                                        type="checkbox"
-                                        checked={areAllSelected}
-                                        onChange={onToggleSelectAll}
-                                        className="h-4 w-4 cursor-pointer rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                                    />
-                                </th>
-                            )}
-                            {tableHeaders.map((header) => (
-                                <th
-                                    key={header}
-                                    className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500"
-                                >
-                                    {header}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white">
+        <div className="space-y-6">
+            <div className="hidden lg:block">
+                <div className="overflow-hidden rounded-2xl border border-border/50 bg-secondary/5 transition-all duration-300 backdrop-blur-sm">
+                    <table className="min-w-full text-left text-sm text-muted-foreground">
+                        <thead className="bg-secondary/20 border-b border-border/50">
+                            <tr>
+                                {currentUserRole !== 'employee' && (
+                                    <th className="w-12 px-6 py-4">
+                                        <input
+                                            type="checkbox"
+                                            checked={areAllSelected}
+                                            onChange={onToggleSelectAll}
+                                            className="h-4.5 w-4.5 cursor-pointer rounded-md border-input bg-card text-primary transition-all focus:ring-primary focus:ring-offset-2"
+                                        />
+                                    </th>
+                                )}
+                                {tableHeaders.map((header) => (
+                                    <th
+                                        key={header}
+                                        className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60"
+                                    >
+                                        {header}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/50 bg-transparent">
                         {projects.map((project) => (
                             <ProjectRow
                                 key={project._id}
@@ -77,10 +78,13 @@ const ListView = ({
                                 onToggleSelect={onToggleSelect}
                             />
                         ))}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div className="block space-y-4 lg:hidden">
+            
+            {/* Mobile View */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
                 {projects.map((project) => (
                     <ProjectGridCard
                         key={project._id}
@@ -96,7 +100,7 @@ const ListView = ({
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 };
 

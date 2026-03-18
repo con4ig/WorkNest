@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 export const Icon = {
-    Calendar: ({ className = 'text-emerald-500' }) => (
+    Calendar: ({ className = 'text-primary' }) => (
         <Calendar className={`h-6 w-6 ${className}`} />
     ),
     User: ({ className }) => <User className={`h-5 w-5 ${className}`} />,
@@ -31,10 +31,10 @@ export const Icon = {
     Save: () => <Save className="h-5 w-5" />,
     Cancel: () => <X className="h-5 w-5" />,
     Back: () => <ArrowLeft className="h-5 w-5" />,
-    Users: ({ className = 'text-emerald-500' }) => (
+    Users: ({ className = 'text-primary' }) => (
         <Users className={`h-6 w-6 ${className}`} />
     ),
-    Info: ({ className = 'text-emerald-500' }) => (
+    Info: ({ className = 'text-primary' }) => (
         <Info className={`h-6 w-6 ${className}`} />
     ),
     CheckCircle: ({ className }) => (
@@ -42,10 +42,10 @@ export const Icon = {
     ),
     Circle: ({ className }) => <Circle className={`h-5 w-5 ${className}`} />,
     Clock: ({ className }) => <Clock className={`h-5 w-5 ${className}`} />,
-    Message: ({ className = 'text-emerald-500' }) => (
+    Message: ({ className = 'text-primary' }) => (
         <MessageSquare className={`h-6 w-6 ${className}`} />
     ),
-    Activity: ({ className = 'text-emerald-500' }) => (
+    Activity: ({ className = 'text-primary' }) => (
         <ActivityIcon className={`h-6 w-6 ${className}`} />
     ),
     Plus: () => <Plus className="h-4 w-4" />,
@@ -54,36 +54,50 @@ export const Icon = {
     Send: () => <Send className="h-4 w-4" />,
     ChevronDown: () => <ChevronDown className="h-4 w-4" />,
     ChevronRight: () => <ChevronRight className="h-4 w-4" />,
-    ListTodo: ({ className = 'text-emerald-500' }) => (
+    ListTodo: ({ className = 'text-primary' }) => (
         <ListTodo className={`h-6 w-6 ${className}`} />
+    ),
+    Status: ({ className = 'text-primary' }) => (
+        <ActivityIcon className={`h-6 w-6 ${className}`} />
+    ),
+    Description: ({ className = 'text-primary' }) => (
+        <Info className={`h-6 w-6 ${className}`} />
     ),
 };
 
 export const getStatusClasses = (status) => {
+    return 'bg-secondary/50 text-muted-foreground ring-1 ring-border';
+};
+
+export const getStatusColor = (status) => {
     switch (status) {
         case 'running':
         case 'in-progress':
-            return 'bg-sky-100 text-sky-800 ring-sky-300/50';
+            return 'bg-blue-500';
         case 'completed':
-            return 'bg-green-100 text-green-800 ring-green-300/50';
+            return 'bg-primary';
         case 'on-hold':
-            return 'bg-amber-100 text-amber-800 ring-amber-300/50';
+            return 'bg-amber-500';
         case 'todo':
-            return 'bg-slate-100 text-slate-800 ring-slate-300/50';
+            return 'bg-muted-foreground/30';
         default:
-            return 'bg-slate-100 text-slate-800 ring-slate-300/50';
+            return 'bg-muted-foreground/30';
     }
 };
 
 export const getPriorityClasses = (priority) => {
+    return 'bg-secondary/50 text-muted-foreground ring-1 ring-border';
+};
+
+export const getPriorityColor = (priority) => {
     switch (priority) {
         case 'critical':
         case 'high':
-            return 'bg-red-100 text-red-800';
+            return 'bg-destructive';
         case 'medium':
-            return 'bg-amber-100 text-amber-800';
+            return 'bg-amber-500';
         default:
-            return 'bg-green-100 text-green-800';
+            return 'bg-primary';
     }
 };
 

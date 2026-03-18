@@ -290,15 +290,15 @@ export default function Projekty() {
 
     if (error) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
-                <div className="w-full max-w-md rounded-xl border border-red-200 bg-red-50 px-6 py-6 text-red-700 shadow-sm">
+            <div className="flex min-h-screen items-center justify-center bg-background p-4">
+                <div className="w-full max-w-md rounded-xl border border-destructive/50 bg-card px-6 py-6 text-destructive shadow-sm">
                     <div className="mb-2 text-lg font-semibold">
                         {t('projects.misc.error')}
                     </div>
                     <div className="text-sm">{error}</div>
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="mt-4 w-full rounded-lg bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 sm:w-auto"
+                        className="mt-4 w-full rounded-lg bg-destructive px-4 py-2 text-destructive-foreground transition-colors hover:bg-destructive/90 sm:w-auto"
                     >
                         {t('projects.misc.backToDashboard')}
                     </button>
@@ -309,8 +309,8 @@ export default function Projekty() {
 
     if (!companyId) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
-                <div className="w-full max-w-md rounded-xl border border-yellow-200 bg-yellow-50 px-6 py-6 text-yellow-700 shadow-sm">
+            <div className="flex min-h-screen items-center justify-center bg-background p-4">
+                <div className="w-full max-w-md rounded-xl border border-yellow-500/50 bg-card px-6 py-6 text-yellow-500 shadow-sm">
                     <div className="mb-2 text-lg font-semibold">
                         {t('projects.misc.noCompanyAssigned')}
                     </div>
@@ -319,7 +319,7 @@ export default function Projekty() {
                     </div>
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="mt-4 w-full rounded-lg bg-yellow-600 px-4 py-2 text-white transition-colors hover:bg-yellow-700 sm:w-auto"
+                        className="mt-4 w-full rounded-lg bg-yellow-500 px-4 py-2 text-white transition-colors hover:bg-yellow-600 sm:w-auto"
                     >
                         {t('projects.misc.backToDashboard')}
                     </button>
@@ -329,7 +329,7 @@ export default function Projekty() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-8">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
@@ -344,9 +344,10 @@ export default function Projekty() {
                 onAddProject={() => setIsModalOpen(true)}
                 currentUserRole={currentUserRole}
             />
-            <Card
-                className={`transition-opacity duration-300 ${isFiltering ? 'opacity-60' : 'opacity-100'}`}
-            >
+            <div className="p-6 md:p-8">
+                <Card
+                    className={`transition-opacity duration-300 ${isFiltering ? 'opacity-60' : 'opacity-100'} shadow-none`}
+                >
                 <CardContent className="p-4 md:p-6">
                     <div className="mb-4 grid grid-cols-1 grid-rows-1">
                         {currentUserRole !== 'employee' && (
@@ -381,12 +382,12 @@ export default function Projekty() {
                                     screenSize={screenSize}
                                 />
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                    <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1">
+                                    <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-secondary/10 p-1 backdrop-blur-sm">
                                         <button
                                             onClick={() =>
                                                 setShowArchived(false)
                                             }
-                                            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${!showArchived ? 'bg-emerald-100 text-emerald-700' : 'text-slate-600 hover:bg-slate-100'}`}
+                                            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${!showArchived ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
                                         >
                                             <FolderKanban className="h-4 w-4" />{' '}
                                             {t('projects.misc.active')}
@@ -395,7 +396,7 @@ export default function Projekty() {
                                             onClick={() =>
                                                 setShowArchived(true)
                                             }
-                                            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${showArchived ? 'bg-slate-600 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                                            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${showArchived ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
                                         >
                                             <Archive className="h-4 w-4" />{' '}
                                             {t('projects.misc.archive')}
@@ -416,7 +417,7 @@ export default function Projekty() {
                         </div>
                     </div>
                     {projects.length === 0 ? (
-                        <div className="py-10 text-center text-slate-500">
+                        <div className="py-10 text-center text-muted-foreground">
                             {showArchived
                                 ? t('projects.misc.noArchivedProjects')
                                 : t('projects.misc.noProjectsFound')}
@@ -461,7 +462,7 @@ export default function Projekty() {
                     )}
                 </CardContent>
             </Card>
-            <footer className="mt-8 text-center text-sm text-slate-400">
+            <footer className="mt-8 text-center text-sm text-muted-foreground">
                 © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
             </footer>
             <AddProjectModal
@@ -469,6 +470,7 @@ export default function Projekty() {
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={handleProjectAdded}
             />
+            </div>
         </div>
     );
 }

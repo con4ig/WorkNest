@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import TaskItem from './TaskItem.jsx';
 import InlineCreateTask from './InlineCreateTask.jsx';
+import clsx from 'clsx';
 
 const KanbanColumn = ({
     status,
@@ -18,34 +19,32 @@ const KanbanColumn = ({
     const statusConfig = {
         todo: {
             title: t('common.taskStatus.todo'),
-            color: 'bg-slate-200',
-            textColor: 'text-slate-800',
+            dotColor: 'bg-muted-foreground/30',
         },
         'in-progress': {
             title: t('common.taskStatus.in-progress'),
-            color: 'bg-sky-200',
-            textColor: 'text-sky-800',
+            dotColor: 'bg-primary',
         },
         completed: {
             title: t('common.taskStatus.completed'),
-            color: 'bg-green-200',
-            textColor: 'text-green-800',
+            dotColor: 'bg-green-500',
         },
     };
 
     const config = statusConfig[status];
 
     return (
-        <div className="flex min-h-[200px] w-full min-w-[300px] flex-1 flex-col rounded-xl bg-gray-100 p-4 sm:min-w-[350px]">
-            <div
-                className={`mb-4 flex items-center justify-between rounded-lg px-4 py-2 ${config.color}`}
-            >
-                <h3 className={`text-lg font-bold ${config.textColor}`}>
-                    {config.title}
-                </h3>
-                <span
-                    className={`font-bold ${config.textColor}`}
-                >{`${tasks.length}`}</span>
+        <div className="flex min-h-[300px] w-full min-w-[320px] max-w-[400px] flex-1 flex-col rounded-xl border border-border/40 bg-secondary/10 p-5 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-secondary/20">
+            <div className="mb-6 flex items-center justify-between px-1">
+                <div className="flex items-center gap-2.5">
+                    <div className={clsx("h-2 w-2 rounded-full", config.dotColor)} />
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+                        {config.title}
+                    </h3>
+                    <span className="rounded-full bg-secondary/50 px-2 py-0.5 text-[10px] font-bold text-muted-foreground/60">
+                        {tasks.length}
+                    </span>
+                </div>
             </div>
             <div className="custom-scrollbar max-h-[600px] flex-grow space-y-3 overflow-y-auto pr-2">
                 {tasks.length > 0 ? (
@@ -61,7 +60,7 @@ const KanbanColumn = ({
                         />
                     ))
                 ) : (
-                    <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 text-center text-sm text-gray-400">
+                    <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-border/40 bg-secondary/5 text-center text-sm text-muted-foreground/60 transition-colors group-hover:bg-secondary/10">
                         <p>{t('projects.details.kanban.noTasksInColumn')}</p>
                     </div>
                 )}

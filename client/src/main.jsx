@@ -28,6 +28,7 @@ import Upload from './pages/Upload.jsx';
 import GenerateCode from './pages/GenerateCode.jsx';
 import ForcePasswordChange from './pages/ForcePasswordChange.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './pages/ErrorBoundary.jsx';
@@ -64,8 +65,9 @@ const AuthErrorHandler = () => {
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <ErrorBoundary>
-            <AuthProvider>
-                <I18nextProvider i18n={i18n}>
+            <ThemeProvider>
+                <AuthProvider>
+                    <I18nextProvider i18n={i18n}>
                     <Suspense fallback={<LoadingScreen />}>
                         <Router>
                             <AuthErrorHandler />
@@ -151,6 +153,7 @@ createRoot(document.getElementById('root')).render(
                     </Suspense>
                 </I18nextProvider>
             </AuthProvider>
+            </ThemeProvider>
         </ErrorBoundary>
     </StrictMode>,
 );

@@ -18,23 +18,18 @@ function ProfileImageUpload() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Walidacja rozmiaru (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 setError(t('upload.errors.tooLarge'));
                 return;
             }
-
-            // Walidacja typu
             if (!file.type.startsWith('image/')) {
                 setError(t('upload.errors.invalidType'));
                 return;
             }
-
             setImage(file);
             setError('');
             setSuccess(false);
 
-            // Podgląd obrazka
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreview(reader.result);
@@ -45,28 +40,18 @@ function ProfileImageUpload() {
 
     const handleUpload = async (e) => {
         e.preventDefault();
-
         if (!image) {
             setError(t('upload.errors.noImage'));
             return;
         }
-
         setLoading(true);
         setError('');
-
         const formData = new FormData();
         formData.append('image', image);
-
         try {
-            const res = await api.put('/users/profile-image', formData);
-
+            await api.put('/users/profile-image', formData);
             setSuccess(true);
-
-            // Odśwież dane użytkownika (w tym zdjęcie)
             await refreshUser();
-
-            setSuccess(true);
-
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1500);
@@ -85,164 +70,192 @@ function ProfileImageUpload() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-50 p-4">
-            {/* Floating shapes for decoration */}
+        <div className="relative flex min-h-screen items-center justify-center bg-background p-4 overflow-hidden">
+            {/* Ambient Background Elements */}
+            <div className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
+            <div className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-primary/5 blur-[120px]" />
+            
+            <div className="relative w-full max-w-xl">
+                {/* Main Card */}
+                <div className="animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-card/30 p-8 shadow-2xl backdrop-blur-xl sm:p-12">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
+                    
+                    {/* Back Button */}
+                    <button
+                        onClick={() => navigate('/dashboard')}
+                        className="group absolute left-8 top-8 flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50 text-foreground transition-all hover:bg-muted active:scale-95 shadow-sm border border-border/50"
+                    >
+                        <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                    </button>
 
-            <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
-                {/* Back button */}
-                <button
-                    onClick={() => navigate('/dashboard')}
-                    className="absolute left-4 top-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                </button>
+                    {/* Content Wrapper */}
+                    <div className="relative z-10 flex flex-col items-center">
+                        {/* Header Section */}
+                        <div className="mb-10 text-center">
+                            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20 shadow-inner group transition-transform hover:rotate-3">
+                                <Camera className="h-10 w-10 transition-transform group-hover:scale-110" />
+                            </div>
+                            <h2 className="mb-2 text-3xl font-black tracking-tighter text-foreground sm:text-4xl">
+                                {t('upload.title')}
+                            </h2>
+                            <p className="max-w-[280px] mx-auto text-sm font-medium leading-relaxed text-muted-foreground/60 italic">
+                                {t('upload.subtitle')}
+                            </p>
+                        </div>
 
-                {/* Header */}
-                <div className="mb-6 text-center sm:mb-8">
-                    <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 sm:h-16 sm:w-16">
-                        <Camera className="h-7 w-7 text-emerald-600 sm:h-8 sm:w-8" />
-                    </div>
-                    <h2 className="mb-2 text-2xl font-bold text-gray-800 sm:text-3xl">
-                        {t('upload.title')}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                        {t('upload.subtitle')}
-                    </p>
-                </div>
-
-                <form onSubmit={handleUpload} className="space-y-6">
-                    {/* Preview area */}
-                    <div className="relative">
-                        <div className="mb-6 flex justify-center">
-                            {preview ? (
-                                <div className="group relative">
-                                    <img
-                                        src={preview}
-                                        alt={t('upload.previewAlt')}
-                                        className="h-32 w-32 rounded-full border-4 border-emerald-500 object-cover shadow-lg transition-transform group-hover:scale-105 sm:h-40 sm:w-40"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={handleRemoveImage}
-                                        className="absolute -right-2 -top-2 transform rounded-full bg-red-500 p-2 text-white shadow-lg transition-all hover:scale-110 hover:bg-red-600"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                    {success && (
-                                        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-emerald-500 bg-opacity-90">
-                                            <Check className="h-12 w-12 animate-bounce text-white sm:h-16 sm:w-16" />
+                        <form onSubmit={handleUpload} className="w-full space-y-8">
+                            {/* Preview/Drop Zone */}
+                            <div className="relative flex justify-center">
+                                {preview ? (
+                                    <div className="group relative">
+                                        <div className="relative h-40 w-40 sm:h-48 sm:w-48 overflow-hidden rounded-full border-4 border-primary/30 shadow-2xl shadow-primary/20 transition-transform group-hover:scale-[1.02]">
+                                            <img
+                                                src={preview}
+                                                alt={t('upload.previewAlt')}
+                                                className="h-full w-full object-cover"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                                         </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-dashed border-slate-200 bg-slate-50 transition-colors duration-300 hover:border-emerald-400 hover:bg-emerald-50 sm:h-40 sm:w-40">
-                                    <Upload className="h-10 w-10 text-slate-400 sm:h-12 sm:w-12" />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* File input - styled */}
-                        <label className="group relative block cursor-pointer">
-                            <div className="flex transform items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow-md active:scale-95 sm:text-base">
-                                <Upload className="h-5 w-5" />
-                                <span>
-                                    {preview
-                                        ? t('upload.selectAnother')
-                                        : t('upload.selectImage')}
-                                </span>
-                            </div>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                className="hidden"
-                                disabled={loading}
-                            />
-                        </label>
-
-                        <p className="mt-2 text-center text-xs text-gray-500">
-                            JPG, PNG, GIF • Max 5MB
-                        </p>
-                    </div>
-
-                    {/* Error message */}
-                    {error && (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 shadow-sm duration-300">
-                            <div className="flex items-center gap-3">
-                                <div className="rounded-full bg-red-100 p-1">
-                                    <X className="h-4 w-4 text-red-600" />
-                                </div>
-                                <p className="text-sm font-medium text-red-800">
-                                    {error}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Success message */}
-                    {success && (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 rounded-lg border-l-4 border-emerald-500 bg-emerald-50 p-4 shadow-sm duration-300">
-                            <div className="flex items-center gap-3">
-                                <div className="rounded-full bg-emerald-100 p-1">
-                                    <Check className="h-4 w-4 text-emerald-600" />
-                                </div>
-                                <p className="text-sm font-medium text-emerald-800">
-                                    {t('upload.successMessage')}
-                                    <span className="ml-1 opacity-75">
-                                        {t('common.redirecting')}...
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Action buttons */}
-                    {preview && !success && (
-                        <div className="flex flex-col gap-3 sm:flex-row">
-                            <button
-                                type="submit"
-                                disabled={loading || !image}
-                                className="flex-1 transform rounded-xl bg-emerald-600 px-6 py-3 font-medium text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
-                            >
-                                {loading ? (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                                        {t('common.uploading')}...
-                                    </span>
+                                        
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveImage}
+                                            className="absolute -right-1 -top-1 flex h-10 w-10 transform items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-xl transition-all hover:scale-110 hover:bg-destructive/90 active:scale-95"
+                                        >
+                                            <X className="h-5 w-5" />
+                                        </button>
+                                        
+                                        {success && (
+                                            <div className="animate-in fade-in zoom-in-50 duration-300 absolute inset-0 flex items-center justify-center rounded-full bg-primary/80 backdrop-blur-sm">
+                                                <div className="flex flex-col items-center">
+                                                    <Check className="h-16 w-16 animate-bounce text-primary-foreground" />
+                                                    <span className="text-xs font-black uppercase tracking-widest text-primary-foreground">Success</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 ) : (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <Check className="h-5 w-5" />
-                                        {t('upload.saveButton')}
-                                    </span>
+                                    <label className="group relative z-10 flex h-40 w-40 cursor-pointer items-center justify-center rounded-full border-4 border-dashed border-border/50 bg-muted/20 transition-all hover:border-primary/50 hover:bg-primary/5 sm:h-48 sm:w-48">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Upload className="h-12 w-12 text-muted-foreground/40 transition-transform group-hover:scale-110 group-hover:text-primary/60" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{t('upload.selectImage')}</span>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                            disabled={loading}
+                                        />
+                                    </label>
                                 )}
-                            </button>
+                            </div>
 
-                            <button
-                                type="button"
-                                onClick={() => navigate('/dashboard')}
-                                disabled={loading}
-                                className="rounded-xl bg-gray-100 px-6 py-3 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50 sm:order-first"
-                            >
-                                {t('common.cancel')}
-                            </button>
+                            {/* Info text */}
+                            <div className="text-center">
+                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/30">
+                                    JPG, PNG, GIF • MAX 5MB
+                                </p>
+                            </div>
+
+                            {/* Status Messages */}
+                            <div className="space-y-4">
+                                {error && (
+                                    <div className="animate-in slide-in-from-top-2 duration-300 rounded-2xl border border-destructive/20 bg-destructive/10 p-5 text-center shadow-inner">
+                                        <div className="flex items-center justify-center gap-3">
+                                            <X className="h-5 w-5 text-destructive" />
+                                            <p className="text-sm font-bold text-destructive">
+                                                {error}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {success && (
+                                    <div className="animate-in slide-in-from-top-2 duration-300 rounded-2xl border border-primary/20 bg-primary/10 p-5 text-center shadow-inner">
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="flex items-center gap-2">
+                                                <Check className="h-5 w-5 text-primary" />
+                                                <p className="text-sm font-bold text-primary">
+                                                    {t('upload.successMessage')}
+                                                </p>
+                                            </div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
+                                                {t('common.redirecting')}...
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex flex-col gap-4">
+                                {preview && !success ? (
+                                    <div className="flex flex-col gap-3 sm:flex-row">
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="flex-1 rounded-2xl bg-primary px-8 py-4 font-black uppercase tracking-widest text-primary-foreground shadow-2xl shadow-primary/30 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95 disabled:opacity-50"
+                                        >
+                                            {loading ? (
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                                                    {t('common.uploading')}
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <Upload className="h-5 w-5" />
+                                                    {t('upload.saveButton')}
+                                                </div>
+                                            )}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate('/dashboard')}
+                                            disabled={loading}
+                                            className="rounded-2xl border border-border/50 bg-muted/50 px-8 py-4 font-black uppercase tracking-widest text-foreground transition-all hover:bg-muted active:scale-95"
+                                        >
+                                            {t('common.cancel')}
+                                        </button>
+                                    </div>
+                                ) : !preview ? (
+                                    <label className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-primary px-8 py-4 font-black uppercase tracking-widest text-primary-foreground shadow-2xl shadow-primary/30 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95">
+                                        <Camera className="h-5 w-5" />
+                                        {t('upload.selectImage')}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                ) : null}
+                            </div>
+                        </form>
+
+                        {/* Tips Section */}
+                        <div className="mt-12 w-full rounded-3xl border border-border/20 bg-muted/10 p-6 backdrop-blur-sm sm:p-8">
+                            <h4 className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
+                                {t('upload.tips.title')}
+                            </h4>
+                            <div className="grid grid-cols-1 gap-4 text-xs font-bold sm:grid-cols-3">
+                                <div className="flex flex-col gap-2 p-3 rounded-2xl bg-background/50 border border-border/10">
+                                    <span className="text-primary italic opacity-60">01</span>
+                                    <span className="text-muted-foreground/80 leading-relaxed text-[11px]">{t('upload.tips.lighting')}</span>
+                                </div>
+                                <div className="flex flex-col gap-2 p-3 rounded-2xl bg-background/50 border border-border/10">
+                                    <span className="text-primary italic opacity-60">02</span>
+                                    <span className="text-muted-foreground/80 leading-relaxed text-[11px]">{t('upload.tips.visibility')}</span>
+                                </div>
+                                <div className="flex flex-col gap-2 p-3 rounded-2xl bg-background/50 border border-border/10">
+                                    <span className="text-primary italic opacity-60">03</span>
+                                    <span className="text-muted-foreground/80 leading-relaxed text-[11px]">{t('upload.tips.aspectRatio')}</span>
+                                </div>
+                            </div>
                         </div>
-                    )}
-                </form>
-
-                {/* Tips */}
-                <div className="mt-8 rounded-xl bg-emerald-50 p-4">
-                    <p className="mb-2 text-xs font-medium text-emerald-800">
-                        {t('upload.tips.title')}
-                    </p>
-                    <ul className="space-y-1 text-xs text-emerald-700">
-                        <li>• {t('upload.tips.lighting')}</li>
-                        <li>• {t('upload.tips.visibility')}</li>
-                        <li>• {t('upload.tips.aspectRatio')}</li>
-                    </ul>
+                    </div>
                 </div>
             </div>
-
-            {/* Simple professional background subtle pattern/gradient is handled by parent classes */}
         </div>
     );
 }

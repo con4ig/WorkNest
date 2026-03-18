@@ -12,16 +12,16 @@ const Toast = ({ message, type = 'success', onClose }) => {
         <div className="animate-slide-up fixed bottom-4 right-4 z-50">
             <div
                 className={cn(
-                    'flex items-center gap-3 rounded-lg border px-4 py-3 shadow-lg',
+                    'flex items-center gap-3 rounded-md border px-4 py-3 shadow-lg',
                     type === 'success'
-                        ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                        : 'border-red-200 bg-red-50 text-red-900',
+                        ? 'border-primary/20 bg-primary/10 text-primary'
+                        : 'border-destructive/20 bg-destructive/10 text-destructive',
                 )}
             >
                 {type === 'success' ? (
-                    <Check className="h-5 w-5 text-emerald-600" />
+                    <Check className="h-5 w-5 text-primary" />
                 ) : (
-                    <AlertCircle className="h-5 w-5 text-red-600" />
+                    <AlertCircle className="h-5 w-5 text-destructive" />
                 )}
                 <p className="text-sm font-medium">{message}</p>
                 <button
@@ -29,8 +29,8 @@ const Toast = ({ message, type = 'success', onClose }) => {
                     className={cn(
                         'ml-2 rounded-full p-1 transition-colors',
                         type === 'success'
-                            ? 'text-emerald-700 hover:bg-emerald-100'
-                            : 'text-red-700 hover:bg-red-100',
+                            ? 'text-primary hover:bg-primary/20'
+                            : 'text-destructive hover:bg-destructive/20',
                     )}
                 >
                     <X className="h-4 w-4" />

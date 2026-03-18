@@ -16,7 +16,6 @@ import {
 import clsx from 'clsx';
 import ProjectCard from './projects/ProjectCard';
 
-// Komponent droppable area dla pustej kolumny
 const DroppableArea = ({ status }) => {
     const { t } = useTranslation();
     const { setNodeRef, isOver } = useDroppable({ id: status });
@@ -25,13 +24,13 @@ const DroppableArea = ({ status }) => {
         <div
             ref={setNodeRef}
             className={clsx(
-                'flex h-32 items-center justify-center rounded-xl border-2 border-dashed transition-all',
+                'flex h-32 items-center justify-center rounded-2xl border-2 border-dashed transition-all duration-300',
                 isOver
-                    ? 'border-indigo-400 bg-indigo-50/50 text-indigo-600'
-                    : 'border-slate-200 bg-slate-50/50 text-slate-400',
+                    ? 'border-primary bg-primary/10 text-primary scale-[0.98] shadow-inner'
+                    : 'border-border/50 bg-muted/20 text-muted-foreground/40 hover:border-border hover:bg-muted/30',
             )}
         >
-            <span className="text-xs font-medium">
+            <span className="text-[10px] font-bold uppercase tracking-widest">
                 {isOver
                     ? t('projects.kanban.dropHere')
                     : t('projects.kanban.noProjects')}
@@ -40,7 +39,6 @@ const DroppableArea = ({ status }) => {
     );
 };
 
-// Komponent kolumny Kanban
 const KanbanColumn = ({
     status,
     title,
@@ -53,18 +51,18 @@ const KanbanColumn = ({
     currentUserRole,
 }) => {
     return (
-        <div className="flex max-h-[calc(100vh-200px)] min-w-[300px] flex-col rounded-xl border border-slate-200/60 bg-slate-50/50 p-3 lg:w-1/4">
+        <div className="flex max-h-[calc(100vh-220px)] min-w-[320px] flex-col rounded-2xl border border-border/40 bg-secondary/10 p-4 shadow-sm backdrop-blur-sm lg:w-1/4">
             {/* Header kolumny */}
-            <div className="mb-4 flex items-center justify-between px-1 pt-1">
-                <div className="flex items-center gap-2">
+            <div className="mb-5 flex items-center justify-between px-1">
+                <div className="flex items-center gap-2.5">
                     <div
-                        className={clsx('h-2.5 w-2.5 rounded-full', color)}
+                        className={clsx('h-2 w-2 rounded-full shadow-[0_0_8px_rgba(var(--primary),0.5)]', color)}
                     ></div>
-                    <h3 className="text-sm font-bold leading-none text-slate-700">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-foreground/70">
                         {title}
                     </h3>
                 </div>
-                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full border border-slate-100 bg-white px-1.5 text-[10px] font-bold text-slate-500 shadow-sm">
+                <span className="flex h-5 min-w-[24px] items-center justify-center rounded-lg border border-border bg-card px-1.5 text-[10px] font-bold text-primary shadow-sm ring-1 ring-black/5">
                     {projects.length}
                 </span>
             </div>
@@ -118,22 +116,22 @@ const KanbanView = ({
         {
             status: 'pending',
             title: t('common.projectStatus.pending'),
-            color: 'bg-yellow-400',
+            color: 'bg-yellow-500',
         },
         {
             status: 'running',
             title: t('common.projectStatus.running'),
-            color: 'bg-indigo-500',
+            color: 'bg-blue-500',
         },
         {
             status: 'completed',
             title: t('common.projectStatus.completed'),
-            color: 'bg-emerald-500',
+            color: 'bg-primary',
         },
         {
             status: 'on-hold',
             title: t('common.projectStatus.on-hold'),
-            color: 'bg-slate-400',
+            color: 'bg-destructive',
         },
     ];
 

@@ -35,21 +35,21 @@ const FilterControls = ({
 
     return (
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <div className="relative group">
+                <Search className="absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
                 <input
                     type="text"
                     placeholder={t('projects.filter.searchPlaceholder')}
-                    className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-base shadow-sm transition-all hover:border-emerald-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 md:text-sm"
+                    className="w-full rounded-xl border border-input bg-background/50 py-2.5 pl-11 pr-4 text-base shadow-sm ring-offset-background transition-all text-foreground placeholder:text-muted-foreground hover:border-primary/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 md:w-80 md:text-sm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
             <div className="flex gap-2">
-                <div className="relative flex-1">
-                    <ListFilter className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <div className="relative flex-1 group">
+                    <ListFilter className="absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
                     <select
-                        className="w-full appearance-none rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-8 text-base shadow-sm transition-all hover:border-emerald-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 md:text-sm"
+                        className="w-full appearance-none rounded-xl border border-input bg-background/50 py-2.5 pl-11 pr-10 text-base shadow-sm ring-offset-background transition-all text-foreground hover:border-primary/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 md:text-sm"
                         value={status}
                         onChange={(e) => setStatus(e.target.value)}
                     >
@@ -69,15 +69,18 @@ const FilterControls = ({
                             {t('common.projectStatus.on-hold')}
                         </option>
                     </select>
+                    <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                        <ListFilter className="h-4 w-4 opacity-50" />
+                    </div>
                 </div>
                 {screenSize !== 'mobile' && (
                     <button
                         onClick={onRefresh}
-                        className="rounded-lg border border-slate-200 bg-white p-2.5 text-slate-600 shadow-sm transition-all hover:border-emerald-400 hover:bg-slate-50 hover:text-emerald-600 active:scale-95"
+                        className="group flex items-center justify-center rounded-xl border border-border bg-card p-2.5 text-muted-foreground shadow-sm ring-offset-background transition-all hover:border-primary/50 hover:bg-secondary hover:text-primary active:scale-95 active:shadow-inner"
                         title={t('projects.filter.refresh')}
                     >
                         <RefreshCcw
-                            className={`h-5 w-5 ${isFiltering ? 'animate-spin' : ''}`}
+                            className={`h-5 w-5 transition-transform group-hover:rotate-180 ${isFiltering ? 'animate-spin' : ''}`}
                         />
                     </button>
                 )}

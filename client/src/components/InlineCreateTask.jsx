@@ -36,7 +36,7 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
         return (
             <button
                 onClick={() => setIsCreating(true)}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 hover:text-emerald-800"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
             >
                 <Plus size={18} className="font-bold" />
                 {t('projects.details.kanban.addNewTask')}
@@ -45,12 +45,12 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
     }
 
     return (
-        <div className="rounded-lg border border-gray-300 bg-white p-2 shadow-sm">
+        <div className="rounded-lg border border-border/50 bg-secondary/10 p-2 shadow-sm backdrop-blur-sm">
             <textarea
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('projects.details.kanban.taskTitlePlaceholder')}
-                className="w-full resize-none border-none p-1 text-sm placeholder-gray-500 focus:ring-0"
+                className="w-full resize-none border-none bg-transparent p-1 text-sm placeholder:text-muted-foreground focus:ring-0"
                 autoFocus
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
@@ -72,14 +72,14 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
                             setIsCreating(false);
                             setTitle('');
                         }}
-                        className="rounded-md p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                        className="rounded-md p-1.5 text-muted-foreground hover:bg-muted"
                     >
                         <X size={18} />
                     </button>
                     <button
                         onClick={handleAddTask}
                         disabled={isSubmitting || !title.trim()}
-                        className="rounded-md bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-md bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {isSubmitting ? t('projects.details.kanban.adding') : t('common.add')}
                     </button>

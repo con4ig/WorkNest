@@ -80,11 +80,11 @@ const ProjectProgressChart = ({ stats }) => {
         if (active && payload && payload.length) {
             const data = payload[0];
             return (
-                <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg">
-                    <p className="text-sm font-semibold text-slate-900">
+                <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md">
+                    <p className="text-sm font-semibold text-foreground">
                         {data.name}
                     </p>
-                    <p className="text-xs text-slate-600">
+                    <p className="text-xs text-muted-foreground">
                         {data.value}{' '}
                         {t('dashboard.stats.projectCount', {
                             count: data.value,
@@ -99,7 +99,7 @@ const ProjectProgressChart = ({ stats }) => {
     return (
         <div className="flex w-full flex-col gap-6 p-4">
             {/* Tytuł z podkreśleniem */}
-            <h3 className="w-fit text-xl font-bold text-slate-900">
+            <h3 className="w-fit text-xl font-bold text-foreground">
                 Postęp Projektów
             </h3>
 
@@ -145,10 +145,10 @@ const ProjectProgressChart = ({ stats }) => {
                     </div>
                     {/* Central percentage stats */}
                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-xl font-bold tracking-tight text-slate-900">
+                        <span className="text-xl font-bold tracking-tight text-foreground">
                             {animatedPercentage}%
                         </span>
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
                             OGÓLNIE
                         </span>
                     </div>
@@ -161,12 +161,12 @@ const ProjectProgressChart = ({ stats }) => {
                     {/* Completed */}
                     <div className="group flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-                            <span className="text-sm font-semibold text-slate-600">
+                            <div className="h-3 w-3 rounded-full bg-primary shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+                            <span className="text-sm font-semibold text-muted-foreground">
                                 {t('dashboard.stats.completed')}
                             </span>
                         </div>
-                        <span className="text-sm font-bold text-slate-900">
+                        <span className="text-sm font-bold text-foreground">
                             {stats[1]?.value || '1'}
                         </span>
                     </div>
@@ -175,11 +175,11 @@ const ProjectProgressChart = ({ stats }) => {
                     <div className="group flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
                             <div className="h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.4)]" />
-                            <span className="text-sm font-semibold text-slate-600">
+                            <span className="text-sm font-semibold text-muted-foreground">
                                 {t('dashboard.stats.inProgress')}
                             </span>
                         </div>
-                        <span className="text-sm font-bold text-slate-900">
+                        <span className="text-sm font-bold text-foreground">
                             {stats[2]?.value || '1'}
                         </span>
                     </div>
@@ -187,12 +187,12 @@ const ProjectProgressChart = ({ stats }) => {
                     {/* Pending */}
                     <div className="group flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-slate-400 shadow-[0_0_6px_rgba(148,163,184,0.4)]" />
-                            <span className="text-sm font-semibold text-slate-600">
+                            <div className="h-3 w-3 rounded-full bg-muted-foreground shadow-[0_0_6px_rgba(148,163,184,0.4)]" />
+                            <span className="text-sm font-semibold text-muted-foreground">
                                 {t('dashboard.stats.pending')}
                             </span>
                         </div>
-                        <span className="text-sm font-bold text-slate-900">
+                        <span className="text-sm font-bold text-foreground">
                             {stats[3]?.value || '1'}
                         </span>
                     </div>
@@ -368,20 +368,20 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="flex h-full flex-col space-y-6 p-6 md:p-8">
+        <div className="flex h-full select-none flex-col space-y-6 p-6 md:p-8">
             {/* Header */}
-            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">
+                    <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
                         {t('dashboard.welcome', {
                             name: user?.firstName || user?.username,
                         })}
                     </h1>
-                    <p className="mt-1 text-slate-500">
+                    <p className="mt-2 text-sm text-muted-foreground">
                         {t('dashboard.overview')}
                     </p>
                 </div>
-                <div className="text-sm font-medium text-slate-500">
+                <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
                     {format(new Date(), 'EEEE, d MMMM yyyy', {
                         locale: i18n.language === 'pl' ? pl : undefined,
                     })}
@@ -395,15 +395,15 @@ export default function Dashboard() {
                     {stats.map((stat) => (
                         <Card
                             key={stat.id}
-                            className="border-slate-200 shadow-sm transition-all hover:shadow-md"
+                            className="border-border bg-card shadow-sm transition-all hover:shadow-md"
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-slate-600">
+                                <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                     {t(`dashboard.stats.${stat.titleKey}`)}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-slate-900">
+                                <div className="text-2xl font-semibold tracking-tight text-foreground">
                                     <AnimatedNumber value={stat.value} />
                                 </div>
                             </CardContent>
@@ -412,7 +412,10 @@ export default function Dashboard() {
                 </div>
 
                 {/* Project Progress Chart (Right Side) */}
-                <Card className="col-span-1 border-slate-200 shadow-sm lg:col-span-4">
+                <Card
+                    className="col-span-1 select-none border-border bg-card shadow-sm lg:col-span-4"
+                    onMouseDown={(e) => e.preventDefault()}
+                >
                     <CardContent className="flex h-full items-center justify-center p-0">
                         <ProjectProgressChart stats={stats} />
                     </CardContent>
@@ -420,47 +423,62 @@ export default function Dashboard() {
             </div>
 
             {/* Middle Section: Weekly Activity */}
-            <Card className="border-slate-200 shadow-sm">
+            <Card className="border-border bg-card shadow-sm">
                 <CardHeader>
-                    <CardTitle>{t('dashboard.charts.activity')}</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="font-semibold text-foreground">
+                        {t('dashboard.charts.activity')}
+                    </CardTitle>
+                    <CardDescription className="text-xs tracking-wide text-muted-foreground">
                         {t('dashboard.charts.activityDesc')}
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="pl-0">
-                    <div className="h-[300px]">
+                <CardContent
+                    className="select-none pl-0"
+                    onMouseDown={(e) => e.preventDefault()}
+                >
+                    <div className="h-[300px] select-none">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={weeklyActivity}>
+                            <BarChart
+                                data={weeklyActivity}
+                                className="select-none"
+                            >
                                 <CartesianGrid
                                     strokeDasharray="3 3"
                                     vertical={false}
-                                    stroke="#e2e8f0"
+                                    stroke="rgb(var(--border))"
                                 />
                                 <XAxis
                                     dataKey="day"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                    tick={{
+                                        fill: 'rgb(var(--muted-foreground))',
+                                        fontSize: 12,
+                                    }}
                                     dy={10}
                                 />
                                 <YAxis
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                    tick={{
+                                        fill: 'rgb(var(--muted-foreground))',
+                                        fontSize: 12,
+                                    }}
                                 />
                                 <Tooltip
-                                    cursor={{ fill: '#f1f5f9' }}
+                                    cursor={{ fill: 'rgb(var(--muted))' }}
                                     contentStyle={{
-                                        backgroundColor: '#fff',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '8px',
+                                        backgroundColor: 'rgb(var(--card))',
+                                        border: '1px solid rgb(var(--border))',
+                                        borderRadius: 'var(--radius)',
+                                        userSelect: 'none',
                                         boxShadow:
-                                            '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                                            '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                                     }}
                                 />
                                 <Bar
                                     dataKey="val"
-                                    fill="#10B981"
+                                    fill="rgb(var(--primary))"
                                     radius={[4, 4, 0, 0]}
                                     barSize={40}
                                 />
@@ -471,19 +489,19 @@ export default function Dashboard() {
             </Card>
 
             {/* Recent Projects */}
-            <Card className="border-slate-200 shadow-sm">
-                <CardHeader className="flex flex-row items-center justify-between">
+            <Card className="border-border bg-card shadow-sm">
+                <CardHeader className="mb-4 flex flex-row items-center justify-between border-b border-border pb-4">
                     <div>
-                        <CardTitle>
+                        <CardTitle className="font-semibold text-foreground">
                             {t('dashboard.recentProjects.title')}
                         </CardTitle>
-                        <CardDescription>
+                        <CardDescription className="mt-1 text-xs tracking-wide text-muted-foreground">
                             {t('dashboard.recentProjects.desc')}
                         </CardDescription>
                     </div>
                     <Button
                         variant="ghost"
-                        className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                        className="hover:bg-primary/10 text-primary hover:text-primary"
                         onClick={() => navigate('/projects')}
                     >
                         {t('common.viewAll')}{' '}
@@ -496,29 +514,29 @@ export default function Dashboard() {
                             projects.map((project) => (
                                 <div
                                     key={project._id}
-                                    className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-100 p-4 transition-colors hover:bg-slate-50"
+                                    className="flex cursor-pointer items-center justify-between rounded-lg border border-border p-4 transition-colors hover:bg-muted"
                                     onClick={() =>
                                         navigate(`/projects/${project._id}`)
                                     }
                                 >
                                     <div className="flex items-center gap-4">
                                         <div
-                                            className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                                            className={`flex h-10 w-10 items-center justify-center rounded-lg border ${
                                                 project.status === 'completed'
-                                                    ? 'bg-emerald-100 text-emerald-600'
+                                                    ? 'bg-primary/10 border-primary/20 text-primary'
                                                     : project.status ===
                                                         'in_progress'
-                                                      ? 'bg-amber-100 text-amber-600'
-                                                      : 'bg-slate-100 text-slate-600'
+                                                      ? 'border-amber-500/20 bg-amber-500/10 text-amber-500'
+                                                      : 'border-border bg-muted text-muted-foreground'
                                             }`}
                                         >
-                                            <div className="h-2 w-2 rounded-full bg-current" />
+                                            <div className="h-1.5 w-1.5 rounded-full bg-current" />
                                         </div>
                                         <div>
-                                            <h3 className="font-medium text-slate-900">
+                                            <h3 className="font-semibold text-foreground">
                                                 {project.name}
                                             </h3>
-                                            <p className="text-sm text-slate-500">
+                                            <p className="text-xs tracking-wide text-muted-foreground">
                                                 {t('common.deadline')}:{' '}
                                                 {(() => {
                                                     try {
@@ -549,7 +567,7 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-sm font-medium text-slate-900">
+                                        <div className="text-sm font-bold text-foreground">
                                             {
                                                 project.tasks?.filter(
                                                     (t) =>
@@ -557,16 +575,18 @@ export default function Dashboard() {
                                                         'completed',
                                                 ).length
                                             }
-                                            /{project.tasks?.length || 0}
+                                            <span className="font-normal text-muted-foreground">
+                                                /{project.tasks?.length || 0}
+                                            </span>
                                         </div>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
                                             {t('common.tasks')}
                                         </p>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="py-8 text-center text-slate-500">
+                            <div className="py-8 text-center text-sm tracking-wide text-muted-foreground">
                                 {t('dashboard.noProjects')}
                             </div>
                         )}
@@ -574,7 +594,7 @@ export default function Dashboard() {
                 </CardContent>
             </Card>
 
-            <footer className="mt-8 text-center text-xs text-slate-400">
+            <footer className="mt-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
                 © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
             </footer>
         </div>

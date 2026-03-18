@@ -2,54 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
-
-const Icon = {
-    Close: () => (
-        <svg
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-            />
-        </svg>
-    ),
-    Add: () => (
-        <svg
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-        </svg>
-    ),
-    Remove: () => (
-        <svg
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M20 12H4"
-            />
-        </svg>
-    ),
-};
+import { X, UserPlus, UserMinus, Search, Loader2, Shield, User, Star } from 'lucide-react';
+import clsx from 'clsx';
 
 export default function UserManagementModal({ project, onClose, onUpdate }) {
     const { t } = useTranslation();
@@ -62,11 +16,9 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
     const [searchError, setSearchError] = useState(null);
     const [isUpdating, setIsUpdating] = useState(false);
 
-    // Funkcja do wyszukiwania użytkowników
     const handleSearch = async (term) => {
-        if (!companyId) return; // Nie wyszukuj, jeśli companyId nie jest dostępne
+        if (!companyId) return;
         
-        // Pomiń walidację długości dla pustego ciągu (init load), ale zablokuj dla 1 znaku
         if (term.trim().length === 1) {
             return;
         }
@@ -77,7 +29,6 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         try {
             const res = await api.get('/users', { params: { search: term.trim() } });
 
-            // Filtruj użytkowników już przypisanych
             const assignedIds = project.assignedUsers.map((u) => u._id);
             const filteredUsers = res.data.users.filter(
                 (user) => !assignedIds.includes(user._id),
@@ -94,16 +45,14 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         }
     };
 
-    // Debouncing dla wyszukiwania
     useEffect(() => {
         const timer = setTimeout(() => {
             handleSearch(searchTerm);
-        }, 500); // 500ms delay
+        }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchTerm, project, companyId]); // Zmieniono dependency array, aby reagował na otwarcie (mount)
+    }, [searchTerm, project, companyId]);
 
-    // Logika wyświetlania - limit 3 jeśli brak wyszukiwania
     const isSearchActive = searchTerm.trim().length >= 2;
     const displayedUsers = isSearchActive 
         ? availableUsers 
@@ -111,31 +60,23 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
     
     const hiddenCount = !isSearchActive ? Math.max(0, availableUsers.length - 3) : 0;
 
-    // Funkcja do dodawania/usuwania użytkownika
     const handleToggleUser = async (userId, action) => {
-        if (!companyId) return; // Nie wykonuj akcji, jeśli companyId nie jest dostępne
+        if (!companyId) return;
         setIsUpdating(true);
         try {
             const response = await api.patch(`/projects/${project._id}/users`, { userId, action });
 
-            // Aktualizuj projekt
             if (response.data.project) {
                 onUpdate(response.data.project);
             }
 
-            // Wyczyść search po dodaniu (co spowoduje reload domyślnej listy)
             if (action === 'add') {
                 setSearchTerm('');
-                // Nie czyścimy availableUsers, useEffect sam odświeży listę dla pustego searcha
             }
         } catch (err) {
             console.error(
                 `Błąd podczas ${action === 'add' ? 'dodawania' : 'usuwania'} użytkownika:`,
                 err,
-            );
-            alert(
-                err.response?.data?.message ||
-                    t('projects.details.userModal.errors.updateError'),
             );
         } finally {
             setIsUpdating(false);
@@ -143,101 +84,96 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-2xl transform rounded-xl bg-white shadow-2xl transition-all">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            {/* Full-screen Backdrop */}
+            <div 
+                className="fixed inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300"
+                onClick={onClose}
+            />
+
+            {/* Modal Card */}
+            <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-200 p-6">
+                <div className="flex items-center justify-between p-6 border-b border-black/5 dark:border-white/5">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-800">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
                             {t('projects.details.userModal.title')}
                         </h2>
-                        <p className="mt-1 text-sm text-gray-500">
-                            {t('projects.details.userModal.projectLabel')}: {project.name}
-                        </p>
+                        <div className="mt-1 flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-xs text-[10px] uppercase">
+                            <span className="font-mono">{t('common.project')}</span>
+                            <span className="truncate max-w-[300px] font-medium text-zinc-700 dark:text-zinc-300">{project.name}</span>
+                        </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                        className="p-2 rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
-                        <Icon.Close />
+                        <X size={20} />
                     </button>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto p-6">
-                    {/* Sekcja Obecnych Użytkowników */}
-                    <div className="mb-8">
-                        <h3 className="mb-3 text-lg font-semibold text-gray-700">
-                            {t('projects.details.userModal.currentUsers')}
-                            <span className="ml-2 text-sm font-normal text-gray-500">
-                                ({project.assignedUsers.length})
+                <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                    {/* Current Users Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold">
+                                <User size={18} className="text-primary" />
+                                <h3>{t('projects.details.userModal.currentUsers')}</h3>
+                            </div>
+                            <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+                                {project.assignedUsers.length} {t('common.members', { defaultValue: 'MEMBERS' })}
                             </span>
-                        </h3>
+                        </div>
 
-                        <div className="space-y-2">
+                        <div className="grid grid-cols-1 gap-3">
                             {project.assignedUsers.length === 0 ? (
-                                <div className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
+                                <div className="rounded-xl border border-dashed border-black/10 dark:border-white/10 p-8 text-center text-zinc-500 text-sm">
                                     {t('projects.details.userModal.noUsers')}
                                 </div>
                             ) : (
                                 project.assignedUsers.map((user) => {
-                                    const isCreator =
-                                        project.createdBy._id === user._id;
+                                    const isCreator = project.createdBy?._id === user._id;
 
                                     return (
                                         <div
                                             key={user._id}
-                                            className="flex items-center justify-between rounded-lg border bg-gray-50 p-3 transition-colors hover:bg-gray-100"
+                                            className="flex items-center justify-between p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 transition-all"
                                         >
-                                            <div className="flex items-center gap-3">
-                                                <div
-                                                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                                                        user.role === 'admin'
-                                                            ? 'bg-purple-600 text-white'
-                                                            : user.role === 'hr'
-                                                              ? 'bg-blue-600 text-white'
-                                                              : 'bg-emerald-600 text-white'
-                                                    }`}
-                                                >
-                                                    {user.username
-                                                        .charAt(0)
-                                                        .toUpperCase()}
+                                            <div className="flex items-center gap-4">
+                                                <div className={clsx(
+                                                    "w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold",
+                                                    user.role === 'admin' ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/10" :
+                                                    user.role === 'hr' ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/10" :
+                                                    "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                                                )}>
+                                                    {user.username.charAt(0).toUpperCase()}
                                                 </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 font-medium text-gray-800">
-                                                        {user.username}
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{user.username}</span>
                                                         {isCreator && (
-                                                            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-700">
+                                                            <div className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-[10px] font-bold text-amber-600 dark:text-amber-500">
                                                                 {t('common.creator')}
-                                                            </span>
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <div className="text-xs text-gray-500 truncate max-w-48">
-                                                        {user.email} - {t(`common.roles.${user.role}`)}
-                                                    </div>
+                                                    <p className="text-[10px] text-zinc-500 truncate">
+                                                        {user.email} • {t(`common.roles.${user.role}`)}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <button
-                                                onClick={() =>
-                                                    handleToggleUser(
-                                                        user._id,
-                                                        'remove',
-                                                    )
-                                                }
-                                                disabled={
-                                                    isUpdating || isCreator
-                                                }
-                                                className={`rounded-lg p-2 transition-colors ${
-                                                    isCreator
-                                                        ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-                                                        : 'bg-red-100 text-red-600 hover:bg-red-200'
-                                                }`}
-                                                title={
-                                                    isCreator
-                                                        ? t('projects.details.userModal.cannotRemoveCreator')
-                                                        : t('projects.details.userModal.removeUser')
-                                                }
+                                                onClick={() => handleToggleUser(user._id, 'remove')}
+                                                disabled={isUpdating || isCreator}
+                                                className={clsx(
+                                                    "p-2 rounded-lg transition-all",
+                                                    isCreator 
+                                                        ? "text-zinc-300 dark:text-zinc-800 cursor-not-allowed" 
+                                                        : "text-red-500 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10"
+                                                )}
+                                                title={isCreator ? t('projects.details.userModal.cannotRemoveCreator') : t('projects.details.userModal.removeUser')}
                                             >
-                                                <Icon.Remove />
+                                                <UserMinus size={18} />
                                             </button>
                                         </div>
                                     );
@@ -246,106 +182,95 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                         </div>
                     </div>
 
-                    {/* Sekcja Dodawania Użytkowników */}
-                    <div>
-                        <h3 className="mb-3 text-lg font-semibold text-gray-700">
-                            {t('projects.details.userModal.addUserTitle')}
-                        </h3>
+                    {/* Add Users Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold text-sm">
+                            <UserPlus size={18} className="text-primary" />
+                            <h3>{t('projects.details.userModal.addUserTitle')}</h3>
+                        </div>
 
-                        <div className="mb-4">
+                        <div className="relative">
+                            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-600" />
                             <input
                                 type="text"
                                 placeholder={t('common.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl pl-12 pr-4 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium"
                             />
-                            {/* Removed min length hint since we show defaults */ }
                         </div>
 
                         {searchError && (
-                            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 text-sm font-medium">
                                 {searchError}
                             </div>
                         )}
 
-                        {loadingSearch && (
-                            <div className="py-8 text-center text-gray-500">
-                                <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"></div>
-                                {t('common.searching')}
-                            </div>
-                        )}
-
-                        {/* Wyniki Wyszukiwania / Lista Domyślna */}
-                        {!loadingSearch && (
-                            <div className="max-h-64 space-y-2 overflow-y-auto">
-                                {displayedUsers.length > 0 ? (
-                                    <>
+                        <div className="space-y-3">
+                            {loadingSearch ? (
+                                <div className="py-12 flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-600 gap-3">
+                                    <Loader2 className="animate-spin text-primary" size={24} />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.searching')}</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-1 gap-3">
                                         {displayedUsers.map((user) => (
                                             <div
                                                 key={user._id}
-                                                className="flex items-center justify-between rounded-lg border bg-white p-3 shadow-sm transition-shadow hover:shadow-md"
+                                                className="flex items-center justify-between p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 transition-all"
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <div
-                                                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                                                            user.role === 'admin'
-                                                                ? 'bg-purple-600 text-white'
-                                                                : user.role === 'hr'
-                                                                  ? 'bg-blue-600 text-white'
-                                                                  : 'bg-gray-400 text-white'
-                                                        }`}
-                                                    >
-                                                        {user.username
-                                                            .charAt(0)
-                                                            .toUpperCase()}
+                                                <div className="flex items-center gap-4">
+                                                    <div className={clsx(
+                                                        "w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-200 dark:bg-zinc-800",
+                                                        user.role === 'admin' && "text-purple-600 dark:text-purple-400 bg-purple-500/10",
+                                                        user.role === 'hr' && "text-blue-600 dark:text-blue-400 bg-blue-500/10"
+                                                    )}>
+                                                        {user.username.charAt(0).toUpperCase()}
                                                     </div>
                                                     <div>
-                                                        <div className="font-medium text-gray-800">
-                                                            {user.username}
-                                                        </div>
-                                                        <div className="text-xs text-gray-500 truncate max-w-48">
-                                                            {user.email} - {t(`common.roles.${user.role}`)}
-                                                        </div>
+                                                        <p className="text-xs font-semibold text-zinc-900 dark:text-white">{user.username}</p>
+                                                        <p className="text-[10px] text-zinc-500 truncate">
+                                                            {user.email} • {t(`common.roles.${user.role}`)}
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 <button
-                                                    onClick={() =>
-                                                        handleToggleUser(
-                                                            user._id,
-                                                            'add',
-                                                        )
-                                                    }
+                                                    onClick={() => handleToggleUser(user._id, 'add')}
                                                     disabled={isUpdating}
-                                                    className="flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="p-2 w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-black hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg shadow-primary/20"
                                                 >
-                                                    <Icon.Add />
-                                                    <span>{t('common.add')}</span>
+                                                    <UserPlus size={18} />
                                                 </button>
                                             </div>
                                         ))}
-                                        {hiddenCount > 0 && (
-                                            <div className="text-center py-2 text-sm text-gray-500 bg-gray-50 rounded-lg">
-                                                {t('projects.details.userModal.othersCount', { count: hiddenCount })} 
-                                                <span className="font-medium text-emerald-600 ml-1">{t('projects.details.userModal.typeToSearch')}</span>
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    <div className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
-                                        {searchTerm ? t('common.noUsersFound') : t('projects.details.userModal.allAssigned')}
                                     </div>
-                                )}
-                            </div>
-                        )}
+
+                                    {displayedUsers.length === 0 && !loadingSearch && (
+                                        <div className="rounded-xl border border-dashed border-black/10 dark:border-white/10 p-8 text-center text-zinc-500 text-sm">
+                                            {searchTerm ? t('common.noUsersFound') : t('projects.details.userModal.allAssigned')}
+                                        </div>
+                                    )}
+
+                                    {hiddenCount > 0 && (
+                                        <div className="p-3 text-center">
+                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                                {t('projects.details.userModal.othersCount', { count: hiddenCount })} 
+                                                <span className="text-primary ml-1">{t('projects.details.userModal.typeToSearch')}</span>
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end border-t border-gray-200 p-4">
+                <div className="p-6 border-t border-black/5 dark:border-white/5 flex items-center justify-end">
                     <button
                         onClick={onClose}
-                        className="rounded-lg bg-gray-200 px-6 py-2 text-gray-800 transition-colors hover:bg-gray-300"
+                        className="px-6 py-2 bg-zinc-900 dark:bg-white text-white dark:text-black font-bold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg dark:shadow-white/10"
                     >
                         {t('common.close')}
                     </button>

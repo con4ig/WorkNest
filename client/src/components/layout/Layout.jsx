@@ -25,11 +25,11 @@ const Layout = () => {
     }, []);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
+        <div className="flex h-screen overflow-hidden bg-background font-sans text-foreground selection:bg-none select-none">
             {/* Mobile Overlay */}
             {isMobile && isSidebarOpen && (
                 <div
-                    className="fixed inset-0 z-20 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+                    className="fixed inset-0 z-20 bg-foreground/20 backdrop-blur-sm transition-opacity"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
@@ -57,3 +57,4 @@ const Layout = () => {
 };
 
 export default Layout;
+
