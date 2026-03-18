@@ -23,7 +23,7 @@ const ViewSwitcher = ({
     ];
 
     return (
-        <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1">
+        <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-secondary/20 p-1 backdrop-blur-sm">
             {views.map(
                 ({
                     id,
@@ -32,7 +32,7 @@ const ViewSwitcher = ({
                     disabledInArchive,
                     forceDisabled,
                 }) => {
-                    if (forceDisabled) return null; // Nie renderuj jeśli wymuszone wyłączenie (np. na tablecie)
+                    if (forceDisabled) return null;
 
                     const isDisabled = disabledInArchive && showArchived;
                     return (
@@ -40,12 +40,12 @@ const ViewSwitcher = ({
                             key={id}
                             onClick={() => !isDisabled && onViewChange(id)}
                             disabled={isDisabled}
-                            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${
                                 isDisabled
-                                    ? 'cursor-not-allowed text-slate-300'
+                                    ? 'cursor-not-allowed text-muted-foreground/30'
                                     : currentView === id
-                                      ? 'bg-emerald-600 text-white shadow-sm'
-                                      : 'text-slate-600 hover:bg-slate-100'
+                                      ? 'bg-primary text-primary-foreground shadow-sm'
+                                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                             }`}
                             title={
                                 isDisabled

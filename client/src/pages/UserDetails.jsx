@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
+import { clsx } from 'clsx';
 
 import LoadingScreen from '../components/LoadingScreen';
 // --- Pomocnicze funkcje formatowania ---
@@ -63,35 +64,35 @@ const calculateWorkExperience = (hireDate, t) => {
 
 // --- Komponenty Ikon ---
 const Icon = {
-    Mail: ({ className = 'text-emerald-500' }) => (
+    Mail: ({ className = 'text-primary' }) => (
         <Mail className={`h-6 w-6 ${className}`} />
     ),
-    Phone: ({ className = 'text-emerald-500' }) => (
+    Phone: ({ className = 'text-primary' }) => (
         <Phone className={`h-6 w-6 ${className}`} />
     ),
-    Briefcase: ({ className = 'text-emerald-500' }) => (
+    Briefcase: ({ className = 'text-primary' }) => (
         <Briefcase className={`h-6 w-6 ${className}`} />
     ),
-    Building: ({ className = 'text-emerald-500' }) => (
+    Building: ({ className = 'text-primary' }) => (
         <Building2 className={`h-6 w-6 ${className}`} />
     ),
-    Location: ({ className = 'text-emerald-500' }) => (
+    Location: ({ className = 'text-primary' }) => (
         <MapPin className={`h-6 w-6 ${className}`} />
     ),
-    Calendar: ({ className = 'text-emerald-500' }) => (
+    Calendar: ({ className = 'text-primary' }) => (
         <Calendar className={`h-6 w-6 ${className}`} />
     ),
     Edit: () => <SquarePen className="h-5 w-5" />,
     Save: () => <Save className="h-5 w-5" />,
     Cancel: () => <X className="h-5 w-5" />,
     Back: () => <ArrowLeft className="h-5 w-5" />,
-    Badge: ({ className = 'text-emerald-500' }) => (
+    Badge: ({ className = 'text-primary' }) => (
         <Badge className={`h-6 w-6 ${className}`} />
     ),
-    Notes: ({ className = 'text-emerald-500' }) => (
+    Notes: ({ className = 'text-primary' }) => (
         <FileText className={`h-6 w-6 ${className}`} />
     ),
-    Documents: ({ className = 'text-emerald-500' }) => (
+    Documents: ({ className = 'text-primary' }) => (
         <FileText className={`h-6 w-6 ${className}`} />
     ),
 };
@@ -100,30 +101,30 @@ const Icon = {
 const getStatusClasses = (status) => {
     switch (status) {
         case 'active':
-            return 'bg-green-100 text-green-800 ring-green-300/50';
+            return 'bg-green-500/10 text-green-500 ring-green-500/20';
         case 'inactive':
-            return 'bg-slate-100 text-slate-800 ring-slate-300/50';
+            return 'bg-muted text-muted-foreground ring-border';
         case 'on-leave':
-            return 'bg-blue-100 text-blue-800 ring-blue-300/50';
+            return 'bg-blue-500/10 text-blue-500 ring-blue-500/20';
         case 'terminated':
-            return 'bg-red-100 text-red-800 ring-red-300/50';
+            return 'bg-destructive/10 text-destructive ring-destructive/20';
         default:
-            return 'bg-slate-100 text-slate-800 ring-slate-300/50';
+            return 'bg-muted text-muted-foreground ring-border';
     }
 };
 
 const getContractClasses = (type) => {
     switch (type) {
         case 'full-time':
-            return 'bg-emerald-100 text-emerald-800';
+            return 'bg-primary/10 text-primary';
         case 'part-time':
-            return 'bg-amber-100 text-amber-800';
+            return 'bg-yellow-500/10 text-yellow-500';
         case 'contract':
-            return 'bg-purple-100 text-purple-800';
+            return 'bg-purple-500/10 text-purple-500';
         case 'temporary':
-            return 'bg-orange-100 text-orange-800';
+            return 'bg-orange-500/10 text-orange-500';
         default:
-            return 'bg-slate-100 text-slate-800';
+            return 'bg-muted text-muted-foreground';
     }
 };
 
@@ -139,22 +140,35 @@ const DEPARTMENTS = ['IT', 'HR', 'Sales', 'Marketing', 'Finance', 'Operations'];
 
 // --- Sub-komponenty ---
 const StatCard = ({ icon, title, children }) => (
-    <div className="flex items-start gap-4">
-        <div className="mt-1">{icon}</div>
-        <div className="w-full">
-            <h3 className="text-sm font-semibold text-slate-500">{title}</h3>
-            <div className="mt-2">{children}</div>
+    <div className="group relative flex items-start gap-4 rounded-2xl border border-border/50 bg-card/30 p-4 transition-all hover:bg-card/50 backdrop-blur-sm">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm transition-transform group-hover:scale-110">
+            {icon}
+        </div>
+        <div className="flex-1 min-w-0">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+                {title}
+            </h3>
+            <div className="mt-1 font-bold text-foreground truncate">
+                {children}
+            </div>
         </div>
     </div>
 );
 
-const ContentCard = ({ icon, title, children }) => (
-    <div className="rounded-xl bg-white p-6 shadow-sm sm:p-8">
-        <div className="mb-5 flex items-center gap-4 border-b border-slate-200 pb-4">
-            {icon}
-            <h2 className="text-2xl font-bold text-slate-800">{title}</h2>
+const ContentCard = ({ icon, title, children, actions }) => (
+    <div className="rounded-3xl border border-border/50 bg-card/30 shadow-sm backdrop-blur-sm overflow-hidden transition-all hover:border-primary/20 hover:shadow-md">
+        <div className="flex items-center justify-between border-b border-border/30 bg-muted/20 px-6 py-4">
+            <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm">
+                    {icon}
+                </div>
+                <h2 className="text-lg font-bold tracking-tight text-foreground">{title}</h2>
+            </div>
+            {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
-        {children}
+        <div className="p-6 sm:p-8">
+            {children}
+        </div>
     </div>
 );
 
@@ -168,44 +182,52 @@ const EditableField = ({
     options,
 }) => {
     const { t } = useTranslation();
+    const inputClasses = "w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm font-medium transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:opacity-50 placeholder:text-muted-foreground/30";
+
     return (
-    <div className="flex flex-col gap-2">
-        <label className="text-sm font-semibold text-slate-600">{label}</label>
-        {options ? (
-            <select
-                name={name}
-                value={value}
-                onChange={onChange}
-                disabled={disabled}
-                className="rounded-lg border border-slate-300 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-                <option value="">-- {t('common.select')} --</option>
-                {options.map((opt) => (
-                    <option key={opt} value={opt}>
-                        {name === 'role' ? t(`common.roles.${opt}`) : name === 'department' ? t(`common.departments.${opt}`) : opt}
-                    </option>
-                ))}
-            </select>
-        ) : type === 'textarea' ? (
-            <textarea
-                name={name}
-                value={value}
-                onChange={onChange}
-                disabled={disabled}
-                rows="4"
-                className="rounded-lg border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-        ) : (
-            <input
-                type={type}
-                name={name}
-                value={value}
-                onChange={onChange}
-                disabled={disabled}
-                className="rounded-lg border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-        )}
-    </div>
+        <div className="flex flex-col gap-2">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                {label}
+            </label>
+            {options ? (
+                <select
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    disabled={disabled}
+                    className={inputClasses}
+                >
+                    <option value="">-- {t('common.select')} --</option>
+                    {options.map((opt) => (
+                        <option key={opt} value={opt}>
+                            {name === 'role'
+                                ? t(`common.roles.${opt}`)
+                                : name === 'department'
+                                  ? t(`common.departments.${opt}`)
+                                  : opt}
+                        </option>
+                    ))}
+                </select>
+            ) : type === 'textarea' ? (
+                <textarea
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    disabled={disabled}
+                    rows={4}
+                    className={inputClasses}
+                />
+            ) : (
+                <input
+                    type={type}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    disabled={disabled}
+                    className={inputClasses}
+                />
+            )}
+        </div>
     );
 };
 
@@ -405,15 +427,15 @@ export default function UserDetails() {
 
     if (error)
         return (
-            <div className="flex min-h-screen items-center justify-center bg-slate-50 p-8 text-center">
-                <div className="w-full max-w-lg rounded-xl border border-red-400 bg-red-50 px-8 py-6 text-red-700 shadow-lg">
+            <div className="flex min-h-screen items-center justify-center bg-background p-8 text-center">
+                <div className="w-full max-w-lg rounded-xl border border-destructive/50 bg-destructive/10 px-8 py-6 text-destructive shadow-lg">
                     <strong className="mb-2 block text-lg font-bold">
                         {t('common.error')}
                     </strong>
                     <span>{error}</span>
                     <button
                         onClick={() => navigate('/employees')}
-                        className="mt-6 w-full rounded-lg bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700"
+                        className="mt-6 w-full rounded-lg bg-destructive px-4 py-2 font-semibold text-destructive-foreground transition-colors hover:bg-destructive/90"
                     >
                         {t('common.back')}
                     </button>
@@ -429,184 +451,228 @@ export default function UserDetails() {
         editData.username;
 
     return (
-        <div className="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-700 lg:flex-row">
-            {/* --- LEWY PANEL --- */}
-            <aside className="flex w-full flex-col border-r border-slate-200 bg-white p-6 lg:min-h-screen lg:w-[380px] lg:p-8">
-                <div className="mb-10 flex items-center gap-3">
-                    <button
-                        onClick={() => navigate('/employees')}
-                        className="rounded-lg bg-slate-100 p-2.5 transition-colors hover:bg-slate-200"
-                    >
-                        <Icon.Back />
-                    </button>
-                    <h2 className="text-xl font-bold tracking-tight text-slate-800">
-                        {t('employees.details.title')}
-                    </h2>
-                </div>
-
-                <div className="mb-8 flex flex-col items-center text-center">
-                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-4xl font-bold text-white shadow-lg">
-                        {fullName.charAt(0).toUpperCase()}
-                    </div>
-                    <h3 className="mt-4 text-2xl font-bold text-slate-800">
-                        {fullName}
-                    </h3>
-                    <p className="mt-1 text-sm text-slate-500">
-                        {editData.position || t('common.noPosition')}
-                    </p>
-                </div>
-
-                <div className="space-y-6">
-                    <StatCard icon={<Icon.Badge />} title={t('employees.details.statusAndContract')}>
-                        {isEditing ? (
-                            <div className="space-y-3">
-                                <select
-                                    name="status"
-                                    value={editData.status}
-                                    onChange={handleEditChange}
-                                    className="w-full rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-emerald-500"
-                                >
-                                    {AVAILABLE_STATUSES.map((s) => (
-                                        <option key={s} value={s}>
-                                            {t(`common.employeeStatus.${s}`)}
-                                        </option>
-                                    ))}
-                                </select>
-                                <select
-                                    name="contractType"
-                                    value={editData.contractType}
-                                    onChange={handleEditChange}
-                                    className="w-full rounded-lg border bg-white px-3 py-1.5 text-sm font-semibold ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-emerald-500"
-                                >
-                                    {AVAILABLE_CONTRACT_TYPES.map((c) => (
-                                        <option key={c} value={c}>
-                                            {t(`common.contractType.${c}`)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-2">
-                                <span
-                                    className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ring-1 ${getStatusClasses(user.status)}`}
-                                >
-                                    {t(`common.employeeStatus.${user.status}`)}
-                                </span>
-                                <span
-                                    className={`w-fit rounded-full px-3 py-1 text-xs font-bold capitalize ${getContractClasses(user.contractType)}`}
-                                >
-                                    {t(`common.contractType.${user.contractType}`)}
-                                </span>
-                            </div>
-                        )}
-                    </StatCard>
-                    <StatCard icon={<Icon.Calendar />} title={t('employees.details.workExperience')}>
-                        <p className="text-lg font-bold text-slate-800">
-                            {calculateWorkExperience(user.hireDate, t)}
-                        </p>
-                    </StatCard>
-                    <StatCard icon={<Icon.Briefcase />} title={t('common.department')}>
-                        {isEditing ? (
-                            <select
-                                name="department"
-                                value={editData.department}
-                                onChange={handleEditChange}
-                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 focus:ring-2 focus:ring-emerald-500"
-                            >
-                                <option value="">-- {t('common.select')} --</option>
-                                {DEPARTMENTS.map((d) => (
-                                    <option key={d} value={d}>
-                                        {t(`common.departments.${d}`)}
-                                    </option>
-                                ))}
-                            </select>
-                        ) : (
-                            <p className="text-lg font-bold text-slate-800">
-                                {user.department ? t(`common.departments.${user.department}`) : t('common.notSpecified')}
+        <div className="flex min-h-screen flex-col bg-background font-sans text-foreground lg:flex-row">
+            {/* --- SIDEBAR --- */}
+            <aside className="relative flex w-full flex-col border-r border-border/50 bg-card/30 p-6 lg:min-h-screen lg:w-[380px] lg:p-10 backdrop-blur-md">
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-50" />
+                
+                <div className="relative z-10">
+                    <div className="mb-10 flex items-center gap-4">
+                        <button
+                            onClick={() => navigate('/employees')}
+                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50 text-foreground transition-all hover:bg-muted active:scale-95 shadow-sm border border-border/50"
+                        >
+                            <Icon.Back />
+                        </button>
+                        <div>
+                            <h2 className="text-xl font-black tracking-tight text-foreground">
+                                {t('employees.details.title')}
+                            </h2>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
+                                Management Panel
                             </p>
-                        )}
-                    </StatCard>
-                </div>
+                        </div>
+                    </div>
 
-                <div className="mt-auto pt-8 text-center text-xs text-slate-400">
-                    <p>
-                        {t('common.createdAt')}:{' '}
-                        <span className="font-semibold text-slate-500">
-                            {formatDateForDisplay(user.createdAt, i18n.language) || t('common.notSpecified')}
-                        </span>
-                    </p>
+                    <div className="mb-10 flex flex-col items-center text-center">
+                        <div className="relative">
+                            <div className="absolute inset-0 animate-pulse rounded-full bg-primary/20 blur-xl" />
+                            <div className="relative flex h-28 w-28 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-primary/80 text-4xl font-black text-white shadow-2xl shadow-primary/30">
+                                {fullName.charAt(0).toUpperCase()}
+                            </div>
+                        </div>
+                        <h3 className="mt-6 text-2xl font-black tracking-tighter text-foreground">
+                            {fullName}
+                        </h3>
+                        <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                            <Icon.Briefcase className="h-3 w-3" />
+                            {editData.position || t('common.noPosition')}
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <StatCard
+                            icon={<Icon.Badge className="h-5 w-5" />}
+                            title={t('employees.details.statusAndContract')}
+                        >
+                            {isEditing ? (
+                                <div className="space-y-2 mt-2">
+                                    <select
+                                        name="status"
+                                        value={editData.status}
+                                        onChange={handleEditChange}
+                                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none"
+                                    >
+                                        {AVAILABLE_STATUSES.map((s) => (
+                                            <option key={s} value={s}>
+                                                {t(`common.employeeStatus.${s}`)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        name="contractType"
+                                        value={editData.contractType}
+                                        onChange={handleEditChange}
+                                        className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none"
+                                    >
+                                        {AVAILABLE_CONTRACT_TYPES.map((c) => (
+                                            <option key={c} value={c}>
+                                                {t(`common.contractType.${c}`)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    <span className={clsx(
+                                        "rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-widest border",
+                                        getStatusClasses(user.status)
+                                    )}>
+                                        {t(`common.employeeStatus.${user.status}`)}
+                                    </span>
+                                    <span className={clsx(
+                                        "rounded-lg px-2 py-1 text-[10px] font-black uppercase tracking-widest border",
+                                        getContractClasses(user.contractType)
+                                    )}>
+                                        {t(`common.contractType.${user.contractType}`)}
+                                    </span>
+                                </div>
+                            )}
+                        </StatCard>
+                        <StatCard
+                            icon={<Icon.Calendar className="h-5 w-5" />}
+                            title={t('employees.details.workExperience')}
+                        >
+                            <span className="text-lg font-black tracking-tight text-foreground">
+                                {calculateWorkExperience(user.hireDate, t)}
+                            </span>
+                        </StatCard>
+                        <StatCard
+                            icon={<Icon.Briefcase className="h-5 w-5" />}
+                            title={t('common.department')}
+                        >
+                            {isEditing ? (
+                                <select
+                                    name="department"
+                                    value={editData.department}
+                                    onChange={handleEditChange}
+                                    className="w-full mt-2 rounded-xl border border-border bg-background px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none"
+                                >
+                                    <option value="">-- {t('common.select')} --</option>
+                                    {DEPARTMENTS.map((d) => (
+                                        <option key={d} value={d}>
+                                            {t(`common.departments.${d}`)}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <span className="text-lg font-black tracking-tight text-foreground italic opacity-80">
+                                    {user.department
+                                        ? t(`common.departments.${user.department}`)
+                                        : t('common.notSpecified')}
+                                </span>
+                            )}
+                        </StatCard>
+                    </div>
+
+                    <div className="mt-10 pt-10 border-t border-border/30 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/30">
+                        <div className="flex justify-between items-center">
+                            <span>{t('common.createdAt')}</span>
+                            <span className="text-foreground/40">
+                                {formatDateForDisplay(user.createdAt, i18n.language) || t('common.notSpecified')}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </aside>
 
-            {/* --- GŁÓWNA ZAWARTOŚĆ --- */}
-            <main className="w-full flex-grow p-6 lg:p-10">
-                <header className="relative mb-10 overflow-hidden rounded-t-xl bg-white border-b p-8">
-                    <div className="relative z-10">
-                        {isEditing ? (
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <input
-                                    type="text"
-                                    name="firstName"
-                                    value={editData.firstName}
-                                    onChange={handleEditChange}
-                                    placeholder={`${t('common.firstName')}...`}
-                                    className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
-                                />
-                                <input
-                                    type="text"
-                                    name="lastName"
-                                    value={editData.lastName}
-                                    onChange={handleEditChange}
-                                    placeholder={`${t('common.lastName')}...`}
-                                    className="rounded border-b-2 border-gray-300 bg-gray-100 px-2 py-1 text-lg font-bold text-gray-800 focus:outline-none"
-                                />
+            {/* --- MAIN CONTENT --- */}
+            <main className="flex-1 overflow-y-auto bg-background/50 p-6 lg:p-10">
+                <div className="mx-auto max-w-6xl space-y-10">
+                    <header className="relative overflow-hidden rounded-[2.5rem] bg-zinc-950 p-10 shadow-2xl sm:p-12">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-50" />
+                        <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-primary/10 blur-[100px]" />
+                        
+                        <div className="relative z-10">
+                            <div className="mb-4 flex items-center gap-2">
+                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+                                    Employee Profile
+                                </span>
                             </div>
-                        ) : (
-                            <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 lg:text-5xl">
-                                {fullName}
-                            </h1>
-                        )}
-                        {isAdmin && (
-                            <div className="mt-6 flex flex-wrap gap-3">
-                                {isEditing ? (
-                                    <>
-                                        <button
-                                            onClick={handleSave}
-                                            disabled={isSaving}
-                                            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 font-bold text-white shadow-md transition-all hover:bg-emerald-700 disabled:opacity-60"
-                                        >
-                                            {isSaving ? (
-                                                t('common.saving')
-                                            ) : (
-                                                <>
-                                                    <Icon.Save /> {t('common.saveChanges')}
-                                                </>
-                                            )}
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setIsEditing(false);
-                                                fetchData();
-                                            }}
-                                            className="flex items-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 font-bold text-gray-800 transition-all hover:bg-gray-300"
-                                        >
-                                            <Icon.Cancel /> {t('common.cancel')}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <button
-                                        onClick={() => setIsEditing(true)}
-                                        className="flex items-center gap-2 rounded-lg bg-slate-800 px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:bg-slate-900"
-                                    >
-                                        <Icon.Edit /> {t('common.editData')}
-                                    </button>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </header>
+                            
+                            {isEditing ? (
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={editData.firstName}
+                                        onChange={handleEditChange}
+                                        placeholder={`${t('common.firstName')}...`}
+                                        className="w-full border-b-2 border-primary/30 bg-transparent text-4xl font-black tracking-tighter text-white placeholder:text-zinc-700 focus:border-primary focus:outline-none sm:text-5xl lg:text-6xl"
+                                    />
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={editData.lastName}
+                                        onChange={handleEditChange}
+                                        placeholder={`${t('common.lastName')}...`}
+                                        className="w-full border-b-2 border-primary/30 bg-transparent text-4xl font-black tracking-tighter text-white placeholder:text-zinc-700 focus:border-primary focus:outline-none sm:text-5xl lg:text-6xl"
+                                    />
+                                </div>
+                            ) : (
+                                <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl lg:text-6xl">
+                                    {fullName}
+                                </h1>
+                            )}
 
-                <div className="space-y-8">
+                            {isAdmin && (
+                                <div className="mt-8 flex flex-wrap gap-3">
+                                    {isEditing ? (
+                                        <>
+                                            <button
+                                                onClick={handleSave}
+                                                disabled={isSaving}
+                                                className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 font-bold text-primary-foreground shadow-xl shadow-primary/20 transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95"
+                                            >
+                                                {isSaving ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                                                        {t('common.saving')}
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <Icon.Save className="h-4 w-4" />
+                                                        {t('common.saveChanges')}
+                                                    </>
+                                                )}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setIsEditing(false);
+                                                    fetchData();
+                                                }}
+                                                className="flex items-center gap-2 rounded-2xl bg-white/10 px-6 py-3 font-bold text-white backdrop-blur-md transition-all hover:bg-white/20 active:scale-95"
+                                            >
+                                                <Icon.Cancel className="h-4 w-4" />
+                                                {t('common.cancel')}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <button
+                                            onClick={() => setIsEditing(true)}
+                                            className="flex items-center gap-2 rounded-2xl bg-white px-6 py-3 font-bold text-black shadow-xl transition-all hover:bg-zinc-200 active:scale-95"
+                                        >
+                                            <Icon.Edit className="h-4 w-4" />
+                                            {t('common.editData')}
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </header>
+
+                    <div className="space-y-8 pb-20">
                     {/* Sekcja Kontakt */}
                     <ContentCard icon={<Icon.Mail />} title={t('common.contact')}>
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -629,21 +695,21 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('common.email')}
                                         </p>
                                         <a
                                             href={`mailto:${user.email}`}
-                                            className="text-lg font-bold text-emerald-600 hover:underline"
+                                            className="text-lg font-bold text-primary hover:underline hover:text-primary/80"
                                         >
                                             {user.email}
                                         </a>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('common.phoneNumber')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
+                                        <p className="text-lg font-bold text-foreground">
                                             {user.phoneNumber || t('common.notProvided')}
                                         </p>
                                     </div>
@@ -691,26 +757,26 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('common.position')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
+                                        <p className="text-lg font-bold text-foreground">
                                             {user.position || t('common.notSpecified')}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('common.role')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
+                                        <p className="text-lg font-bold text-foreground">
                                             {t(`common.roles.${user.role}`)}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('employees.details.hireDate')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
+                                        <p className="text-lg font-bold text-foreground">
                                             {formatDateForDisplay(
                                                 user.hireDate,
                                                 i18n.language
@@ -718,10 +784,10 @@ export default function UserDetails() {
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('employees.details.salaryLabel')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
+                                        <p className="text-lg font-bold text-foreground">
                                             {user.salary > 0
                                                 ? `${user.salary} PLN`
                                                 : t('common.notSpecified')}
@@ -753,18 +819,18 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('common.address')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
+                                        <p className="text-lg font-bold text-foreground">
                                             {user.address || t('common.notProvided')}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('common.city')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
+                                        <p className="text-lg font-bold text-foreground">
                                             {user.city || t('common.notProvided')}
                                         </p>
                                     </div>
@@ -788,11 +854,12 @@ export default function UserDetails() {
                             ) : (
                                 <>
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-500">
+                                        <p className="text-sm font-semibold text-muted-foreground">
                                             {t('employees.details.peselId')}
                                         </p>
-                                        <p className="text-lg font-bold text-slate-800">
-                                            {user.peselOrId || t('common.notProvided')}
+                                        <p className="text-lg font-bold text-foreground">
+                                            {user.peselOrId ||
+                                                t('common.notProvided')}
                                         </p>
                                     </div>
                                 </>
@@ -811,7 +878,7 @@ export default function UserDetails() {
                                 onChange={handleEditChange}
                             />
                         ) : (
-                            <p className="whitespace-pre-wrap leading-relaxed text-slate-600">
+                            <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">
                                 {user.notes || t('employees.details.noNotes')}
                             </p>
                         )}
@@ -828,7 +895,7 @@ export default function UserDetails() {
                                       (item, index) => (
                                           <div
                                               key={index}
-                                              className="rounded-lg border bg-slate-50 p-4"
+                                              className="rounded-lg border border-border bg-muted/50 p-4"
                                           >
                                               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                   <EditableField
@@ -893,13 +960,13 @@ export default function UserDetails() {
                                                           e,
                                                       )
                                                   }
-                                                  className="mt-4 w-full rounded-lg border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                                  className="mt-4 w-full rounded-lg border border-input bg-card px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                                               ></textarea>
                                               <button
                                                   onClick={() =>
                                                       handleRemoveHistory(index)
                                                   }
-                                                  className="mt-2 text-sm font-semibold text-red-600 hover:text-red-800"
+                                                  className="mt-2 text-sm font-semibold text-destructive hover:text-destructive/80"
                                               >
                                                   {t('common.delete')}
                                               </button>
@@ -909,41 +976,42 @@ export default function UserDetails() {
                                 : employmentHistory.map((item, index) => (
                                       <div
                                           key={index}
-                                          className="relative pl-8"
+                                          className="group relative pl-10 pb-10 last:pb-0"
                                       >
-                                          <div className="absolute left-0 top-1 h-full w-px bg-slate-200"></div>
-                                          <div className="absolute left-[-5px] top-1 h-3 w-3 rounded-full bg-emerald-500"></div>
-                                          <p className="font-bold text-slate-800">
-                                              {item.position}
-                                          </p>
-                                          <p className="text-sm text-slate-600">
-                                              {item.company}
-                                          </p>
-                                          <p className="text-xs text-slate-400">
-                                              {formatDateForDisplay(
-                                                  item.startDate,
-                                              )}{' '}
-                                              -{' '}
-                                              {formatDateForDisplay(
-                                                  item.endDate,
-                                              )}
-                                          </p>
-                                          <p className="mt-2 text-sm text-slate-500">
-                                              {item.description}
-                                          </p>
+                                          {/* Timeline line */}
+                                          <div className="absolute left-0 top-2 h-full w-[2px] bg-gradient-to-b from-primary/30 to-border/10 last:hidden" />
+                                          
+                                          {/* Timeline dot */}
+                                          <div className="absolute left-[-5px] top-1.5 flex h-3 w-3 items-center justify-center rounded-full bg-background border-2 border-primary shadow-[0_0_10px_rgba(var(--primary),0.5)] transition-transform group-hover:scale-125" />
+                                          
+                                          <div className="transition-transform group-hover:translate-x-1">
+                                            <p className="text-lg font-black tracking-tight text-foreground">
+                                                {item.position}
+                                            </p>
+                                            <p className="flex items-center gap-2 text-sm font-bold text-primary italic">
+                                                <Icon.Building className="h-3 w-3" />
+                                                {item.company}
+                                            </p>
+                                            <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                                                {formatDateForDisplay(item.startDate)} — {formatDateForDisplay(item.endDate)}
+                                            </p>
+                                            <p className="mt-3 leading-relaxed text-muted-foreground/80 bg-muted/20 p-4 rounded-2xl border border-border/10">
+                                                {item.description}
+                                            </p>
+                                          </div>
                                       </div>
                                   ))}
                             {isEditing && (
                                 <button
                                     onClick={handleAddHistory}
-                                    className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
+                                    className="rounded-lg bg-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/30"
                                 >
                                     + {t('employees.details.addHistoryEntry')}
                                 </button>
                             )}
                             {!isEditing &&
                                 employmentHistory.length === 0 && (
-                                    <p className="text-slate-500">
+                                    <p className="text-muted-foreground">
                                         {t('employees.details.noHistory')}
                                     </p>
                                 )}
@@ -961,7 +1029,7 @@ export default function UserDetails() {
                                       (doc, index) => (
                                           <div
                                               key={index}
-                                              className="rounded-lg border bg-slate-50 p-4"
+                                              className="rounded-lg border border-border bg-muted/50 p-4"
                                           >
                                               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                                   <EditableField
@@ -1006,7 +1074,7 @@ export default function UserDetails() {
                                                   onClick={() =>
                                                       handleRemoveDocument(index)
                                                   }
-                                                  className="mt-4 text-sm font-semibold text-red-600 hover:text-red-800"
+                                                  className="mt-4 text-sm font-semibold text-destructive hover:text-destructive/80"
                                               >
                                                   {t('employees.details.removeDocument')}
                                               </button>
@@ -1016,36 +1084,48 @@ export default function UserDetails() {
                                 : (user.documents || []).map((doc, index) => (
                                       <div
                                           key={index}
-                                          className="flex items-center justify-between rounded-lg bg-slate-50 p-4"
+                                          className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-border/30 bg-muted/10 p-5 transition-all hover:bg-muted/20 hover:border-primary/20"
                                       >
-                                          <div className="flex flex-col">
-                                              <a
-                                                  href={doc.url}
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  className="font-bold text-emerald-600 hover:underline"
-                                              >
-                                                  {doc.name}
-                                              </a>
-                                              <span className="text-sm text-slate-500">
-                                                  {doc.category === 'agreement'
-                                                      ? t('employees.details.agreement')
-                                                      : t('employees.details.documentation')}
-                                              </span>
+                                          <div className="flex items-center gap-4">
+                                              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+                                                  <Icon.Documents />
+                                              </div>
+                                              <div className="flex flex-col">
+                                                  <a
+                                                      href={doc.url}
+                                                      target="_blank"
+                                                      rel="noopener noreferrer"
+                                                      className="text-lg font-black tracking-tight text-foreground hover:text-primary transition-colors"
+                                                  >
+                                                      {doc.name}
+                                                  </a>
+                                                  <div className="flex items-center gap-2 mt-1">
+                                                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 px-2 py-0.5 rounded-md border border-border/30">
+                                                          {doc.category === 'agreement'
+                                                              ? t('employees.details.agreement')
+                                                              : t('employees.details.documentation')}
+                                                      </span>
+                                                      <span className="text-[10px] font-bold text-muted-foreground/30">
+                                                          {t('common.Added')}: {formatDateForDisplay(doc.uploadedAt)}
+                                                      </span>
+                                                  </div>
+                                              </div>
                                           </div>
-                                          <span className="text-xs text-slate-400">
-                                              {t('common.Added')}:{' '}
-                                              {formatDateForDisplay(
-                                                  doc.uploadedAt,
-                                              )}
-                                          </span>
+                                          <a
+                                              href={doc.url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="flex items-center justify-center rounded-xl bg-primary/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all active:scale-95"
+                                          >
+                                              Open
+                                          </a>
                                       </div>
                                   ))}
 
                             {isEditing && (
                                 <button
                                     onClick={handleAddDocument}
-                                    className="rounded-lg bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-200"
+                                    className="rounded-lg bg-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/30"
                                 >
                                     + {t('employees.details.addDocument')}
                                 </button>
@@ -1054,14 +1134,15 @@ export default function UserDetails() {
                             {!isEditing &&
                                 (!user.documents ||
                                     user.documents.length === 0) && (
-                                    <p className="text-slate-500">
+                                    <p className="text-muted-foreground">
                                         {t('employees.details.noDocuments')}
                                     </p>
                                 )}
                         </div>
                     </ContentCard>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
+    </div>
     );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Archive, Trash2, Eye } from 'lucide-react';
+import { Archive, Trash2, Eye, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../ui/Card';
 import clsx from 'clsx';
@@ -19,7 +19,11 @@ const AssignedUsersAvatarGroup = ({ users }) => {
     const { t } = useTranslation();
 
     if (!users || users.length === 0) {
-        return <div className="text-xs text-slate-400">Brak</div>;
+        return (
+            <div className="text-[10px] font-medium text-muted-foreground/60 italic">
+                {t('projects.projectRow.none')}
+            </div>
+        );
     }
 
     return (
@@ -28,13 +32,13 @@ const AssignedUsersAvatarGroup = ({ users }) => {
                 <div
                     key={user._id}
                     title={user.username}
-                    className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-indigo-50 text-xs font-bold text-indigo-600 ring-1 ring-white"
+                    className="flex h-7 w-7 items-center justify-center rounded-xl border-2 border-card bg-primary/10 text-[10px] font-bold text-primary shadow-sm ring-1 ring-border transition-transform hover:z-10 hover:scale-110"
                 >
                     {user.username.charAt(0).toUpperCase()}
                 </div>
             ))}
             {users.length > 3 && (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-slate-100 text-xs font-bold text-slate-600 ring-1 ring-white">
+                <div className="flex h-7 w-7 items-center justify-center rounded-xl border-2 border-card bg-secondary text-[10px] font-bold text-muted-foreground shadow-sm ring-1 ring-border">
                     +{users.length - 3}
                 </div>
             )}
@@ -53,23 +57,23 @@ const ProjectCard = ({
 
     const priorityStyles = {
         low: {
-            bg: 'bg-slate-100',
-            text: 'text-slate-600',
+            bg: 'bg-muted/50 border-border',
+            text: 'text-muted-foreground',
             label: t('common.priority.low'),
         },
         medium: {
-            bg: 'bg-blue-50',
-            text: 'text-blue-600',
+            bg: 'bg-blue-500/10 border-blue-500/20',
+            text: 'text-blue-500',
             label: t('common.priority.medium'),
         },
         high: {
-            bg: 'bg-orange-50',
-            text: 'text-orange-600',
+            bg: 'bg-amber-500/10 border-amber-500/20',
+            text: 'text-amber-500',
             label: t('common.priority.high'),
         },
         critical: {
-            bg: 'bg-red-50',
-            text: 'text-red-600',
+            bg: 'bg-destructive/10 border-destructive/20',
+            text: 'text-destructive',
             label: t('common.priority.critical'),
         },
     };
@@ -100,109 +104,93 @@ const ProjectCard = ({
         <Card
             ref={setNodeRef}
             style={style}
-            {...attributes}
-            {...(currentUserRole !== 'employee' ? listeners : {})}
             className={clsx(
-                'group relative mb-3 cursor-grab p-4 transition-all hover:shadow-md active:cursor-grabbing',
-                isDragging && 'rotate-2 shadow-lg ring-2 ring-indigo-500/20',
-                currentUserRole === 'employee' && 'cursor-pointer',
+                'group relative cursor-grab overflow-hidden p-4 ring-offset-background transition-all duration-200 active:cursor-grabbing hover:shadow-lg',
+                isDragging ? 'z-50 shadow-2xl ring-2 ring-primary border-primary ring-offset-4 rotate-3' : 'hover:border-primary/40',
             )}
-            onClick={(e) => {
-                if (!isDragging) {
-                    onCardClick(project._id);
-                }
-            }}
+            onClick={() => onCardClick(project._id)}
+            {...attributes}
+            {...listeners}
         >
-            <div className="mb-3 flex items-start justify-between">
-                <h4 className="flex-1 text-sm font-semibold text-slate-900 transition-colors group-hover:text-indigo-600">
-                    {project.name}
-                </h4>
-                {/* Actions */}
-                {(currentUserRole === 'admin' ||
-                    currentUserRole === 'owner') && (
-                    <div className="ml-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                        <button
-                            onPointerDown={(e) => {
-                                e.stopPropagation();
-                                onCardClick(project._id);
-                            }}
-                            title="Szczegóły"
-                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-indigo-600"
-                        >
-                            <Eye className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                            onPointerDown={(e) => {
-                                e.stopPropagation();
-                                onArchive(project._id);
-                            }}
-                            title="Archiwizuj"
-                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-amber-600"
-                        >
-                            <Archive className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                            onPointerDown={(e) => {
-                                e.stopPropagation();
-                                onPermanentDelete(project._id);
-                            }}
-                            title="Usuń trwale"
-                            className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-red-600"
-                        >
-                            <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                    </div>
-                )}
-            </div>
-
-            <p className="mb-4 line-clamp-2 text-xs font-medium text-slate-500">
-                {project.description}
-            </p>
-
-            <div className="mb-4 flex items-center justify-between">
-                <span
-                    className={clsx(
-                        'inline-flex rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wider',
-                        priorityInfo.bg,
-                        priorityInfo.text,
+            <div className="flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-2">
+                    <h4 className="line-clamp-2 text-sm font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
+                        {project.name}
+                    </h4>
+                    
+                    {(currentUserRole === 'admin' ||
+                        currentUserRole === 'owner') && (
+                        <div className="ml-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            <button
+                                onPointerDown={(e) => {
+                                    e.stopPropagation();
+                                    onCardClick(project._id);
+                                }}
+                                title="Szczegóły"
+                                className="rounded p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+                            >
+                                <Eye className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                                onPointerDown={(e) => {
+                                    e.stopPropagation();
+                                    onArchive(project._id);
+                                }}
+                                title="Archiwizuj"
+                                className="rounded p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-yellow-500"
+                            >
+                                <Archive className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                                onPointerDown={(e) => {
+                                    e.stopPropagation();
+                                    onPermanentDelete(project._id);
+                                }}
+                                title="Usuń trwale"
+                                className="rounded p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                            >
+                                <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
                     )}
-                >
-                    {priorityInfo.label}
-                </span>
-                <span className="text-[10px] font-medium text-slate-400">
-                    {formatDate(project.endDate)}
-                </span>
-            </div>
-
-            {/* Progress bar */}
-            <div className="mb-4">
-                <div className="mb-1.5 flex items-center justify-between">
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                        {t('projects.card.progress')}
-                    </span>
-                    <span className="text-xs font-bold text-slate-700">
-                        {project.progress || 0}%
-                    </span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div
+
+                <div className="flex items-center justify-between">
+                    <span
                         className={clsx(
-                            'h-full rounded-full transition-all duration-300',
-                            (project.progress || 0) === 100
-                                ? 'bg-emerald-500'
-                                : 'bg-indigo-500',
+                            'shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider shadow-sm',
+                            priorityInfo.bg,
+                            priorityInfo.text,
                         )}
-                        style={{ width: `${project.progress || 0}%` }}
-                    ></div>
+                    >
+                        {priorityInfo.label}
+                    </span>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground/60 transition-colors group-hover:text-foreground">
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>{formatDate(project.endDate)}</span>
+                    </div>
                 </div>
-            </div>
 
-            {/* Footer */}
-            <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3">
-                <div className="flex items-center text-xs text-slate-500">
-                    {/* Placeholder for task count logic if needed */}
+                <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px]">
+                        <span className="font-bold uppercase tracking-widest text-muted-foreground/50">
+                            {t('projects.projectCard.progress')}
+                        </span>
+                        <span className="font-bold text-foreground">
+                            {project.progress || 0}%
+                        </span>
+                    </div>
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-secondary/50">
+                        <div
+                            className="h-full bg-primary transition-all duration-1000 ease-out shadow-[0_0_4px_rgba(var(--primary),0.4)]"
+                            style={{ width: `${project.progress || 0}%` }}
+                        />
+                    </div>
                 </div>
-                <AssignedUsersAvatarGroup users={project.assignedUsers} />
+
+                <div className="flex items-center justify-end pt-1">
+                    <AssignedUsersAvatarGroup users={project.assignedUsers} />
+                </div>
             </div>
         </Card>
     );

@@ -1,21 +1,9 @@
 import { useState, useEffect } from 'react';
-import api from '../services/api.js'; // ZMIANA: Importujemy naszą instancję api
+import { X, User, Calendar, AlertCircle, Plus, Check } from 'lucide-react';
+import api from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTranslation } from 'react-i18next';
-
-const Icon = {
-    X: () => (
-        <svg
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-        >
-            <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-    ),
-};
+import clsx from 'clsx';
 
 export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
     const { t } = useTranslation();
@@ -40,15 +28,14 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         if (isOpen && companyId) {
             fetchUsers();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, companyId]);
 
     const fetchUsers = async () => {
         try {
             const res = await api.get('/users', {
                 params: { company: companyId },
-            }); // ZMIANA: Używamy 'api'
-            setUsers(res.data.users || []); // ZABEZPIECZENIE: Upewnij się, że users jest zawsze tablicą
+            });
+            setUsers(res.data.users || []);
         } catch (err) {
             console.error('Error fetching users:', err);
         }
@@ -70,26 +57,21 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // ... walidacja ...
-
         setLoading(true);
         setError('');
 
         try {
             const response = await api.post(
-                // ZMIANA: Używamy 'api'
                 '/projects',
                 { ...formData, company: companyId },
             );
 
             const newProject = response.data.project;
-
             onSuccess(newProject);
-
             onClose();
         } catch (err) {
             console.error('Error creating project:', err);
-            // ... obsługa błędu ...
+            setError(err.response?.data?.message || t('common.error'));
         } finally {
             setLoading(false);
         }
@@ -98,184 +80,211 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            {/* Full-screen Backdrop */}
+            <div 
+                className="fixed inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300"
+                onClick={onClose}
+            />
+            
+            {/* Modal Card */}
+            <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300">
                 {/* Header */}
-                <div className="sticky top-0 flex items-center justify-between border-b bg-white p-6">
-                    <h2 className="text-2xl font-bold">{t('projects.addProject')}</h2>
+                <div className="flex items-center justify-between p-6 border-b border-black/5 dark:border-white/5">
+                    <div>
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                            {t('projects.addProject')}
+                        </h2>
+                        <p className="mt-1 text-zinc-500 dark:text-zinc-400 text-xs">
+                            {t('projects.createSubtitle', { defaultValue: 'Define project details and assign team members.' })}
+                        </p>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-2 transition-colors hover:bg-gray-100"
+                        className="p-2 rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
-                        <Icon.X />
+                        <X size={20} />
                     </button>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-4 p-6">
+                {/* Form Content - Scrollable */}
+                <form id="add-project-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
                     {error && (
-                        <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 dark:text-red-400 text-sm font-medium">
+                            <AlertCircle size={18} />
                             {error}
                         </div>
                     )}
 
-                    {/* Name */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                            {t('projects.labelName')}{' '}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-                            placeholder={t('projects.placeholderName')}
-                            required
-                        />
+                    {/* Basic Info Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold">
+                            <Plus size={18} className="text-primary" />
+                            <h3>{t('projects.basicInfo', { defaultValue: 'Basic Information' })}</h3>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 ml-1">
+                                    {t('projects.labelName')}
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder={t('projects.placeholderName')}
+                                    required
+                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all font-medium"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 ml-1">
+                                    {t('projects.labelDescription')}
+                                </label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    placeholder={t('projects.placeholderDescription')}
+                                    rows={3}
+                                    className="w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl p-4 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all resize-none font-medium"
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Description */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                            {t('projects.labelDescription')}
-                        </label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            rows="3"
-                            className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-                            placeholder={t('projects.placeholderDescription')}
-                        />
-                    </div>
-
-                    {/* Status & Priority */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                    {/* Settings Section */}
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
                                 {t('common.status')}
                             </label>
                             <select
                                 name="status"
                                 value={formData.status}
                                 onChange={handleChange}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer font-medium"
                             >
-                                <option value="pending">{t('common.projectStatus.pending')}</option>
-                                <option value="running">{t('common.projectStatus.running')}</option>
-                                <option value="completed">{t('common.projectStatus.completed')}</option>
-                                <option value="on-hold">{t('common.projectStatus.on-hold')}</option>
+                                <option value="pending" className="bg-white dark:bg-zinc-900">{t('common.projectStatus.pending')}</option>
+                                <option value="running" className="bg-white dark:bg-zinc-900">{t('common.projectStatus.running')}</option>
+                                <option value="completed" className="bg-white dark:bg-zinc-900">{t('common.projectStatus.completed')}</option>
+                                <option value="on-hold" className="bg-white dark:bg-zinc-900">{t('common.projectStatus.on-hold')}</option>
                             </select>
                         </div>
 
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                        <div className="space-y-2">
+                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
                                 {t('projects.labelPriority')}
                             </label>
                             <select
                                 name="priority"
                                 value={formData.priority}
                                 onChange={handleChange}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer font-medium"
                             >
-                                <option value="low">🟢 {t('common.priority.low')}</option>
-                                <option value="medium">🔵 {t('common.priority.medium')}</option>
-                                <option value="high">🟠 {t('common.priority.high')}</option>
-                                <option value="critical">🔴 {t('common.priority.critical')}</option>
+                                <option value="low" className="bg-white dark:bg-zinc-900">{t('common.priority.low')}</option>
+                                <option value="medium" className="bg-white dark:bg-zinc-900">{t('common.priority.medium')}</option>
+                                <option value="high" className="bg-white dark:bg-zinc-900">{t('common.priority.high')}</option>
+                                <option value="critical" className="bg-white dark:bg-zinc-900">{t('common.priority.critical')}</option>
                             </select>
                         </div>
                     </div>
 
-                    {/* Dates */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                {t('projects.labelStartDate')}
-                            </label>
-                            <input
-                                type="date"
-                                name="startDate"
-                                value={formData.startDate}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-                            />
+                    {/* Timeline Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold">
+                            <Calendar size={18} className="text-primary" />
+                            <h3>{t('projects.timeline', { defaultValue: 'Timeline' })}</h3>
                         </div>
 
-                        <div>
-                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                {t('projects.labelEndDate')}
-                            </label>
-                            <input
-                                type="date"
-                                name="endDate"
-                                value={formData.endDate}
-                                onChange={handleChange}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition-colors focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
-                            />
+                        <div className="grid grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 ml-1">
+                                    {t('projects.labelStartDate')}
+                                </label>
+                                <input
+                                    type="date"
+                                    name="startDate"
+                                    value={formData.startDate}
+                                    onChange={handleChange}
+                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium dark:[color-scheme:dark]"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 ml-1">
+                                    {t('projects.labelEndDate')}
+                                </label>
+                                <input
+                                    type="date"
+                                    name="endDate"
+                                    value={formData.endDate}
+                                    onChange={handleChange}
+                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium dark:[color-scheme:dark]"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Assigned Users */}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                            {t('projects.labelAssignedUsers')}
-                        </label>
-                        <div className="max-h-48 space-y-2 overflow-y-auto rounded-lg border border-gray-300 p-4">
+                    {/* Team Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold">
+                            <User size={18} className="text-primary" />
+                            <h3>{t('projects.assignTeam', { defaultValue: 'Assign Team Members' })}</h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {users.map((user) => (
-                                <label
+                                <div
                                     key={user._id}
-                                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-50"
+                                    onClick={() => handleUserToggle(user._id)}
+                                    className={clsx(
+                                        "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
+                                        formData.assignedUsers.includes(user._id)
+                                            ? "bg-primary/10 border-primary/30 shadow-sm"
+                                            : "bg-black/5 dark:bg-white/5 border-transparent dark:border-white/5 hover:border-black/10 dark:hover:border-white/10"
+                                    )}
                                 >
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.assignedUsers.includes(
-                                            user._id,
-                                        )}
-                                        onChange={() =>
-                                            handleUserToggle(user._id)
-                                        }
-                                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                                    />
-                                    <div className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                                    <div className={clsx(
+                                        "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold",
+                                        formData.assignedUsers.includes(user._id) ? "bg-primary text-black" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                                    )}>
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
-                                    <div className="flex-1 overflow-hidden">
-                                        <div className="truncate text-sm font-medium">
-                                            {user.username}
-                                        </div>
-                                        <div className="truncate text-xs text-gray-500 max-w-48">
-                                            {user.email}
-                                        </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">{user.username}</p>
+                                        <p className="text-[10px] text-zinc-500 truncate">{user.email}</p>
                                     </div>
-                                    <span className="ml-auto flex-shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                                        {t(`common.roles.${user.role}`)}
-                                    </span>
-                                </label>
+                                    {formData.assignedUsers.includes(user._id) && (
+                                        <Check size={14} className="text-primary" />
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center justify-end gap-3 border-t pt-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="rounded-lg px-6 py-2 text-gray-600 transition-colors hover:bg-gray-100"
-                            disabled={loading}
-                        >
-                            {t('common.cancel')}
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="rounded-lg bg-emerald-600 px-6 py-2 text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            {loading ? t('projects.creating') : t('projects.addProject')}
-                        </button>
-                    </div>
                 </form>
+
+                {/* Footer */}
+                <div className="p-6 border-t border-black/5 dark:border-white/5 flex items-center justify-end gap-3">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors"
+                        disabled={loading}
+                    >
+                        {t('common.cancel')}
+                    </button>
+                    <button
+                        form="add-project-form"
+                        type="submit"
+                        disabled={loading}
+                        className="px-6 py-2 rounded-2xl border border-border/50 bg-secondary/20 text-foreground font-bold hover:bg-secondary/40 hover:border-primary/50 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 uppercase tracking-wider text-xs flex items-center gap-2"
+                    >
+                        <Plus className="h-4 w-4 text-primary stroke-[3]" />
+                        {loading ? t('projects.creating') : t('projects.addProject')}
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -12,9 +12,12 @@ import {
     ChevronRight,
     ChevronLeft,
     LogOut,
+    Moon,
+    Sun,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/Button';
+import { useTheme } from '../../context/ThemeContext';
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
     const { t } = useTranslation();
@@ -22,6 +25,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
     const location = useLocation();
     const { user, logout } = useAuth();
     const { role, username, profileImage } = user || {};
+    const { theme, toggleTheme } = useTheme();
 
     const handleLogout = () => {
         navigate('/');
@@ -45,8 +49,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                         ? 'justify-start gap-3 px-4'
                         : 'justify-center px-2',
                     isActive
-                        ? 'bg-slate-900 text-white shadow-md'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground',
                     'py-3',
                 )}
             >
@@ -54,8 +58,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                     className={cn(
                         'h-5 w-5 flex-shrink-0',
                         isActive
-                            ? 'text-white'
-                            : 'text-slate-500 group-hover:text-slate-900',
+                            ? 'text-primary-foreground'
+                            : 'text-muted-foreground group-hover:text-secondary-foreground',
                     )}
                 />
                 {isSidebarOpen && (
@@ -64,7 +68,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                     </span>
                 )}
                 {!isSidebarOpen && !isMobile && (
-                    <div className="absolute left-14 z-50 rounded-md bg-slate-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="bg-popover text-popover-foreground absolute left-14 z-50 rounded-md border border-border px-2 py-1 text-xs opacity-0 shadow-md transition-opacity group-hover:opacity-100">
                         {label}
                     </div>
                 )}
@@ -75,7 +79,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
     return (
         <aside
             className={cn(
-                'fixed z-20 h-screen overflow-hidden border-r border-slate-200 bg-white/90 shadow-xl backdrop-blur-xl transition-all duration-300 ease-in-out',
+                'fixed z-20 h-screen overflow-hidden border-r border-border bg-background backdrop-blur-xl transition-all duration-300 ease-in-out',
                 isSidebarOpen
                     ? 'w-64'
                     : isMobile
@@ -94,7 +98,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                 size="icon"
                                 onClick={() => setIsSidebarOpen(true)}
                             >
-                                <ChevronRight className="h-5 w-5 text-slate-400" />
+                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
                             </Button>
                         </div>
                     )}
@@ -111,20 +115,20 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                         <img
                                             src={profileImage}
                                             alt="Avatar"
-                                            className="h-10 w-10 rounded-full object-cover ring-2 ring-slate-100"
+                                            className="h-10 w-10 rounded-full border border-border object-cover"
                                         />
                                     ) : (
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white ring-2 ring-slate-100">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                                             {username?.charAt(0).toUpperCase()}
                                         </div>
                                     )}
-                                    <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-white"></div>
+                                    <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-primary"></div>
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <h3 className="truncate text-sm font-semibold text-slate-900">
+                                    <h3 className="truncate text-sm font-semibold text-foreground">
                                         {username}
                                     </h3>
-                                    <p className="truncate text-xs capitalize text-slate-500">
+                                    <p className="truncate text-xs capitalize text-muted-foreground">
                                         {t(`common.roles.${role}`)}
                                     </p>
                                 </div>
@@ -135,9 +139,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => setIsSidebarOpen(false)}
-                                    className="-mr-2"
+                                    className="-mr-2 text-muted-foreground hover:text-foreground"
                                 >
-                                    <ChevronLeft className="h-5 w-5 text-slate-400" />
+                                    <ChevronLeft className="h-5 w-5" />
                                 </Button>
                             )}
                         </div>
@@ -145,7 +149,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                 </div>
 
                 {/* Navigation */}
-                <nav className="scrollbar-thin scrollbar-thumb-slate-200 flex-1 overflow-y-auto overflow-x-hidden">
+                <nav className="scrollbar-thin scrollbar-thumb-muted flex-1 overflow-y-auto overflow-x-hidden">
                     <ul className="space-y-1.5 px-1">
                         <NavItem
                             to="/dashboard"
@@ -183,7 +187,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                             />
                         )}
 
-                        <div className="mx-2 my-4 border-t border-slate-100"></div>
+                        <div className="mx-2 my-4 border-t border-border"></div>
 
                         <NavItem
                             to="/"
@@ -195,11 +199,31 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                 </nav>
 
                 {/* Footer */}
-                <div className="mt-auto border-t border-slate-100 pt-4">
+                <div className="mt-auto flex flex-col gap-2 border-t border-border pt-4">
+                    <Button
+                        variant="ghost"
+                        className={cn(
+                            'justify-start text-muted-foreground hover:bg-secondary hover:text-secondary-foreground',
+                            !isSidebarOpen && 'justify-center',
+                        )}
+                        onClick={toggleTheme}
+                    >
+                        {theme === 'dark' ? (
+                            <Sun className="h-5 w-5" />
+                        ) : (
+                            <Moon className="h-5 w-5" />
+                        )}
+                        {isSidebarOpen && (
+                            <span className="ml-3 font-medium">
+                                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                            </span>
+                        )}
+                    </Button>
+
                     {isSidebarOpen ? (
                         <Button
-                            variant="destructive"
-                            className="w-full justify-start gap-2 border-0 bg-red-50 text-red-600 shadow-none hover:bg-red-100 hover:text-red-700"
+                            variant="ghost"
+                            className="border-destructive/20 bg-destructive/5 w-full justify-start gap-3 border text-destructive hover:bg-destructive hover:text-destructive-foreground"
                             onClick={handleLogout}
                         >
                             <LogOut className="h-4 w-4" />
@@ -211,7 +235,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={handleLogout}
-                                className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                                className="border-destructive/20 border text-destructive hover:bg-destructive hover:text-destructive-foreground"
                             >
                                 <LogOut className="h-5 w-5" />
                             </Button>

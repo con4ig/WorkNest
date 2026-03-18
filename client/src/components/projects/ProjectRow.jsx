@@ -7,18 +7,30 @@ import {
     Trash2,
     ArchiveRestore,
 } from 'lucide-react';
+import clsx from 'clsx';
+import { translateProjectStatus } from '../../utils/translations';
 
 const statusStyles = {
     pending: {
-        text: 'text-yellow-800',
-        bg: 'bg-yellow-100',
+        text: 'text-amber-500',
+        bg: 'bg-amber-500/10 border-amber-500/20',
+        dot: 'bg-amber-500'
     },
-    running: { text: 'text-sky-800', bg: 'bg-sky-100' },
+    running: {
+        text: 'text-blue-500',
+        bg: 'bg-blue-500/10 border-blue-500/20',
+        dot: 'bg-blue-500 animate-pulse'
+    },
     completed: {
-        text: 'text-emerald-800',
-        bg: 'bg-emerald-100',
+        text: 'text-primary',
+        bg: 'bg-primary/10 border-primary/20',
+        dot: 'bg-primary'
     },
-    'on-hold': { text: 'text-red-800', bg: 'bg-red-100' },
+    'on-hold': {
+        text: 'text-destructive',
+        bg: 'bg-destructive/10 border-destructive/20',
+        dot: 'bg-destructive'
+    },
 };
 
 const ProjectRow = ({
@@ -49,25 +61,25 @@ const ProjectRow = ({
     const AssignedUsersAvatarGroup = ({ users }) => {
         if (!users || users.length === 0) {
             return (
-                <div className="text-xs text-slate-400">
+                <div className="text-xs font-medium text-muted-foreground/60 italic">
                     {t('projects.projectRow.none')}
                 </div>
             );
         }
 
         return (
-            <div className="flex -space-x-2">
+            <div className="flex -space-x-2.5">
                 {users.slice(0, 3).map((user) => (
                     <div
                         key={user._id}
                         title={user.username}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-sky-100 text-xs font-bold text-sky-700"
+                        className="flex h-8 w-8 items-center justify-center rounded-xl border-2 border-card bg-primary/10 text-[11px] font-bold text-primary shadow-sm ring-1 ring-border transition-transform hover:z-10 hover:scale-110"
                     >
                         {user.username.charAt(0).toUpperCase()}
                     </div>
                 ))}
                 {users.length > 3 && (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-slate-200 text-xs font-bold text-slate-700">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl border-2 border-card bg-secondary text-[11px] font-bold text-muted-foreground shadow-sm ring-1 ring-border">
                         +{users.length - 3}
                     </div>
                 )}
@@ -94,125 +106,115 @@ const ProjectRow = ({
 
     return (
         <tr
-            className={`cursor-pointer border-b border-slate-100 transition-colors last:border-0 ${
-                isSelected
-                    ? 'bg-emerald-50 hover:bg-emerald-100'
-                    : 'hover:bg-slate-50'
-            }`}
+            className={clsx(
+                'group h-16 cursor-pointer border-b border-border/50 transition-all duration-200 hover:bg-muted/30 focus-within:bg-muted/30 font-medium',
+                isSelected && 'bg-primary/5',
+            )}
             onClick={() => onRowClick(project._id)}
         >
             {currentUserRole !== 'employee' && (
-                <td
-                    className="w-4 px-6 py-4"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div
-                        className="flex h-5 w-5 cursor-pointer items-center justify-center rounded transition-transform active:scale-90"
-                        onClick={() => onToggleSelect(project._id)}
-                    >
-                        <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => {}} // Zmiana stanu w divie wyżej
-                            className="h-4 w-4 cursor-pointer rounded border-slate-300 text-emerald-600 transition-all checked:bg-emerald-600 hover:border-emerald-500 focus:ring-emerald-500"
-                        />
-                    </div>
+                <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                    <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => onToggleSelect(project._id)}
+                        className="h-4.5 w-4.5 cursor-pointer rounded-md border-input bg-card text-primary transition-all focus:ring-primary focus:ring-offset-2"
+                    />
                 </td>
             )}
             <td className="px-6 py-4">
-                <div className="font-semibold text-slate-800">
-                    {project.name}
-                </div>
-                {project.client && (
-                    <div className="text-sm text-slate-500">
-                        {project.client}
+                <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm border border-primary/20 group-hover:scale-110 transition-transform">
+                        <Calendar className="h-5 w-5" />
                     </div>
-                )}
+                    <div className="flex flex-col min-w-0">
+                        <span className="truncate text-sm font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
+                            {project.name}
+                        </span>
+                        <span className="hidden w-48 truncate text-[11px] font-medium text-muted-foreground/60 md:block">
+                            {project.description || t('projects.projectRow.noDescription')}
+                        </span>
+                    </div>
+                </div>
             </td>
-            <td className="hidden px-6 py-4 md:table-cell">
-                <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${statusInfo.bg} ${statusInfo.text}`}
+            <td className="px-6 py-4">
+                <div
+                    className={clsx(
+                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border shadow-sm',
+                        statusInfo.bg,
+                        statusInfo.text,
+                    )}
                 >
-                    {t(`common.projectStatus.${project.status}`)}
-                </span>
-            </td>
-            <td className="hidden px-6 py-4 md:table-cell">
-                <div className="flex w-full min-w-[100px] flex-col gap-1">
-                    <span className="text-xs font-medium text-slate-700">
-                        {project.progress || 0}% (
-                        {project.tasks?.filter((t) => t.status === 'completed')
-                            .length || 0}
-                        /{project.tasks?.length || 0})
-                    </span>
-                    <div className="h-1.5 w-full rounded-full bg-slate-200">
-                        <div
-                            className="h-1.5 rounded-full bg-emerald-600"
-                            style={{ width: `${project.progress || 0}%` }}
-                        ></div>
-                    </div>
+                    <div className={clsx('h-1.5 w-1.5 rounded-full', statusInfo.dot)} />
+                    {translateProjectStatus(project.status, i18n.language)}
                 </div>
             </td>
-            <td className="hidden px-6 py-4 xl:table-cell">
-                <div className="flex items-center text-sm text-slate-500">
-                    <Calendar className="mr-2 h-4 w-4" />
+            <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                    <div className="h-1.5 w-24 overflow-hidden rounded-full bg-secondary/50 shadow-inner">
+                        <div
+                            className="h-full bg-primary transition-all duration-700 ease-out shadow-[0_0_8px_rgba(var(--primary),0.4)]"
+                            style={{ width: `${project.progress || 0}%` }}
+                        />
+                    </div>
+                    <span className="text-xs font-bold text-foreground">
+                        {project.progress || 0}%
+                    </span>
+                </div>
+            </td>
+            <td className="px-6 py-4">
+                <div className="text-xs font-bold text-foreground">
                     {formatDate(project.endDate)}
                 </div>
             </td>
-            <td className="hidden px-6 py-4 lg:table-cell">
+            <td className="px-6 py-4">
                 <AssignedUsersAvatarGroup users={project.assignedUsers} />
             </td>
+
             {currentUserRole !== 'employee' && (
                 <td className="px-6 py-4">
                     <div className="relative flex" ref={menuRef}>
                         <button
                             onClick={handleMenuClick}
-                            className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-secondary hover:text-foreground active:scale-90"
                         >
                             <MoreVertical className="h-5 w-5" />
                         </button>
                         {showMenu && (
-                            <div className="absolute right-0 top-full z-10 mt-1 w-56 rounded-lg border border-slate-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                                <div className="py-1">
+                            <div className="absolute right-0 top-full z-50 mt-2 w-56 origin-top-right rounded-xl border border-border bg-card p-1.5 shadow-xl ring-1 ring-black/5 backdrop-blur-xl">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        project.isArchived ? onRestore(project._id) : onArchive(project._id);
+                                        setShowMenu(false);
+                                    }}
+                                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+                                >
                                     {project.isArchived ? (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onRestore(project._id);
-                                                setShowMenu(false);
-                                            }}
-                                            className="flex w-full items-center px-5 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
-                                        >
-                                            <ArchiveRestore className="mr-2.5 h-4 w-4" />
+                                        <>
+                                            <ArchiveRestore className="h-4 w-4" />
                                             {t('projects.projectRow.restore')}
-                                        </button>
+                                        </>
                                     ) : (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onArchive(project._id);
-                                                setShowMenu(false);
-                                            }}
-                                            className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
-                                        >
-                                            <Archive className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-slate-700" />
+                                        <>
+                                            <Archive className="h-4 w-4 text-amber-500" />
                                             {t('projects.projectRow.archive')}
-                                        </button>
+                                        </>
                                     )}
-                                    {(currentUserRole === 'admin' ||
-                                        currentUserRole === 'owner') && (
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onPermanentDelete(project._id);
-                                                setShowMenu(false);
-                                            }}
-                                            className="group flex w-full items-center px-5 py-2.5 text-sm text-slate-700 transition-colors hover:bg-red-50 hover:text-red-700"
-                                        >
-                                            <Trash2 className="mr-2.5 h-4 w-4 text-slate-500 transition-colors group-hover:text-red-600" />
-                                            {t('projects.projectRow.delete')}
-                                        </button>
-                                    )}
-                                </div>
+                                </button>
+                                {(currentUserRole === 'admin' || currentUserRole === 'owner') && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onPermanentDelete(project._id);
+                                            setShowMenu(false);
+                                        }}
+                                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-semibold text-destructive transition-colors hover:bg-destructive/10"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                        {t('projects.projectRow.delete')}
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>

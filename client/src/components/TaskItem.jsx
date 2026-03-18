@@ -1,5 +1,6 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
 import api from '../../src/services/api.js';
 import moment from 'moment';
 import 'moment/locale/pl';
@@ -15,6 +16,8 @@ import {
     Icon,
     getStatusClasses,
     getPriorityClasses,
+    getStatusColor,
+    getPriorityColor,
     formatDateForInput,
     AVAILABLE_PRIORITIES,
     TASK_STATUSES,
@@ -25,7 +28,7 @@ import {
 const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <button
         type="button"
-        className="flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-xs text-gray-700 hover:bg-gray-200 w-40"
+        className="flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary w-40"
         onClick={onClick}
         ref={ref}
     >
@@ -96,10 +99,10 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
 
     return (
         <div
-            className={`group flex items-start gap-3 rounded-lg border bg-white p-4 transition-all duration-200 ease-in-out ${
+            className={`group flex items-start gap-3 rounded-lg border bg-card p-4 transition-all duration-200 ease-in-out ${
                 isEditing
-                    ? 'border-emerald-400 shadow-lg'
-                    : 'border-gray-200 hover:border-emerald-300 hover:shadow-md'
+                    ? 'border-primary/50 shadow-lg ring-1 ring-primary/20'
+                    : 'border-border hover:border-primary/30 hover:shadow-md'
             }`}
         >
             <div className="flex-1">
@@ -111,7 +114,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                             onChange={(e) =>
                                 setEditData({ ...editData, title: e.target.value })
                             }
-                            className="mb-1 w-full rounded-md border-gray-300 bg-gray-50 px-2 py-1 text-base font-semibold text-gray-800 focus:border-emerald-500 focus:ring-emerald-500"
+                            className="mb-1 w-full rounded-md border border-input bg-muted px-2 py-1 text-base font-semibold text-foreground focus:border-primary focus:ring-primary/20"
                             placeholder={t('projects.details.kanban.taskTitlePlaceholder')}
                         />
                         <textarea
@@ -122,24 +125,43 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                     description: e.target.value,
                                 })
                             }
-                            className="w-full rounded-md border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-600 focus:border-emerald-500 focus:ring-emerald-500"
+                            className="w-full rounded-md border border-input bg-muted px-2 py-1 text-sm text-muted-foreground focus:border-primary focus:ring-primary/20"
                             rows="2"
                             placeholder={t('projects.details.addDescriptionPlaceholder')}
                         />
                     </div>
                 ) : (
-                    <div>
-                        <h4
-                            className={`font-semibold ${
-                                task.status === 'completed'
-                                    ? 'text-gray-400 line-through'
-                                    : 'text-gray-800'
-                            }`}
-                        >
-                            {task.title}
-                        </h4>
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                                <div 
+                                    className={clsx(
+                                        "h-2 w-2 flex-shrink-0 rounded-full",
+                                        getStatusColor(task.status)
+                                    )} 
+                                />
+                                <h4
+                                    className={clsx(
+                                        "truncate text-sm font-semibold tracking-tight transition-colors",
+                                        task.status === 'completed'
+                                            ? 'text-muted-foreground/60 line-through'
+                                            : 'text-foreground'
+                                    )}
+                                >
+                                    {task.title}
+                                </h4>
+                            </div>
+                            <div 
+                                className={clsx(
+                                    "mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full",
+                                    getPriorityColor(task.priority)
+                                )} 
+                                title={t(`common.priority.${task.priority}`)}
+                            />
+                        </div>
+
                         {task.description && (
-                            <p className="mt-1 text-sm text-gray-600">
+                            <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground/70">
                                 {task.description}
                             </p>
                         )}
@@ -153,7 +175,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 <select
                                     value={editData.status}
                                     onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-                                    className="rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-xs focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="rounded-full border border-input bg-muted py-1 pl-3 pr-8 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
                                     {statusOptions.map(option => (
                                         <option key={option.id} value={option.id}>
@@ -164,7 +186,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 <select
                                     value={editData.priority}
                                     onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
-                                    className="rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-xs focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="rounded-full border border-input bg-muted py-1 pl-3 pr-8 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
                                     {priorityOptions.map(option => (
                                         <option key={option.id} value={option.id}>
@@ -178,7 +200,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 <select
                                     value={editData.assignedTo}
                                     onChange={(e) => setEditData({ ...editData, assignedTo: e.target.value })}
-                                    className="rounded-full border border-gray-300 bg-gray-50 py-1 pl-3 pr-10 text-xs focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                    className="rounded-full border border-input bg-muted py-1 pl-3 pr-8 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
                                     {userOptions.map(option => (
                                         <option key={option.id} value={option.id}>
@@ -204,33 +226,29 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                         </>
                     ) : (
                         <>
-                            <div className="flex items-center gap-2">
-                                <span
-                                    className={`rounded-full px-2 py-1 ${getStatusClasses(
-                                        task.status,
-                                    )}`}
-                                >
-                                    {t(`common.taskStatus.${task.status}`)}
-                                </span>
-                                <span
-                                    className={`rounded-full px-2 py-1 ${getPriorityClasses(
-                                        task.priority,
-                                    )}`}
-                                >
-                                    {t(`common.priority.${task.priority}`)}
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {task.assignedTo && (
-                                    <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 w-fit">
-                                        <Icon.User size={12} /> {task.assignedTo.username}
-                                    </span>
-                                )}
+                            <div className="mt-2 flex items-center justify-between border-t border-border/40 pt-3">
+                                <div className="flex items-center gap-2">
+                                    {task.assignedTo ? (
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] font-medium text-muted-foreground">
+                                                {task.assignedTo.username.charAt(0).toUpperCase()}
+                                            </div>
+                                            <span className="text-[10px] font-medium text-muted-foreground/80">
+                                                {task.assignedTo.username}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-[10px] italic text-muted-foreground/40">
+                                            {t('common.unassigned')}
+                                        </span>
+                                    )}
+                                </div>
+
                                 {task.dueDate && (
-                                    <span className="flex items-center gap-1.5 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 w-fit">
-                                        <Icon.Calendar size={12} />{' '}
-                                        {moment(task.dueDate).format('DD MMM YYYY')}
-                                    </span>
+                                    <div className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground/80">
+                                        <Icon.Calendar size={10} className="text-muted-foreground/40" />
+                                        {moment(task.dueDate).format('DD MMM')}
+                                    </div>
                                 )}
                             </div>
                         </>
@@ -248,14 +266,14 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 <button
                                     type="button"
                                     onClick={handleSave}
-                                    className="flex items-center gap-1.5 rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700"
+                                    className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                                 >
                                     <Icon.Save size={14} /> {t('common.save')}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setIsEditing(false)}
-                                    className="flex items-center gap-1.5 rounded-md bg-gray-200 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-300"
+                                    className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-sm font-semibold text-foreground hover:bg-secondary/80"
                                 >
                                     <Icon.Cancel size={14} /> {t('common.cancel')}
                                 </button>
@@ -265,14 +283,14 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 <button
                                     type="button"
                                     onClick={() => setIsEditing(true)}
-                                    className="rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-emerald-600"
+                                    className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-primary"
                                 >
                                     <Icon.Edit3 />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => onDelete(task._id)}
-                                    className="rounded p-1 text-gray-400 hover:bg-red-100 hover:text-red-600"
+                                    className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                                 >
                                     <Icon.Trash />
                                 </button>
