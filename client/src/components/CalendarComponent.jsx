@@ -186,12 +186,12 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
             dark:[--calendar-bg-view:rgba(0,0,0,0.2)]
             dark:[--calendar-border:rgba(255,255,255,0.05)]
             dark:[--calendar-off-range:rgba(255,255,255,0.02)]
-            dark:[--calendar-event-pending-bg:rgba(245,158,11,0.15)]
-            dark:[--calendar-event-pending-border:rgba(245,158,11,0.3)]
-            dark:[--calendar-event-approved-bg:rgba(16,185,129,0.15)]
-            dark:[--calendar-event-approved-border:rgba(16,185,129,0.3)]
-            dark:[--calendar-event-rejected-bg:rgba(244,63,94,0.15)]
-            dark:[--calendar-event-rejected-border:rgba(244,63,94,0.3)]
+            dark:[--calendar-event-pending-bg:rgba(245,158,11,0.8)]
+            dark:[--calendar-event-pending-border:rgba(245,158,11,1)]
+            dark:[--calendar-event-approved-bg:rgba(16,185,129,0.8)]
+            dark:[--calendar-event-approved-border:rgba(16,185,129,1)]
+            dark:[--calendar-event-rejected-bg:rgba(244,63,94,0.8)]
+            dark:[--calendar-event-rejected-border:rgba(244,63,94,1)]
         ">
             <style>{`
                 .rbc-calendar { font-family: inherit; color: var(--calendar-text-main); }
@@ -245,9 +245,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
                 .rbc-date-cell.rbc-now { color: var(--calendar-text-main); }
                 
                 .rbc-event { 
-                    background: transparent !important;
                     padding: 0 !important; 
-                    border: none !important;
                     box-sizing: border-box !important;
                     display: flex !important;
                 }

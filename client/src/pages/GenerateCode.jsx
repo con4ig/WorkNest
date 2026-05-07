@@ -14,12 +14,24 @@ import {
     Clock,
     Shield,
     Infinity as InfinityIcon,
+    AlertCircle,
+    Info,
 } from 'lucide-react';
 import LoadingScreen from '../components/LoadingScreen.jsx';
-import CustomSelect from '../components/common/CustomSelect.jsx';
 import moment from 'moment';
 import 'moment/locale/pl';
+import toast from 'react-hot-toast';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { useAuth } from '../context/AuthContext';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardDescription,
+} from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import AnimatedNumber from '../components/ui/AnimatedNumber';
 
 moment.locale('pl');
 
@@ -31,6 +43,17 @@ export default function GenerateCode() {
     const { user: currentUser } = useAuth();
     const [showDemoWarning, setShowDemoWarning] = useState(false);
     
+    const [confirmationProps, setConfirmationProps] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
+
+    const askForConfirmation = (props) => {
+        setConfirmationProps({ isOpen: true, ...props });
+    };
+
     // Form state
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -88,14 +111,22 @@ export default function GenerateCode() {
         }
     };
 
-    const handleRevoke = async (id) => {
-        if (!window.confirm(t('generateCode.revokeConfirm'))) return;
-        try {
-            await api.delete(`/users/invitations/${id}`);
-            await fetchInvitations();
-        } catch (err) {
-            alert(t('generateCode.revokeError'));
-        }
+    const handleRevoke = (id) => {
+        askForConfirmation({
+            title: t('generateCode.revokeCode'),
+            message: t('generateCode.revokeConfirm'),
+            confirmText: t('common.delete'),
+            confirmVariant: 'danger',
+            onConfirm: async () => {
+                try {
+                    await api.delete(`/users/invitations/${id}`);
+                    await fetchInvitations();
+                    toast.success('Kod został usunięty');
+                } catch (err) {
+                    toast.error(t('generateCode.revokeError'));
+                }
+            },
+        });
     };
 
     const copyToClipboard = (text, id) => {
@@ -105,146 +136,167 @@ export default function GenerateCode() {
     };
 
     // Options for selects
-    const roleOptions = [
-        { id: 'employee', name: t('common.roles.employee') },
-        { id: 'hr', name: t('common.roles.hr') },
-        { id: 'admin', name: t('common.roles.admin') },
-    ];
-
-    const expirationOptions = [
-        { id: '5m', name: t('generateCode.expirations.5m') },
-        { id: '30m', name: t('generateCode.expirations.30m') },
-        { id: '1h', name: t('generateCode.expirations.1h') },
-        { id: '24h', name: t('generateCode.expirations.24h') },
-        { id: '7d', name: t('generateCode.expirations.7d') },
-        { id: '30d', name: t('generateCode.expirations.30d') },
+    const stats = [
+        {
+            id: 1,
+            title: t('generateCode.activeInvitations'),
+            value: invitations.filter(i => new Date(i.expiresAt) > new Date()).length,
+            icon: Key,
+            color: 'text-primary',
+        },
+        {
+            id: 2,
+            title: t('generateCode.allUses'),
+            value: invitations.reduce((acc, curr) => acc + curr.uses, 0),
+            icon: Users,
+            color: 'text-blue-500',
+        },
+        {
+            id: 3,
+            title: t('generateCode.expired'),
+            value: invitations.filter(i => new Date(i.expiresAt) <= new Date()).length,
+            icon: Clock,
+            color: 'text-orange-500',
+        },
     ];
 
     if (pageLoading) return <LoadingScreen message={t('generateCode.loading')} />;
 
+    const inputClass = "w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
+
     return (
-        <div className="flex min-h-screen flex-col bg-background font-sans text-foreground">
-            {/* Ambient Background Elements */}
-            <div className="fixed -left-20 -top-20 h-96 w-96 rounded-full bg-primary/10 blur-[120px]" />
-            <div className="fixed -right-20 -bottom-20 h-96 w-96 rounded-full bg-primary/5 blur-[120px]" />
+        <div className="flex h-full select-none flex-col space-y-6 p-6 md:p-8">
+            <ConfirmationModal
+                {...confirmationProps}
+                onClose={() =>
+                    setConfirmationProps({
+                        ...confirmationProps,
+                        isOpen: false,
+                    })
+                }
+            />
+            {/* Header */}
+            <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate('/dashboard')}
+                            className="mr-2 md:hidden"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+                            {t('generateCode.title')}
+                        </h1>
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {t('generateCode.subtitle')}
+                    </p>
+                </div>
+            </div>
 
-            <div className="relative z-10 flex-1 overflow-y-auto px-6 py-10 lg:px-10">
-                <div className="mx-auto max-w-7xl space-y-10">
-                    {/* Header */}
-                    <header className="relative overflow-hidden rounded-[2.5rem] bg-zinc-950 p-10 shadow-2xl sm:p-12">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-50" />
-                        <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-primary/10 blur-[100px]" />
-                        
-                        <div className="relative z-10">
-                            <button
-                                onClick={() => navigate('/dashboard')}
-                                className="group mb-8 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary/80 transition-all hover:text-primary"
-                            >
-                                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                                {t('generateCode.backToDashboard')}
-                            </button>
-                            
-                            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <div className="mb-2 flex items-center gap-2">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
-                                            Security & Access
-                                        </span>
-                                    </div>
-                                    <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl lg:text-6xl">
-                                        {t('generateCode.title')}
-                                    </h1>
-                                    <p className="mt-4 max-w-2xl text-lg font-medium text-zinc-400">
-                                        {t('generateCode.subtitle')}
-                                    </p>
-                                </div>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                {stats.map((stat) => (
+                    <Card
+                        key={stat.id}
+                        className="border-border bg-card shadow-sm transition-all hover:shadow-md"
+                    >
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                {stat.title}
+                            </CardTitle>
+                            <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-semibold tracking-tight text-foreground">
+                                <AnimatedNumber value={stat.value} />
                             </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
+            {/* Main Content */}
+            <div className="grid gap-6 lg:grid-cols-12">
+                {/* Left Column: Generator Form */}
+                <Card className="border-border bg-card shadow-sm lg:col-span-4 h-fit">
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-primary" />
+                            <CardTitle>{t('generateCode.newCode')}</CardTitle>
                         </div>
-                    </header>
-
-                <div className="grid gap-8 lg:grid-cols-12">
-                    {/* Left Column: Generator Form */}
-                    <aside className="lg:col-span-4">
-                        <div className="sticky top-10 overflow-hidden rounded-[2.5rem] border border-white/10 bg-zinc-900/50 p-8 shadow-2xl backdrop-blur-2xl">
-                            <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-50" />
-                            
-                            <div className="relative z-10">
-                                <div className="mb-8 flex items-center gap-4">
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-primary/10 text-primary border border-primary/20 shadow-inner">
-                                        <Sparkles className="h-7 w-7" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl font-black tracking-tight text-white">
-                                            {t('generateCode.newCode')}
-                                        </h2>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
-                                            Generator
-                                        </p>
-                                    </div>
-                                </div>
-
+                        <CardDescription>
+                            {t('generateCode.generatorDescription')}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
                                 <div className="space-y-8">
                                     {/* Role Selection */}
                                     <div className="space-y-3">
-                                        <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                             {t('generateCode.roleLabel')}
                                         </label>
-                                        <CustomSelect
-                                            options={roleOptions}
-                                            selected={formData.role}
+                                <select
+                                    value={formData.role}
                                             onChange={(val) =>
-                                                setFormData({ ...formData, role: val })
+                                        setFormData({ ...formData, role: val.target.value })
                                             }
-                                            placeholder={t('generateCode.rolePlaceholder')}
-                                        />
+                                    className={inputClass}
+                                >
+                                    <option value="employee">{t('common.roles.employee')}</option>
+                                    <option value="hr">{t('common.roles.hr')}</option>
+                                    <option value="admin">{t('common.roles.admin')}</option>
+                                </select>
                                     </div>
 
                                     {/* Type Selection */}
                                     <div className="space-y-3">
-                                        <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                             {t('generateCode.typeLabel')}
                                         </label>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <button
+                                    <div
                                                 onClick={() =>
                                                     setFormData({
                                                         ...formData,
                                                         type: 'single',
                                                     })
                                                 }
-                                                className={`group flex flex-col items-center justify-center gap-3 rounded-[1.5rem] border p-5 transition-all active:scale-95 ${
+                                        className={`cursor-pointer group flex flex-col items-center justify-center gap-3 rounded-xl border p-4 transition-all ${
                                                     formData.type === 'single'
-                                                        ? 'border-primary bg-primary/20 text-primary shadow-lg shadow-primary/20 ring-1 ring-primary/30'
-                                                        : 'border-white/5 bg-zinc-900/50 text-zinc-500 hover:border-white/10 hover:bg-zinc-800'
+                                                ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/20'
+                                                : 'border-border bg-card hover:bg-muted'
                                                 }`}
                                             >
                                                 <Users className={`h-6 w-6 transition-transform group-hover:scale-110`} />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">
                                                     {t('generateCode.typeSingle')}
                                                 </span>
-                                            </button>
-                                            <button
+                                    </div>
+                                    <div
                                                 onClick={() =>
                                                     setFormData({
                                                         ...formData,
                                                         type: 'multi',
                                                     })
                                                 }
-                                                className={`group flex flex-col items-center justify-center gap-3 rounded-[1.5rem] border p-5 transition-all active:scale-95 ${
+                                        className={`cursor-pointer group flex flex-col items-center justify-center gap-3 rounded-xl border p-4 transition-all ${
                                                     formData.type === 'multi'
-                                                        ? 'border-primary bg-primary/20 text-primary shadow-lg shadow-primary/20 ring-1 ring-primary/30'
-                                                        : 'border-white/5 bg-zinc-900/50 text-zinc-500 hover:border-white/10 hover:bg-zinc-800'
+                                                ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/20'
+                                                : 'border-border bg-card hover:bg-muted'
                                                 }`}
                                             >
                                                 <div className="flex items-center">
                                                     <Users className={`h-6 w-6 transition-transform group-hover:scale-110`} />
-                                                    <InfinityIcon className="h-4 w-4 -ml-1 text-current opacity-60" />
+                                            <InfinityIcon className="h-4 w-4 -ml-1 opacity-70" />
                                                 </div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">
                                                     {t('generateCode.typeMulti')}
                                                 </span>
-                                            </button>
+                                    </div>
                                         </div>
                                     </div>
 
@@ -252,8 +304,8 @@ export default function GenerateCode() {
                                     <div
                                         className={`overflow-hidden transition-all duration-500 ease-in-out ${formData.type === 'multi' ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
                                     >
-                                        <div className="space-y-3 pt-2">
-                                            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                <div className="space-y-3">
+                                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                                 {t('generateCode.maxUsesLabel')}
                                             </label>
                                             <input
@@ -268,34 +320,41 @@ export default function GenerateCode() {
                                                         maxUses: val === '' ? '' : parseInt(val),
                                                     });
                                                 }}
-                                                className="w-full rounded-[1.25rem] border border-white/10 bg-zinc-950/50 px-5 py-4 text-sm font-bold text-white transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+                                        className={inputClass}
                                             />
                                         </div>
                                     </div>
 
                                     {/* Expiration */}
                                     <div className="space-y-3">
-                                        <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                             {t('generateCode.expirationLabel')}
                                         </label>
-                                        <CustomSelect
-                                            options={expirationOptions}
-                                            selected={formData.expiresIn}
+                                <select
+                                    value={formData.expiresIn}
                                             onChange={(val) =>
-                                                setFormData({ ...formData, expiresIn: val })
+                                        setFormData({ ...formData, expiresIn: val.target.value })
                                             }
-                                        />
+                                    className={inputClass}
+                                >
+                                    <option value="5m">{t('generateCode.expirations.5m')}</option>
+                                    <option value="30m">{t('generateCode.expirations.30m')}</option>
+                                    <option value="1h">{t('generateCode.expirations.1h')}</option>
+                                    <option value="24h">{t('generateCode.expirations.24h')}</option>
+                                    <option value="7d">{t('generateCode.expirations.7d')}</option>
+                                    <option value="30d">{t('generateCode.expirations.30d')}</option>
+                                </select>
                                     </div>
 
                                     {error && (
-                                        <div className="animate-in slide-in-from-top-2 rounded-[1.25rem] border border-destructive/20 bg-destructive/10 p-4">
-                                            <p className="text-center text-xs font-bold text-destructive">
+                                <div className="rounded-lg bg-destructive/10 p-3 text-destructive text-sm text-center font-medium">
                                                 {error}
-                                            </p>
                                         </div>
                                     )}
 
-                                    <button
+                            <Button
+                                className="w-full gap-2"
+                                disabled={loading}
                                         onClick={() => {
                                             if (currentUser?.email === 'demo@worknest.com') {
                                                 setShowDemoWarning(true);
@@ -303,53 +362,49 @@ export default function GenerateCode() {
                                                 handleGenerate();
                                             }
                                         }}
-                                        disabled={loading}
-                                        className="relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-[1.25rem] bg-primary py-5 text-sm font-black uppercase tracking-widest text-white shadow-2xl shadow-primary/30 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95 disabled:opacity-50 disabled:translate-y-0"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-1000" />
                                         {loading ? (
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                                                {t('generateCode.generating')}
-                                            </div>
+                                    <>
+                                        <RefreshCw className="h-4 w-4 animate-spin" />
+                                        {t('generateCode.generating')}
+                                    </>
                                         ) : (
                                             <>
+                                        <RefreshCw className="h-4 w-4" />
                                                 {t('generateCode.generateButton')}
-                                                <RefreshCw className="h-5 w-5" />
                                             </>
                                         )}
-                                    </button>
-                                </div>
-                            </div>
+                            </Button>
                         </div>
-                    </aside>
+                    </CardContent>
+                </Card>
 
                     {/* Right Column: Active Invitations List */}
-                    <div className="lg:col-span-8">
-                        <div className="rounded-[2.5rem] border border-white/5 bg-zinc-900/30 p-10 shadow-2xl backdrop-blur-2xl">
-                            <div className="mb-10 flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-2xl font-black tracking-tight text-white">
-                                        {t('generateCode.activeInvitations')}
-                                    </h3>
-                                    <p className="mt-1 text-xs font-bold uppercase tracking-widest text-zinc-500">
-                                        Manage Access Tokens
-                                    </p>
+                <Card className="border-border bg-card shadow-sm lg:col-span-8">
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle>{t('generateCode.activeInvitations')}</CardTitle>
+                                <CardDescription>
+                                    {t('generateCode.manageAccessTokens')}
+                                </CardDescription>
                                 </div>
-                                <span className="inline-flex items-center rounded-xl bg-primary/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary border border-primary/20">
+                            <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary border border-primary/20">
                                     {invitations.length} Active
                                 </span>
                             </div>
+                    </CardHeader>
+                    <CardContent>
 
                             {invitations.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center rounded-[3rem] border-2 border-dashed border-white/5 bg-zinc-950/20 py-24 text-center">
-                                    <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-zinc-900/80 text-zinc-700 shadow-inner">
-                                        <Key className="h-10 w-10" />
+                            <div className="flex flex-col items-center justify-center py-16 text-center">
+                                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                                    <Key className="h-8 w-8 text-muted-foreground/50" />
                                     </div>
-                                    <h4 className="text-xl font-bold text-white">
+                                <h4 className="text-lg font-semibold text-foreground">
                                         {t('generateCode.noActiveCodes')}
                                     </h4>
-                                    <p className="mt-2 max-w-xs text-sm font-medium text-zinc-500">
+                                <p className="mt-1 max-w-xs text-sm text-muted-foreground">
                                         {t('generateCode.noActiveCodesDesc')}
                                     </p>
                                 </div>
@@ -362,56 +417,57 @@ export default function GenerateCode() {
                                         return (
                                             <div
                                                 key={inv._id}
-                                                className={`group relative overflow-hidden rounded-[2rem] border transition-all duration-500 hover:shadow-2xl ${
+                                            className={`group relative overflow-hidden rounded-xl border p-6 transition-all hover:shadow-md ${
                                                     isExpired
-                                                        ? 'border-white/5 bg-zinc-950/20 opacity-50 grayscale'
-                                                        : 'border-white/10 bg-zinc-900/40 hover:bg-zinc-800/60 hover:border-primary/30'
+                                                    ? 'border-border bg-muted/30 opacity-60 grayscale'
+                                                    : 'border-border bg-card hover:border-primary/30'
                                                 }`}
                                             >
-                                                <div className="flex flex-col gap-8 p-8 sm:flex-row sm:items-center">
+                                            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                                                     {/* Code & Role info */}
                                                     <div className="flex-1 space-y-6">
                                                         <div className="flex flex-wrap items-center gap-6">
                                                             <div className="relative">
-                                                                <span className="font-mono text-3xl font-black tracking-[0.25em] text-white sm:text-4xl">
+                                                            <span className="font-mono text-2xl font-bold tracking-[0.2em] text-foreground sm:text-3xl">
                                                                     {inv.code}
                                                                 </span>
                                                                 {isExpired && (
                                                                     <div className="absolute inset-0 flex items-center justify-center">
-                                                                        <div className="h-[2px] w-full bg-destructive/50" />
+                                                                    <div className="h-[2px] w-full bg-destructive" />
                                                                     </div>
                                                                 )}
                                                             </div>
-                                                            <button
-                                                                onClick={() => copyToClipboard(inv.code, inv._id)}
-                                                                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-950/50 text-zinc-400 transition-all hover:bg-primary/20 hover:text-primary active:scale-95 shadow-inner"
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            onClick={() => copyToClipboard(inv.code, inv._id)}
                                                                 title={t('generateCode.copyCode')}
                                                             >
                                                                 {copiedId === inv._id ? (
-                                                                    <Check className="h-6 w-6" />
+                                                                    <Check className="h-4 w-4" />
                                                                 ) : (
-                                                                    <Copy className="h-6 w-6" />
+                                                                    <Copy className="h-4 w-4" />
                                                                 )}
-                                                            </button>
-                                                            <span className={`rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm ${
+                                                        </Button>
+                                                        <span className={`rounded-lg px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border ${
                                                                 inv.role === 'admin'
-                                                                    ? 'bg-purple-500/10 text-purple-400 border-purple-500/20 shadow-purple-500/5'
+                                                                ? 'bg-purple-500/10 text-purple-500 border-purple-500/20'
                                                                     : inv.role === 'hr'
-                                                                      ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-blue-500/5'
-                                                                      : 'bg-primary/10 text-primary border-primary/20 shadow-primary/5'
+                                                                  ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                                  : 'bg-primary/10 text-primary border-primary/20'
                                                             }`}>
                                                                 {t(`common.roles.${inv.role}`)}
                                                             </span>
                                                         </div>
 
                                                         <div className="flex flex-wrap items-center gap-8">
-                                                            <div className="flex items-center gap-2.5 text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">
+                                                        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                                                 <Clock className="h-4 w-4 opacity-50" />
                                                                 {isExpired
-                                                                    ? <span className="text-destructive/70">{t('generateCode.expired')}</span>
+                                                                ? <span className="text-destructive">{t('generateCode.expired')}</span>
                                                                     : `${t('generateCode.expiresIn')} ${moment(inv.expiresAt).fromNow()}`}
                                                             </div>
-                                                            <div className="flex items-center gap-2.5 text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">
+                                                        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                                                 <Shield className="h-4 w-4 opacity-50" />
                                                                 {inv.createdBy?.username || t('leaves.approvals.unknownUser')}
                                                             </div>
@@ -419,29 +475,31 @@ export default function GenerateCode() {
                                                     </div>
 
                                                     {/* Usage & Delete */}
-                                                    <div className="flex items-center justify-between gap-8 border-t border-white/5 pt-8 sm:justify-end sm:border-t-0 sm:pt-0">
+                                                <div className="flex items-center justify-between gap-6 border-t border-border pt-6 sm:justify-end sm:border-t-0 sm:pt-0">
                                                         {inv.maxUses > 1 && (
                                                             <div className="flex flex-col items-start gap-3 sm:items-end">
-                                                                <div className="flex items-center gap-2 text-xs font-black text-zinc-400">
+                                                            <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
                                                                     <Users className="h-4 w-4 text-primary" />
                                                                     {inv.uses} / {inv.maxUses}
                                                                 </div>
-                                                                <div className="h-2 w-32 overflow-hidden rounded-full bg-zinc-950 shadow-inner">
+                                                            <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
                                                                     <div
-                                                                        className="h-full bg-gradient-to-r from-primary/50 to-primary transition-all duration-1000 ease-out"
+                                                                    className="h-full bg-primary transition-all duration-1000 ease-out"
                                                                         style={{ width: `${progress}%` }}
                                                                     />
                                                                 </div>
                                                             </div>
                                                         )}
 
-                                                        <button
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                             onClick={() => handleRevoke(inv._id)}
-                                                            className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-destructive/10 text-destructive opacity-30 transition-all hover:bg-destructive hover:text-white hover:opacity-100 active:scale-90 shadow-lg"
                                                             title={t('generateCode.revokeCode')}
                                                         >
-                                                            <Trash2 className="h-6 w-6" />
-                                                        </button>
+                                                        <Trash2 className="h-5 w-5" />
+                                                    </Button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -449,71 +507,74 @@ export default function GenerateCode() {
                                     })}
                                 </div>
                             )}
-                        </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
             </div>
             
             {/* Demo Warning Modal */}
             {showDemoWarning && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 p-4 backdrop-blur-xl">
-                    <div className="w-full max-w-md overflow-hidden rounded-[2.5rem] border border-white/10 bg-zinc-900 shadow-[0_0_100px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in duration-500">
-                        <div className="bg-amber-500/10 p-8">
-                             <div className="flex items-start gap-6">
-                                <div className="flex-shrink-0 rounded-2xl bg-amber-500/20 p-4 text-amber-500 border border-amber-500/20">
-                                    <Shield className="h-8 w-8" />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
+                    <div className="w-full max-w-md overflow-hidden rounded-xl border border-border bg-card shadow-xl animate-in fade-in zoom-in-95 duration-200">
+                        <div className="p-6">
+                            <div className="flex flex-col items-center text-center mb-6">
+                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/10 text-amber-500">
+                                    <Shield className="h-6 w-6" />
                                 </div>
-                                <div className="mt-1">
-                                    <h3 className="text-xl font-black tracking-tight text-white leading-tight">
-                                        {t('generateCode.demoWarningTitle')}
-                                    </h3>
-                                    <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-400">
-                                        {t('generateCode.demoWarningDesc')} <strong className="text-amber-500">{t('generateCode.demoWarningDescBold')}</strong>. 
-                                    </p>
-                                </div>
-                             </div>
-                        </div>
-                        <div className="px-8 py-6 space-y-6">
-                            <ul className="space-y-4 text-sm font-medium text-zinc-400">
-                                <li className="flex items-start gap-4">
-                                    <div className="mt-1 h-5 w-5 flex-shrink-0 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/20">
-                                        <Check className="h-3 w-3" />
-                                    </div>
-                                    <span>{t('generateCode.demoPoint1')} <strong className="text-white">{t('generateCode.demoPoint1Bold')}</strong> {t('generateCode.demoPoint1End')}</span>
-                                </li>
-                                <li className="flex items-start gap-4">
-                                     <div className="mt-1 h-5 w-5 flex-shrink-0 rounded-full bg-destructive/20 flex items-center justify-center text-destructive border border-destructive/20">
-                                        <Trash2 className="h-3 w-3" />
-                                    </div>
-                                    <span>{t('generateCode.demoPoint2')} <strong className="text-white">{t('generateCode.demoPoint2Bold')}</strong>.</span>
-                                </li>
-                            </ul>
-                            <div className="rounded-2xl bg-zinc-950/50 border border-white/5 p-4 text-xs font-medium text-zinc-500">
-                                <strong className="text-zinc-400">{t('generateCode.demoHintLabel')}</strong> {t('generateCode.demoHint')}
+                                <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                                    {t('generateCode.demoWarningTitle')}
+                                </h3>
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                    {t('generateCode.demoWarningDesc')} <span className="text-foreground font-medium">{t('generateCode.demoWarningDescBold')}</span>.
+                                </p>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-4 border-t border-white/5 bg-zinc-950/30 px-8 py-6">
-                            <button
+
+                            <div className="space-y-4 mb-6">
+                                <ul className="space-y-3 text-sm text-muted-foreground">
+                                    <li className="flex gap-3">
+                                        <div className="mt-0.5 text-primary">
+                                            <Check className="h-4 w-4" />
+                                        </div>
+                                        {t('generateCode.demoPoint1')} <strong className="text-white font-semibold">{t('generateCode.demoPoint1Bold')}</strong> {t('generateCode.demoPoint1End')}
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <div className="mt-0.5 text-destructive">
+                                            <Trash2 className="h-4 w-4" />
+                                        </div>
+                                        {t('generateCode.demoPoint2')} <strong className="text-white font-semibold">{t('generateCode.demoPoint2Bold')}</strong>.
+                                    </li>
+                                </ul>
+
+                                <div className="rounded-md bg-muted p-3 text-xs text-muted-foreground flex gap-2">
+                                    <Info className="h-4 w-4 shrink-0 text-blue-500" />
+                                    <div>
+                                        <span className="font-semibold text-foreground block mb-0.5">{t('generateCode.demoHintLabel')}</span>
+                                        {t('generateCode.demoHint')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                            <Button
+                                variant="outline"
+                                    className="w-full sm:w-auto"
                                 onClick={() => setShowDemoWarning(false)}
-                                className="flex-1 rounded-2xl border border-white/10 bg-zinc-900 px-6 py-4 text-sm font-black uppercase tracking-widest text-zinc-400 transition-all hover:bg-zinc-800 hover:text-white"
                             >
                                 {t('generateCode.cancel')}
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                    className="w-full sm:w-auto"
                                 onClick={() => {
                                     setShowDemoWarning(false);
                                     handleGenerate();
                                 }}
-                                className="flex-1 rounded-2xl bg-primary px-6 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-primary/20 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95"
                             >
                                 {t('generateCode.understand')}
-                            </button>
+                            </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-            </div>
         </div>
     );
 }
-

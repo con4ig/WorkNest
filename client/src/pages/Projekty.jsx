@@ -349,7 +349,7 @@ export default function Projekty() {
     }
 
     return (
-        <div className="min-h-screen select-none bg-background">
+        <div className="flex h-full select-none flex-col space-y-6 p-6 md:p-8">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
@@ -361,226 +361,221 @@ export default function Projekty() {
             />
 
             {/* Header */}
-            <div className="sticky top-0 z-20 border-b border-border bg-background/80 shadow-sm backdrop-blur-xl transition-all">
-                <div className="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 md:px-8">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => navigate('/dashboard')}
-                                className="group flex items-center justify-center rounded-xl border border-border bg-card p-2.5 text-foreground shadow-sm transition-all hover:bg-secondary hover:shadow-md"
-                            >
-                                <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                            </button>
-                            <div className="h-10 w-px bg-border/60"></div>
-                            <div>
-                                <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                                    {t('projects.projectListHeader.title')}
-                                </h1>
-                                <p className="text-xs font-medium text-muted-foreground">
-                                    {t('projects.projectListHeader.subtitle')}
-                                </p>
-                            </div>
-                        </div>
+            <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
+                <div>
+                    <div className="flex items-center gap-2">
+                         <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate('/dashboard')}
+                            className="mr-2 md:hidden"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+                            {t('projects.projectListHeader.title')}
+                        </h1>
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {t('projects.projectListHeader.subtitle')}
+                    </p>
+                </div>
 
-                        <div className="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
-                            {(currentUserRole === 'admin' ||
-                                currentUserRole === 'hr') && (
-                                <Button
-                                    onClick={() => setIsModalOpen(true)}
-                                    variant="outline"
-                                    className="gap-2"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    <span>
-                                        {t('projects.projectListHeader.addProject')}
-                                    </span>
-                                </Button>
+                <div className="flex flex-col gap-3 sm:flex-row md:items-center">
+                    {(currentUserRole === 'admin' ||
+                        currentUserRole === 'hr') && (
+                        <Button
+                            onClick={() => setIsModalOpen(true)}
+                            variant="outline"
+                            className="gap-2"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span>
+                                {t('projects.projectListHeader.addProject')}
+                            </span>
+                        </Button>
+                    )}
+                    <div className="relative w-full sm:w-auto">
+                        <input
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[250px]"
+                            placeholder={t(
+                                'projects.filter.searchPlaceholder',
                             )}
-                            <div className="relative w-full sm:w-auto">
-                                <input
-                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[250px]"
-                                    placeholder={t(
-                                        'projects.filter.searchPlaceholder',
-                                    )}
-                                    value={searchTerm}
-                                    onChange={(e) =>
-                                        setSearchTerm(e.target.value)
-                                    }
-                                />
-                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                    <Search className="h-4 w-4" />
-                                </div>
-                            </div>
+                            value={searchTerm}
+                            onChange={(e) =>
+                                setSearchTerm(e.target.value)
+                            }
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                            <Search className="h-4 w-4" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-8">
-                {/* Filters & View Switcher Toolbar */}
-                <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                        <div className="relative">
-                             <select
-                                className="h-10 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-8 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-[200px]"
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                            >
-                                <option value="">
-                                    {t('projects.filter.allStatuses')}
-                                </option>
-                                <option value="pending">
-                                    {t('common.projectStatus.pending')}
-                                </option>
-                                <option value="running">
-                                    {t('common.projectStatus.running')}
-                                </option>
-                                <option value="completed">
-                                    {t('common.projectStatus.completed')}
-                                </option>
-                                <option value="on-hold">
-                                    {t('common.projectStatus.on-hold')}
-                                </option>
-                            </select>
-                            <ListFilter className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                        </div>
-
-                         <div className="flex items-center gap-1 rounded-lg border border-border p-1 bg-card">
-                            <button
-                                onClick={() => setShowArchived(false)}
-                                className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
-                                    !showArchived
-                                        ? 'bg-primary text-primary-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:bg-muted'
-                                }`}
-                            >
-                                <FolderKanban className="h-3.5 w-3.5" />
-                                {t('projects.misc.active')}
-                            </button>
-                            <button
-                                onClick={() => setShowArchived(true)}
-                                className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
-                                    showArchived
-                                        ? 'bg-primary text-primary-foreground shadow-sm'
-                                        : 'text-muted-foreground hover:bg-muted'
-                                }`}
-                            >
-                                <Archive className="h-3.5 w-3.5" />
-                                {t('projects.misc.archive')}
-                            </button>
-                        </div>
-                         {screenSize !== 'mobile' && (
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={handleRefresh}
-                                className={`h-10 w-10 ${isFiltering ? 'animate-spin' : ''}`}
-                                title={t('projects.filter.refresh')}
-                            >
-                                <RefreshCcw className="h-4 w-4" />
-                            </Button>
-                        )}
+            {/* Filters & View Switcher - Styled to match the flow */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="relative">
+                            <select
+                            className="h-10 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-8 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-[200px]"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                        >
+                            <option value="">
+                                {t('projects.filter.allStatuses')}
+                            </option>
+                            <option value="pending">
+                                {t('common.projectStatus.pending')}
+                            </option>
+                            <option value="running">
+                                {t('common.projectStatus.running')}
+                            </option>
+                            <option value="completed">
+                                {t('common.projectStatus.completed')}
+                            </option>
+                            <option value="on-hold">
+                                {t('common.projectStatus.on-hold')}
+                            </option>
+                        </select>
+                        <ListFilter className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     </div>
 
-                    {screenSize !== 'mobile' && (
-                        <ViewSwitcher
-                            currentView={currentView}
-                            onViewChange={handleViewChange}
-                            showArchived={showArchived}
-                            disableKanban={screenSize !== 'desktop'}
-                        />
+                        <div className="flex items-center gap-1 rounded-lg border border-border p-1 bg-card">
+                        <button
+                            onClick={() => setShowArchived(false)}
+                            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                                !showArchived
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:bg-muted'
+                            }`}
+                        >
+                            <FolderKanban className="h-3.5 w-3.5" />
+                            {t('projects.misc.active')}
+                        </button>
+                        <button
+                            onClick={() => setShowArchived(true)}
+                            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                                showArchived
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'text-muted-foreground hover:bg-muted'
+                            }`}
+                        >
+                            <Archive className="h-3.5 w-3.5" />
+                            {t('projects.misc.archive')}
+                        </button>
+                    </div>
+                        {screenSize !== 'mobile' && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleRefresh}
+                            className={`h-10 w-10 ${isFiltering ? 'animate-spin' : ''}`}
+                            title={t('projects.filter.refresh')}
+                        >
+                            <RefreshCcw className="h-4 w-4" />
+                        </Button>
                     )}
                 </div>
 
-                {/* Main Content Card */}
-                <Card
-                    className={`transition-opacity duration-300 ${
-                        isFiltering ? 'opacity-60' : 'opacity-100'
-                    } border-border bg-card shadow-sm`}
-                >
-                    <CardContent className="p-0">
-                         {currentUserRole !== 'employee' && selectedProjects.length > 0 && (
-                             <div className="border-b border-border bg-muted/30 p-4">
-                                <BulkActionsHeader
-                                    selectedCount={selectedProjects.length}
-                                    onClearSelection={() =>
-                                        setSelectedProjects([])
-                                    }
-                                    onArchive={() =>
-                                        handleBulkAction('archive')
-                                    }
-                                    onRestore={() =>
-                                        handleBulkAction('restore')
-                                    }
-                                    onDelete={() => handleBulkAction('delete')}
-                                    showArchived={showArchived}
-                                />
-                             </div>
-                        )}
-
-                        <div className="p-4 md:p-6">
-                        {projects.length === 0 ? (
-                            <div className="py-16 text-center text-muted-foreground">
-                                <div className="mb-4 flex justify-center">
-                                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                                        <FolderKanban className="h-8 w-8 text-muted-foreground/50" />
-                                     </div>
-                                </div>
-                                <h3 className="text-lg font-semibold text-foreground">
-                                    {showArchived
-                                        ? t('projects.misc.noArchivedProjects')
-                                        : t('projects.misc.noProjectsFound')}
-                                </h3>
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                   {t('common.tryDifferentSearch')}
-                                </p>
-                            </div>
-                        ) : screenSize === 'mobile' ||
-                          currentView === 'grid' ||
-                          (currentView === 'kanban' &&
-                              (showArchived || screenSize !== 'desktop')) ? (
-                            <GridView
-                                projects={projects}
-                                currentUserRole={currentUserRole}
-                                onArchive={handleArchive}
-                                onRestore={handleRestore}
-                                onDelete={handlePermanentDelete}
-                                onCardClick={handleRowClick}
-                                showArchived={showArchived}
-                                selectedProjects={selectedProjects}
-                                onToggleSelect={toggleSelection}
-                            />
-                        ) : currentView === 'kanban' ? (
-                            <KanbanView
-                                projects={projects}
-                                onStatusChange={handleStatusChange}
-                                onCardClick={handleRowClick}
-                                onArchive={handleArchive}
-                                onPermanentDelete={handlePermanentDelete}
-                                currentUserRole={currentUserRole}
-                            />
-                        ) : (
-                            <ListView
-                                projects={projects}
-                                currentUserRole={currentUserRole}
-                                onArchive={handleArchive}
-                                onRestore={handleRestore}
-                                onPermanentDelete={handlePermanentDelete}
-                                onRowClick={handleRowClick}
-                                showArchived={showArchived}
-                                selectedProjects={selectedProjects}
-                                onToggleSelect={toggleSelection}
-                                onToggleSelectAll={toggleSelectAll}
-                            />
-                        )}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <footer className="mt-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
-                    © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
-                </footer>
+                {screenSize !== 'mobile' && (
+                    <ViewSwitcher
+                        currentView={currentView}
+                        onViewChange={handleViewChange}
+                        showArchived={showArchived}
+                        disableKanban={screenSize !== 'desktop'}
+                    />
+                )}
             </div>
+
+            {/* Main Content Card */}
+            <Card
+                className={`transition-opacity duration-300 ${
+                    isFiltering ? 'opacity-60' : 'opacity-100'
+                } border-border bg-card shadow-sm h-full`}
+            >
+                <CardContent className="p-0 h-full">
+                        {currentUserRole !== 'employee' && selectedProjects.length > 0 && (
+                            <div className="border-b border-border bg-muted/30 p-4">
+                            <BulkActionsHeader
+                                selectedCount={selectedProjects.length}
+                                onClearSelection={() =>
+                                    setSelectedProjects([])
+                                }
+                                onArchive={() =>
+                                    handleBulkAction('archive')
+                                }
+                                onRestore={() =>
+                                    handleBulkAction('restore')
+                                }
+                                onDelete={() => handleBulkAction('delete')}
+                                showArchived={showArchived}
+                            />
+                            </div>
+                    )}
+
+                    <div className="p-4 md:p-6 h-full">
+                    {projects.length === 0 ? (
+                        <div className="py-16 text-center text-muted-foreground">
+                            <div className="mb-4 flex justify-center">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                                    <FolderKanban className="h-8 w-8 text-muted-foreground/50" />
+                                    </div>
+                            </div>
+                            <h3 className="text-lg font-semibold text-foreground">
+                                {showArchived
+                                    ? t('projects.misc.noArchivedProjects')
+                                    : t('projects.misc.noProjectsFound')}
+                            </h3>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                {t('common.tryDifferentSearch')}
+                            </p>
+                        </div>
+                    ) : screenSize === 'mobile' ||
+                        currentView === 'grid' ||
+                        (currentView === 'kanban' &&
+                            (showArchived || screenSize !== 'desktop')) ? (
+                        <GridView
+                            projects={projects}
+                            currentUserRole={currentUserRole}
+                            onArchive={handleArchive}
+                            onRestore={handleRestore}
+                            onDelete={handlePermanentDelete}
+                            onCardClick={handleRowClick}
+                            showArchived={showArchived}
+                            selectedProjects={selectedProjects}
+                            onToggleSelect={toggleSelection}
+                        />
+                    ) : currentView === 'kanban' ? (
+                        <KanbanView
+                            projects={projects}
+                            onStatusChange={handleStatusChange}
+                            onCardClick={handleRowClick}
+                            onArchive={handleArchive}
+                            onPermanentDelete={handlePermanentDelete}
+                            currentUserRole={currentUserRole}
+                        />
+                    ) : (
+                        <ListView
+                            projects={projects}
+                            currentUserRole={currentUserRole}
+                            onArchive={handleArchive}
+                            onRestore={handleRestore}
+                            onPermanentDelete={handlePermanentDelete}
+                            onRowClick={handleRowClick}
+                            showArchived={showArchived}
+                            selectedProjects={selectedProjects}
+                            onToggleSelect={toggleSelection}
+                            onToggleSelectAll={toggleSelectAll}
+                        />
+                    )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            <footer className="mt-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
+                © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
+            </footer>
 
             <AddProjectModal
                 isOpen={isModalOpen}

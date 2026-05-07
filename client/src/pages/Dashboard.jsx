@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api.js';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Key } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
     Bar,
@@ -381,10 +381,22 @@ export default function Dashboard() {
                         {t('dashboard.overview')}
                     </p>
                 </div>
-                <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                    {format(new Date(), 'EEEE, d MMMM yyyy', {
-                        locale: i18n.language === 'pl' ? pl : undefined,
-                    })}
+                <div className="flex flex-col items-end gap-3">
+                    {(user?.role === 'admin' || user?.role === 'hr') && (
+                        <Button
+                            onClick={() => navigate('/generate-code')}
+                            variant="outline"
+                            className="gap-2"
+                        >
+                            <Key className="h-4 w-4" />
+                            {t('dashboard.generateCode')}
+                        </Button>
+                    )}
+                    <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                        {format(new Date(), 'EEEE, d MMMM yyyy', {
+                            locale: i18n.language === 'pl' ? pl : undefined,
+                        })}
+                    </div>
                 </div>
             </div>
 
