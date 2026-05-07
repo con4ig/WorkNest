@@ -54,13 +54,13 @@ const formatDateForInput = (dateString) => {
 };
 
 const StatCard = ({ icon, title, children }) => (
-    <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:bg-muted/50">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
+    <div className="group flex items-center gap-3 rounded-xl border border-border bg-card/50 p-3 shadow-sm transition-all hover:bg-muted/50 hover:shadow-md hover:border-primary/20">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground border border-border group-hover:text-primary group-hover:border-primary/30 transition-colors">
             {icon}
         </div>
         <div className="min-w-0 flex-1">
-            <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{title}</h3>
-            <div className="mt-0.5 text-xl font-semibold tracking-tight text-foreground">{children}</div>
+            <h3 className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/80">{title}</h3>
+            <div className="mt-0.5 text-lg font-bold tracking-tight text-foreground">{children}</div>
         </div>
     </div>
 );
@@ -101,15 +101,9 @@ const CircularProgress = ({ progress }) => {
                     className="transition-all duration-1000 ease-in-out"
                 />
                 <defs>
-                    <linearGradient
-                        id="progressGradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="100%"
-                    >
-                        <stop offset="0%" style={{ stopColor: 'var(--primary)' }} />
-                        <stop offset="100%" style={{ stopColor: 'rgb(var(--primary-rgb), 0.6)' }} />
+                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgb(var(--primary))" />
+                        <stop offset="100%" stopColor="rgb(var(--primary) / 0.5)" />
                     </linearGradient>
                 </defs>
             </svg>
@@ -126,13 +120,13 @@ const CircularProgress = ({ progress }) => {
 };
 
 const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3 sm:px-6 sm:py-4">
+    <div className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden transition-all hover:shadow-md">
+        <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-card text-primary border border-border shadow-sm sm:h-9 sm:w-9">
                     {icon}
                 </div>
-                <h2 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
+                <h2 className="truncate text-sm font-bold uppercase tracking-widest text-foreground/90 sm:text-xl sm:normal-case sm:tracking-tight">
                     {title}
                 </h2>
             </div>
@@ -556,7 +550,7 @@ export default function ProjectDetails() {
     }
 
     return (
-        <div className="flex min-h-screen flex-col bg-background font-sans text-foreground lg:flex-row">
+        <div className="flex min-h-screen w-full max-w-full flex-col bg-background font-sans text-foreground lg:flex-row overflow-x-hidden">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
@@ -567,32 +561,35 @@ export default function ProjectDetails() {
                 }
             />
             {/* Sidebar - Left Panel */}
-            <aside className="flex w-full flex-col border-r border-border bg-card p-6 lg:min-h-screen lg:w-[360px] lg:p-8">
-                <div className="mb-10 flex items-center gap-4">
+            <aside className="flex w-full max-w-full flex-col border-b border-r-0 border-border bg-card px-3 py-4 sm:p-6 lg:min-h-screen lg:w-[360px] lg:max-w-[360px] lg:border-b-0 lg:border-r lg:p-8">
+                <div className="mb-6 flex items-center gap-4 lg:mb-10">
                     <button
                         onClick={() => navigate('/projects')}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground transition-all hover:bg-secondary active:scale-95"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-primary active:scale-95"
                     >
                         <Icon.Back size={18} />
                     </button>
-                    <div className="flex flex-col">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    <div className="flex min-w-0 flex-col">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/80">
                             {t('projects.details.title')}
                         </span>
-                        <h2 className="text-xl font-bold tracking-tight text-foreground">
+                        <h2 className="truncate text-lg font-extrabold tracking-tight text-foreground sm:text-xl">
                             {project.name}
                         </h2>
                     </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center py-6 bg-muted/40 rounded-lg border border-border relative overflow-hidden group">
+                <div className="flex flex-row items-center justify-center gap-6 bg-gradient-to-br from-card to-muted/30 rounded-2xl border border-border p-4 shadow-inner sm:flex-col sm:py-6 lg:flex-col">
                     <CircularProgress progress={calculatedProgress} />
-                    <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        {t('projects.details.progress')}
-                    </p>
+                    <div className="flex flex-col items-center sm:mt-2">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                            {calculatedProgress === 100 ? "Completed" : t('projects.details.progress')}
+                        </p>
+                        <div className="mt-1 h-1 w-12 rounded-full bg-primary/20 sm:hidden"></div>
+                    </div>
                 </div>
 
-                <div className="mt-10 space-y-4">
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:mt-10 lg:grid-cols-1">
                     <StatCard
                         icon={<Icon.Calendar className="h-5 w-5" />}
                         title={t('projects.details.duration')}
@@ -615,8 +612,11 @@ export default function ProjectDetails() {
                                 />
                             </div>
                         ) : (
-                            <div className="text-sm font-bold tracking-tight">
-                                {formatDateForDisplay(project.startDate, i18nInstance.language)} — {formatDateForDisplay(project.endDate, i18nInstance.language)}
+                            <div className="text-xs font-bold tracking-tight sm:text-sm">
+                                <span className="block sm:inline">{formatDateForDisplay(project.startDate, i18nInstance.language)}</span>
+                                <span className="mx-1 hidden sm:inline">—</span>
+                                <span className="block text-muted-foreground sm:hidden">↓</span>
+                                <span className="block sm:inline">{formatDateForDisplay(project.endDate, i18nInstance.language)}</span>
                             </div>
                         )}
                     </StatCard>
@@ -699,6 +699,7 @@ export default function ProjectDetails() {
                         </div>
                     </StatCard>
                 </div>
+                <div className="hidden lg:block">
                 <div className="mt-auto pt-8 text-center text-xs text-muted-foreground">
                     <p>
                         {t('projects.details.createdBy')}{' '}
@@ -713,12 +714,13 @@ export default function ProjectDetails() {
                         )}
                     </p>
                 </div>
+                </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-background p-6 lg:p-10">
-                <div className="space-y-10">
-                    <header className="relative rounded-lg border border-border bg-card p-10 sm:p-12 shadow-sm">
+            <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden bg-background p-3 sm:p-6 lg:p-10">
+                <div className="space-y-4 sm:space-y-6 lg:space-y-10">
+                    <header className="relative rounded-lg border border-border bg-card p-4 sm:p-8 lg:p-10 shadow-sm">
                         <div className="relative z-10">
                             
                             {isEditing && isAdmin ? (
@@ -727,11 +729,11 @@ export default function ProjectDetails() {
                                     name="name"
                                     value={editData.name}
                                     onChange={handleEditChange}
-                                    className="w-full border-b border-border bg-transparent text-3xl font-bold tracking-tight text-foreground focus:border-primary focus:outline-none sm:text-4xl lg:text-5xl"
+                                    className="w-full border-b border-border bg-transparent text-2xl font-bold tracking-tight text-foreground focus:border-primary focus:outline-none sm:text-4xl lg:text-5xl"
                                     placeholder={t('projects.details.projectNamePlaceholder')}
                                 />
                             ) : (
-                                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+                                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
                                     {project.name}
                                 </h1>
                             )}
@@ -815,7 +817,7 @@ export default function ProjectDetails() {
 
                     {/* TASKS KANBAN */}
                     <div className="rounded-xl border border-border/50 bg-card overflow-hidden shadow-sm">
-                        <div className="flex items-center justify-between border-b border-border bg-muted/20 px-8 py-5">
+                        <div className="flex items-center justify-between border-b border-border bg-muted/20 px-4 py-3 sm:px-8 sm:py-5">
                             <div className="flex items-center gap-3">
                                 <Icon.ListTodo className="h-4 w-4 text-primary" />
                                 <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
@@ -824,7 +826,7 @@ export default function ProjectDetails() {
                                 </h2>
                             </div>
                         </div>
-                        <div className="p-2 sm:p-4">
+                        <div className="overflow-x-auto p-1 sm:p-4">
                             <KanbanBoard
                                 tasks={tasks}
                                 onUpdate={fetchTasks}
@@ -843,7 +845,7 @@ export default function ProjectDetails() {
                         icon={<Icon.Users className="h-5 w-5" />}
                         title={`${t('projects.details.teamTitle')} (${project.assignedUsers.length})`}
                     >
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
                             {project.assignedUsers.map((user) => (
                                 <div
                                     key={user._id}
@@ -968,7 +970,7 @@ export default function ProjectDetails() {
                                     activities.map((activity) => (
                                         <div
                                             key={activity._id}
-                                            className="group relative flex items-start gap-4 p-5 transition-colors hover:bg-muted/30"
+                                            className="group relative flex items-start gap-3 p-3 sm:gap-4 sm:p-5 transition-colors hover:bg-muted/30"
                                         >
                                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-primary border border-border group-hover:bg-primary group-hover:text-white transition-colors">
                                                 <span className="text-sm font-black">
