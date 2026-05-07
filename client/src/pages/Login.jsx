@@ -13,15 +13,16 @@ const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
 };
 
-const LoginSchema = (t) => z.object({
-    email: z
-        .string()
-        .min(1, { message: t('auth.validation.emailRequired') })
-        .email({ message: t('auth.validation.emailInvalid') }),
-    password: z
-        .string()
-        .min(6, { message: t('auth.validation.passwordMin') }),
-});
+const LoginSchema = (t) =>
+    z.object({
+        email: z
+            .string()
+            .min(1, { message: t('auth.validation.emailRequired') })
+            .email({ message: t('auth.validation.emailInvalid') }),
+        password: z
+            .string()
+            .min(6, { message: t('auth.validation.passwordMin') }),
+    });
 
 export default function Login() {
     const { t } = useTranslation();
@@ -44,7 +45,7 @@ export default function Login() {
         setIsLoading(true);
         try {
             const response = await login(data.email, data.password);
-            
+
             if (response?.user?.mustChangePassword) {
                 navigate('/force-password-change');
             } else {
@@ -77,7 +78,7 @@ export default function Login() {
 
             {/* Right Panel - Login Form */}
 
-            <div className="flex flex-1 items-center justify-center bg-gray-50 p-8">
+            <div className="flex flex-1 items-center justify-center bg-white p-8">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo & Header */}
                     <div className="text-center">
@@ -92,7 +93,7 @@ export default function Login() {
                             </div>
                         </Link>
                         <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-                             {t('auth.login.title')}
+                            {t('auth.login.title')}
                         </h2>
                         <p className="mt-3 text-base text-gray-500">
                             {t('auth.login.noAccount')}{' '}
@@ -124,7 +125,6 @@ export default function Login() {
                         {t('auth.login.demoBtn')}
                     </button>
 
-
                     <form
                         onSubmit={handleSubmit(onSubmit)}
                         className="mt-8 space-y-6"
@@ -138,7 +138,9 @@ export default function Login() {
                                     <input
                                         {...register('email')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                                        placeholder={t('auth.login.emailPlaceholder')}
+                                        placeholder={t(
+                                            'auth.login.emailPlaceholder',
+                                        )}
                                     />
                                     {errors.email && (
                                         <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -160,7 +162,7 @@ export default function Login() {
 
                             <div>
                                 <label className="mb-1.5 block text-sm font-medium text-gray-700">
-                                     {t('auth.login.passwordLabel')}
+                                    {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
@@ -188,13 +190,12 @@ export default function Login() {
                             </div>
                         </div>
 
-
                         <button
                             type="submit"
                             disabled={isLoading}
                             className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
                                 isLoading
-                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    ? 'cursor-not-allowed bg-gray-400'
                                     : 'bg-emerald-600 hover:bg-emerald-700'
                             }`}
                         >
@@ -211,18 +212,25 @@ export default function Login() {
                             )}
                         </button>
                     </form>
-                    
+
                     {/* Footer for production simplicity */}
                     <footer className="pt-8 text-center text-xs text-gray-400">
                         <div className="mb-2">
-                            &copy; {new Date().getFullYear()} WorkNest. {t('landing.footer.Rights')}
+                            &copy; {new Date().getFullYear()} WorkNest.{' '}
+                            {t('landing.footer.Rights')}
                         </div>
                         <div className="space-x-3">
-                            <Link to="/polityka-prywatnosci" className="hover:text-emerald-600 transition-colors">
+                            <Link
+                                to="/polityka-prywatnosci"
+                                className="transition-colors hover:text-emerald-600"
+                            >
                                 {t('landing.footer.Privacy')}
                             </Link>
                             <span className="text-gray-300">|</span>
-                            <Link to="/regulamin" className="hover:text-emerald-600 transition-colors">
+                            <Link
+                                to="/regulamin"
+                                className="transition-colors hover:text-emerald-600"
+                            >
                                 {t('landing.footer.Terms')}
                             </Link>
                         </div>
