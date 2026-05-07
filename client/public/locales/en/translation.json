@@ -78,7 +78,7 @@
             "title": "Log in to your account",
             "noAccount": "Don't have an account yet?",
             "registerLink": "Sign up for free",
-            "demoBtn": "🚀 Try Demo (1-Click)",
+            "demoBtn": "Try Demo (1-Click)",
             "emailLabel": "Email address",
             "emailPlaceholder": "john.doe@company.com",
             "passwordLabel": "Password",
