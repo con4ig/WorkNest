@@ -23,7 +23,7 @@ body {
         --font-body: 'Inter', sans-serif;
 
         /* Supabase-inspired Light Mode - Space separated RGB */
-        --background: 255 255 255;
+        --background: 248 250 252;
         --foreground: 9 9 11;
 
         --card: 255 255 255;
@@ -53,13 +53,13 @@ body {
 
     .dark {
         /* Supabase-inspired Dark Mode (Zinc-950) - Space separated RGB */
-        --background: 9 9 11; 
+        --background: 9 9 11;
         --foreground: 248 250 252;
 
         --card: 9 9 11;
         --card-foreground: 248 250 252;
 
-        --primary: 62 207 142; 
+        --primary: 62 207 142;
         --primary-foreground: 6 32 22;
 
         --secondary: 30 41 59;
@@ -91,13 +91,16 @@ body {
 
 @layer components {
     .glass-panel {
-        @apply border border-border bg-background/95 backdrop-blur-sm shadow-sm;
+        @apply border border-border bg-background/95 shadow-sm backdrop-blur-sm;
     }
-
 }
 
 /* ULTIMATE SELECTION PREVENTION - Outside layers for maximum specificity */
-html, body, #root, .select-none, .select-none * {
+html,
+body,
+#root,
+.select-none,
+.select-none * {
     user-select: none !important;
     -webkit-user-select: none !important;
     -moz-user-select: none !important;
@@ -106,7 +109,10 @@ html, body, #root, .select-none, .select-none * {
     -webkit-tap-highlight-color: transparent !important;
 }
 
-.recharts-wrapper, .recharts-wrapper *, svg, svg * {
+.recharts-wrapper,
+.recharts-wrapper *,
+svg,
+svg * {
     user-select: none !important;
     pointer-events: auto; /* Ensure tooltips still work */
 }
@@ -139,4 +145,3 @@ html, body, #root, .select-none, .select-none * {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: rgb(var(--muted-foreground) / 0.4);
 }
-
