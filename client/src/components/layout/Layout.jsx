@@ -43,7 +43,7 @@ const Layout = () => {
             {/* Main Content Area */}
             <main
                 className={`flex h-full min-w-0 max-w-full flex-1 flex-col transition-all duration-300 ease-in-out ${
-                    isMobile ? 'ml-0' : isSidebarOpen ? 'ml-64' : 'ml-20'
+                    isMobile ? 'ml-0' : isSidebarOpen ? 'ml-72' : 'ml-20'
                 }`}
             >
                 {/* Mobile Top Bar */}
@@ -76,3 +76,4 @@ const Layout = () => {
 };
 
 export default Layout;
+ 
