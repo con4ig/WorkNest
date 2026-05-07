@@ -65,7 +65,7 @@ function Landing() {
         'px-12 py-4 text-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl shadow-2xl shadow-emerald-500/50 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 transform hover:scale-[1.03]';
 
     return (
-        <div className="min-h-screen bg-gray-50/50 select-none">
+        <div className="min-h-screen bg-gray-50/50 dark:bg-zinc-950 select-none transition-colors duration-300">
             {/* Navbar pozostaje bez zmian (przyjmujemy, że jest już w stylu Emerald/Teal z poprzedniego kroku) */}
             <Navbar />
 
@@ -82,7 +82,7 @@ function Landing() {
                         <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-600 md:text-sm">
                             {t('landing.hero.Badge')}
                         </p>
-                        <h1 className="mb-6 text-3xl font-extrabold leading-tight tracking-tighter text-gray-900 sm:text-4xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl">
+                        <h1 className="mb-6 text-3xl font-extrabold leading-tight tracking-tighter text-gray-900 dark:text-white sm:text-4xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl">
                             <Trans i18nKey="landing.hero.Title">
                                 Odkryj nowy wymiar
                                 <span className="block bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
@@ -90,7 +90,7 @@ function Landing() {
                                 </span>
                             </Trans>
                         </h1>
-                        <p className="mx-auto mb-8 max-w-3xl px-4 text-base font-light text-gray-600 sm:text-lg md:mb-10 md:text-xl lg:text-2xl">
+                        <p className="mx-auto mb-8 max-w-3xl px-4 text-base font-light text-gray-600 dark:text-gray-400 sm:text-lg md:mb-10 md:text-xl lg:text-2xl">
                             {t('landing.hero.Subtitle')}
                         </p>
                         <div className="flex justify-center px-4">
@@ -127,20 +127,20 @@ function Landing() {
                     </div>
 
                     {/* 2. Sekcja Wartości (Zamiast statystyk) */}
-                    <div className="mx-4 mb-16 rounded-2xl bg-white border border-gray-100 p-6 shadow-xl shadow-emerald-100/50 md:mb-32 md:rounded-3xl md:p-9">
-                        <div className="grid gap-6 divide-y divide-gray-100 text-center md:grid-cols-3 md:gap-8 md:divide-x md:divide-y-0">
+                    <div className="mx-4 mb-16 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 p-6 shadow-xl shadow-emerald-100/50 dark:shadow-none md:mb-32 md:rounded-3xl md:p-9">
+                        <div className="grid gap-6 divide-y divide-gray-100 dark:divide-white/10 text-center md:grid-cols-3 md:gap-8 md:divide-x md:divide-y-0">
                             {values.map((item, index) => (
                                 <div
                                     key={index}
                                     className="flex flex-col items-center px-4 py-4 md:px-6 md:py-0"
                                 >
-                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
                                         <item.icon className="h-7 w-7" />
                                     </div>
-                                    <h3 className="mb-2 text-xl font-bold text-gray-900">
+                                    <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
                                         {item.value}
                                     </h3>
-                                    <p className="text-sm font-medium text-gray-500 md:text-base">
+                                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 md:text-base">
                                         {item.label}
                                     </p>
                                 </div>
@@ -156,10 +156,10 @@ function Landing() {
                                 <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-teal-600">
                                     {t('landing.integration.Badge')}
                                 </p>
-                                <h2 className="mb-6 text-4xl font-bold text-gray-900 lg:text-5xl">
+                                <h2 className="mb-6 text-4xl font-bold text-gray-900 dark:text-white lg:text-5xl">
                                     {t('landing.integration.Title')}
                                 </h2>
-                                <p className="mb-8 text-xl text-gray-600">
+                                <p className="mb-8 text-xl text-gray-600 dark:text-gray-400">
                                     {t('landing.integration.Desc')}
                                 </p>
                                 <ul className="space-y-4">
@@ -170,7 +170,7 @@ function Landing() {
                                     ].map((item, i) => (
                                         <li
                                             key={i}
-                                            className="flex items-start text-lg text-gray-700"
+                                            className="flex items-start text-lg text-gray-700 dark:text-gray-300"
                                         >
                                             <ShieldCheck className="mr-3 mt-1 h-6 w-6 flex-shrink-0 text-emerald-500" />
                                             {item}
@@ -182,14 +182,14 @@ function Landing() {
                             {/* Mockup / Zrzut ekranu (symulacja) */}
                             <div className="relative p-4 lg:w-1/2">
                                 <div className="absolute inset-0 -rotate-2 scale-105 transform rounded-3xl bg-gradient-to-br from-emerald-100/50 to-teal-100/50 shadow-xl"></div>
-                                <div className="relative rounded-3xl border border-gray-100 bg-white p-8 shadow-2xl">
+                                <div className="relative rounded-3xl border border-gray-100 dark:border-white/10 bg-white dark:bg-zinc-900 p-8 shadow-2xl">
                                     <div className="mb-6 flex items-center justify-between">
-                                        <span className="text-xl font-semibold text-gray-900">
+                                        <span className="text-xl font-semibold text-gray-900 dark:text-white">
                                             Panel Zarządzania
                                         </span>
                                         <div className="h-3 w-16 rounded-full bg-emerald-400"></div>
                                     </div>
-                                    <div className="overflow-hidden rounded-xl border-4 border-emerald-500/20 bg-gray-100">
+                                    <div className="overflow-hidden rounded-xl border-4 border-emerald-500/20 bg-gray-100 dark:bg-zinc-800">
                                         <img
                                             src={demo}
                                             alt="demo photo"
@@ -206,7 +206,7 @@ function Landing() {
                         <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-emerald-600">
                             {t('landing.features.Title')}
                         </p>
-                        <h2 className="text-4xl font-bold text-gray-900">
+                        <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
                             {t('landing.features.Subtitle')}
                         </h2>
                     </div>
@@ -214,16 +214,16 @@ function Landing() {
                         {features.map((feature, index) => (
                             <div
                                 key={index}
-                                className="transform rounded-3xl border border-gray-100 bg-white p-8 shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-emerald-300/50"
+                                className="transform rounded-3xl border border-gray-100 dark:border-white/10 bg-white dark:bg-zinc-900 p-8 shadow-2xl dark:shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-emerald-300/50 dark:hover:shadow-emerald-900/20"
                             >
                                 {/* Ikona w eleganckim kółku */}
-                                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border-4 border-emerald-200/50 bg-emerald-50">
-                                    <feature.icon className="h-8 w-8 text-emerald-600" />
+                                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border-4 border-emerald-200/50 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-900/20">
+                                    <feature.icon className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                                 </div>
-                                <h2 className="mb-3 text-2xl font-bold text-gray-900">
+                                <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
                                     {feature.title}
                                 </h2>
-                                <p className="text-base text-gray-600">
+                                <p className="text-base text-gray-600 dark:text-gray-400">
                                     {feature.description}
                                 </p>
                             </div>
@@ -231,41 +231,41 @@ function Landing() {
                     </div>
 
                     {/* 5. Sekcja "Jak to działa" (Zamiast opinii) */}
-                    <div className="mb-32 rounded-3xl border border-gray-100 bg-white p-12 shadow-xl">
+                    <div className="mb-32 rounded-3xl border border-gray-100 dark:border-white/10 bg-white dark:bg-zinc-900 p-12 shadow-xl dark:shadow-none">
                         <div className="mx-auto mb-12 max-w-4xl text-center">
                             <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-emerald-600">
                                 {t('landing.howItWorks.Badge')}
                             </p>
-                            <h2 className="text-4xl font-bold text-gray-900">
+                            <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
                                 {t('landing.howItWorks.Title')}
                             </h2>
                         </div>
 
                         <div className="grid gap-8 md:grid-cols-3">
-                            <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
-                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
+                            <div className="relative rounded-2xl border border-emerald-50 dark:border-emerald-500/20 bg-gray-50/50 dark:bg-zinc-800/50 p-8 text-center transition-all hover:bg-white dark:hover:bg-zinc-800 hover:shadow-lg">
+                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                                     1
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold text-gray-900">{t('landing.howItWorks.Step1.Title')}</h3>
-                                <p className="text-gray-600">
+                                <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">{t('landing.howItWorks.Step1.Title')}</h3>
+                                <p className="text-gray-600 dark:text-gray-400">
                                     {t('landing.howItWorks.Step1.Desc')}
                                 </p>
                             </div>
-                            <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
-                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
+                            <div className="relative rounded-2xl border border-emerald-50 dark:border-emerald-500/20 bg-gray-50/50 dark:bg-zinc-800/50 p-8 text-center transition-all hover:bg-white dark:hover:bg-zinc-800 hover:shadow-lg">
+                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                                     2
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold text-gray-900">{t('landing.howItWorks.Step2.Title')}</h3>
-                                <p className="text-gray-600">
+                                <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">{t('landing.howItWorks.Step2.Title')}</h3>
+                                <p className="text-gray-600 dark:text-gray-400">
                                     {t('landing.howItWorks.Step2.Desc')}
                                 </p>
                             </div>
-                            <div className="relative rounded-2xl border border-emerald-50 bg-gray-50/50 p-8 text-center transition-all hover:bg-white hover:shadow-lg">
-                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-2xl font-bold text-emerald-600">
+                            <div className="relative rounded-2xl border border-emerald-50 dark:border-emerald-500/20 bg-gray-50/50 dark:bg-zinc-800/50 p-8 text-center transition-all hover:bg-white dark:hover:bg-zinc-800 hover:shadow-lg">
+                                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                                     3
                                 </div>
-                                <h3 className="mb-3 text-xl font-bold text-gray-900">{t('landing.howItWorks.Step3.Title')}</h3>
-                                <p className="text-gray-600">
+                                <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">{t('landing.howItWorks.Step3.Title')}</h3>
+                                <p className="text-gray-600 dark:text-gray-400">
                                     {t('landing.howItWorks.Step3.Desc')}
                                 </p>
                             </div>
@@ -275,7 +275,7 @@ function Landing() {
             </div>
 
             {/* Footer */}
-            <footer className="mt-16 bg-gray-800 py-8">
+            <footer className="mt-16 bg-gray-800 dark:bg-black py-8">
                 <div className="container mx-auto px-4 text-center text-gray-400">
                     <p>
                         &copy; {new Date().getFullYear()} WorkNest. {t('landing.footer.Rights')}

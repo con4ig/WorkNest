@@ -4,22 +4,30 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import LoadingScreen from '../components/LoadingScreen';
 import CalendarComponent from '../components/CalendarComponent';
+import { useAuth } from '../context/AuthContext';
 import {
     ArrowLeft,
     Check,
     Calendar,
     List,
     X,
-    Eye,
-    Menu,
     Search,
-    Filter,
     Clock,
     UserCheck,
     UserX,
-    MoreHorizontal,
+    Briefcase,
+    AlertCircle,
+    Eye,
 } from 'lucide-react';
-import { clsx } from 'clsx';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardDescription,
+} from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import AnimatedNumber from '../components/ui/AnimatedNumber';
 
 export default function LeaveApprovals() {
     const { t, i18n } = useTranslation();
@@ -34,35 +42,19 @@ export default function LeaveApprovals() {
     const [rejectNote, setRejectNote] = useState('');
     const [error, setError] = useState(null);
     const [notification, setNotification] = useState(null); // { message, type: 'success'|'error' }
-    const [currentUser, setCurrentUser] = useState(null);
-    const [showFilterMenu, setShowFilterMenu] = useState(false);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const checkUserAccess = async () => {
-            try {
-                const res = await api.get('/users/me');
-                setCurrentUser(res.data);
-            } catch (err) {
-                console.error(t('leaves.approvals.authError'), err);
-                navigate('/login');
-            }
-        };
-        checkUserAccess();
-        return () => {
-            if (window.searchTimeout) clearTimeout(window.searchTimeout);
-        };
-    }, [navigate, t]);
+    const { user: currentUser, loading: authLoading } = useAuth();
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchLeaves = useCallback(
-        async (showLoader = false, searchQuery = '') => {
-            if (!currentUser || !currentUser.company) return;
+        async (showLoader = false, query = '') => {
+            if (authLoading || !currentUser || !currentUser.company) return;
             try {
                 if (showLoader) setLoading(true);
                 const params = {
                     company: currentUser.company._id,
                     ...(filter !== 'all' && { status: filter }),
-                    ...(searchQuery && { search: searchQuery }),
+                    ...(query && { search: query }),
                 };
                 const res = await api.get('/leaves', { params });
                 setLeaves(res.data.leaves);
@@ -73,17 +65,25 @@ export default function LeaveApprovals() {
                 if (showLoader) setLoading(false);
             }
         },
-        [filter, navigate, currentUser, t],
+        [filter, navigate, currentUser, authLoading, t],
     );
 
     useEffect(() => {
-        if (!currentUser) return;
+        if (authLoading || !currentUser) return;
         if (currentUser.role === 'admin' || currentUser.role === 'hr') {
             fetchLeaves(true);
         } else {
             setError(t('leaves.approvals.noPermissions'));
         }
-    }, [currentUser, fetchLeaves, t]);
+    }, [currentUser, authLoading, fetchLeaves, t]);
+
+    // Handle search debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchLeaves(false, searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery, fetchLeaves]);
 
     const showNotification = (message, type = 'success') => {
         setNotification({ message, type });
@@ -142,34 +142,21 @@ export default function LeaveApprovals() {
         }
     };
 
-    const getStatusBadge = (status) => {
-        const styles = {
-            pending: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-            approved:
-                'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-            rejected: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
-        };
-        const labels = {
-            pending: t('common.leaveStatus.pending'),
-            approved: t('common.leaveStatus.approved'),
-            rejected: t('common.leaveStatus.rejected'),
-        };
-        return (
-            <span
-                className={clsx(
-                    'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest',
-                    styles[status],
-                )}
-            >
-                <div
-                    className={clsx(
-                        'h-1 w-1 rounded-full bg-current',
-                        status === 'pending' && 'animate-pulse',
-                    )}
-                />
-                {labels[status]}
-            </span>
-        );
+    const getStatusBadgeColor = (status) => {
+        switch (status) {
+            case 'pending':
+                return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+            case 'approved':
+                return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+            case 'rejected':
+                return 'bg-destructive/10 text-destructive border-destructive/20';
+            default:
+                return 'bg-muted text-muted-foreground border-border';
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        return t(`common.leaveStatus.${status}`);
     };
 
     const getLeaveTypeLabel = (type) => {
@@ -178,18 +165,25 @@ export default function LeaveApprovals() {
 
     if (error) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4 font-sans">
-                <div className="border-rose-500/20 bg-rose-500/10 w-full max-w-md rounded-[2rem] border px-6 py-6 text-rose-500 shadow-sm">
-                    <div className="mb-2 text-lg font-semibold">
-                        {t('common.error')}
+            <div className="flex min-h-screen items-center justify-center bg-background p-4">
+                <div className="w-full max-w-md rounded-xl border border-destructive/50 bg-card px-6 py-8 shadow-lg">
+                    <div className="mb-4 flex justify-center">
+                        <div className="rounded-full bg-destructive/10 p-3 text-destructive">
+                            <AlertCircle className="h-6 w-6" />
+                        </div>
                     </div>
-                    <div className="text-sm">{error}</div>
-                    <button
+                    <div className="mb-2 text-center text-xl font-semibold text-foreground">
+                        {t('common.errorOccurred')}
+                    </div>
+                    <div className="mb-6 text-center text-sm text-muted-foreground">
+                        {error}
+                    </div>
+                    <Button
                         onClick={() => navigate('/dashboard')}
-                        className="hover:bg-destructive/90 mt-4 w-full rounded-lg bg-destructive px-4 py-2 text-destructive-foreground transition-colors sm:w-auto"
+                        className="w-full"
                     >
-                        {t('leaves.approvals.backToDashboard')}
-                    </button>
+                        {t('employees.list.backToDashboard')}
+                    </Button>
                 </div>
             </div>
         );
@@ -199,12 +193,29 @@ export default function LeaveApprovals() {
         return <LoadingScreen message={t('leaves.approvals.loading')} />;
     }
 
-    const stats = {
-        pending: leaves.filter((l) => l.status === 'pending').length,
-        approved: leaves.filter((l) => l.status === 'approved').length,
-        rejected: leaves.filter((l) => l.status === 'rejected').length,
-        total: leaves.length,
-    };
+    const statsData = [
+        {
+            id: 1,
+            title: t('leaves.approvals.stats.pending'),
+            value: leaves.filter((l) => l.status === 'pending').length,
+            icon: Clock,
+            color: 'text-amber-500',
+        },
+        {
+            id: 2,
+            title: t('leaves.approvals.stats.approved'),
+            value: leaves.filter((l) => l.status === 'approved').length,
+            icon: UserCheck,
+            color: 'text-emerald-500',
+        },
+        {
+            id: 3,
+            title: t('leaves.approvals.stats.rejected'),
+            value: leaves.filter((l) => l.status === 'rejected').length,
+            icon: UserX,
+            color: 'text-destructive',
+        },
+    ];
 
     const filterTabs = [
         {
@@ -230,287 +241,215 @@ export default function LeaveApprovals() {
     ];
 
     return (
-        <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-white transition-colors duration-300">
-            {/* Ambient Background */}
-            <div className="bg-primary/20 fixed -left-20 -top-20 h-96 w-96 rounded-full blur-[120px] opacity-50 dark:opacity-100" />
-            <div className="bg-primary/10 fixed -bottom-20 -right-20 h-96 w-96 rounded-full blur-[120px] opacity-30 dark:opacity-100" />
-
+        <div className="flex h-full select-none flex-col space-y-6 p-6 md:p-8">
             {/* Header */}
-            <div className="sticky top-0 z-50 border-b border-black/5 dark:border-white/5 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl">
-                {notification && (
-                    <div
-                        className={clsx(
-                            'absolute left-1/2 top-4 z-[100] -translate-x-1/2 rounded-full px-6 py-2.5 text-xs font-black uppercase tracking-widest shadow-2xl transition-all duration-500',
-                            notification.type === 'success'
-                                ? 'bg-primary text-black'
-                                : 'bg-rose-500 text-white',
-                        )}
-                    >
-                        {notification.message}
+            <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
+                <div>
+                    <div className="flex items-center gap-2">
+                         <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate('/dashboard')}
+                            className="mr-2 md:hidden"
+                        >
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+                            {t('leaves.approvals.title')}
+                        </h1>
                     </div>
-                )}
-                <div
-                    className={clsx(
-                        'mx-auto py-4 transition-all duration-500',
-                        viewMode === 'calendar'
-                            ? 'max-w-none px-4 lg:px-8'
-                            : 'max-w-7xl px-6 lg:px-10',
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        {t('leaves.approvals.subtitle')}
+                    </p>
+                </div>
+                
+                 <div className="flex flex-col gap-3 sm:flex-row md:items-center">
+                     {/* View Toggle */}
+                    {filter !== 'rejected' && (
+                        <div className="flex items-center gap-1 rounded-lg border border-border p-1 bg-card">
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`rounded-md p-1.5 transition-all ${
+                                    viewMode === 'list'
+                                        ? 'bg-primary text-primary-foreground shadow-sm'
+                                        : 'text-muted-foreground hover:bg-muted'
+                                }`}
+                                title="List View"
+                            >
+                                <List className="h-4 w-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('calendar')}
+                                className={`rounded-md p-1.5 transition-all ${
+                                    viewMode === 'calendar'
+                                        ? 'bg-primary text-primary-foreground shadow-sm'
+                                        : 'text-muted-foreground hover:bg-muted'
+                                }`}
+                                title="Calendar View"
+                            >
+                                <Calendar className="h-4 w-4" />
+                            </button>
+                        </div>
                     )}
-                >
-                    <div className="flex items-center justify-between gap-6">
-                        <div className="flex items-center gap-6">
-                            <button
-                                onClick={() => navigate('/dashboard')}
-                                className="group flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white"
-                            >
-                                <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                            </button>
-                            <div className="hidden h-8 w-px bg-black/10 dark:bg-white/10 md:block" />
-                            <div>
-                                <h1 className="text-xl font-black tracking-tighter text-zinc-900 dark:text-white md:text-2xl">
-                                    {t('leaves.approvals.title')}
-                                </h1>
-                                <p className="hidden text-[10px] font-black uppercase tracking-widest text-zinc-500 md:block">
-                                    {t('leaves.approvals.subtitle')}
-                                </p>
-                            </div>
-                        </div>
 
-                        <div className="flex items-center gap-4">
-                            {/* Desktop Actions */}
-                            <div className="hidden items-center gap-4 lg:flex">
-                                {/* Search Bar */}
-                                <div className="group relative">
-                                    <div className="bg-primary/20 absolute inset-0 rounded-xl opacity-0 blur transition-all group-focus-within:opacity-100" />
-                                    <input
-                                        type="text"
-                                        placeholder={t(
-                                            'leaves.approvals.searchPlaceholder',
-                                        )}
-                                        className="focus:border-primary/50 relative w-64 rounded-xl border border-black/10 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 px-10 py-2.5 text-xs font-medium text-zinc-900 dark:text-white transition-all focus:outline-none focus:ring-0"
-                                        onChange={(e) => {
-                                            const val = e.target.value;
-                                            if (window.searchTimeout)
-                                                clearTimeout(
-                                                    window.searchTimeout,
-                                                );
-                                            window.searchTimeout = setTimeout(
-                                                () => {
-                                                    fetchLeaves(false, val);
-                                                },
-                                                300,
-                                            );
-                                        }}
-                                    />
-                                    <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-zinc-500 transition-colors group-focus-within:text-primary" />
-                                </div>
-
-                                {/* View Toggle */}
-                                {filter !== 'rejected' && (
-                                    <div className="flex rounded-xl border border-black/10 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 p-1">
-                                        <button
-                                            onClick={() => setViewMode('list')}
-                                            className={clsx(
-                                                'rounded-lg p-2 transition-all',
-                                                viewMode === 'list'
-                                                    ? 'shadow-primary/20 bg-primary text-black shadow-lg'
-                                                    : 'text-zinc-500 hover:text-zinc-200',
-                                            )}
-                                        >
-                                            <List className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                setViewMode('calendar')
-                                            }
-                                            className={clsx(
-                                                'rounded-lg p-2 transition-all',
-                                                viewMode === 'calendar'
-                                                    ? 'shadow-primary/20 bg-primary text-black shadow-lg'
-                                                    : 'text-zinc-500 hover:text-zinc-200',
-                                            )}
-                                        >
-                                            <Calendar className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                            <button
-                                onClick={() =>
-                                    setShowFilterMenu(!showFilterMenu)
-                                }
-                                className="rounded-xl bg-black/5 dark:bg-white/5 p-2.5 text-zinc-500 dark:text-zinc-400 transition-all active:scale-95 lg:hidden"
-                            >
-                                <Filter className="h-5 w-5" />
-                            </button>
+                     <div className="relative w-full sm:w-auto">
+                        <input
+                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[250px]"
+                            placeholder={t('leaves.approvals.searchPlaceholder')}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                            <Search className="h-4 w-4" />
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* Filter Tabs - Subheader style */}
-                    <div className="mt-6 flex flex-wrap items-center gap-2">
-                        {filterTabs.map((tab) => (
-                            <button
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                {statsData.map((stat) => (
+                    <Card
+                        key={stat.id}
+                        className="border-border bg-card shadow-sm transition-all hover:shadow-md"
+                    >
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                {stat.title}
+                            </CardTitle>
+                            <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-semibold tracking-tight text-foreground">
+                                <AnimatedNumber value={stat.value} />
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+
+            {/* Content Area */}
+            <div className="space-y-4">
+                {/* Filters */}
+                 <div className="flex flex-wrap items-center gap-2">
+                    {filterTabs.map((tab) => (
+                        <Button
                                 key={tab.value}
+                                variant={filter === tab.value ? 'secondary' : 'ghost'}
+                                size="sm"
                                 onClick={() => {
                                     setFilter(tab.value);
                                     if (tab.value === 'rejected')
                                         setViewMode('list');
                                 }}
-                                className={clsx(
-                                    'rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all',
-                                    filter === tab.value
-                                        ? 'bg-primary/20 border-primary/30 border text-primary'
-                                        : 'border border-transparent bg-black/5 dark:bg-white/5 text-zinc-400 dark:text-zinc-500 hover:bg-black/10 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-zinc-300',
-                                )}
+                                className="text-xs uppercase tracking-wider font-semibold"
                             >
                                 {tab.label}
-                            </button>
-                        ))}
-                    </div>
+                        </Button>
+                    ))}
                 </div>
-            </div>
 
-            {/* Content */}
-            <div
-                className={clsx(
-                    'w-full py-6 transition-all duration-500 md:py-8',
-                    viewMode === 'calendar'
-                        ? 'max-w-none px-4 lg:px-8'
-                        : 'mx-auto max-w-7xl px-4 md:px-8',
-                )}
-            >
                 {viewMode === 'calendar' && filter !== 'rejected' ? (
-                    <CalendarComponent
-                        views={['month']}
-                        leaves={leaves.filter((l) => l.status !== 'rejected')}
-                        onEventClick={(event) => {
-                            const leave = event.resource;
-                            if (leave.status === 'pending') {
-                                setLeaveToApprove(leave._id);
-                                setShowApproveModal(true);
-                            } else {
-                                showNotification(
-                                    t('leaves.approvals.leaveRequestStatus', {
-                                        status: leave.status,
-                                    }),
-                                    'success',
-                                );
-                            }
-                        }}
-                    />
+                    <Card className="border-border bg-card shadow-sm p-4">
+                         <CalendarComponent
+                            views={['month']}
+                            leaves={leaves.filter((l) => l.status !== 'rejected')}
+                            onEventClick={(event) => {
+                                const leave = event.resource;
+                                if (leave.status === 'pending') {
+                                    setLeaveToApprove(leave._id);
+                                    setShowApproveModal(true);
+                                } else {
+                                    showNotification(
+                                        t('leaves.approvals.leaveRequestStatus', {
+                                            status: leave.status,
+                                        }),
+                                        'success',
+                                    );
+                                }
+                            }}
+                        />
+                    </Card>
                 ) : (
-                    <>
-                        {/* Stats */}
-                        <div className="mb-10 grid grid-cols-2 gap-6 md:grid-cols-4">
-                            <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-zinc-900/50 p-6 shadow-2xl backdrop-blur-2xl transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800/80">
-                                <div className="bg-primary/10 dark:bg-primary/5 group-hover:bg-primary/20 dark:group-hover:bg-primary/10 absolute -right-4 -top-4 h-20 w-20 rounded-full blur-2xl transition-all" />
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                                    {t('leaves.approvals.stats.all')}
-                                </div>
-                                <div className="mt-4 text-3xl font-black tracking-tighter text-zinc-900 dark:text-white">
-                                    {stats.total}
-                                </div>
-                            </div>
-                            <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-zinc-900/50 p-6 shadow-2xl backdrop-blur-2xl transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800/80">
-                                <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-amber-500/10 dark:bg-amber-500/5 blur-2xl transition-all group-hover:bg-amber-500/20 dark:group-hover:bg-amber-500/10" />
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                                    {t('leaves.approvals.stats.pending')}
-                                </div>
-                                <div className="mt-4 text-3xl font-black tracking-tighter text-amber-500">
-                                    {stats.pending}
-                                </div>
-                            </div>
-                            <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-zinc-900/50 p-6 shadow-2xl backdrop-blur-2xl transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800/80">
-                                <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-2xl transition-all group-hover:bg-emerald-500/20 dark:group-hover:bg-emerald-500/10" />
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                                    {t('leaves.approvals.stats.approved')}
-                                </div>
-                                <div className="mt-4 text-3xl font-black tracking-tighter text-emerald-500">
-                                    {stats.approved}
-                                </div>
-                            </div>
-                            <div className="group relative overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-zinc-900/50 p-6 shadow-2xl backdrop-blur-2xl transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800/80">
-                                <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-rose-500/10 dark:bg-rose-500/5 blur-2xl transition-all group-hover:bg-rose-500/20 dark:group-hover:bg-rose-500/10" />
-                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                                    {t('leaves.approvals.stats.rejected')}
-                                </div>
-                                <div className="mt-4 text-3xl font-black tracking-tighter text-rose-500">
-                                    {stats.rejected}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Desktop Table */}
-                        <div className="hidden overflow-hidden rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-zinc-50 dark:bg-zinc-900/30 shadow-2xl backdrop-blur-2xl md:block">
+                    <Card className="border-border bg-card shadow-sm">
+                        <CardHeader>
+                            <CardTitle className="font-semibold text-foreground">
+                                {t('leaves.approvals.requestsList')}
+                            </CardTitle>
+                            <CardDescription className="text-xs tracking-wide text-muted-foreground">
+                                {t('leaves.approvals.requestsCount', { count: leaves.length })}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                        <div className="hidden md:block">
                             <table className="w-full">
-                                <thead className="border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/5">
+                                <thead className="border-b border-border bg-muted/50">
                                     <tr>
-                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                                             {t('leaves.approvals.employee')}
                                         </th>
-                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                                             {t('leaves.approvals.type')}
                                         </th>
-                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                                             {t('leaves.approvals.dates')}
                                         </th>
-                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                                             {t('leaves.approvals.days')}
                                         </th>
-                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                                             {t('leaves.approvals.status')}
                                         </th>
-                                        <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+                                        <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                                             {t('leaves.approvals.actions')}
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-black/5 dark:divide-white/5">
+                                <tbody className="divide-y divide-border">
                                     {leaves.map((leave) => (
                                         <tr
                                             key={leave._id}
-                                            className="group transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02]"
+                                            className="cursor-pointer transition-colors hover:bg-muted/50"
                                         >
-                                            <td className="px-8 py-6">
+                                            <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="from-primary/20 to-primary/5 border-primary/20 dark:border-primary/10 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br font-black text-primary shadow-inner transition-transform group-hover:rotate-3 group-hover:scale-105">
+                                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 font-bold text-primary shadow-sm">
                                                         {leave.user?.username
                                                             ?.charAt(0)
                                                             .toUpperCase() ||
                                                             '?'}
                                                     </div>
                                                     <div>
-                                                        <div className="font-bold text-zinc-900 dark:text-white transition-colors group-hover:text-primary">
+                                                        <div className="font-semibold text-foreground">
                                                             {leave.user
                                                                 ?.username ||
                                                                 t(
                                                                     'leaves.approvals.unknownUser',
                                                                 )}
                                                         </div>
-                                                        <div className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
+                                                        <div className="text-sm text-muted-foreground">
                                                             {leave.user?.email}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-xs font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm text-foreground">
                                                     {getLeaveTypeLabel(
                                                         leave.leaveType,
                                                     )}
                                                 </span>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <div className="flex flex-col gap-1 text-xs">
-                                                    <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col gap-1 text-sm">
+                                                    <span className="font-medium text-foreground">
                                                         {new Date(
                                                             leave.startDate,
                                                         ).toLocaleDateString(
                                                             i18n.language,
                                                         )}
                                                     </span>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                                                    <span className="text-xs text-muted-foreground">
                                                         {t(
                                                             'leaves.approvals.to',
                                                         )}{' '}
@@ -522,31 +461,42 @@ export default function LeaveApprovals() {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-xl font-black tracking-tighter text-zinc-900 dark:text-white">
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-semibold text-foreground">
                                                     {leave.days}
                                                 </span>
-                                                <span className="ml-1 text-[8px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                                                <span className="ml-1 text-xs text-muted-foreground">
                                                     {t('common.days')}
                                                 </span>
                                             </td>
-                                            <td className="px-8 py-6">
-                                                {getStatusBadge(leave.status)}
+                                            <td className="px-6 py-4">
+                                                <span
+                                                    className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeColor(
+                                                        leave.status
+                                                    )}`}
+                                                >
+                                                    {getStatusLabel(leave.status)}
+                                                </span>
                                             </td>
-                                            <td className="px-8 py-6">
+                                            <td className="px-6 py-4 text-right">
                                                 {leave.status === 'pending' ? (
                                                     <div className="flex items-center justify-end gap-3">
-                                                        <button
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
                                                             onClick={() =>
                                                                 handleApproveClick(
                                                                     leave._id,
                                                                 )
                                                             }
-                                                            className="group/btn flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 transition-all hover:bg-emerald-500 hover:text-white dark:hover:text-black hover:shadow-lg hover:shadow-emerald-500/20 active:scale-90"
+                                                            className="h-8 w-8 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-600"
+                                                            title={t('leaves.approvals.approve')}
                                                         >
                                                             <Check className="h-4 w-4" />
-                                                        </button>
-                                                        <button
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
                                                             onClick={() => {
                                                                 setSelectedLeave(
                                                                     leave._id,
@@ -555,19 +505,20 @@ export default function LeaveApprovals() {
                                                                     true,
                                                                 );
                                                             }}
-                                                            className="group/btn flex h-9 w-9 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-500 transition-all hover:bg-rose-500 hover:text-white hover:shadow-lg hover:shadow-rose-500/20 active:scale-90"
+                                                            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                            title={t('leaves.approvals.reject')}
                                                         >
                                                             <X className="h-4 w-4" />
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 ) : (
-                                                    <div className="flex flex-col items-end gap-1 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                                                    <div className="flex flex-col items-end gap-1 text-xs text-muted-foreground">
                                                         {leave.reviewedBy && (
                                                             <>
-                                                                <span className="text-zinc-300 dark:text-zinc-600">
+                                                                <span className="opacity-70">
                                                                     Reviewed by
                                                                 </span>
-                                                                <span className="text-zinc-500 dark:text-zinc-400">
+                                                                <span className="font-medium text-foreground">
                                                                     {
                                                                         leave
                                                                             .reviewedBy
@@ -585,65 +536,74 @@ export default function LeaveApprovals() {
                             </table>
 
                             {leaves.length === 0 && (
-                                <div className="py-24 text-center">
-                                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-black/5 dark:bg-white/5 text-zinc-300 dark:text-zinc-700">
-                                        <Clock className="h-10 w-10 text-zinc-400 dark:text-zinc-500" />
+                                <div className="py-16 text-center">
+                                    <div className="mb-4 flex justify-center">
+                                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                                            <Eye className="h-8 w-8 text-muted-foreground/50" strokeWidth={1.5} />
+                                        </div>
                                     </div>
-                                    <h4 className="text-xl font-black tracking-tight text-zinc-900 dark:text-white">
+                                    <div className="text-base font-medium text-foreground">
                                         {t('leaves.approvals.noRequests')}
-                                    </h4>
-                                    <p className="mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                                        {t('leaves.approvals.noLeaveRequests')}
-                                    </p>
+                                    </div>
+                                    <div className="mt-1 text-sm text-muted-foreground">
+                                        {t('common.tryDifferentSearch')}
+                                    </div>
                                 </div>
                             )}
                         </div>
 
                         {/* Mobile Cards */}
-                        <div className="space-y-6 md:hidden">
+                        <div className="block md:hidden">
+                            <div className="divide-y divide-border">
                             {leaves.map((leave) => (
                                 <div
                                     key={leave._id}
-                                    className="group overflow-hidden rounded-[2rem] border border-black/5 dark:border-white/5 bg-white dark:bg-zinc-900/50 p-6 shadow-2xl backdrop-blur-2xl"
+                                        className="p-4 transition-colors hover:bg-muted/50"
                                 >
-                                    <div className="mb-6 flex items-start justify-between">
-                                        <div className="flex items-center gap-4">
-                                            <div className="from-primary/20 to-primary/5 border-primary/20 dark:border-primary/10 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br font-black text-primary shadow-inner">
+                                    <div className="mb-4 flex items-start justify-between">
+                                        <div className="flex items-center gap-3">
+                                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 font-bold text-primary">
                                                 {leave.user?.username
                                                     ?.charAt(0)
                                                     .toUpperCase() || '?'}
                                             </div>
                                             <div>
-                                                <div className="font-bold text-zinc-900 dark:text-white">
+                                                    <div className="font-semibold text-foreground">
                                                     {leave.user?.username ||
                                                         t(
                                                             'leaves.approvals.unknownUser',
                                                         )}
                                                 </div>
-                                                <div className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
+                                                    <div className="text-sm text-muted-foreground">
                                                     {leave.user?.email}
                                                 </div>
                                             </div>
                                         </div>
-                                        {getStatusBadge(leave.status)}
+                                            <span
+                                                className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${getStatusBadgeColor(
+                                                    leave.status
+                                                )}`}
+                                            >
+                                                {getStatusLabel(leave.status)}
+                                            </span>
                                     </div>
 
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                                                <span className="text-xs font-medium text-muted-foreground">
                                                 {t('common.type')}
                                             </span>
-                                            <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                                                <span className="text-sm font-medium text-foreground">
                                                 {getLeaveTypeLabel(
                                                     leave.leaveType,
                                                 )}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                                                <span className="text-xs font-medium text-muted-foreground">
                                                 {t('common.dates')}
                                             </span>
-                                            <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                                                <span className="text-sm font-medium text-foreground">
                                                 {new Date(
                                                     leave.startDate,
                                                 ).toLocaleDateString(
@@ -658,39 +618,45 @@ export default function LeaveApprovals() {
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                                                <span className="text-xs font-medium text-muted-foreground">
                                                 {t('common.days')}
                                             </span>
-                                            <span className="text-xl font-black tracking-tighter text-zinc-900 dark:text-white">
+                                                <span className="text-base font-bold text-foreground">
                                                 {leave.days}
                                             </span>
                                         </div>
 
-                                        <div className="rounded-[1.5rem] border border-black/5 dark:border-white/5 bg-black/5 dark:bg-black/30 p-4">
-                                            <span className="mb-2 block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-600">
+                                            {leave.reason && (
+                                                <div className="rounded-lg border border-border bg-muted/20 p-3">
+                                                    <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">
                                                 Reason
                                             </span>
-                                            <p className="text-sm italic text-zinc-500 dark:text-zinc-400">
+                                                    <p className="text-sm text-foreground">
                                                 "{leave.reason}"
                                             </p>
                                         </div>
+                                            )}
 
                                         {leave.status === 'pending' && (
-                                            <div className="grid grid-cols-2 gap-3 pt-4">
-                                                <button
+                                                <div className="flex gap-2 pt-2">
+                                                    <Button
+                                                        className="flex-1 gap-2"
+                                                        size="sm"
                                                     onClick={() =>
                                                         handleApproveClick(
                                                             leave._id,
                                                         )
                                                     }
-                                                    className="shadow-primary/20 flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-xs font-black uppercase tracking-widest text-black shadow-lg transition-all active:scale-95"
                                                 >
                                                     <Check className="h-4 w-4" />
                                                     {t(
                                                         'leaves.approvals.approve',
                                                     )}
-                                                </button>
-                                                <button
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="flex-1 gap-2"
+                                                        size="sm"
                                                     onClick={() => {
                                                         setSelectedLeave(
                                                             leave._id,
@@ -699,54 +665,77 @@ export default function LeaveApprovals() {
                                                             true,
                                                         );
                                                     }}
-                                                    className="flex items-center justify-center gap-2 rounded-2xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 px-4 py-3 text-xs font-black uppercase tracking-widest text-zinc-900 dark:text-white transition-all active:scale-95"
                                                 >
                                                     <X className="h-4 w-4" />
                                                     {t(
                                                         'leaves.approvals.reject',
                                                     )}
-                                                </button>
+                                                    </Button>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                             ))}
+                            </div>
+                             {leaves.length === 0 && (
+                                <div className="py-16 text-center">
+                                    <div className="mb-4 flex justify-center">
+                                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                                            <Eye className="h-8 w-8 text-muted-foreground/50" strokeWidth={1.5} />
+                                        </div>
+                                    </div>
+                                    <div className="text-base font-medium text-foreground">
+                                        {t('leaves.approvals.noRequests')}
+                                    </div>
+                                    <div className="mt-1 text-sm text-muted-foreground">
+                                        {t('common.tryDifferentSearch')}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </>
+                    </CardContent>
+                </Card>
                 )}
             </div>
+
+             {notification && (
+                 <div className={`fixed top-4 right-4 z-50 rounded-md p-4 shadow-md ${
+                     notification.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-destructive text-white'
+                 }`}>
+                     {notification.message}
+                 </div>
+            )}
 
             {/* Approve Confirmation Modal */}
             {showApproveModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
-                    <div className="w-full max-w-sm overflow-hidden rounded-[2rem] border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl">
+                    <div className="w-full max-w-sm overflow-hidden rounded-xl border border-border bg-card shadow-xl">
                         <div className="p-8">
-                            <div className="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-primary">
+                            <div className="bg-primary/10 mb-6 flex h-12 w-12 items-center justify-center rounded-full text-primary">
                                 <UserCheck className="h-8 w-8" />
                             </div>
-                            <h3 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
+                            <h3 className="text-lg font-semibold tracking-tight text-foreground">
                                 {t('leaves.approvals.approveModalTitle')}
                             </h3>
-                            <p className="mt-2 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                            <p className="mt-2 text-sm text-muted-foreground">
                                 {t('leaves.approvals.approveModalMessage')}
                             </p>
 
-                            <div className="mt-8 flex flex-col gap-3">
-                                <button
+                            <div className="mt-6 flex flex-col gap-3">
+                                <Button
                                     onClick={confirmApprove}
-                                    className="shadow-primary/20 w-full rounded-2xl bg-primary py-4 text-xs font-black uppercase tracking-[0.2em] text-black shadow-lg transition-all hover:scale-[1.02] active:scale-95"
                                 >
                                     {t('leaves.approvals.confirm')}
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    variant="outline"
                                     onClick={() => {
                                         setShowApproveModal(false);
                                         setLeaveToApprove(null);
                                     }}
-                                    className="w-full rounded-2xl bg-black/5 dark:bg-white/5 py-4 text-xs font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white"
                                 >
                                     {t('leaves.approvals.cancel')}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -756,20 +745,20 @@ export default function LeaveApprovals() {
             {/* Reject Modal */}
             {showRejectModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm">
-                    <div className="w-full max-w-md overflow-hidden rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl">
+                    <div className="w-full max-w-md overflow-hidden rounded-xl border border-border bg-card shadow-xl">
                         <div className="p-8">
-                            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
+                            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
                                 <UserX className="h-8 w-8" />
                             </div>
-                            <h3 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
+                            <h3 className="text-lg font-semibold tracking-tight text-foreground">
                                 {t('leaves.approvals.rejectModalTitle')}
                             </h3>
-                            <p className="mt-2 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                            <p className="mt-2 text-sm text-muted-foreground">
                                 {t('leaves.approvals.rejectModalMessage')}
                             </p>
 
                             <div className="mt-6">
-                                <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                                <label className="mb-2 block text-xs font-semibold text-muted-foreground">
                                     Reason for rejection
                                 </label>
                                 <textarea
@@ -778,28 +767,28 @@ export default function LeaveApprovals() {
                                         setRejectNote(e.target.value)
                                     }
                                     rows="4"
-                                    className="w-full rounded-2xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/50 p-4 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 transition-all focus:border-rose-500/50 focus:outline-none"
+                                    className="w-full rounded-md border border-input bg-background p-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     placeholder="Please provide a brief explanation..."
                                 />
                             </div>
 
-                            <div className="mt-8 flex flex-col gap-3">
-                                <button
+                            <div className="mt-6 flex flex-col gap-3">
+                                <Button
                                     onClick={handleReject}
-                                    className="w-full rounded-2xl bg-rose-500 py-4 text-xs font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-rose-500/20 transition-all hover:scale-[1.02] active:scale-95"
+                                    variant="destructive"
                                 >
                                     {t('leaves.approvals.reject')}
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    variant="outline"
                                     onClick={() => {
                                         setShowRejectModal(false);
                                         setRejectNote('');
                                         setSelectedLeave(null);
                                     }}
-                                    className="w-full rounded-2xl bg-black/5 dark:bg-white/5 py-4 text-xs font-black uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white"
                                 >
                                     {t('leaves.approvals.cancel')}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>

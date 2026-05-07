@@ -27,26 +27,26 @@ class ErrorBoundary extends React.Component {
 
     if (this.state.hasError) {
       return (
-        <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 px-4 py-12 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
           {/* Dekoracyjne elementy tła */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-100 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-100 dark:bg-red-900/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-30 animate-pulse"></div>
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-100 dark:bg-slate-800/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-30 animate-pulse"></div>
           </div>
 
           {/* Główna karta */}
           <div className="relative w-full max-w-lg">
-            <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 px-8 py-12 sm:px-12 sm:py-16 border border-slate-100">
+            <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-black/50 px-8 py-12 sm:px-12 sm:py-16 border border-slate-100 dark:border-white/5">
               {/* Ikona błędu z animacją */}
               <div className="flex justify-center mb-8">
                 <div className="relative">
                   {/* Outer ring - pulsujący efekt */}
-                  <div className="absolute inset-0 rounded-full bg-red-100 animate-ping opacity-75"></div>
+                  <div className="absolute inset-0 rounded-full bg-red-100 dark:bg-red-900/20 animate-ping opacity-75"></div>
                   
                   {/* Main icon container */}
-                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-red-50 to-red-100 ring-8 ring-red-50">
+                  <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30 ring-8 ring-red-50 dark:ring-red-900/10">
                     <svg
-                      className="h-10 w-10 text-red-600"
+                      className="h-10 w-10 text-red-600 dark:text-red-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -66,11 +66,11 @@ class ErrorBoundary extends React.Component {
 
               {/* Treść */}
               <div className="text-center space-y-4">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
                   {t('common.errorBoundary.title')}
                 </h2>
 
-                <p className="text-base text-slate-600 leading-relaxed max-w-md mx-auto">
+                <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mx-auto">
                   {t('common.errorBoundary.description')}
                 </p>
               </div>
@@ -79,7 +79,7 @@ class ErrorBoundary extends React.Component {
               <div className="mt-10">
                 <button
                   onClick={() => window.location.href = '/login'}
-                  className="group relative w-full flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-4 text-base font-semibold text-white shadow-lg shadow-slate-900/20 hover:shadow-xl hover:shadow-slate-900/30 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 transition-all duration-200 hover:-translate-y-0.5"
+                  className="group relative w-full flex justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 dark:from-white dark:to-zinc-200 px-6 py-4 text-base font-semibold text-white dark:text-black shadow-lg shadow-slate-900/20 dark:shadow-white/5 hover:shadow-xl hover:shadow-slate-900/30 dark:hover:shadow-white/10 focus:outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-white focus:ring-offset-2 dark:focus:ring-offset-zinc-900 transition-all duration-200 hover:-translate-y-0.5"
                 >
                   <span>{t('common.errorBoundary.button')}</span>
                   <svg 
@@ -94,7 +94,7 @@ class ErrorBoundary extends React.Component {
               </div>
 
               {/* Dodatkowa informacja */}
-              <p className="mt-6 text-center text-sm text-slate-500">
+              <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-500">
                 {t('common.errorBoundary.contactSupport')}
               </p>
             </div>
