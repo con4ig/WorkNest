@@ -79,12 +79,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
     return (
         <aside
             className={cn(
-                'fixed z-20 h-screen overflow-hidden border-r border-border bg-background backdrop-blur-xl transition-all duration-300 ease-in-out',
+                'fixed z-40 h-screen overflow-hidden border-r border-border bg-background backdrop-blur-xl transition-all duration-300 ease-in-out',
                 isSidebarOpen
-                    ? 'w-64'
+                    ? 'w-72 shadow-2xl'
                     : isMobile
-                      ? '-translate-x-full'
+                      ? '-translate-x-full w-72'
                       : 'w-20',
+                isMobile && 'rounded-r-2xl',
             )}
         >
             <div className="flex h-full flex-col p-4">

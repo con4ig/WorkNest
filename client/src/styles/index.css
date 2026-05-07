@@ -11,6 +11,16 @@ body {
         sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+#root {
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 @tailwind base;
