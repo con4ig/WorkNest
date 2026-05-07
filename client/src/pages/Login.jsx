@@ -78,7 +78,7 @@ export default function Login() {
 
             {/* Right Panel - Login Form */}
 
-            <div className="flex flex-1 items-center justify-center bg-gray-50 p-8">
+            <div className="flex flex-1 items-center justify-center bg-background p-8 transition-colors duration-300">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo & Header */}
                     <div className="text-center">
@@ -92,10 +92,10 @@ export default function Login() {
                                 </span>
                             </div>
                         </Link>
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                        <h2 className="text-3xl font-bold tracking-tight text-foreground">
                             {t('auth.login.title')}
                         </h2>
-                        <p className="mt-3 text-base text-gray-500">
+                        <p className="mt-3 text-base text-muted-foreground">
                             {t('auth.login.noAccount')}{' '}
                             <Link
                                 to="/register"
@@ -120,7 +120,7 @@ export default function Login() {
                                 setIsLoading(false);
                             }
                         }}
-                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-transparent py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-50 hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-transparent dark:text-emerald-400 dark:border-emerald-500/50"
+                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-transparent py-3 text-sm font-bold text-emerald-700 transition-all hover:border-emerald-600 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:border-emerald-500/50 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40"
                     >
                         {t('auth.login.demoBtn')}
                     </button>
@@ -131,13 +131,13 @@ export default function Login() {
                     >
                         <div className="space-y-5">
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label className="mb-1.5 block text-sm font-medium text-foreground">
                                     {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         {...register('email')}
-                                        className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                        className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         placeholder={t(
                                             'auth.login.emailPlaceholder',
                                         )}
@@ -161,13 +161,13 @@ export default function Login() {
                             </div>
 
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label className="mb-1.5 block text-sm font-medium text-foreground">
                                     {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         {...register('password')}
-                                        className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                        className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         type="password"
                                         placeholder="********"
                                     />
@@ -195,8 +195,8 @@ export default function Login() {
                             disabled={isLoading}
                             className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
                                 isLoading
-                                    ? 'cursor-not-allowed bg-gray-400'
-                                    : 'bg-emerald-600 hover:bg-emerald-700'
+                                    ? 'cursor-not-allowed bg-muted text-muted-foreground'
+                                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
                             }`}
                         >
                             {isLoading ? (
@@ -214,7 +214,7 @@ export default function Login() {
                     </form>
 
                     {/* Footer for production simplicity */}
-                    <footer className="pt-8 text-center text-xs text-gray-400">
+                    <footer className="pt-8 text-center text-xs text-muted-foreground">
                         <div className="mb-2">
                             &copy; {new Date().getFullYear()} WorkNest.{' '}
                             {t('landing.footer.Rights')}
