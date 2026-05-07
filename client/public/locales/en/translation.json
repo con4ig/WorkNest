@@ -322,6 +322,7 @@
             "noData": "No data for chart",
             "tooltipProject": "New projects",
             "progressTitle": "Project Progress",
+            "projectProgress": "Project Progress",
             "progress": "Projects Progress",
             "progressDesc": "Status of active projects.",
             "general": "Overall"

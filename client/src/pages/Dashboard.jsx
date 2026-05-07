@@ -97,45 +97,35 @@ const ProjectProgressChart = ({ stats }) => {
     };
 
     return (
-        <div className="flex w-full flex-col gap-6 p-4">
-            {/* Tytuł z podkreśleniem */}
-            <h3 className="w-fit text-xl font-bold text-foreground">
-                Postęp Projektów
+        <div className="flex w-full flex-col gap-4 p-4">
+            <h3 className="text-base font-bold tracking-tight text-foreground sm:text-xl">
+                {t('dashboard.charts.projectProgress') || 'Postęp Projektów'}
             </h3>
 
-            {/* Kontener wykresu i legendy obok siebie */}
-            <div className="flex items-center justify-start gap-8">
-                {/* Wykres kołowy */}
+            {/* On mobile: chart centered, legend below. On sm+: side by side */}
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-start sm:gap-8">
+                {/* Pie chart */}
                 <div className="relative flex-shrink-0">
-                    <div className="h-32 w-32">
+                    <div className="h-28 w-28 sm:h-32 sm:w-32">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
                                     data={chartData}
                                     cx="50%"
                                     cy="50%"
-                                    innerRadius={45}
-                                    outerRadius={60}
+                                    innerRadius={40}
+                                    outerRadius={55}
                                     dataKey="value"
                                     stroke="none"
-                                    onMouseEnter={(_, index) =>
-                                        setHoveredSection(index)
-                                    }
+                                    onMouseEnter={(_, index) => setHoveredSection(index)}
                                     onMouseLeave={() => setHoveredSection(null)}
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
                                             fill={entry.color}
-                                            opacity={
-                                                hoveredSection === null ||
-                                                hoveredSection === index
-                                                    ? 1
-                                                    : 0.6
-                                            }
-                                            style={{
-                                                transition: 'opacity 0.3s ease',
-                                            }}
+                                            opacity={hoveredSection === null || hoveredSection === index ? 1 : 0.6}
+                                            style={{ transition: 'opacity 0.3s ease' }}
                                         />
                                     ))}
                                 </Pie>
@@ -143,7 +133,6 @@ const ProjectProgressChart = ({ stats }) => {
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
-                    {/* Central percentage stats */}
                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                         <span className="text-xl font-bold tracking-tight text-foreground">
                             {animatedPercentage}%
@@ -154,46 +143,39 @@ const ProjectProgressChart = ({ stats }) => {
                     </div>
                 </div>
 
-                {/* Legenda po prawej */}
-                <div className="flex min-w-[140px] flex-col space-y-4">
-                    {/* Reference: "zakonczone w trakc" -> Keeping consistent with translation keys but styling as requested */}
-
-                    {/* Completed */}
-                    <div className="group flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-primary shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-                            <span className="text-sm font-semibold text-muted-foreground">
+                {/* Legend — row on mobile (compact), column on sm+ */}
+                <div className="flex w-full flex-row justify-around gap-2 sm:min-w-[140px] sm:flex-col sm:space-y-4">
+                    <div className="flex flex-col items-center gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-2.5 w-2.5 rounded-full bg-primary shadow-[0_0_6px_rgba(16,185,129,0.4)] sm:h-3 sm:w-3" />
+                            <span className="text-xs font-semibold text-muted-foreground sm:text-sm">
                                 {t('dashboard.stats.completed')}
                             </span>
                         </div>
-                        <span className="text-sm font-bold text-foreground">
-                            {stats[1]?.value || '1'}
+                        <span className="text-base font-bold text-foreground sm:text-sm">
+                            {stats[1]?.value || '0'}
                         </span>
                     </div>
-
-                    {/* In Progress */}
-                    <div className="group flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.4)]" />
-                            <span className="text-sm font-semibold text-muted-foreground">
+                    <div className="flex flex-col items-center gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-2.5 w-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.4)] sm:h-3 sm:w-3" />
+                            <span className="text-xs font-semibold text-muted-foreground sm:text-sm">
                                 {t('dashboard.stats.inProgress')}
                             </span>
                         </div>
-                        <span className="text-sm font-bold text-foreground">
-                            {stats[2]?.value || '1'}
+                        <span className="text-base font-bold text-foreground sm:text-sm">
+                            {stats[2]?.value || '0'}
                         </span>
                     </div>
-
-                    {/* Pending */}
-                    <div className="group flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-muted-foreground shadow-[0_0_6px_rgba(148,163,184,0.4)]" />
-                            <span className="text-sm font-semibold text-muted-foreground">
+                    <div className="flex flex-col items-center gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                        <div className="flex items-center gap-1.5">
+                            <div className="h-2.5 w-2.5 rounded-full bg-muted-foreground sm:h-3 sm:w-3" />
+                            <span className="text-xs font-semibold text-muted-foreground sm:text-sm">
                                 {t('dashboard.stats.pending')}
                             </span>
                         </div>
-                        <span className="text-sm font-bold text-foreground">
-                            {stats[3]?.value || '1'}
+                        <span className="text-base font-bold text-foreground sm:text-sm">
+                            {stats[3]?.value || '0'}
                         </span>
                     </div>
                 </div>
@@ -368,54 +350,56 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="flex h-full select-none flex-col space-y-6 p-6 md:p-8">
-            {/* Header */}
-            <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
-                <div>
-                    <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+        <div className="flex h-full select-none flex-col space-y-4 p-4 sm:space-y-6 sm:p-6 md:p-8">
+            {/* Header — compact on mobile */}
+            <div className="flex items-center justify-between border-b border-border pb-4">
+                <div className="min-w-0">
+                    <h1 className="truncate text-lg font-bold tracking-tight text-foreground sm:text-2xl md:text-3xl">
                         {t('dashboard.welcome', {
                             name: user?.firstName || user?.username,
                         })}
                     </h1>
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="mt-0.5 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
                         {t('dashboard.overview')}
                     </p>
                 </div>
-                <div className="flex flex-col items-end gap-3">
+                <div className="ml-3 flex shrink-0 flex-col items-end gap-2">
                     {(user?.role === 'admin' || user?.role === 'hr') && (
                         <Button
                             onClick={() => navigate('/generate-code')}
                             variant="outline"
-                            className="gap-2"
+                            size="sm"
+                            className="gap-1.5 text-xs"
                         >
-                            <Key className="h-4 w-4" />
-                            {t('dashboard.generateCode')}
+                            <Key className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">{t('dashboard.generateCode')}</span>
+                            <span className="sm:hidden">Kod</span>
                         </Button>
                     )}
-                    <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                        {format(new Date(), 'EEEE, d MMMM yyyy', {
+                    <div className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                        {format(new Date(), 'd MMM', {
                             locale: i18n.language === 'pl' ? pl : undefined,
                         })}
                     </div>
                 </div>
             </div>
 
-            {/* Top Section: Stats Cards + Project Progress */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                {/* Stats Cards (Left Side) */}
-                <div className="col-span-1 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-8 lg:grid-cols-4">
+            {/* Top Section: Stats (2x2 on mobile) + Project Progress */}
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">
+                {/* Stats Cards — 2 columns on mobile, 4 on lg */}
+                <div className="col-span-1 grid grid-cols-2 gap-3 sm:gap-4 lg:col-span-8 lg:grid-cols-4">
                     {stats.map((stat) => (
                         <Card
                             key={stat.id}
                             className="border-border bg-card shadow-sm transition-all hover:shadow-md"
                         >
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-4 sm:pb-2">
+                                <CardTitle className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[10px]">
                                     {t(`dashboard.stats.${stat.titleKey}`)}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-semibold tracking-tight text-foreground">
+                            <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4">
+                                <div className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
                                     <AnimatedNumber value={stat.value} />
                                 </div>
                             </CardContent>
@@ -423,7 +407,7 @@ export default function Dashboard() {
                     ))}
                 </div>
 
-                {/* Project Progress Chart (Right Side) */}
+                {/* Project Progress Chart */}
                 <Card
                     className="col-span-1 select-none border-border bg-card shadow-sm lg:col-span-4"
                     onMouseDown={(e) => e.preventDefault()}
@@ -492,7 +476,7 @@ export default function Dashboard() {
                                     dataKey="val"
                                     fill="rgb(var(--primary))"
                                     radius={[4, 4, 0, 0]}
-                                    barSize={40}
+                                    maxBarSize={36}
                                 />
                             </BarChart>
                         </ResponsiveContainer>
@@ -521,75 +505,50 @@ export default function Dashboard() {
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-2 sm:space-y-4">
                         {projects.length > 0 ? (
                             projects.map((project) => (
                                 <div
                                     key={project._id}
-                                    className="flex cursor-pointer items-center justify-between rounded-lg border border-border p-4 transition-colors hover:bg-muted"
-                                    onClick={() =>
-                                        navigate(`/projects/${project._id}`)
-                                    }
+                                    className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-3 transition-colors hover:bg-muted active:scale-[0.99] sm:p-4"
+                                    onClick={() => navigate(`/projects/${project._id}`)}
                                 >
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex min-w-0 items-center gap-3">
                                         <div
-                                            className={`flex h-10 w-10 items-center justify-center rounded-lg border ${
+                                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border sm:h-10 sm:w-10 ${
                                                 project.status === 'completed'
                                                     ? 'bg-primary/10 border-primary/20 text-primary'
-                                                    : project.status ===
-                                                        'in_progress'
+                                                    : project.status === 'in_progress'
                                                       ? 'border-amber-500/20 bg-amber-500/10 text-amber-500'
                                                       : 'border-border bg-muted text-muted-foreground'
                                             }`}
                                         >
                                             <div className="h-1.5 w-1.5 rounded-full bg-current" />
                                         </div>
-                                        <div>
-                                            <h3 className="font-semibold text-foreground">
+                                        <div className="min-w-0">
+                                            <h3 className="truncate text-sm font-semibold text-foreground">
                                                 {project.name}
                                             </h3>
-                                            <p className="text-xs tracking-wide text-muted-foreground">
+                                            <p className="text-[10px] tracking-wide text-muted-foreground sm:text-xs">
                                                 {t('common.deadline')}:{' '}
                                                 {(() => {
                                                     try {
                                                         return project.endDate
-                                                            ? format(
-                                                                  new Date(
-                                                                      project.endDate,
-                                                                  ),
-                                                                  'dd MMM yyyy',
-                                                                  {
-                                                                      locale:
-                                                                          i18n.language ===
-                                                                          'pl'
-                                                                              ? pl
-                                                                              : undefined,
-                                                                  },
-                                                              )
-                                                            : t(
-                                                                  'common.notSpecified',
-                                                              );
+                                                            ? format(new Date(project.endDate), 'dd MMM yyyy', {
+                                                                  locale: i18n.language === 'pl' ? pl : undefined,
+                                                              })
+                                                            : t('common.notSpecified');
                                                     } catch (e) {
-                                                        return t(
-                                                            'common.invalidDate',
-                                                        );
+                                                        return t('common.invalidDate');
                                                     }
                                                 })()}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="ml-2 shrink-0 text-right">
                                         <div className="text-sm font-bold text-foreground">
-                                            {
-                                                project.tasks?.filter(
-                                                    (t) =>
-                                                        t.status ===
-                                                        'completed',
-                                                ).length
-                                            }
-                                            <span className="font-normal text-muted-foreground">
-                                                /{project.tasks?.length || 0}
-                                            </span>
+                                            {project.tasks?.filter((t) => t.status === 'completed').length}
+                                            <span className="font-normal text-muted-foreground">/{project.tasks?.length || 0}</span>
                                         </div>
                                         <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
                                             {t('common.tasks')}

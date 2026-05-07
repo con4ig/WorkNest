@@ -28,12 +28,12 @@ import {
 const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <button
         type="button"
-        className="flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary w-40"
+        className="flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary min-w-0 max-w-[160px] truncate"
         onClick={onClick}
         ref={ref}
     >
-        <Icon.Calendar size={12} />
-        {value || placeholder}
+        <Icon.Calendar size={12} className="shrink-0" />
+        <span className="truncate">{value || placeholder}</span>
     </button>
 ));
 CustomDateInput.displayName = 'CustomDateInput';
@@ -171,11 +171,12 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                 <div className="mt-3 flex flex-col gap-2 text-xs">
                     {isEditing ? (
                         <>
-                            <div className="flex flex-wrap gap-2">
+                            {/* Row 1: Status + Priority — full width each on mobile */}
+                            <div className="grid grid-cols-2 gap-2">
                                 <select
                                     value={editData.status}
                                     onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-                                    className="rounded-full border border-input bg-muted py-1 pl-3 pr-8 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-input bg-muted py-1.5 pl-2 pr-1 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
                                     {statusOptions.map(option => (
                                         <option key={option.id} value={option.id}>
@@ -186,7 +187,7 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 <select
                                     value={editData.priority}
                                     onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
-                                    className="rounded-full border border-input bg-muted py-1 pl-3 pr-8 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-input bg-muted py-1.5 pl-2 pr-1 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
                                     {priorityOptions.map(option => (
                                         <option key={option.id} value={option.id}>
@@ -196,11 +197,12 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 </select>
                             </div>
 
-                            <div className="flex flex-wrap gap-2">
+                            {/* Row 2: Assignee (full width) + DatePicker */}
+                            <div className="flex flex-col gap-2">
                                 <select
                                     value={editData.assignedTo}
                                     onChange={(e) => setEditData({ ...editData, assignedTo: e.target.value })}
-                                    className="rounded-full border border-input bg-muted py-1 pl-3 pr-8 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    className="w-full rounded-lg border border-input bg-muted py-1.5 pl-2 pr-1 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 >
                                     {userOptions.map(option => (
                                         <option key={option.id} value={option.id}>
@@ -279,18 +281,19 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 </button>
                             </div>
                         ) : (
-                            <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            /* Always visible on touch (mobile), hover-only on sm+ */
+                            <div className="flex gap-1 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
                                 <button
                                     type="button"
                                     onClick={() => setIsEditing(true)}
-                                    className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-primary"
+                                    className="rounded p-1.5 text-muted-foreground hover:bg-secondary hover:text-primary active:scale-90 transition-transform"
                                 >
                                     <Icon.Edit3 />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => onDelete(task._id)}
-                                    className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                    className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:scale-90 transition-transform"
                                 >
                                     <Icon.Trash />
                                 </button>
