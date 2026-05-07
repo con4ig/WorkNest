@@ -223,6 +223,22 @@ export default function Login() {
                             )}
                         </button>
                     </form>
+                    
+                    {/* Footer for production simplicity */}
+                    <footer className="pt-8 text-center text-xs text-gray-400">
+                        <div className="mb-2">
+                            &copy; {new Date().getFullYear()} WorkNest. {t('landing.footer.Rights')}
+                        </div>
+                        <div className="space-x-3">
+                            <Link to="/polityka-prywatnosci" className="hover:text-emerald-600 transition-colors">
+                                {t('landing.footer.Privacy')}
+                            </Link>
+                            <span className="text-gray-300">|</span>
+                            <Link to="/regulamin" className="hover:text-emerald-600 transition-colors">
+                                {t('landing.footer.Terms')}
+                            </Link>
+                        </div>
+                    </footer>
                 </div>
             </div>
         </div>
