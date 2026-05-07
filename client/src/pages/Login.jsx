@@ -78,7 +78,7 @@ export default function Login() {
 
             {/* Right Panel - Login Form */}
 
-            <div className="flex flex-1 items-center justify-center bg-white p-8">
+            <div className="flex flex-1 items-center justify-center bg-gray-50 p-8">
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo & Header */}
                     <div className="text-center">
@@ -120,7 +120,7 @@ export default function Login() {
                                 setIsLoading(false);
                             }
                         }}
-                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-emerald-50 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/50"
+                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-transparent py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-50 hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-transparent dark:text-emerald-400 dark:border-emerald-500/50"
                     >
                         {t('auth.login.demoBtn')}
                     </button>
