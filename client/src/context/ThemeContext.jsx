@@ -20,9 +20,9 @@ export const ThemeProvider = ({ children }) => {
             }
             // Optional: User said "Moim zdaniem użytkownik powinien mieć możliwość wyboru kolorystyki."
             // We can default to light theme as it's the safest.
-            return 'light';
+            return 'dark';
         }
-        return 'light';
+        return 'dark';
     });
 
     useEffect(() => {
