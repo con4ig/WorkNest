@@ -77,13 +77,13 @@ function ProfileImageUpload() {
             
             <div className="relative w-full max-w-xl">
                 {/* Main Card */}
-                <div className="animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden rounded-[2.5rem] border border-border/50 bg-card/30 p-8 shadow-2xl backdrop-blur-xl sm:p-12">
+                <div className="animate-in fade-in zoom-in-95 duration-500 relative overflow-hidden rounded-3xl border border-border/50 bg-card/30 p-6 shadow-2xl backdrop-blur-xl sm:rounded-[2.5rem] sm:p-12">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
                     
                     {/* Back Button */}
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="group absolute left-8 top-8 flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50 text-foreground transition-all hover:bg-muted active:scale-95 shadow-sm border border-border/50"
+                        className="group absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50 text-foreground transition-all hover:bg-muted active:scale-95 shadow-sm border border-border/50 sm:left-8 sm:top-8"
                     >
                         <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
                     </button>
@@ -92,10 +92,10 @@ function ProfileImageUpload() {
                     <div className="relative z-10 flex flex-col items-center">
                         {/* Header Section */}
                         <div className="mb-10 text-center">
-                            <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20 shadow-inner group transition-transform hover:rotate-3">
-                                <Camera className="h-10 w-10 transition-transform group-hover:scale-110" />
+                            <div className="mb-4 inline-flex h-16 w-16 sm:mb-6 sm:h-20 sm:w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary border border-primary/20 shadow-inner group transition-transform hover:rotate-3">
+                                <Camera className="h-8 w-8 sm:h-10 sm:w-10 transition-transform group-hover:scale-110" />
                             </div>
-                            <h2 className="mb-2 text-3xl font-black tracking-tighter text-foreground sm:text-4xl">
+                            <h2 className="mb-2 text-2xl font-black tracking-tighter text-foreground sm:text-4xl">
                                 {t('upload.title')}
                             </h2>
                             <p className="max-w-[280px] mx-auto text-sm font-medium leading-relaxed text-muted-foreground/60 italic">
@@ -195,16 +195,16 @@ function ProfileImageUpload() {
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="flex-1 rounded-2xl bg-primary px-8 py-4 font-black uppercase tracking-widest text-primary-foreground shadow-2xl shadow-primary/30 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95 disabled:opacity-50"
+                                            className="flex-1 rounded-2xl bg-primary px-6 py-3 font-black uppercase tracking-widest text-primary-foreground shadow-2xl shadow-primary/30 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95 disabled:opacity-50 sm:px-8 sm:py-4 text-xs sm:text-sm"
                                         >
                                             {loading ? (
                                                 <div className="flex items-center justify-center gap-3">
-                                                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+                                                    <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
                                                     {t('common.uploading')}
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <Upload className="h-5 w-5" />
+                                                    <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
                                                     {t('upload.saveButton')}
                                                 </div>
                                             )}
@@ -213,14 +213,14 @@ function ProfileImageUpload() {
                                             type="button"
                                             onClick={() => navigate('/dashboard')}
                                             disabled={loading}
-                                            className="rounded-2xl border border-border/50 bg-muted/50 px-8 py-4 font-black uppercase tracking-widest text-foreground transition-all hover:bg-muted active:scale-95"
+                                            className="flex-1 rounded-2xl border border-border/50 bg-muted/50 px-6 py-3 font-black uppercase tracking-widest text-foreground transition-all hover:bg-muted active:scale-95 sm:px-8 sm:py-4 text-xs sm:text-sm"
                                         >
                                             {t('common.cancel')}
                                         </button>
                                     </div>
                                 ) : !preview ? (
-                                    <label className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-primary px-8 py-4 font-black uppercase tracking-widest text-primary-foreground shadow-2xl shadow-primary/30 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95">
-                                        <Camera className="h-5 w-5" />
+                                    <label className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-3 font-black uppercase tracking-widest text-primary-foreground shadow-2xl shadow-primary/30 transition-all hover:bg-primary/90 hover:translate-y-[-2px] active:scale-95 sm:px-8 sm:py-4 text-xs sm:text-sm">
+                                        <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
                                         {t('upload.selectImage')}
                                         <input
                                             type="file"
@@ -234,7 +234,7 @@ function ProfileImageUpload() {
                         </form>
 
                         {/* Tips Section */}
-                        <div className="mt-12 w-full rounded-3xl border border-border/20 bg-muted/10 p-6 backdrop-blur-sm sm:p-8">
+                        <div className="mt-8 w-full rounded-3xl border border-border/20 bg-muted/10 p-5 backdrop-blur-sm sm:mt-12 sm:p-8">
                             <h4 className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
                                 {t('upload.tips.title')}
                             </h4>
