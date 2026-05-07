@@ -76,6 +76,17 @@ app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
 
+// Health check endpoint (moved up to avoid rate limiters/routes interference)
+app.get("/api/health", (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+  res.status(dbStatus === "connected" ? 200 : 503).json({
+    status: dbStatus === "connected" ? "ok" : "unhealthy",
+    db: dbStatus,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 10000,
@@ -106,16 +117,6 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/activities", activityRoutes);
 
-// Health check endpoint (required by Docker)
-app.get("/api/health", (req, res) => {
-  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
-  res.status(dbStatus === "connected" ? 200 : 503).json({
-    status: dbStatus === "connected" ? "ok" : "unhealthy",
-    db: dbStatus,
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-  });
-});
 
 // Root route
 app.get("/", (req, res) => {
