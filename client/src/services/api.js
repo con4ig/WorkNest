@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-// W trybie produkcyjnym Nginx obsługuje proxy /api do backendu, 
-// więc używamy ścieżki relatywnej.
-const API_URL = '/api';
+// W trybie produkcyjnym używamy pełnego adresu backendu na Renderze,
+// a lokalnie używamy proxy /api.
+const API_URL = import.meta.env.PROD 
+  ? 'https://worknest-qpsw.onrender.com/api' 
+  : '/api';
 
 const api = axios.create({
   baseURL: API_URL,
