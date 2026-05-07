@@ -105,7 +105,6 @@ export default function Login() {
                         </p>
                     </div>
 
-                    {/* Przycisk Demo */}
                     <button
                         type="button"
                         onClick={async () => {
@@ -120,7 +119,7 @@ export default function Login() {
                                 setIsLoading(false);
                             }
                         }}
-                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-emerald-50 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-emerald-50 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100 hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-500/50"
                     >
                         {t('auth.login.demoBtn')}
                     </button>
@@ -189,17 +188,6 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500">
-                                {t('auth.login.forgotPassword')}
-                            </span>
-                            <Link
-                                to="/forgot-password"
-                                className="text-sm font-medium text-emerald-600 transition-colors hover:text-emerald-500"
-                            >
-                                {t('auth.login.recoverAccess')}
-                            </Link>
-                        </div>
 
                         <button
                             type="submit"

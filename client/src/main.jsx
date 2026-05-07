@@ -91,10 +91,6 @@ createRoot(document.getElementById('root')).render(
                                     element={<Register />}
                                 />
                                 <Route
-                                    path="/forgot-password"
-                                    element={<Forgot />}
-                                />
-                                <Route
                                     path="/regulamin"
                                     element={<Regulamin />}
                                 />
