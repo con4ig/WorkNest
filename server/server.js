@@ -122,6 +122,11 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/activities", activityRoutes);
 
 
+// Simple ping endpoint for cron jobs
+app.get("/ping", (req, res) => {
+  res.status(200).send("pong");
+});
+
 // Root route
 app.get("/", (req, res) => {
   res.send("WorkNest API działa poprawnie.");
@@ -132,19 +137,20 @@ const PORT = process.env.PORT || 5500;
 
 // Połączenie z MongoDB i start serwera
 const startServer = async () => {
+  // Start server listening immediately so Render sees it as "live"
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Serwer działa na porcie ${PORT}`);
+    console.log(`📁 Środowisko: ${process.env.NODE_ENV || "development"}`);
+  });
+
   try {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log(`✅ MongoDB Connected`);
-    
-    app.listen(PORT, () => {
-      console.log(`🚀 Serwer działa na porcie ${PORT}`);
-      console.log(`📁 Środowisko: ${process.env.NODE_ENV || "development"}`);
-    });
   } catch (error) {
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    // Pozwól serwerowi wystartować nawet bez DB (opcjonalnie), ale lepiej wywalić błąd w tym przypadku
-    // Jeśli Render ma problem z połączeniem, 503 w health checku i tak go zrestartuje
-    process.exit(1);
+    // Optional: notify about DB failure but keep server running
+    // Or close server if DB is strictly required
+    // server.close(() => process.exit(1));
   }
 };
 
