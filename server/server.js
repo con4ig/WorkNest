@@ -29,7 +29,17 @@ const allowedOrigins = [
 // Helmet configuration
 app.use(
   helmet({
-    contentSecurityPolicy: false, // Disable CSP for API only server
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        "font-src": ["'self'", "https://fonts.gstatic.com"],
+        "img-src": ["'self'", "data:", "https:"],
+        "connect-src": ["'self'", "https://worknest-production-10f0.up.railway.app", "https://worknest-1.onrender.com", "http://localhost:5500"],
+      },
+    },
     crossOriginResourcePolicy: { policy: "cross-origin" },
     crossOriginEmbedderPolicy: false,
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
