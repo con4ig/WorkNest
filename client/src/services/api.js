@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // W trybie produkcyjnym używamy pełnego adresu backendu na Renderze,
 // a lokalnie używamy proxy /api.
-const API_URL = '/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_URL,
