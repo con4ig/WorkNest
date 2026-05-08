@@ -469,11 +469,15 @@ export const demoLogin = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, cookieOptions);
 
+    console.log(`🔑 Wygenerowano tokeny dla: ${DEMO_EMAIL}`);
+    console.log(`👤 Dane użytkownika demo:`, { id: user._id, role: user.role });
+
     res.json({
       message: "Uruchomiono Twój osobisty sandbox Demo. Dane wygasną za 2 godziny.",
       accessToken,
       user: {
-        _id: user._id,
+        id: user._id, // Zmieniam na id (bez podkreślnika) dla spójności, jeśli frontend tego szuka
+        _id: user._id, // Zachowuję _id dla bezpieczeństwa
         username: user.username,
         email: user.email,
         role: user.role,

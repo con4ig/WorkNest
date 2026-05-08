@@ -134,13 +134,18 @@ const startServer = async () => {
   });
 
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    console.log("⏳ Łączenie z MongoDB...");
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000, // Timeout po 5 sekundach
+    });
     console.log(`✅ MongoDB Connected`);
   } catch (error) {
-    console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    // Optional: notify about DB failure but keep server running
-    // Or close server if DB is strictly required
-    // server.close(() => process.exit(1));
+    console.error(`❌ Błąd połączenia z MongoDB: ${error.message}`);
+    // Na produkcji lepiej zamknąć serwer, jeśli baza jest kluczowa
+    if (process.env.NODE_ENV === 'production') {
+      console.error("FATAL: Nie można połączyć się z bazą danych na produkcji.");
+      // server.close(() => process.exit(1));
+    }
   }
 };
 
