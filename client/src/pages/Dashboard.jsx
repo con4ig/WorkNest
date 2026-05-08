@@ -107,7 +107,7 @@ const ProjectProgressChart = ({ stats }) => {
                 {/* Pie chart */}
                 <div className="relative flex-shrink-0">
                     <div className="h-28 w-28 sm:h-32 sm:w-32">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                             <PieChart>
                                 <Pie
                                     data={chartData}
@@ -433,7 +433,7 @@ export default function Dashboard() {
                     onMouseDown={(e) => e.preventDefault()}
                 >
                     <div className="h-[300px] select-none">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                             <BarChart
                                 data={weeklyActivity}
                                 className="select-none"
@@ -547,7 +547,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="ml-2 shrink-0 text-right">
                                         <div className="text-sm font-bold text-foreground">
-                                            {project.tasks?.filter((t) => t.status === 'completed').length}
+                                            {project.tasks?.filter((t) => t.status === 'completed')?.length || 0}
                                             <span className="font-normal text-muted-foreground">/{project.tasks?.length || 0}</span>
                                         </div>
                                         <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
