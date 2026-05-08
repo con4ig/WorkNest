@@ -77,6 +77,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
 
+// Ignore favicon.ico
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+
 // Health check endpoint
 app.get("/api/health", (req, res) => {
   const readyState = mongoose.connection.readyState;
