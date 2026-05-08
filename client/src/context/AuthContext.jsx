@@ -55,12 +55,15 @@ export const AuthProvider = ({ children }) => {
     const demoLogin = async () => {
         try {
             const { data } = await api.post('/auth/demo-login');
+            console.log('Demo login response data:', data);
+            if (!data.accessToken) {
+                console.error('Brak accessToken w odpowiedzi!');
+            }
             localStorage.setItem('accessToken', data.accessToken);
-            setUser(data.user);
             setUser(data.user);
             return data;
         } catch (error) {
-            console.error('Błąd logowania demo:', error);
+            console.error('Błąd logowania demo (Frontend):', error);
             throw error;
         }
     };
