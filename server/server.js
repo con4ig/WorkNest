@@ -22,6 +22,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5500",
   "https://worknest-1.onrender.com",
+  "https://worknest-production-10f0.up.railway.app",
   ...envOrigins
 ];
 
