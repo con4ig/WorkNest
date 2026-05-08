@@ -3,7 +3,7 @@ import axios from 'axios';
 // W trybie produkcyjnym używamy pełnego adresu backendu na Renderze,
 // a lokalnie używamy proxy /api.
 const API_URL = import.meta.env.PROD 
-  ? 'https://worknest-qpsw.onrender.com/api' 
+  ? 'https://worknest-production-10f0.up.railway.app/api' 
   : '/api';
 
 const api = axios.create({
