@@ -236,6 +236,7 @@
         "cancel": "Cancel",
         "edit": "Edit",
         "delete": "Delete",
+        "archive": "Archive",
         "actions": "Actions",
         "search": "Search",
         "searching": "Searching...",
@@ -567,6 +568,9 @@
         "card": {
             "progress": "Progress"
         },
+        "projectCard": {
+            "progress": "Progress"
+        },
         "filter": {
             "searchPlaceholder": "Search project...",
             "allStatuses": "All statuses",
@@ -642,7 +646,8 @@
             "none": "None",
             "restore": "Restore",
             "archive": "Archive",
-            "delete": "Delete permanently"
+            "delete": "Delete permanently",
+            "team": "Team"
         },
         "projectGridCard": {
             "archiveTitle": "Archive project",
