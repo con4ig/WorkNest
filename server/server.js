@@ -77,12 +77,15 @@ app.use(express.json());
 app.use(cookieParser());
 app.set("trust proxy", 1);
 
-// Health check endpoint (moved up to avoid rate limiters/routes interference)
+// Health check endpoint
 app.get("/api/health", (req, res) => {
-  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
-  res.status(dbStatus === "connected" ? 200 : 503).json({
-    status: dbStatus === "connected" ? "ok" : "unhealthy",
-    db: dbStatus,
+  const readyState = mongoose.connection.readyState;
+  // 1 = connected, 2 = connecting
+  const isAvailable = readyState === 1 || readyState === 2;
+  
+  res.status(isAvailable ? 200 : 503).json({
+    status: isAvailable ? "ok" : "unhealthy",
+    db: readyState === 1 ? "connected" : readyState === 2 ? "connecting" : "disconnected",
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
   });
@@ -127,20 +130,22 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5500;
 
-// Połączenie z MongoDB
-const connectDB = async () => {
+// Połączenie z MongoDB i start serwera
+const startServer = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log(`✅ MongoDB Connected`);
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Serwer działa na porcie ${PORT}`);
+      console.log(`📁 Środowisko: ${process.env.NODE_ENV || "development"}`);
+    });
   } catch (error) {
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
+    // Pozwól serwerowi wystartować nawet bez DB (opcjonalnie), ale lepiej wywalić błąd w tym przypadku
+    // Jeśli Render ma problem z połączeniem, 503 w health checku i tak go zrestartuje
     process.exit(1);
   }
 };
 
-connectDB();
-
-app.listen(PORT, () => {
-  console.log(`🚀 Serwer działa na porcie ${PORT}`);
-  console.log(`📁 Środowisko: ${process.env.NODE_ENV || "development"}`);
-});
+startServer();
