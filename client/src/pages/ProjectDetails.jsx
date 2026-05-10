@@ -183,7 +183,7 @@ const CommentItem = ({
                             {canDelete && (
                                 <button
                                     onClick={() => onDelete(comment._id)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
+                                    className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
                                 >
                                     <Icon.Trash className="h-4 w-4" />
                                 </button>
