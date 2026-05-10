@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, AlertTriangle, AlertCircle, Info, CheckCircle2 } from 'lucide-react';
+import { X, AlertTriangle, AlertCircle, Info, CheckCircle2, Archive } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { clsx } from 'clsx';
 
@@ -18,29 +18,25 @@ const ConfirmationModal = ({
 
     const variants = {
         danger: {
-            button: 'bg-destructive hover:bg-destructive/90 shadow-destructive/20 text-destructive-foreground',
-            iconBg: 'bg-destructive/10 text-destructive',
+            confirm: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
             icon: AlertTriangle,
-            glow: 'bg-destructive/10'
+            iconClass: 'text-destructive',
         },
         primary: {
-            button: 'bg-primary hover:bg-primary/90 shadow-primary/20 text-primary-foreground',
-            iconBg: 'bg-primary/10 text-primary',
+            confirm: 'bg-primary text-primary-foreground hover:bg-primary/90',
             icon: CheckCircle2,
-            glow: 'bg-primary/10'
+            iconClass: 'text-primary',
         },
         warning: {
-            button: 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20 text-white',
-            iconBg: 'bg-amber-500/10 text-amber-500',
-            icon: AlertCircle,
-            glow: 'bg-amber-500/10'
+            confirm: 'bg-amber-500 text-white hover:bg-amber-600',
+            icon: Archive,
+            iconClass: 'text-amber-500',
         },
         info: {
-            button: 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/20 text-white',
-            iconBg: 'bg-blue-500/10 text-blue-500',
+            confirm: 'bg-blue-500 text-white hover:bg-blue-600',
             icon: Info,
-            glow: 'bg-blue-500/10'
-        }
+            iconClass: 'text-blue-500',
+        },
     };
 
     const config = variants[confirmVariant] || variants.danger;
@@ -48,53 +44,62 @@ const ConfirmationModal = ({
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+            {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-foreground/30 backdrop-blur-2xl transition-opacity animate-in fade-in duration-300"
+                className="absolute inset-0 bg-foreground/25 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
                 onClick={onClose}
             />
 
-            <div className="relative w-full max-w-md scale-100 overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-2xl transition-all animate-in zoom-in-95 duration-300">
-                {/* Close Button */}
-                <button
-                    onClick={onClose}
-                    className="absolute right-6 top-6 z-20 flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    aria-label={t('common.close')}
-                >
-                    <X size={20} aria-hidden="true" />
-                </button>
-
-                <div className="relative p-8 sm:p-10">
-                    {/* Background Glow */}
-                    <div className={clsx("absolute -left-4 -top-4 rounded-full p-20 blur-3xl opacity-50 dark:opacity-50", config.glow)} />
-
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                        <div className={clsx("mb-6 flex h-20 w-20 items-center justify-center rounded-3xl", config.iconBg)}>
-                            <Icon className="h-10 w-10 stroke-[1.5]" />
-                        </div>
-                        <h3 className="mb-3 text-2xl font-black uppercase tracking-tight text-foreground">{title}</h3>
-                        <p className="text-sm font-medium leading-relaxed text-muted-foreground">{message}</p>
+            {/* Dialog */}
+            <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-200 overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
+                {/* Header */}
+                <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon
+                            size={18}
+                            className={clsx('shrink-0', config.iconClass)}
+                            aria-hidden="true"
+                        />
+                        <h2 className="text-base font-semibold text-foreground leading-snug">
+                            {title}
+                        </h2>
                     </div>
+                    <button
+                        onClick={onClose}
+                        className="shrink-0 -mt-0.5 flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        aria-label={t('common.close')}
+                    >
+                        <X size={15} aria-hidden="true" />
+                    </button>
+                </div>
 
-                    <div className="relative z-10 mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <button
-                            onClick={onClose}
-                            className="rounded-2xl bg-muted py-4 text-xs font-black uppercase tracking-widest text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        >
-                            {cancelText || t('common.cancel')}
-                        </button>
-                        <button
-                            onClick={() => {
-                                onConfirm();
-                                onClose();
-                            }}
-                            className={clsx(
-                                "flex items-center justify-center rounded-2xl py-4 text-xs font-black uppercase tracking-widest shadow-lg transition-all hover:scale-[1.02] active:scale-95",
-                                config.button
-                            )}
-                        >
-                            {confirmText || t('common.confirm')}
-                        </button>
-                    </div>
+                {/* Body */}
+                {message && (
+                    <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">
+                        {message}
+                    </p>
+                )}
+
+                {/* Footer */}
+                <div className="flex items-center justify-end gap-2 border-t border-border bg-muted/30 px-5 py-3">
+                    <button
+                        onClick={onClose}
+                        className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
+                    >
+                        {cancelText || t('common.cancel')}
+                    </button>
+                    <button
+                        onClick={() => {
+                            onConfirm();
+                            onClose();
+                        }}
+                        className={clsx(
+                            'rounded-lg px-4 py-2 text-xs font-semibold shadow-sm transition-all hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                            config.confirm,
+                        )}
+                    >
+                        {confirmText || t('common.confirm')}
+                    </button>
                 </div>
             </div>
         </div>
