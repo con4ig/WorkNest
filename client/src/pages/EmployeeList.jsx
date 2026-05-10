@@ -265,11 +265,12 @@ export default function EmployeeList() {
                         <input
                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[250px]"
                             placeholder={t('employees.list.searchPlaceholder')}
+                            aria-label={t('employees.list.searchPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                            <Search className="h-4 w-4" />
+                            <Search className="h-4 w-4" aria-hidden="true" />
                         </div>
                     </div>
                 </div>
@@ -308,8 +309,8 @@ export default function EmployeeList() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <div className="hidden md:block">
-                        <table className="w-full">
+                    <div className="hidden md:block md:overflow-x-auto">
+                        <table className="w-full min-w-[640px]">
                             <thead className="border-b border-border bg-muted/50">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">

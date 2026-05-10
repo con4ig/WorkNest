@@ -349,7 +349,7 @@ export default function Projekty() {
     }
 
     return (
-        <div className="flex h-full select-none flex-col space-y-6 p-6 md:p-8">
+        <div className="flex h-full select-none flex-col space-y-6 pt-6 md:pt-8 px-6 md:px-8 pb-6">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
