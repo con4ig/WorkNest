@@ -392,27 +392,36 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Top Section: Stats (2x2 on mobile) + Project Progress */}
+            {/* Top Section: Stats + Project Progress */}
             <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">
-                {/* Stats Cards — 2 columns on mobile, 4 on lg */}
-                <div className="col-span-1 grid grid-cols-2 gap-3 sm:gap-4 lg:col-span-8 lg:grid-cols-4">
-                    {stats.map((stat) => (
-                        <Card
-                            key={stat.id}
-                            className="border-border bg-card shadow-sm transition-all hover:shadow-md"
-                        >
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-4 sm:pb-2">
-                                <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
-                                    {t(`dashboard.stats.${stat.titleKey}`)}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="px-3 pb-3 pt-0 sm:px-4 sm:pb-4">
-                                <div className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                                    <AnimatedNumber value={stat.value} />
+                {/* Stats — single panel, internal dividers, varied visual weight */}
+                <div className="col-span-1 lg:col-span-8">
+                    <div className="grid grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-sm sm:grid-cols-4 sm:divide-y-0">
+                        {stats.map((stat, idx) => {
+                            const accents = [
+                                null,
+                                'bg-primary',
+                                'bg-amber-500',
+                                'bg-muted-foreground',
+                            ];
+                            const accent = accents[idx];
+                            return (
+                                <div key={stat.id} className="flex flex-col gap-2 p-4 sm:p-5">
+                                    <div className="flex items-center gap-2">
+                                        {accent && (
+                                            <span className={`h-1.5 w-1.5 rounded-full ${accent}`} />
+                                        )}
+                                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
+                                            {t(`dashboard.stats.${stat.titleKey}`)}
+                                        </span>
+                                    </div>
+                                    <div className={`font-bold tracking-tight text-foreground ${idx === 0 ? 'text-3xl sm:text-4xl' : 'text-xl sm:text-2xl'}`}>
+                                        <AnimatedNumber value={stat.value} />
+                                    </div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Project Progress Chart */}
