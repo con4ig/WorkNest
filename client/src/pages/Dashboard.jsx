@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api.js';
 import { ChevronRight, Key } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { chartColors } from '../config/colors';
 import {
     Bar,
     BarChart,
@@ -54,24 +55,24 @@ const ProjectProgressChart = ({ stats }) => {
                   {
                       name: t('dashboard.stats.completed'),
                       value: completedProjects,
-                      color: '#10B981', // Emerald 500
+                      color: chartColors.success,
                   },
                   {
                       name: t('dashboard.stats.inProgress'),
                       value: runningProjects,
-                      color: '#F59E0B', // Amber 500
+                      color: chartColors.warning,
                   },
                   {
                       name: t('dashboard.stats.pending'),
                       value: pendingProjects,
-                      color: '#94A3B8', // Slate 400
+                      color: chartColors.pending,
                   },
               ].filter((item) => item.value > 0)
             : [
                   {
                       name: t('dashboard.charts.noData'),
                       value: 1,
-                      color: '#E2E8F0', // Slate 200
+                      color: chartColors.muted,
                   },
               ];
 
