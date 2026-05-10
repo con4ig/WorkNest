@@ -140,7 +140,7 @@ export default function MyLeaves() {
     }
 
     return (
-        <div className="min-h-screen select-none bg-zinc-950 pb-12 text-zinc-400">
+        <div className="min-h-screen select-none bg-zinc-950 pb-12 text-muted-foreground">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
@@ -157,7 +157,7 @@ export default function MyLeaves() {
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="group flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400 shadow-lg transition-all hover:bg-white/10 hover:text-white active:scale-95"
+                                className="group flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-muted-foreground shadow-lg transition-all hover:bg-white/10 hover:text-white active:scale-95"
                             >
                                 <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" />
                             </button>
@@ -166,7 +166,7 @@ export default function MyLeaves() {
                                 <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">
                                     {t('leaves.myLeaves.title')}
                                 </h1>
-                                <p className="text-xs sm:text-sm font-medium text-zinc-500">
+                                <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                                     {t('leaves.myLeaves.subtitle')}
                                 </p>
                             </div>
@@ -224,12 +224,12 @@ export default function MyLeaves() {
                                 <stat.icon className={clsx("h-12 w-12", stat.color)} />
                             </div>
                             <div className="relative z-10">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                     {stat.label}
                                 </span>
                                 <div className={clsx("mt-2 flex items-baseline gap-2 text-4xl font-black", stat.color)}>
                                     {stat.value}
-                                    <span className="text-sm font-medium text-zinc-600">
+                                    <span className="text-sm font-medium text-muted-foreground">
                                         {i === 3 ? t('common.days') : t('common.requests')}
                                     </span>
                                 </div>
@@ -245,22 +245,22 @@ export default function MyLeaves() {
                         <table className="w-full border-collapse text-left">
                             <thead className="bg-white/[0.02]">
                                 <tr>
-                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                         {t('common.type')}
                                     </th>
-                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                         {t('common.dates')}
                                     </th>
-                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                         {t('common.days')}
                                     </th>
-                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                         {t('common.status')}
                                     </th>
-                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                    <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                         {t('common.reason')}
                                     </th>
-                                    <th className="px-8 py-6 text-right text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                    <th className="px-8 py-6 text-right text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                         {t('common.actions')}
                                     </th>
                                 </tr>
@@ -282,16 +282,16 @@ export default function MyLeaves() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="flex items-center gap-2 font-medium text-zinc-400">
+                                            <div className="flex items-center gap-2 font-medium text-muted-foreground">
                                                 <span>{new Date(leave.startDate).toLocaleDateString('pl-PL')}</span>
-                                                <ArrowUpRight className="h-3 w-3 text-zinc-600" />
+                                                <ArrowUpRight className="h-3 w-3 text-muted-foreground" />
                                                 <span>{new Date(leave.endDate).toLocaleDateString('pl-PL')}</span>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1 font-bold text-white">
                                                 {leave.days}
-                                                <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500">
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                                                     {t('common.days')}
                                                 </span>
                                             </div>
@@ -300,7 +300,7 @@ export default function MyLeaves() {
                                             {getStatusBadge(leave.status)}
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="max-w-[200px] truncate text-sm font-medium text-zinc-500" title={leave.reason}>
+                                            <div className="max-w-[200px] truncate text-sm font-medium text-muted-foreground" title={leave.reason}>
                                                 {leave.reason || <span className="italic opacity-30">—</span>}
                                             </div>
                                         </td>
@@ -334,7 +334,7 @@ export default function MyLeaves() {
                                             <div className="font-bold text-white tracking-tight">
                                                 {getLeaveTypeLabel(leave.leaveType)}
                                             </div>
-                                            <div className="text-xs font-black uppercase tracking-wider text-zinc-600">
+                                            <div className="text-xs font-black uppercase tracking-wider text-muted-foreground">
                                                 {leave.days} {t('common.days')}
                                             </div>
                                         </div>
@@ -344,17 +344,17 @@ export default function MyLeaves() {
 
                                 <div className="rounded-2xl bg-white/5 p-4 space-y-3">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="font-black uppercase tracking-widest text-zinc-600 text-[10px]">Termin</span>
-                                        <div className="flex items-center gap-2 font-bold text-zinc-300">
+                                        <span className="font-black uppercase tracking-widest text-muted-foreground text-[10px]">Termin</span>
+                                        <div className="flex items-center gap-2 font-bold text-foreground">
                                             <span>{new Date(leave.startDate).toLocaleDateString('pl-PL')}</span>
-                                            <ChevronRight className="h-4 w-4 text-zinc-600" />
+                                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                             <span>{new Date(leave.endDate).toLocaleDateString('pl-PL')}</span>
                                         </div>
                                     </div>
                                     {leave.reason && (
                                         <div className="pt-2 border-t border-white/5">
-                                            <span className="font-black uppercase tracking-widest text-zinc-600 text-[10px]">Powód</span>
-                                            <p className="mt-1 text-sm font-medium text-zinc-400 leading-relaxed italic">
+                                            <span className="font-black uppercase tracking-widest text-muted-foreground text-[10px]">Powód</span>
+                                            <p className="mt-1 text-sm font-medium text-muted-foreground leading-relaxed italic">
                                                 "{leave.reason}"
                                             </p>
                                         </div>
@@ -386,7 +386,7 @@ export default function MyLeaves() {
                             <h3 className="text-xl font-black uppercase tracking-tight text-white mb-2">
                                 {t('leaves.myLeaves.noLeaves')}
                             </h3>
-                            <p className="max-w-[280px] text-sm font-medium text-zinc-500 leading-relaxed">
+                            <p className="max-w-[280px] text-sm font-medium text-muted-foreground leading-relaxed">
                                 {t('leaves.myLeaves.clickToAdd')}
                             </p>
                             <button
