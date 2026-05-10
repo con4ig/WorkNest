@@ -98,8 +98,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setIsSidebarOpen(true)}
+                                aria-label={t('dashboard.sidebar.expand', { defaultValue: 'Expand sidebar' })}
                             >
-                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                                <ChevronRight className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
                             </Button>
                         </div>
                     )}
@@ -115,11 +116,16 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                     {profileImage ? (
                                         <img
                                             src={profileImage}
-                                            alt="Avatar"
+                                            alt={t('dashboard.sidebar.avatarAlt', { defaultValue: 'Profile picture', name: username })}
+                                            loading="lazy"
                                             className="h-10 w-10 rounded-full border border-border object-cover"
                                         />
                                     ) : (
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                                        <div
+                                            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
+                                            role="img"
+                                            aria-label={`${username} avatar`}
+                                        >
                                             {username?.charAt(0).toUpperCase()}
                                         </div>
                                     )}
@@ -141,8 +147,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                     size="icon"
                                     onClick={() => setIsSidebarOpen(false)}
                                     className="-mr-2 text-muted-foreground hover:text-foreground"
+                                    aria-label={t('dashboard.sidebar.collapse', { defaultValue: 'Collapse sidebar' })}
                                 >
-                                    <ChevronLeft className="h-5 w-5" />
+                                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                                 </Button>
                             )}
                         </div>
@@ -208,11 +215,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                             !isSidebarOpen && 'justify-center',
                         )}
                         onClick={toggleTheme}
+                        aria-label={theme === 'dark' ? t('dashboard.sidebar.lightMode', { defaultValue: 'Switch to light mode' }) : t('dashboard.sidebar.darkMode', { defaultValue: 'Switch to dark mode' })}
                     >
                         {theme === 'dark' ? (
-                            <Sun className="h-5 w-5" />
+                            <Sun className="h-5 w-5" aria-hidden="true" />
                         ) : (
-                            <Moon className="h-5 w-5" />
+                            <Moon className="h-5 w-5" aria-hidden="true" />
                         )}
                         {isSidebarOpen && (
                             <span className="ml-3 font-medium">
@@ -227,7 +235,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                             className="border-destructive/20 bg-destructive/5 w-full justify-start gap-3 border text-destructive hover:bg-destructive hover:text-destructive-foreground"
                             onClick={handleLogout}
                         >
-                            <LogOut className="h-4 w-4" />
+                            <LogOut className="h-4 w-4" aria-hidden="true" />
                             <span>{t('dashboard.sidebar.logout')}</span>
                         </Button>
                     ) : (
@@ -237,8 +245,9 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                 size="icon"
                                 onClick={handleLogout}
                                 className="border-destructive/20 border text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                                aria-label={t('dashboard.sidebar.logout')}
                             >
-                                <LogOut className="h-5 w-5" />
+                                <LogOut className="h-5 w-5" aria-hidden="true" />
                             </Button>
                         </div>
                     )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
@@ -488,26 +488,32 @@ export default function ProjectDetails() {
         fetchActivities();
     }, [fetchData, fetchActivities]);
 
+    const taskStats = useMemo(
+        () =>
+            tasks.reduce(
+                (acc, task) => {
+                    acc.total++;
+                    if (task.status === 'completed') acc.completed++;
+                    if (task.status === 'in-progress') acc.inProgress++;
+                    if (task.status === 'todo') acc.todo++;
+                    return acc;
+                },
+                { total: 0, completed: 0, inProgress: 0, todo: 0 },
+            ),
+        [tasks],
+    );
+
+    const calculatedProgress = useMemo(
+        () =>
+            taskStats.total > 0
+                ? Math.round((taskStats.completed / taskStats.total) * 100)
+                : 0,
+        [taskStats.total, taskStats.completed],
+    );
+
     if (loading || !currentUser) {
         return <LoadingScreen message={t('projects.details.loading')} />;
     }
-
-    // Calculate task statistics
-    const taskStats = tasks.reduce(
-        (acc, task) => {
-            acc.total++;
-            if (task.status === 'completed') acc.completed++;
-            if (task.status === 'in-progress') acc.inProgress++;
-            if (task.status === 'todo') acc.todo++;
-            return acc;
-        },
-        { total: 0, completed: 0, inProgress: 0, todo: 0 },
-    );
-
-    const calculatedProgress =
-        taskStats.total > 0
-            ? Math.round((taskStats.completed / taskStats.total) * 100)
-            : 0;
 
     // Fallback do ręcznego progressu jest niepotrzebny, jeśli chcemy full automation,
     // ale może warto zostawić jako fallback wizualny, gdy zadania się jeszcze ładują?
