@@ -395,8 +395,8 @@ export default function Dashboard() {
             {/* Top Section: Stats + Project Progress */}
             <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">
                 {/* Stats — single panel, internal dividers, varied visual weight */}
-                <div className="col-span-1 lg:col-span-8">
-                    <div className="grid grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-sm sm:grid-cols-4 sm:divide-y-0">
+                <div className="col-span-1 lg:col-span-8 lg:h-full">
+                    <div className="grid h-full grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card shadow-sm sm:grid-cols-4 sm:divide-y-0">
                         {stats.map((stat, idx) => {
                             const accents = [
                                 null,
@@ -406,16 +406,16 @@ export default function Dashboard() {
                             ];
                             const accent = accents[idx];
                             return (
-                                <div key={stat.id} className="flex flex-col gap-2 p-4 sm:p-5">
+                                <div key={stat.id} className="flex flex-col justify-between gap-3 p-5 sm:p-6">
                                     <div className="flex items-center gap-2">
                                         {accent && (
-                                            <span className={`h-1.5 w-1.5 rounded-full ${accent}`} />
+                                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${accent}`} />
                                         )}
                                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
                                             {t(`dashboard.stats.${stat.titleKey}`)}
                                         </span>
                                     </div>
-                                    <div className={`font-bold tracking-tight text-foreground ${idx === 0 ? 'text-3xl sm:text-4xl' : 'text-xl sm:text-2xl'}`}>
+                                    <div className={`font-black tracking-tight text-foreground leading-none ${idx === 0 ? 'text-4xl sm:text-5xl' : 'text-2xl sm:text-3xl'}`}>
                                         <AnimatedNumber value={stat.value} />
                                     </div>
                                 </div>
