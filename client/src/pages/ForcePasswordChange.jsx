@@ -62,22 +62,22 @@ export default function ForcePasswordChange() {
                 <div className="p-8">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">{t('auth.forcePasswordChange.newPasswordLabel')}</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">{t('auth.forcePasswordChange.newPasswordLabel')}</label>
                             <input
                                 {...register('password')}
                                 type="password"
-                                className="w-full rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all p-3 border"
+                                className="w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 transition-all p-3 border"
                                 placeholder={t('auth.forcePasswordChange.newPasswordPlaceholder')}
                             />
                             {errors.password && <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">{t('auth.forcePasswordChange.confirmPasswordLabel')}</label>
+                            <label className="block text-sm font-medium text-muted-foreground mb-1">{t('auth.forcePasswordChange.confirmPasswordLabel')}</label>
                             <input
                                 {...register('confirmPassword')}
                                 type="password"
-                                className="w-full rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all p-3 border"
+                                className="w-full rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20 transition-all p-3 border"
                                 placeholder={t('auth.forcePasswordChange.confirmPasswordPlaceholder')}
                             />
                             {errors.confirmPassword && <p className="text-sm text-red-600 mt-1">{errors.confirmPassword.message}</p>}
