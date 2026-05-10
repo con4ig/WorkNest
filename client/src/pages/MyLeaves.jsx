@@ -140,7 +140,7 @@ export default function MyLeaves() {
     }
 
     return (
-        <div className="min-h-screen select-none bg-zinc-950 pb-12 text-muted-foreground">
+        <div className="min-h-screen select-none bg-background pb-12 text-muted-foreground">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
@@ -151,19 +151,19 @@ export default function MyLeaves() {
                 }
             />
             {/* Header */}
-            <div className="sticky top-0 z-40 border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl">
+            <div className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
                 <div className="mx-auto max-w-[1400px] px-4 sm:px-8 py-4 sm:py-6">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                className="group flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-muted-foreground shadow-lg transition-all hover:bg-white/10 hover:text-white active:scale-95"
+                                className="group flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-muted-foreground shadow-sm transition-all hover:bg-muted/80 hover:text-foreground active:scale-95"
                             >
                                 <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" />
                             </button>
-                            <div className="h-8 w-px bg-white/10"></div>
+                            <div className="h-8 w-px bg-border"></div>
                             <div>
-                                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">
+                                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground uppercase">
                                     {t('leaves.myLeaves.title')}
                                 </h1>
                                 <p className="text-xs sm:text-sm font-medium text-muted-foreground">
@@ -218,7 +218,7 @@ export default function MyLeaves() {
                     ].map((stat, i) => (
                         <div 
                             key={i}
-                            className="relative overflow-hidden rounded-[2rem] border border-white/5 bg-zinc-900/50 p-6 backdrop-blur-2xl"
+                            className="relative overflow-hidden rounded-2xl border border-border bg-card p-6"
                         >
                             <div className={clsx("absolute -right-4 -top-4 rounded-full p-8 opacity-10", stat.bg)}>
                                 <stat.icon className={clsx("h-12 w-12", stat.color)} />
@@ -239,11 +239,11 @@ export default function MyLeaves() {
                 </div>
 
                 {/* Content Container */}
-                <div className="relative overflow-hidden rounded-[2.5rem] border border-white/5 bg-zinc-900/30 backdrop-blur-2xl">
+                <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
                     {/* Desktop Table */}
                     <div className="hidden lg:block overflow-x-auto">
                         <table className="w-full border-collapse text-left">
-                            <thead className="bg-white/[0.02]">
+                            <thead className="bg-muted/40">
                                 <tr>
                                     <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
                                         {t('common.type')}
@@ -265,18 +265,18 @@ export default function MyLeaves() {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-border">
                                 {leaves.map((leave) => (
                                     <tr
                                         key={leave._id}
-                                        className="group transition-all hover:bg-white/[0.02]"
+                                        className="group transition-all hover:bg-muted/30"
                                     >
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                                                     <Calendar className="h-5 w-5" />
                                                 </div>
-                                                <span className="font-bold text-white">
+                                                <span className="font-bold text-foreground">
                                                     {getLeaveTypeLabel(leave.leaveType)}
                                                 </span>
                                             </div>
@@ -289,7 +289,7 @@ export default function MyLeaves() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1 font-bold text-white">
+                                            <div className="inline-flex items-center gap-1.5 rounded-lg bg-muted px-3 py-1 font-bold text-foreground">
                                                 {leave.days}
                                                 <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                                                     {t('common.days')}
@@ -322,7 +322,7 @@ export default function MyLeaves() {
                     </div>
 
                     {/* Mobile Cards */}
-                    <div className="block lg:hidden divide-y divide-white/5">
+                    <div className="block lg:hidden divide-y divide-border">
                         {leaves.map((leave) => (
                             <div key={leave._id} className="p-6 space-y-4 transition-colors active:bg-white/[0.02]">
                                 <div className="flex items-start justify-between">
@@ -331,7 +331,7 @@ export default function MyLeaves() {
                                             <Calendar className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <div className="font-bold text-white tracking-tight">
+                                            <div className="font-bold text-foreground tracking-tight">
                                                 {getLeaveTypeLabel(leave.leaveType)}
                                             </div>
                                             <div className="text-xs font-black uppercase tracking-wider text-muted-foreground">
@@ -342,7 +342,7 @@ export default function MyLeaves() {
                                     {getStatusBadge(leave.status)}
                                 </div>
 
-                                <div className="rounded-2xl bg-white/5 p-4 space-y-3">
+                                <div className="rounded-2xl bg-muted/50 p-4 space-y-3">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="font-black uppercase tracking-widest text-muted-foreground text-[10px]">Termin</span>
                                         <div className="flex items-center gap-2 font-bold text-foreground">
@@ -352,7 +352,7 @@ export default function MyLeaves() {
                                         </div>
                                     </div>
                                     {leave.reason && (
-                                        <div className="pt-2 border-t border-white/5">
+                                        <div className="pt-2 border-t border-border">
                                             <span className="font-black uppercase tracking-widest text-muted-foreground text-[10px]">Powód</span>
                                             <p className="mt-1 text-sm font-medium text-muted-foreground leading-relaxed italic">
                                                 "{leave.reason}"
@@ -383,7 +383,7 @@ export default function MyLeaves() {
                                     <CalendarDays className="h-10 w-10" />
                                 </div>
                             </div>
-                            <h3 className="text-xl font-black uppercase tracking-tight text-white mb-2">
+                            <h3 className="text-xl font-black uppercase tracking-tight text-foreground mb-2">
                                 {t('leaves.myLeaves.noLeaves')}
                             </h3>
                             <p className="max-w-[280px] text-sm font-medium text-muted-foreground leading-relaxed">
@@ -391,7 +391,7 @@ export default function MyLeaves() {
                             </p>
                             <button
                                 onClick={() => setShowModal(true)}
-                                className="mt-8 flex items-center gap-2 rounded-2xl bg-white/5 px-6 py-3 font-black uppercase tracking-widest text-white transition-all hover:bg-white/10"
+                                className="mt-8 flex items-center gap-2 rounded-2xl bg-muted px-6 py-3 font-black uppercase tracking-widest text-foreground transition-all hover:bg-muted/80"
                             >
                                 <Plus className="h-4 w-4 stroke-[3]" />
                                 {t('leaves.myLeaves.newRequest')}
