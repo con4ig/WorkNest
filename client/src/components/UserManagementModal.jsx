@@ -167,7 +167,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                 onClick={() => handleToggleUser(user._id, 'remove')}
                                                 disabled={isUpdating || isCreator}
                                                 className={clsx(
-                                                    "shrink-0 flex h-8 w-8 items-center justify-center rounded-lg transition-all",
+                                                    "shrink-0 flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg transition-all",
                                                     isCreator
                                                         ? "text-zinc-300 dark:text-zinc-700 cursor-not-allowed"
                                                         : "text-red-500 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10"
@@ -238,7 +238,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                 <button
                                                     onClick={() => handleToggleUser(user._id, 'add')}
                                                     disabled={isUpdating}
-                                                    className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                    className="shrink-0 flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
                                                     title={t('projects.details.userModal.addUser')}
                                                     aria-label={t('projects.details.userModal.addUser')}
                                                 >
@@ -272,7 +272,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                 <div className="p-4 border-t border-black/5 dark:border-white/5 flex items-center justify-end sm:p-6">
                     <button
                         onClick={onClose}
-                        className="px-6 py-2 bg-zinc-900 dark:bg-white text-white dark:text-black font-bold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg dark:shadow-white/10"
+                        className="px-6 py-3 sm:py-2 min-h-[44px] bg-zinc-900 dark:bg-white text-white dark:text-black font-bold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg dark:shadow-white/10"
                     >
                         {t('common.close')}
                     </button>
