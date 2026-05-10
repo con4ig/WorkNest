@@ -136,7 +136,7 @@ export default function Register() {
                                 </span>
                             </div>
                         </Link>
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                        <h2 className="text-3xl font-bold tracking-tight text-foreground">
                             {t('auth.register.title')}
                         </h2>
                         <p className="mt-3 text-base text-gray-500">
@@ -156,14 +156,14 @@ export default function Register() {
                     >
                         <div className="space-y-5">
                             <div>
-                                <label htmlFor="register-email" className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-email" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                     {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         id="register-email"
                                         {...register('email')}
-                                        className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                        className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         placeholder={t('auth.login.emailPlaceholder')}
                                     />
                                     {errors.email && (
@@ -185,14 +185,14 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <label htmlFor="register-username" className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-username" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                     {t('auth.register.usernameLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         id="register-username"
                                         {...register('username')}
-                                        className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                        className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         placeholder={t('auth.register.usernamePlaceholder')}
                                     />
                                     {errors.username && (
@@ -214,14 +214,14 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <label htmlFor="register-password" className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                     {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
                                         id="register-password"
                                         {...register('password')}
-                                        className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                        className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         type="password"
                                         placeholder="********"
                                     />
@@ -245,13 +245,13 @@ export default function Register() {
 
                             {/* Role Selection */}
                             <div>
-                                <label htmlFor="register-role" className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-role" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                     {t('auth.register.roleLabel')}
                                 </label>
                                 <select
                                     id="register-role"
                                     {...register('role')}
-                                    className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                    className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                 >
                                     <option value="admin">
                                         {t('auth.register.roleAdmin')}
@@ -264,14 +264,14 @@ export default function Register() {
 
                             {selectedRole === 'admin' ? (
                                 <div>
-                                    <label htmlFor="register-company" className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="register-company" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                         {t('auth.register.companyLabel')}
                                     </label>
                                     <div className="group relative">
                                         <input
                                             id="register-company"
                                             {...register('companyName')}
-                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                             placeholder={t('auth.register.companyPlaceholder')}
                                         />
                                         {errors.companyName && (
@@ -293,14 +293,14 @@ export default function Register() {
                                 </div>
                             ) : (
                                 <div>
-                                    <label htmlFor="register-code" className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="register-code" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                         {t('auth.register.codeLabel')}
                                     </label>
                                     <div className="group relative">
                                         <input
                                             id="register-code"
                                             {...register('invitationCode')}
-                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                             placeholder={t('auth.register.codePlaceholder')}
                                         />
                                         {errors.invitationCode && (
