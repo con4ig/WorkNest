@@ -61,18 +61,17 @@ export default function Login() {
     return (
         <div className="flex min-h-screen flex-col md:flex-row">
             {/* Left Panel - Decorative */}
-            <div className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-12 md:flex md:w-1/2">
+            <div className="relative hidden overflow-hidden bg-primary p-12 md:flex md:w-1/2">
                 <div className="relative z-10 mt-auto">
-                    <h2 className="mb-6 text-4xl font-bold text-white">
+                    <h2 className="mb-6 text-4xl font-bold tracking-tight text-primary-foreground">
                         {t('auth.welcome.title')}
                     </h2>
-                    <p className="max-w-md text-lg text-emerald-50">
+                    <p className="max-w-md text-lg text-primary-foreground/80">
                         {t('auth.welcome.subtitle')}
                     </p>
 
-                    {/* Decorative elements */}
-                    <div className="absolute right-0 top-0 h-96 w-96 -translate-y-1/2 translate-x-1/2 transform rounded-full bg-white/10 blur-3xl" />
-                    <div className="absolute bottom-0 left-0 h-96 w-96 -translate-x-1/2 translate-y-1/2 transform rounded-full bg-emerald-800/20 blur-3xl" />
+                    <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 -translate-y-1/2 translate-x-1/2 rounded-full bg-primary-foreground/10 blur-3xl" />
+                    <div className="pointer-events-none absolute bottom-0 left-0 h-96 w-96 -translate-x-1/2 translate-y-1/2 rounded-full bg-primary-foreground/5 blur-3xl" />
                 </div>
             </div>
 
@@ -86,8 +85,8 @@ export default function Login() {
                             to="/"
                             className="group mb-6 inline-flex transform flex-col items-center transition-transform duration-300 hover:scale-105"
                         >
-                            <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-2xl transition-all group-hover:shadow-2xl group-hover:shadow-emerald-500/50">
-                                <span className="text-3xl font-bold text-white">
+                            <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/30 transition-shadow group-hover:shadow-primary/50">
+                                <span className="text-3xl font-bold text-primary-foreground">
                                     W
                                 </span>
                             </div>
@@ -99,7 +98,7 @@ export default function Login() {
                             {t('auth.login.noAccount')}{' '}
                             <Link
                                 to="/register"
-                                className="font-medium text-emerald-600 transition-colors hover:text-emerald-500"
+                                className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:underline"
                             >
                                 {t('auth.login.registerLink')}
                             </Link>
@@ -120,7 +119,7 @@ export default function Login() {
                                 setIsLoading(false);
                             }
                         }}
-                        className="w-full rounded-xl border-2 border-dashed border-emerald-500 bg-transparent py-3 text-sm font-bold text-emerald-700 transition-all hover:border-emerald-600 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:border-emerald-500/50 dark:bg-emerald-950/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40"
+                        className="w-full rounded-xl border-2 border-dashed border-primary/50 bg-transparent py-3 text-sm font-bold text-primary transition-colors hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     >
                         {t('auth.login.demoBtn')}
                     </button>
@@ -143,7 +142,7 @@ export default function Login() {
                                         )}
                                     />
                                     {errors.email && (
-                                        <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
+                                        <p className="mt-2 flex items-center gap-1 text-sm text-destructive">
                                             <svg
                                                 className="h-4 w-4"
                                                 fill="currentColor"
@@ -172,7 +171,7 @@ export default function Login() {
                                         placeholder="********"
                                     />
                                     {errors.password && (
-                                        <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
+                                        <p className="mt-2 flex items-center gap-1 text-sm text-destructive">
                                             <svg
                                                 className="h-4 w-4"
                                                 fill="currentColor"
@@ -193,7 +192,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${
+                            className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-base font-semibold shadow-sm transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                                 isLoading
                                     ? 'cursor-not-allowed bg-muted text-muted-foreground'
                                     : 'bg-primary text-primary-foreground hover:bg-primary/90'
@@ -214,7 +213,7 @@ export default function Login() {
                     </form>
 
                     {/* Footer for production simplicity */}
-                    <footer className="pt-8 text-center text-xs text-muted-foreground">
+                    <footer className="pt-8 pb-10 text-center text-xs text-muted-foreground">
                         <div className="mb-2">
                             &copy; {new Date().getFullYear()} WorkNest.{' '}
                             {t('landing.footer.Rights')}
@@ -222,14 +221,14 @@ export default function Login() {
                         <div className="space-x-3">
                             <Link
                                 to="/polityka-prywatnosci"
-                                className="transition-colors hover:text-emerald-600"
+                                className="transition-colors hover:text-primary focus-visible:underline focus-visible:outline-none"
                             >
                                 {t('landing.footer.Privacy')}
                             </Link>
-                            <span className="text-gray-300">|</span>
+                            <span className="text-muted-foreground/40">|</span>
                             <Link
                                 to="/regulamin"
-                                className="transition-colors hover:text-emerald-600"
+                                className="transition-colors hover:text-primary focus-visible:underline focus-visible:outline-none"
                             >
                                 {t('landing.footer.Terms')}
                             </Link>
