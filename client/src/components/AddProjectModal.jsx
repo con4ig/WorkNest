@@ -125,10 +125,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                         
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-name" className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelName')}
                                 </label>
                                 <input
+                                    id="project-name"
                                     type="text"
                                     name="name"
                                     value={formData.name}
@@ -140,10 +141,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-description" className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelDescription')}
                                 </label>
                                 <textarea
+                                    id="project-description"
                                     name="description"
                                     value={formData.description}
                                     onChange={handleChange}
@@ -158,10 +160,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     {/* Status & Priority — 1 col on mobile, 2 on sm+ */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
+                            <label htmlFor="project-status" className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
                                 {t('common.status')}
                             </label>
                             <select
+                                id="project-status"
                                 name="status"
                                 value={formData.status}
                                 onChange={handleChange}
@@ -175,10 +178,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
+                            <label htmlFor="project-priority" className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
                                 {t('projects.labelPriority')}
                             </label>
                             <select
+                                id="project-priority"
                                 name="priority"
                                 value={formData.priority}
                                 onChange={handleChange}
@@ -201,10 +205,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-start-date" className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelStartDate')}
                                 </label>
                                 <input
+                                    id="project-start-date"
                                     type="date"
                                     name="startDate"
                                     value={formData.startDate}
@@ -213,10 +218,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-end-date" className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelEndDate')}
                                 </label>
                                 <input
+                                    id="project-end-date"
                                     type="date"
                                     name="endDate"
                                     value={formData.endDate}
