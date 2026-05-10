@@ -21,7 +21,7 @@ function TermsOfService() {
                             <span className="text-sm font-semibold tracking-wider uppercase">{t('terms.title')}</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                            Regulamin Serwisu
+                            {t('terms.title')}
                         </h1>
                         <p className="text-zinc-500 dark:text-zinc-400 text-lg">
                             {t('terms.effectiveDate')}
