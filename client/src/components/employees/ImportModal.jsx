@@ -93,17 +93,17 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                             <Upload size={20} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                            <h2 className="text-xl font-bold text-foreground tracking-tight">
                                 {t('employees.list.importModal.title')}
                             </h2>
-                            <p className="mt-1 text-zinc-500 dark:text-zinc-400 text-xs font-medium">
+                            <p className="mt-1 text-muted-foreground text-xs font-medium">
                                 {t('employees.list.importModal.instructions')}
                             </p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                        className="p-2 rounded-lg text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -119,18 +119,18 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                 t('employees.list.importModal.instruction3')
                             ].map((step, idx) => (
                                 <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
-                                    <Info size={14} className="mt-1 text-zinc-500 shrink-0" />
-                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: step }}></p>
+                                    <Info size={14} className="mt-1 text-muted-foreground shrink-0" />
+                                    <p className="text-xs text-muted-foreground leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: step }}></p>
                                 </div>
                             ))}
                         </div>
 
                         {/* Roles Table */}
                         <div className="space-y-3">
-                            <p className="text-xs font-bold text-zinc-500 dark:text-zinc-300 uppercase tracking-widest">{t('employees.list.importModal.rolesTitle')}</p>
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('employees.list.importModal.rolesTitle')}</p>
                             <div className="overflow-hidden rounded-xl border border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-zinc-800/20 text-[10px]">
                                 <table className="w-full text-left">
-                                    <thead className="bg-black/5 dark:bg-white/5 font-bold text-zinc-500 uppercase tracking-tighter">
+                                    <thead className="bg-black/5 dark:bg-white/5 font-bold text-muted-foreground uppercase tracking-tighter">
                                         <tr>
                                             <th className="px-3 py-2 border-r border-black/5 dark:border-white/5">{t('employees.list.importModal.csvValue')}</th>
                                             <th className="px-3 py-2">{t('employees.list.importModal.systemRole')}</th>
@@ -144,7 +144,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                         ].map((row, idx) => (
                                             <tr key={idx} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                                 <td className={clsx("px-3 py-2 font-mono border-r border-black/5 dark:border-white/5", row.color)}>{row.val}</td>
-                                                <td className="px-3 py-2 text-zinc-500 dark:text-zinc-400 font-medium">{row.label}</td>
+                                                <td className="px-3 py-2 text-muted-foreground font-medium">{row.label}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -165,7 +165,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* File Upload Section */}
                         <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                                 <FileSpreadsheet size={16} className="text-primary" />
                                 <h3>{t('employees.list.importModal.fileLabel')}</h3>
                             </div>
@@ -192,16 +192,16 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                 <div className={clsx(
                                     "w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-all",
                                     dragging ? "bg-primary text-black" : 
-                                    file ? "bg-emerald-500 text-black" : "bg-black/5 dark:bg-white/5 text-zinc-400 dark:text-zinc-500"
+                                    file ? "bg-emerald-500 text-black" : "bg-black/5 dark:bg-white/5 text-muted-foreground"
                                 )}>
                                     {file ? <CheckCircle2 size={24} /> : <Upload size={24} />}
                                 </div>
 
                                 <div className="text-center">
-                                    <p className="text-sm font-bold text-zinc-900 dark:text-white mb-1">
+                                    <p className="text-sm font-bold text-foreground mb-1">
                                         {file ? file.name : t('employees.list.importModal.chooseFile')}
                                     </p>
-                                    <p className="text-[10px] text-zinc-500 dark:text-zinc-600 font-bold uppercase tracking-tighter">
+                                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tighter">
                                         {file 
                                             ? `${(file.size / 1024).toFixed(1)} KB` 
                                             : ".CSV only"
@@ -213,7 +213,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
 
                         {/* Password Section */}
                         <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                                 <Key size={16} className="text-primary" />
                                 <h3>{t('employees.list.importModal.tempPasswordLabel')}</h3>
                             </div>
@@ -222,11 +222,11 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                 value={tempPassword}
                                 onChange={(e) => setTempPassword(e.target.value)}
                                 placeholder={t('employees.list.importModal.tempPasswordPlaceholder')}
-                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-mono text-sm"
+                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-foreground placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-mono text-sm"
                             />
                             <div className="flex items-start gap-2 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5">
-                                <Info size={12} className="mt-1 text-zinc-500 dark:text-zinc-500" />
-                                <p className="text-[10px] text-zinc-500 dark:text-zinc-500 leading-relaxed font-bold uppercase tracking-tighter">
+                                <Info size={12} className="mt-1 text-muted-foreground" />
+                                <p className="text-[10px] text-muted-foreground leading-relaxed font-bold uppercase tracking-tighter">
                                     {t('employees.list.importModal.tempPasswordHint')}
                                 </p>
                             </div>
@@ -245,7 +245,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                 <div className="p-6 border-t border-black/5 dark:border-white/5 flex items-center justify-end gap-3">
                     <button
                         onClick={onClose}
-                        className="px-6 py-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-zinc-900 dark:text-white font-bold rounded-xl transition-all"
+                        className="px-6 py-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 text-foreground font-bold rounded-xl transition-all"
                     >
                         {t('common.cancel')}
                     </button>

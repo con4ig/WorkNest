@@ -125,12 +125,12 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                 <div className="relative flex items-center justify-between border-b border-black/5 dark:border-white/5 p-8 sm:p-10">
                     <div className="absolute -left-4 -top-4 rounded-full bg-primary/10 p-12 blur-3xl" />
                     <div className="relative z-10">
-                        <h2 className="text-2xl font-black uppercase tracking-tight text-zinc-900 dark:text-white">{t('leaves.myLeaves.newRequest')}</h2>
-                        <p className="mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400">{t('leaves.myLeaves.modalSubtitle') || 'Wypełnij formularz aby złożyć wniosek urlopowy'}</p>
+                        <h2 className="text-2xl font-black uppercase tracking-tight text-foreground">{t('leaves.myLeaves.newRequest')}</h2>
+                        <p className="mt-1 text-sm font-medium text-muted-foreground">{t('leaves.myLeaves.modalSubtitle') || 'Wypełnij formularz aby złożyć wniosek urlopowy'}</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-white active:scale-95"
+                        className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 dark:bg-white/5 text-muted-foreground transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-foreground active:scale-95"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -147,7 +147,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                     <div className="space-y-6">
                         {/* Leave Type */}
                         <div className="group space-y-2">
-                            <label htmlFor="leave-type" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 transition-colors group-focus-within:text-primary">
+                            <label htmlFor="leave-type" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors group-focus-within:text-primary">
                                 {t('common.type')}
                             </label>
                             <div className="relative">
@@ -156,7 +156,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                     name="leaveType"
                                     value={formData.leaveType}
                                     onChange={handleChange}
-                                    className="w-full appearance-none rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 px-4 py-4 font-bold text-zinc-900 dark:text-white outline-none transition-all focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
+                                    className="w-full appearance-none rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 px-4 py-4 font-bold text-foreground outline-none transition-all focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
                                 >
                                     <optgroup label="Podstawowe" className="bg-white dark:bg-zinc-900 font-sans">
                                         <option value="vacation">Urlop wypoczynkowy</option>
@@ -179,7 +179,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                         <option value="other">Inny</option>
                                     </optgroup>
                                 </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-zinc-500">
+                                <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
                                     <Clock className="h-4 w-4" />
                                 </div>
                             </div>
@@ -187,11 +187,11 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
 
                         {/* Date Picker */}
                         <div className="group space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 transition-colors group-focus-within:text-primary">
+                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors group-focus-within:text-primary">
                                 {t('common.dates')} <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-4 z-10 flex items-center text-zinc-500">
+                                <div className="pointer-events-none absolute inset-y-0 left-4 z-10 flex items-center text-muted-foreground">
                                     <CalendarIcon className="h-5 w-5" />
                                 </div>
                                 <DatePicker
@@ -203,7 +203,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                     dateFormat="dd/MM/yyyy"
                                     minDate={new Date()}
                                     placeholderText="Wybierz zakres dat"
-                                    className="w-full rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 py-4 pl-12 pr-4 font-bold text-zinc-900 dark:text-white outline-none transition-all focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
+                                    className="w-full rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 py-4 pl-12 pr-4 font-bold text-foreground outline-none transition-all focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
                                     wrapperClassName="w-full"
                                 />
                             </div>
@@ -227,7 +227,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
 
                         {/* Reason */}
                         <div className="group space-y-2">
-                            <label htmlFor="leave-reason" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 transition-colors group-focus-within:text-primary">
+                            <label htmlFor="leave-reason" className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground transition-colors group-focus-within:text-primary">
                                 {t('common.reason')} {isReasonRequired() && <span className="text-rose-500">*</span>}
                             </label>
                             <textarea
@@ -236,7 +236,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                 value={formData.reason}
                                 onChange={handleChange}
                                 rows="3"
-                                className="w-full resize-none rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 px-4 py-4 font-medium text-zinc-900 dark:text-white outline-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
+                                className="w-full resize-none rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 px-4 py-4 font-medium text-foreground outline-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
                                 placeholder={isReasonRequired() ? "Opisz powód wniosku (wymagane)..." : "Dodatkowe informacje (opcjonalne)..."}
                                 required={isReasonRequired()}
                             />
@@ -248,7 +248,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-zinc-500 transition-all hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white"
+                            className="rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground transition-all hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"
                             disabled={loading}
                         >
                             Anuluj

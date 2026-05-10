@@ -96,17 +96,17 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                 {/* Header */}
                 <div className="flex items-center justify-between gap-3 p-4 border-b border-black/5 dark:border-white/5 sm:p-6">
                     <div className="min-w-0">
-                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                        <h2 className="text-xl font-bold text-foreground tracking-tight">
                             {t('projects.details.userModal.title')}
                         </h2>
-                        <div className="mt-1 flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-xs text-[10px] uppercase">
+                        <div className="mt-1 flex items-center gap-2 text-muted-foreground text-xs text-[10px] uppercase">
                             <span className="shrink-0 font-mono">{t('common.project')}</span>
-                            <span className="truncate font-medium text-zinc-700 dark:text-zinc-300">{project.name}</span>
+                            <span className="truncate font-medium text-foreground">{project.name}</span>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="shrink-0 flex h-11 w-11 items-center justify-center rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                        className="shrink-0 flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground transition-colors"
                         aria-label="Close modal"
                     >
                         <X size={20} aria-hidden="true" />
@@ -117,18 +117,18 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                     {/* Current Users Section */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold">
+                            <div className="flex items-center gap-2 text-foreground font-semibold">
                                 <User size={18} className="text-primary" />
                                 <h3>{t('projects.details.userModal.currentUsers')}</h3>
                             </div>
-                            <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+                            <span className="text-muted-foreground font-bold uppercase tracking-widest text-[10px]">
                                 {project.assignedUsers.length} {t('common.members', { defaultValue: 'MEMBERS' })}
                             </span>
                         </div>
 
                         <div className="grid grid-cols-1 gap-3">
                             {project.assignedUsers.length === 0 ? (
-                                <div className="rounded-xl border border-dashed border-black/10 dark:border-white/10 p-8 text-center text-zinc-500 text-sm">
+                                <div className="rounded-xl border border-dashed border-black/10 dark:border-white/10 p-8 text-center text-muted-foreground text-sm">
                                     {t('projects.details.userModal.noUsers')}
                                 </div>
                             ) : (
@@ -145,21 +145,21 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                     "w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold",
                                                     user.role === 'admin' ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/10" :
                                                     user.role === 'hr' ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/10" :
-                                                    "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                                                    "bg-zinc-200 dark:bg-zinc-800 text-muted-foreground"
                                                 )}>
                                                     {user.username.charAt(0).toUpperCase()}
                                                 </div>
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{user.username}</span>
+                                                    <span className="text-sm font-semibold text-foreground truncate">{user.username}</span>
                                                     {isCreator && (
                                                         <div className="shrink-0 px-2 py-0.5 rounded-lg bg-amber-500/10 text-[10px] font-bold text-amber-600 dark:text-amber-500">
                                                             {t('common.creator')}
                                                         </div>
                                                     )}
                                                 </div>
-                                                <p className="text-[10px] text-zinc-500 truncate">
+                                                <p className="text-[10px] text-muted-foreground truncate">
                                                     {user.email} • {t(`common.roles.${user.role}`)}
                                                 </p>
                                             </div>
@@ -186,19 +186,19 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
 
                     {/* Add Users Section */}
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold text-sm">
+                        <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
                             <UserPlus size={18} className="text-primary" />
                             <h3>{t('projects.details.userModal.addUserTitle')}</h3>
                         </div>
 
                         <div className="relative">
-                            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 dark:text-zinc-600" />
+                            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                             <input
                                 type="text"
                                 placeholder={t('common.searchPlaceholder')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl pl-12 pr-4 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium"
+                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl pl-12 pr-4 text-foreground placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium"
                             />
                         </div>
 
@@ -210,7 +210,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
 
                         <div className="space-y-3">
                             {loadingSearch ? (
-                                <div className="py-12 flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-600 gap-3">
+                                <div className="py-12 flex flex-col items-center justify-center text-muted-foreground gap-3">
                                     <Loader2 className="animate-spin text-primary" size={24} />
                                     <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.searching')}</span>
                                 </div>
@@ -223,15 +223,15 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                 className="flex items-center gap-3 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 transition-all"
                                             >
                                                 <div className={clsx(
-                                                    "shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-200 dark:bg-zinc-800",
+                                                    "shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-muted-foreground bg-zinc-200 dark:bg-zinc-800",
                                                     user.role === 'admin' && "text-purple-600 dark:text-purple-400 bg-purple-500/10",
                                                     user.role === 'hr' && "text-blue-600 dark:text-blue-400 bg-blue-500/10"
                                                 )}>
                                                     {user.username.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">{user.username}</p>
-                                                    <p className="text-[10px] text-zinc-500 truncate">
+                                                    <p className="text-xs font-semibold text-foreground truncate">{user.username}</p>
+                                                    <p className="text-[10px] text-muted-foreground truncate">
                                                         {user.email} • {t(`common.roles.${user.role}`)}
                                                     </p>
                                                 </div>
@@ -249,14 +249,14 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                     </div>
 
                                     {displayedUsers.length === 0 && !loadingSearch && (
-                                        <div className="rounded-xl border border-dashed border-black/10 dark:border-white/10 p-8 text-center text-zinc-500 text-sm">
+                                        <div className="rounded-xl border border-dashed border-black/10 dark:border-white/10 p-8 text-center text-muted-foreground text-sm">
                                             {searchTerm ? t('common.noUsersFound') : t('projects.details.userModal.allAssigned')}
                                         </div>
                                     )}
 
                                     {hiddenCount > 0 && (
                                         <div className="p-3 text-center">
-                                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                                                 {t('projects.details.userModal.othersCount', { count: hiddenCount })} 
                                                 <span className="text-primary ml-1">{t('projects.details.userModal.typeToSearch')}</span>
                                             </p>
