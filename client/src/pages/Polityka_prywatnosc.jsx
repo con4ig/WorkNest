@@ -17,7 +17,7 @@ function PrivacyPolicy() {
                             <span className="text-sm font-semibold tracking-wider uppercase">{t('privacy.title')}</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                            Polityka Prywatności
+                            {t('privacy.title')}
                         </h1>
                         <p className="text-zinc-500 dark:text-zinc-400 text-lg">
                             {t('privacy.effectiveDate', {
