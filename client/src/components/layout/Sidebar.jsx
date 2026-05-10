@@ -37,14 +37,22 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
             ? location.pathname === to
             : location.pathname.startsWith(to);
 
+        const handleNav = () => {
+            navigate(to);
+            if (isMobile) setIsSidebarOpen(false);
+        };
+
         return (
             <li
-                onClick={() => {
-                    navigate(to);
-                    if (isMobile) setIsSidebarOpen(false);
-                }}
+                role="link"
+                tabIndex={0}
+                onClick={handleNav}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav(); } }}
+                aria-label={label}
+                aria-current={isActive ? 'page' : undefined}
                 className={cn(
                     'group relative flex cursor-pointer items-center overflow-hidden rounded-lg transition-all duration-200',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                     isSidebarOpen
                         ? 'justify-start gap-3 px-4'
                         : 'justify-center px-2',
@@ -110,8 +118,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                         <div className="flex w-full items-center justify-between overflow-hidden">
                             <div className="flex min-w-0 items-center gap-3">
                                 <div
-                                    className="relative cursor-pointer transition-transform hover:scale-105"
+                                    role="button"
+                                    tabIndex={0}
+                                    className="relative cursor-pointer transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full"
                                     onClick={() => navigate('/upload')}
+                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/upload'); }}
+                                    aria-label={t('dashboard.sidebar.editProfile', { defaultValue: 'Edit profile' })}
                                 >
                                     {profileImage ? (
                                         <img

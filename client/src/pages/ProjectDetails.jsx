@@ -231,7 +231,7 @@ const CommentItem = ({
                                 placeholder={t(
                                     'projects.details.replyPlaceholder',
                                 )}
-                                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                             />{' '}
                             <button
                                 onClick={handleReply}
