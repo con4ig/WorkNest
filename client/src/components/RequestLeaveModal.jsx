@@ -195,6 +195,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                     <CalendarIcon className="h-5 w-5" />
                                 </div>
                                 <DatePicker
+                                    inputId="leave-dates"
                                     selectsRange={true}
                                     startDate={formData.startDate}
                                     endDate={formData.endDate}
