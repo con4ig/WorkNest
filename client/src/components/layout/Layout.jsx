@@ -51,10 +51,10 @@ const Layout = () => {
                     <header className="sticky top-0 z-20 flex h-14 w-full shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-md shadow-sm">
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
+                            className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
                             aria-label="Toggle navigation"
                         >
-                            {isSidebarOpen ? <X size={18} /> : <Menu size={18} />}
+                            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
 
                         <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground">
@@ -62,7 +62,7 @@ const Layout = () => {
                         </span>
 
                         {/* Right spacer — keeps title centered */}
-                        <div className="h-9 w-9" />
+                        <div className="h-11 w-11" />
                     </header>
                 )}
 

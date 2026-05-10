@@ -394,7 +394,7 @@ export default function Dashboard() {
                             className="border-border bg-card shadow-sm transition-all hover:shadow-md"
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-4 sm:pb-2">
-                                <CardTitle className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[10px]">
+                                <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
                                     {t(`dashboard.stats.${stat.titleKey}`)}
                                 </CardTitle>
                             </CardHeader>
@@ -565,7 +565,7 @@ export default function Dashboard() {
                 </CardContent>
             </Card>
 
-            <footer className="mt-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
+            <footer className="mt-8 pb-6 text-center text-xs uppercase tracking-widest text-muted-foreground">
                 © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
             </footer>
         </div>
