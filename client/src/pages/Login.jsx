@@ -130,11 +130,12 @@ export default function Login() {
                     >
                         <div className="space-y-5">
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-foreground">
+                                <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-foreground">
                                     {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
+                                        id="login-email"
                                         {...register('email')}
                                         className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         placeholder={t(
@@ -160,11 +161,12 @@ export default function Login() {
                             </div>
 
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-foreground">
+                                <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-foreground">
                                     {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
+                                        id="login-password"
                                         {...register('password')}
                                         className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         type="password"

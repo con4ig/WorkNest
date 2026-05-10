@@ -156,11 +156,12 @@ export default function Register() {
                     >
                         <div className="space-y-5">
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-email" className="mb-1.5 block text-sm font-medium text-gray-700">
                                     {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
+                                        id="register-email"
                                         {...register('email')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         placeholder={t('auth.login.emailPlaceholder')}
@@ -184,11 +185,12 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-username" className="mb-1.5 block text-sm font-medium text-gray-700">
                                     {t('auth.register.usernameLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
+                                        id="register-username"
                                         {...register('username')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         placeholder={t('auth.register.usernamePlaceholder')}
@@ -212,11 +214,12 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-password" className="mb-1.5 block text-sm font-medium text-gray-700">
                                     {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
                                     <input
+                                        id="register-password"
                                         {...register('password')}
                                         className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                         type="password"
@@ -242,10 +245,11 @@ export default function Register() {
 
                             {/* Role Selection */}
                             <div>
-                                <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label htmlFor="register-role" className="mb-1.5 block text-sm font-medium text-gray-700">
                                     {t('auth.register.roleLabel')}
                                 </label>
                                 <select
+                                    id="register-role"
                                     {...register('role')}
                                     className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                 >
@@ -260,11 +264,12 @@ export default function Register() {
 
                             {selectedRole === 'admin' ? (
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="register-company" className="mb-1.5 block text-sm font-medium text-gray-700">
                                         {t('auth.register.companyLabel')}
                                     </label>
                                     <div className="group relative">
                                         <input
+                                            id="register-company"
                                             {...register('companyName')}
                                             className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                             placeholder={t('auth.register.companyPlaceholder')}
@@ -288,11 +293,12 @@ export default function Register() {
                                 </div>
                             ) : (
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="register-code" className="mb-1.5 block text-sm font-medium text-gray-700">
                                         {t('auth.register.codeLabel')}
                                     </label>
                                     <div className="group relative">
                                         <input
+                                            id="register-code"
                                             {...register('invitationCode')}
                                             className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                                             placeholder={t('auth.register.codePlaceholder')}

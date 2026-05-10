@@ -147,11 +147,12 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                     <div className="space-y-6">
                         {/* Leave Type */}
                         <div className="group space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 transition-colors group-focus-within:text-primary">
+                            <label htmlFor="leave-type" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 transition-colors group-focus-within:text-primary">
                                 {t('common.type')}
                             </label>
                             <div className="relative">
                                 <select
+                                    id="leave-type"
                                     name="leaveType"
                                     value={formData.leaveType}
                                     onChange={handleChange}
@@ -226,10 +227,11 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
 
                         {/* Reason */}
                         <div className="group space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 transition-colors group-focus-within:text-primary">
+                            <label htmlFor="leave-reason" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 transition-colors group-focus-within:text-primary">
                                 {t('common.reason')} {isReasonRequired() && <span className="text-rose-500">*</span>}
                             </label>
                             <textarea
+                                id="leave-reason"
                                 name="reason"
                                 value={formData.reason}
                                 onChange={handleChange}

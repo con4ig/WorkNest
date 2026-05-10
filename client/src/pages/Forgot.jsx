@@ -123,10 +123,11 @@ function Forgot() {
                         {step === 1 && (
                             <>
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="forgot-email" className="mb-1.5 block text-sm font-medium text-gray-700">
                                         {t('auth.login.emailLabel')}
                                     </label>
                                     <input
+                                        id="forgot-email"
                                         {...register('email', {
                                             required: t('auth.validation.emailRequired'),
                                             pattern: {
@@ -169,10 +170,11 @@ function Forgot() {
                         {step === 2 && (
                             <>
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="forgot-otp" className="mb-1.5 block text-sm font-medium text-gray-700">
                                         {t('auth.forgot.codeLabel')}
                                     </label>
                                     <input
+                                        id="forgot-otp"
                                         {...register('otp', {
                                             required: t('auth.validation.otpRequired'),
                                             pattern: {
@@ -219,10 +221,11 @@ function Forgot() {
                                 {/* Dodatkowy div dla zachowania space-y-6 z formularza */}
                                 <div className="space-y-5">
                                     <div>
-                                        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        <label htmlFor="forgot-new-password" className="mb-1.5 block text-sm font-medium text-gray-700">
                                             {t('auth.forgot.newPasswordLabel')}
                                         </label>
                                         <input
+                                            id="forgot-new-password"
                                             type="password"
                                             {...register('newPassword', {
                                                 required: t('auth.validation.passwordRequired'),
@@ -242,10 +245,11 @@ function Forgot() {
                                     </div>
 
                                     <div>
-                                        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        <label htmlFor="forgot-confirm-password" className="mb-1.5 block text-sm font-medium text-gray-700">
                                             {t('auth.forgot.confirmPasswordLabel')}
                                         </label>
                                         <input
+                                            id="forgot-confirm-password"
                                             type="password"
                                             {...register('confirmPassword', {
                                                 required: t('auth.validation.confirmRequired'),
