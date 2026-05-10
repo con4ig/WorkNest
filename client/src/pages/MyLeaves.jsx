@@ -378,7 +378,7 @@ export default function MyLeaves() {
                     {leaves.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-24 text-center">
                             <div className="relative mb-6">
-                                <div className="absolute inset-0 animate-ping rounded-full bg-primary/20"></div>
+                                <div className="absolute inset-0 motion-safe:animate-ping rounded-full bg-primary/20"></div>
                                 <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary">
                                     <CalendarDays className="h-10 w-10" />
                                 </div>
