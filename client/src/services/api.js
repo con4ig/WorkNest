@@ -7,6 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true, // Niezbędne do wysyłania i odbierania ciasteczek (np. z refresh tokenem)
+  timeout: 15000, // Abort after 15 s — prevents infinite hang during Render cold start
 });
 
 // --- Interceptor Żądania (Request Interceptor) ---
@@ -50,6 +51,15 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+
+    // Timeout or network error during refresh — force logout immediately
+    if (!error.response && originalRequest.url === '/auth/refresh') {
+      console.error("🔴 Brak odpowiedzi serwera podczas odświeżania tokenu. Wylogowywanie...");
+      localStorage.removeItem('accessToken');
+      processQueue(error, null);
+      window.dispatchEvent(new Event('auth-error'));
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && originalRequest.url === '/auth/refresh') {
       console.error("🔴 Refresh token wygasł. Wylogowywanie...");
