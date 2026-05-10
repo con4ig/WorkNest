@@ -87,7 +87,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             {/* Full-screen Backdrop */}
             <div 
-                className="fixed inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300"
+                className="fixed inset-0 bg-foreground/30 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
 
