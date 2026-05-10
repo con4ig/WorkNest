@@ -185,11 +185,12 @@ const EditableField = ({
 
     return (
         <div className="flex flex-col gap-2">
-            <label className="ml-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <label htmlFor={`field-${name}`} className="ml-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 {label}
             </label>
             {options ? (
                 <select
+                    id={`field-${name}`}
                     name={name}
                     value={value}
                     onChange={onChange}
@@ -209,6 +210,7 @@ const EditableField = ({
                 </select>
             ) : type === 'textarea' ? (
                 <textarea
+                    id={`field-${name}`}
                     name={name}
                     value={value}
                     onChange={onChange}
@@ -218,6 +220,7 @@ const EditableField = ({
                 />
             ) : (
                 <input
+                    id={`field-${name}`}
                     type={type}
                     name={name}
                     value={value}

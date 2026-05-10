@@ -12,7 +12,7 @@ function TermsOfService() {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
+            <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
                 {/* Header Section */}
                 <header className="border-b border-zinc-200 dark:border-white/5 pt-32 pb-16">
                     <div className="container mx-auto max-w-4xl px-6">
