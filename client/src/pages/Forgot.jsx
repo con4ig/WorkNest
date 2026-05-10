@@ -99,7 +99,7 @@ function Forgot() {
                                 W
                             </span>
                         </div>
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                        <h2 className="text-3xl font-bold tracking-tight text-foreground">
                             {step === 1
                                 ? t('auth.forgot.steps.resetTitle')
                                 : step === 2
@@ -123,10 +123,11 @@ function Forgot() {
                         {step === 1 && (
                             <>
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="forgot-email" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                         {t('auth.login.emailLabel')}
                                     </label>
                                     <input
+                                        id="forgot-email"
                                         {...register('email', {
                                             required: t('auth.validation.emailRequired'),
                                             pattern: {
@@ -134,7 +135,7 @@ function Forgot() {
                                                 message: t('auth.validation.emailInvalid'),
                                             },
                                         })}
-                                        className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                        className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         placeholder={t('auth.login.emailPlaceholder')}
                                     />
                                     {errors.email && (
@@ -146,7 +147,7 @@ function Forgot() {
 
                                 <button
                                     type="submit"
-                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 >
                                     {t('auth.forgot.sendCode')}
                                     <svg
@@ -169,10 +170,11 @@ function Forgot() {
                         {step === 2 && (
                             <>
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                    <label htmlFor="forgot-otp" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                         {t('auth.forgot.codeLabel')}
                                     </label>
                                     <input
+                                        id="forgot-otp"
                                         {...register('otp', {
                                             required: t('auth.validation.otpRequired'),
                                             pattern: {
@@ -181,7 +183,7 @@ function Forgot() {
                                             },
                                         })}
                                         maxLength={6}
-                                        className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-center text-2xl tracking-widest text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                        className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-center text-2xl tracking-widest text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                         placeholder="000000"
                                     />
                                     {errors.otp && (
@@ -193,7 +195,7 @@ function Forgot() {
 
                                 <button
                                     type="submit"
-                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 >
                                     {t('auth.forgot.verifyBtn')}
                                     <svg
@@ -219,10 +221,11 @@ function Forgot() {
                                 {/* Dodatkowy div dla zachowania space-y-6 z formularza */}
                                 <div className="space-y-5">
                                     <div>
-                                        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        <label htmlFor="forgot-new-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                             {t('auth.forgot.newPasswordLabel')}
                                         </label>
                                         <input
+                                            id="forgot-new-password"
                                             type="password"
                                             {...register('newPassword', {
                                                 required: t('auth.validation.passwordRequired'),
@@ -231,7 +234,7 @@ function Forgot() {
                                                     message: t('auth.validation.passwordMin8'),
                                                 },
                                             })}
-                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                             placeholder="********"
                                         />
                                         {errors.newPassword && (
@@ -242,10 +245,11 @@ function Forgot() {
                                     </div>
 
                                     <div>
-                                        <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                                        <label htmlFor="forgot-confirm-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">
                                             {t('auth.forgot.confirmPasswordLabel')}
                                         </label>
                                         <input
+                                            id="forgot-confirm-password"
                                             type="password"
                                             {...register('confirmPassword', {
                                                 required: t('auth.validation.confirmRequired'),
@@ -254,7 +258,7 @@ function Forgot() {
                                                         watch('newPassword') ||
                                                     t('auth.validation.passwordMismatch'),
                                             })}
-                                            className="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                                            className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                             placeholder="********"
                                         />
                                         {errors.confirmPassword && (
@@ -266,7 +270,7 @@ function Forgot() {
                                 </div>
                                 <button
                                     type="submit"
-                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 >
                                     {t('auth.forgot.changeBtn')}
                                     <svg

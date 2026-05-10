@@ -13,19 +13,50 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Decode JWT payload without verification (only for expiry check — trust is still server-side)
+    const isTokenExpired = (token) => {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            // Treat as expired if it expires within the next 30 s (avoids races near boundary)
+            return payload.exp * 1000 < Date.now() + 30_000;
+        } catch {
+            return true; // Malformed token — treat as expired
+        }
+    };
+
     // Sprawdzanie stanu zalogowania przy starcie aplikacji
     useEffect(() => {
         const checkLoggedIn = async () => {
             const token = localStorage.getItem('accessToken');
-            if (token) {
+
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+
+            // Fast path: token is already expired — skip /users/me and go straight
+            // to /auth/refresh. Saves one cold-start round trip on Render.
+            if (isTokenExpired(token)) {
                 try {
-                    // 2. UŻYJ `api` ZAMIAST `axios`
-                    const { data } = await api.get('/users/me'); // POPRAWNY ENDPOINT: /users/me
-                    setUser(data);
+                    const { data: refreshData } = await api.post('/auth/refresh');
+                    localStorage.setItem('accessToken', refreshData.accessToken);
+                    const { data: userData } = await api.get('/users/me');
+                    setUser(userData);
                 } catch (error) {
-                    console.error('Sesja wygasła lub błąd tokenu', error);
-                    localStorage.removeItem('accessToken'); // Czyścimy zły token
+                    console.error('Sesja wygasła, nie udało się odświeżyć tokenu', error);
+                    localStorage.removeItem('accessToken');
                 }
+                setLoading(false);
+                return;
+            }
+
+            // Token looks valid — verify with the server
+            try {
+                const { data } = await api.get('/users/me');
+                setUser(data);
+            } catch (error) {
+                console.error('Sesja wygasła lub błąd tokenu', error);
+                localStorage.removeItem('accessToken');
             }
             setLoading(false);
         };
@@ -48,8 +79,9 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('accessToken');
         setUser(null);
-        // Opcjonalnie wywołanie endpointu wylogowującego na backendzie
-        // api.post('/auth/logout');
+        // Clear the httpOnly refresh-token cookie on the server so it can't
+        // be replayed after logout
+        api.post('/auth/logout').catch(() => {});
     };
 
     const demoLogin = async () => {

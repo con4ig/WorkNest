@@ -176,7 +176,7 @@ const ProjectRow = ({
                     <div className="relative flex" ref={menuRef}>
                         <button
                             onClick={handleMenuClick}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-secondary hover:text-foreground active:scale-90"
+                            className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-secondary hover:text-foreground active:scale-90"
                         >
                             <MoreVertical className="h-5 w-5" />
                         </button>

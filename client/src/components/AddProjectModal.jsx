@@ -83,7 +83,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center sm:p-4">
             {/* Full-screen Backdrop */}
             <div 
-                className="fixed inset-0 bg-zinc-950/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300"
+                className="fixed inset-0 bg-foreground/30 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
             
@@ -92,16 +92,16 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-5 border-b border-black/5 dark:border-white/5 shrink-0">
                     <div>
-                        <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
+                        <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-tight">
                             {t('projects.addProject')}
                         </h2>
-                        <p className="mt-0.5 text-zinc-500 dark:text-zinc-400 text-xs">
+                        <p className="mt-0.5 text-muted-foreground text-xs">
                             {t('projects.createSubtitle', { defaultValue: 'Define project details and assign team members.' })}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors shrink-0"
+                        className="p-2 rounded-lg text-muted-foreground hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground transition-colors shrink-0"
                     >
                         <X size={20} />
                     </button>
@@ -118,38 +118,40 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
                     {/* Basic Info Section */}
                     <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold text-sm">
+                        <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
                             <Plus size={16} className="text-primary shrink-0" />
                             <h3>{t('projects.basicInfo', { defaultValue: 'Basic Information' })}</h3>
                         </div>
                         
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-name" className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelName')}
                                 </label>
                                 <input
+                                    id="project-name"
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleChange}
                                     placeholder={t('projects.placeholderName')}
                                     required
-                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all font-medium text-base"
+                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-foreground placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all font-medium text-base"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-description" className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelDescription')}
                                 </label>
                                 <textarea
+                                    id="project-description"
                                     name="description"
                                     value={formData.description}
                                     onChange={handleChange}
                                     placeholder={t('projects.placeholderDescription')}
                                     rows={3}
-                                    className="w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl p-3 text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all resize-none font-medium text-base"
+                                    className="w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl p-3 text-foreground placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/30 transition-all resize-none font-medium text-base"
                                 />
                             </div>
                         </div>
@@ -158,14 +160,15 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     {/* Status & Priority — 1 col on mobile, 2 on sm+ */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
+                            <label htmlFor="project-status" className="block text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">
                                 {t('common.status')}
                             </label>
                             <select
+                                id="project-status"
                                 name="status"
                                 value={formData.status}
                                 onChange={handleChange}
-                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer font-medium text-base"
+                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer font-medium text-base"
                             >
                                 <option value="pending" className="bg-white dark:bg-zinc-900">{t('common.projectStatus.pending')}</option>
                                 <option value="running" className="bg-white dark:bg-zinc-900">{t('common.projectStatus.running')}</option>
@@ -175,14 +178,15 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">
+                            <label htmlFor="project-priority" className="block text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">
                                 {t('projects.labelPriority')}
                             </label>
                             <select
+                                id="project-priority"
                                 name="priority"
                                 value={formData.priority}
                                 onChange={handleChange}
-                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer font-medium text-base"
+                                className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all cursor-pointer font-medium text-base"
                             >
                                 <option value="low" className="bg-white dark:bg-zinc-900">{t('common.priority.low')}</option>
                                 <option value="medium" className="bg-white dark:bg-zinc-900">{t('common.priority.medium')}</option>
@@ -194,34 +198,36 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
                     {/* Timeline Section — 1 col on mobile, 2 on sm+ */}
                     <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold text-sm">
+                        <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
                             <Calendar size={16} className="text-primary shrink-0" />
                             <h3>{t('projects.timeline', { defaultValue: 'Timeline' })}</h3>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-start-date" className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelStartDate')}
                                 </label>
                                 <input
+                                    id="project-start-date"
                                     type="date"
                                     name="startDate"
                                     value={formData.startDate}
                                     onChange={handleChange}
-                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium dark:[color-scheme:dark] text-base"
+                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium dark:[color-scheme:dark] text-base"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1.5 ml-1">
+                                <label htmlFor="project-end-date" className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5 ml-1">
                                     {t('projects.labelEndDate')}
                                 </label>
                                 <input
+                                    id="project-end-date"
                                     type="date"
                                     name="endDate"
                                     value={formData.endDate}
                                     onChange={handleChange}
-                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium dark:[color-scheme:dark] text-base"
+                                    className="w-full h-11 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl px-4 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all font-medium dark:[color-scheme:dark] text-base"
                                 />
                             </div>
                         </div>
@@ -229,7 +235,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
 
                     {/* Team Section */}
                     <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-zinc-900 dark:text-zinc-100 font-semibold text-sm">
+                        <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
                             <User size={16} className="text-primary shrink-0" />
                             <h3>{t('projects.assignTeam', { defaultValue: 'Assign Team Members' })}</h3>
                         </div>
@@ -248,13 +254,13 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 >
                                     <div className={clsx(
                                         "w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0",
-                                        formData.assignedUsers.includes(user._id) ? "bg-primary text-black" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                                        formData.assignedUsers.includes(user._id) ? "bg-primary text-black" : "bg-zinc-200 dark:bg-zinc-800 text-muted-foreground"
                                     )}>
                                         {user.username.charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">{user.username}</p>
-                                        <p className="text-[10px] text-zinc-500 truncate">{user.email}</p>
+                                        <p className="text-xs font-semibold text-foreground truncate">{user.username}</p>
+                                        <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
                                     </div>
                                     {formData.assignedUsers.includes(user._id) && (
                                         <Check size={14} className="text-primary shrink-0" />
@@ -270,7 +276,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                     <button
                         type="button"
                         onClick={onClose}
-                        className="w-full sm:w-auto px-4 py-2.5 text-sm font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors text-center rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
+                        className="w-full sm:w-auto px-4 py-2.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors text-center rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
                         disabled={loading}
                     >
                         {t('common.cancel')}

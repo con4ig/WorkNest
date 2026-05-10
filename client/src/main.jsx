@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, Suspense } from 'react';
+import { StrictMode, useEffect, Suspense, lazy } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
 import { createRoot } from 'react-dom/client';
@@ -10,23 +10,26 @@ import {
 } from 'react-router-dom';
 import './styles/fonts.css';
 import './styles/index.css';
+
+// Auth + public pages — small, load eagerly (needed on first paint)
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
-import Dashboard from './pages/Dashboard.jsx';
 import Forgot from './pages/Forgot.jsx';
 import App from './App.jsx';
-import EmployeeList from './pages/EmployeeList.jsx';
-import Addproject from './components/AddProjectModal.jsx';
-import Projekty from './pages/Projekty.jsx';
-import ProjectDetails from './pages/ProjectDetails.jsx';
-import MyLeaves from './pages/MyLeaves.jsx';
-import LeaveApprovals from './pages/LeaveApprovals.jsx';
 import Regulamin from './pages/Regulamin.jsx';
 import Polityka from './pages/Polityka_prywatnosc.jsx';
-import UserDetails from './pages/UserDetails.jsx';
-import Upload from './pages/Upload.jsx';
-import GenerateCode from './pages/GenerateCode.jsx';
-import ForcePasswordChange from './pages/ForcePasswordChange.jsx';
+
+// Protected app pages — lazy loaded, split from main bundle
+const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
+const EmployeeList = lazy(() => import('./pages/EmployeeList.jsx'));
+const Projekty = lazy(() => import('./pages/Projekty.jsx'));
+const ProjectDetails = lazy(() => import('./pages/ProjectDetails.jsx'));
+const MyLeaves = lazy(() => import('./pages/MyLeaves.jsx'));
+const LeaveApprovals = lazy(() => import('./pages/LeaveApprovals.jsx'));
+const UserDetails = lazy(() => import('./pages/UserDetails.jsx'));
+const Upload = lazy(() => import('./pages/Upload.jsx'));
+const GenerateCode = lazy(() => import('./pages/GenerateCode.jsx'));
+const ForcePasswordChange = lazy(() => import('./pages/ForcePasswordChange.jsx'));
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';

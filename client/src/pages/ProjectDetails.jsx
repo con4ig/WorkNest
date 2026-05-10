@@ -183,7 +183,7 @@ const CommentItem = ({
                             {canDelete && (
                                 <button
                                     onClick={() => onDelete(comment._id)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
+                                    className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
                                 >
                                     <Icon.Trash className="h-4 w-4" />
                                 </button>
@@ -231,7 +231,7 @@ const CommentItem = ({
                                 placeholder={t(
                                     'projects.details.replyPlaceholder',
                                 )}
-                                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                             />{' '}
                             <button
                                 onClick={handleReply}
@@ -607,6 +607,7 @@ export default function ProjectDetails() {
                                     name="startDate"
                                     value={editData.startDate}
                                     onChange={handleEditChange}
+                                    aria-label={t('projects.labelStartDate')}
                                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                                 />
                                 <input
@@ -614,6 +615,7 @@ export default function ProjectDetails() {
                                     name="endDate"
                                     value={editData.endDate}
                                     onChange={handleEditChange}
+                                    aria-label={t('projects.labelEndDate')}
                                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                                 />
                             </div>
@@ -636,6 +638,7 @@ export default function ProjectDetails() {
                                     name="status"
                                     value={editData.status}
                                     onChange={handleEditChange}
+                                    aria-label={t('common.status')}
                                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer"
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
@@ -648,6 +651,7 @@ export default function ProjectDetails() {
                                     name="priority"
                                     value={editData.priority}
                                     onChange={handleEditChange}
+                                    aria-label={t('projects.labelPriority')}
                                     className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer"
                                 >
                                     {AVAILABLE_PRIORITIES.map((p) => (
@@ -735,6 +739,7 @@ export default function ProjectDetails() {
                                     name="name"
                                     value={editData.name}
                                     onChange={handleEditChange}
+                                    aria-label={t('projects.details.projectNamePlaceholder')}
                                     className="w-full border-b border-border bg-transparent text-2xl font-bold tracking-tight text-foreground focus:border-primary focus:outline-none sm:text-4xl lg:text-5xl"
                                     placeholder={t('projects.details.projectNamePlaceholder')}
                                 />
@@ -811,6 +816,7 @@ export default function ProjectDetails() {
                                 value={editData.description}
                                 onChange={handleEditChange}
                                 rows={6}
+                                aria-label={t('projects.details.description')}
                                 className="w-full rounded-lg border border-border bg-background p-4 text-sm font-medium focus:border-primary focus:outline-none placeholder:text-muted-foreground/40"
                                 placeholder={t('projects.details.addDescriptionPlaceholder')}
                             />
@@ -904,10 +910,11 @@ export default function ProjectDetails() {
                                     onKeyPress={(e) =>
                                         e.key === 'Enter' && handleAddComment()
                                     }
+                                    aria-label={t('projects.details.addCommentPlaceholder')}
                                     placeholder={t(
                                         'projects.details.addCommentPlaceholder',
                                     )}
-                                    className="flex-1 rounded-lg border border-input bg-background px-4 py-2 focus:border-primary focus:outline-none"
+                                    className="flex-1 rounded-lg border border-input bg-background px-4 py-2 focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                                 />
                                 <button
                                     onClick={handleAddComment}

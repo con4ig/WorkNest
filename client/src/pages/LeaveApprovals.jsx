@@ -489,7 +489,7 @@ export default function LeaveApprovals() {
                                                                     leave._id,
                                                                 )
                                                             }
-                                                            className="h-8 w-8 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-600"
+                                                            className="h-11 w-11 sm:h-8 sm:w-8 text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-600"
                                                             title={t('leaves.approvals.approve')}
                                                         >
                                                             <Check className="h-4 w-4" />
@@ -505,7 +505,7 @@ export default function LeaveApprovals() {
                                                                     true,
                                                                 );
                                                             }}
-                                                            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                            className="h-11 w-11 sm:h-8 sm:w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                             title={t('leaves.approvals.reject')}
                                                         >
                                                             <X className="h-4 w-4" />
