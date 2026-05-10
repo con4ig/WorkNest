@@ -94,25 +94,26 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
             {/* Modal Card */}
             <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-black/5 dark:border-white/5">
-                    <div>
+                <div className="flex items-center justify-between gap-3 p-4 border-b border-black/5 dark:border-white/5 sm:p-6">
+                    <div className="min-w-0">
                         <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">
                             {t('projects.details.userModal.title')}
                         </h2>
                         <div className="mt-1 flex items-center gap-2 text-zinc-500 dark:text-zinc-400 text-xs text-[10px] uppercase">
-                            <span className="font-mono">{t('common.project')}</span>
-                            <span className="truncate max-w-[300px] font-medium text-zinc-700 dark:text-zinc-300">{project.name}</span>
+                            <span className="shrink-0 font-mono">{t('common.project')}</span>
+                            <span className="truncate font-medium text-zinc-700 dark:text-zinc-300">{project.name}</span>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                        className="shrink-0 flex h-11 w-11 items-center justify-center rounded-lg text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                        aria-label="Close modal"
                     >
-                        <X size={20} />
+                        <X size={20} aria-hidden="true" />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4 space-y-8 custom-scrollbar sm:p-6">
                     {/* Current Users Section */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between text-sm">
@@ -137,9 +138,9 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                     return (
                                         <div
                                             key={user._id}
-                                            className="flex items-center justify-between p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 transition-all"
+                                            className="flex items-center gap-3 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 transition-all"
                                         >
-                                            <div className="flex items-center gap-4">
+                                            <div className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg text-xs font-bold">
                                                 <div className={clsx(
                                                     "w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold",
                                                     user.role === 'admin' ? "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/10" :
@@ -148,32 +149,33 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                                 )}>
                                                     {user.username.charAt(0).toUpperCase()}
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{user.username}</span>
-                                                        {isCreator && (
-                                                            <div className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-[10px] font-bold text-amber-600 dark:text-amber-500">
-                                                                {t('common.creator')}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-[10px] text-zinc-500 truncate">
-                                                        {user.email} • {t(`common.roles.${user.role}`)}
-                                                    </p>
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-semibold text-zinc-900 dark:text-white truncate">{user.username}</span>
+                                                    {isCreator && (
+                                                        <div className="shrink-0 px-2 py-0.5 rounded-lg bg-amber-500/10 text-[10px] font-bold text-amber-600 dark:text-amber-500">
+                                                            {t('common.creator')}
+                                                        </div>
+                                                    )}
                                                 </div>
+                                                <p className="text-[10px] text-zinc-500 truncate">
+                                                    {user.email} • {t(`common.roles.${user.role}`)}
+                                                </p>
                                             </div>
                                             <button
                                                 onClick={() => handleToggleUser(user._id, 'remove')}
                                                 disabled={isUpdating || isCreator}
                                                 className={clsx(
-                                                    "p-2 rounded-lg transition-all",
-                                                    isCreator 
-                                                        ? "text-zinc-300 dark:text-zinc-800 cursor-not-allowed" 
+                                                    "shrink-0 flex h-8 w-8 items-center justify-center rounded-lg transition-all",
+                                                    isCreator
+                                                        ? "text-zinc-300 dark:text-zinc-700 cursor-not-allowed"
                                                         : "text-red-500 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-400/10"
                                                 )}
                                                 title={isCreator ? t('projects.details.userModal.cannotRemoveCreator') : t('projects.details.userModal.removeUser')}
+                                                aria-label={isCreator ? t('projects.details.userModal.cannotRemoveCreator') : t('projects.details.userModal.removeUser')}
                                             >
-                                                <UserMinus size={18} />
+                                                <UserMinus size={15} aria-hidden="true" />
                                             </button>
                                         </div>
                                     );
@@ -218,29 +220,29 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                                         {displayedUsers.map((user) => (
                                             <div
                                                 key={user._id}
-                                                className="flex items-center justify-between p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 transition-all"
+                                                className="flex items-center gap-3 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 transition-all"
                                             >
-                                                <div className="flex items-center gap-4">
-                                                    <div className={clsx(
-                                                        "w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-200 dark:bg-zinc-800",
-                                                        user.role === 'admin' && "text-purple-600 dark:text-purple-400 bg-purple-500/10",
-                                                        user.role === 'hr' && "text-blue-600 dark:text-blue-400 bg-blue-500/10"
-                                                    )}>
-                                                        {user.username.charAt(0).toUpperCase()}
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs font-semibold text-zinc-900 dark:text-white">{user.username}</p>
-                                                        <p className="text-[10px] text-zinc-500 truncate">
-                                                            {user.email} • {t(`common.roles.${user.role}`)}
-                                                        </p>
-                                                    </div>
+                                                <div className={clsx(
+                                                    "shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-zinc-500 dark:text-zinc-400 bg-zinc-200 dark:bg-zinc-800",
+                                                    user.role === 'admin' && "text-purple-600 dark:text-purple-400 bg-purple-500/10",
+                                                    user.role === 'hr' && "text-blue-600 dark:text-blue-400 bg-blue-500/10"
+                                                )}>
+                                                    {user.username.charAt(0).toUpperCase()}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-xs font-semibold text-zinc-900 dark:text-white truncate">{user.username}</p>
+                                                    <p className="text-[10px] text-zinc-500 truncate">
+                                                        {user.email} • {t(`common.roles.${user.role}`)}
+                                                    </p>
                                                 </div>
                                                 <button
                                                     onClick={() => handleToggleUser(user._id, 'add')}
                                                     disabled={isUpdating}
-                                                    className="p-2 w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-black hover:bg-primary/90 transition-all disabled:opacity-50 shadow-lg shadow-primary/20"
+                                                    className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all disabled:opacity-50"
+                                                    title={t('projects.details.userModal.addUser')}
+                                                    aria-label={t('projects.details.userModal.addUser')}
                                                 >
-                                                    <UserPlus size={18} />
+                                                    <UserPlus size={15} aria-hidden="true" />
                                                 </button>
                                             </div>
                                         ))}
@@ -267,7 +269,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-black/5 dark:border-white/5 flex items-center justify-end">
+                <div className="p-4 border-t border-black/5 dark:border-white/5 flex items-center justify-end sm:p-6">
                     <button
                         onClick={onClose}
                         className="px-6 py-2 bg-zinc-900 dark:bg-white text-white dark:text-black font-bold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg dark:shadow-white/10"

@@ -34,7 +34,7 @@ const KanbanColumn = ({
     const config = statusConfig[status];
 
     return (
-        <div className="flex min-h-[250px] w-full min-w-[280px] max-w-[400px] flex-1 flex-col rounded-xl border border-border/40 bg-secondary/10 p-3 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-secondary/20 sm:min-h-[300px] sm:min-w-[320px] sm:p-5">
+        <div className="flex w-full flex-1 flex-col rounded-xl border border-border/40 bg-secondary/10 p-3 shadow-sm transition-all duration-300 backdrop-blur-sm hover:bg-secondary/20 lg:min-h-[300px] lg:min-w-[280px] lg:max-w-[400px] lg:p-5">
             <div className="mb-4 flex items-center justify-between px-1 sm:mb-6">
                 <div className="flex items-center gap-2.5">
                     <div className={clsx("h-2 w-2 rounded-full", config.dotColor)} />
@@ -46,7 +46,7 @@ const KanbanColumn = ({
                     </span>
                 </div>
             </div>
-            <div className="custom-scrollbar max-h-[600px] flex-grow space-y-3 overflow-y-auto pr-2">
+            <div className="custom-scrollbar space-y-3 pr-2 lg:max-h-[600px] lg:flex-grow lg:overflow-y-auto">
                 {tasks.length > 0 ? (
                     tasks.map((task) => (
                         <TaskItem
@@ -86,7 +86,7 @@ const KanbanBoard = ({ tasks, onUpdate, onDelete, projectUsers, isAdmin, project
     };
 
     return (
-        <div className="flex gap-3 overflow-x-auto pb-4 sm:gap-6">
+        <div className="flex flex-col gap-3 pb-4 lg:flex-row lg:gap-6 lg:overflow-x-auto">
             {Object.keys(groupedTasks).map((status) => (
                 <KanbanColumn
                     key={status}
