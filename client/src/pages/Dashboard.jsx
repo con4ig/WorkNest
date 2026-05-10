@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api.js';
 import { ChevronRight, Key } from 'lucide-react';
@@ -195,11 +195,38 @@ export default function Dashboard() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const { user, logout } = useAuth();
-    const [weeklyActivity, setWeeklyActivity] = useState([]);
+    const [rawActivity, setRawActivity] = useState([]);
 
-    useEffect(() => {
-        // moment.locale(i18n.language); // Removed as we switched to date-fns
-    }, [i18n.language]);
+    // Re-format activity labels when language changes — no refetch needed
+    const weeklyActivity = useMemo(() => {
+        if (!rawActivity.length) return [];
+        const activityMap = rawActivity.reduce((acc, item) => {
+            acc[item.date] = item.count;
+            return acc;
+        }, {});
+        const today = new Date();
+        return Array.from({ length: 7 }, (_, i) => {
+            const day = new Date(today);
+            day.setDate(today.getDate() - (6 - i));
+            const dayString = format(day, 'yyyy-MM-dd');
+            return {
+                day: format(day, 'EEE', { locale: i18n.language === 'pl' ? pl : undefined }),
+                fullDate: dayString,
+                val: activityMap[dayString] || 0,
+            };
+        });
+    }, [rawActivity, i18n.language]);
+
+    const formatProjectDate = (endDate) => {
+        if (!endDate) return t('common.notSpecified');
+        try {
+            return format(new Date(endDate), 'dd MMM yyyy', {
+                locale: i18n.language === 'pl' ? pl : undefined,
+            });
+        } catch {
+            return t('common.invalidDate');
+        }
+    };
 
     // Połączona funkcja do pobierania wszystkich danych
     const fetchDashboardData = async () => {
@@ -311,28 +338,8 @@ export default function Dashboard() {
 
             setProjects(projectsRes.data.projects);
 
-            // Przetwarzanie danych aktywności
-            const rawActivity = activityRes.data;
-            const activityMap = rawActivity.reduce((acc, item) => {
-                acc[item.date] = item.count;
-                return acc;
-            }, {});
-
-            const processedActivityData = [];
-            const today = new Date();
-            for (let i = 6; i >= 0; i--) {
-                const day = new Date(today);
-                day.setDate(today.getDate() - i);
-                const dayString = format(day, 'yyyy-MM-dd');
-                processedActivityData.push({
-                    day: format(day, 'EEE', {
-                        locale: i18n.language === 'pl' ? pl : undefined,
-                    }),
-                    fullDate: dayString,
-                    val: activityMap[dayString] || 0,
-                });
-            }
-            setWeeklyActivity(processedActivityData);
+            // Store raw API data — formatting handled by useMemo (language-reactive)
+            setRawActivity(activityRes.data);
         } catch {
             // Silent error handling
         } finally {
@@ -344,7 +351,7 @@ export default function Dashboard() {
         if (user) {
             fetchDashboardData();
         }
-    }, [user, i18n.language]);
+    }, [user]);
 
     if (loading) {
         return <LoadingScreen message={t('dashboard.loading')} />;
@@ -532,17 +539,7 @@ export default function Dashboard() {
                                             </h3>
                                             <p className="text-[10px] tracking-wide text-muted-foreground sm:text-xs">
                                                 {t('common.deadline')}:{' '}
-                                                {(() => {
-                                                    try {
-                                                        return project.endDate
-                                                            ? format(new Date(project.endDate), 'dd MMM yyyy', {
-                                                                  locale: i18n.language === 'pl' ? pl : undefined,
-                                                              })
-                                                            : t('common.notSpecified');
-                                                    } catch (e) {
-                                                        return t('common.invalidDate');
-                                                    }
-                                                })()}
+                                                {formatProjectDate(project.endDate)}
                                             </p>
                                         </div>
                                     </div>

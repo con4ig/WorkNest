@@ -167,7 +167,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
     };
 
     return (
-        <div className="shadow-3xl h-[calc(100vh-280px)] min-h-[420px] sm:min-h-[500px] lg:min-h-[600px] w-full rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900/30 p-4 backdrop-blur-2xl md:p-8 transition-colors duration-300
+        <div className="shadow-3xl h-[calc(100vh-280px)] min-h-[420px] sm:min-h-[500px] lg:min-h-[600px] w-full rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900/40 p-4 md:p-8 transition-colors duration-300
             [--calendar-text-main:theme(colors.zinc.900)]
             [--calendar-text-muted:theme(colors.zinc.400)]
             [--calendar-bg-today:rgb(var(--calendar-bg-today))]
