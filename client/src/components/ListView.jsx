@@ -37,12 +37,12 @@ const ListView = ({
     return (
         <div className="space-y-6">
             <div className="hidden lg:block">
-                <div className="overflow-hidden rounded-2xl border border-border/50 bg-secondary/5 transition-all duration-300 backdrop-blur-sm">
+                <div className="rounded-2xl border border-border/50 bg-secondary/5 transition-all duration-300 backdrop-blur-sm">
                     <table className="min-w-full text-left text-sm text-muted-foreground">
                         <thead className="bg-secondary/20 border-b border-border/50">
                             <tr>
                                 {currentUserRole !== 'employee' && (
-                                    <th className="w-12 px-6 py-4">
+                                    <th className="w-12 px-6 py-4 rounded-tl-2xl">
                                         <input
                                             type="checkbox"
                                             checked={areAllSelected}
@@ -51,10 +51,10 @@ const ListView = ({
                                         />
                                     </th>
                                 )}
-                                {tableHeaders.map((header) => (
+                                {tableHeaders.map((header, i) => (
                                     <th
                                         key={header}
-                                        className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60"
+                                        className={`px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60${i === 0 && currentUserRole === 'employee' ? ' rounded-tl-2xl' : ''}${i === tableHeaders.length - 1 ? ' rounded-tr-2xl' : ''}`}
                                     >
                                         {header}
                                     </th>
