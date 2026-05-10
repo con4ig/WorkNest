@@ -51,7 +51,7 @@ const KanbanColumn = ({
     currentUserRole,
 }) => {
     return (
-        <div className="flex max-h-[calc(100vh-220px)] min-w-[320px] flex-col rounded-2xl border border-border/40 bg-secondary/10 p-4 shadow-sm backdrop-blur-sm lg:w-1/4">
+        <div className="flex w-full flex-col rounded-2xl border border-border/40 bg-secondary/10 p-4 shadow-sm backdrop-blur-sm lg:max-h-[calc(100vh-220px)] lg:w-1/4 lg:min-w-[280px]">
             {/* Header kolumny */}
             <div className="mb-5 flex items-center justify-between px-1">
                 <div className="flex items-center gap-2.5">
@@ -72,7 +72,7 @@ const KanbanColumn = ({
                 items={projects.map((p) => p._id)}
                 strategy={verticalListSortingStrategy}
             >
-                <div className="custom-scrollbar flex-1 space-y-3 overflow-y-auto pr-1">
+                <div className="custom-scrollbar space-y-3 lg:flex-1 lg:overflow-y-auto lg:pr-1">
                     {projects.length === 0 ? (
                         <DroppableArea status={status} />
                     ) : (
@@ -178,7 +178,7 @@ const KanbanView = ({
             collisionDetection={closestCorners}
             onDragEnd={handleDragEnd}
         >
-            <div className="flex h-full items-start gap-4 overflow-x-auto pb-4">
+            <div className="flex flex-col gap-4 pb-4 lg:h-full lg:flex-row lg:items-start lg:overflow-x-auto">
                 {columns.map((col) => (
                     <KanbanColumn
                         key={col.status}

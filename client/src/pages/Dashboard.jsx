@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api.js';
 import { ChevronRight, Key } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { chartColors } from '../config/colors';
 import {
     Bar,
     BarChart,
@@ -54,24 +55,24 @@ const ProjectProgressChart = ({ stats }) => {
                   {
                       name: t('dashboard.stats.completed'),
                       value: completedProjects,
-                      color: '#10B981', // Emerald 500
+                      color: chartColors.success,
                   },
                   {
                       name: t('dashboard.stats.inProgress'),
                       value: runningProjects,
-                      color: '#F59E0B', // Amber 500
+                      color: chartColors.warning,
                   },
                   {
                       name: t('dashboard.stats.pending'),
                       value: pendingProjects,
-                      color: '#94A3B8', // Slate 400
+                      color: chartColors.pending,
                   },
               ].filter((item) => item.value > 0)
             : [
                   {
                       name: t('dashboard.charts.noData'),
                       value: 1,
-                      color: '#E2E8F0', // Slate 200
+                      color: chartColors.muted,
                   },
               ];
 
@@ -394,7 +395,7 @@ export default function Dashboard() {
                             className="border-border bg-card shadow-sm transition-all hover:shadow-md"
                         >
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-4 sm:pb-2">
-                                <CardTitle className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[10px]">
+                                <CardTitle className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
                                     {t(`dashboard.stats.${stat.titleKey}`)}
                                 </CardTitle>
                             </CardHeader>
@@ -565,7 +566,7 @@ export default function Dashboard() {
                 </CardContent>
             </Card>
 
-            <footer className="mt-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
+            <footer className="mt-8 pb-6 text-center text-xs uppercase tracking-widest text-muted-foreground">
                 © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
             </footer>
         </div>
