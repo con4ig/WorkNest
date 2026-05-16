@@ -31,7 +31,7 @@ jobs:
         # `auto` config picks the right rulesets for the languages it
         # detects (JavaScript/TypeScript, Node, Express, React, plus
         # OWASP Top 10 and security-audit packs).
-        run: semgrep ci --config auto --sarif --output=semgrep.sarif
+        run: semgrep ci --config auto --sarif --output=semgrep.sarif --audit
 
           # Optional: connect to Semgrep Cloud (semgrep.dev) for a
           # dashboard. Free tier; remove this env var to run purely in
