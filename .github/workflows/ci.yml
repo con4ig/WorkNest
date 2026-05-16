@@ -58,6 +58,11 @@ jobs:
   server:
     name: Server (test + smoke)
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:8
+        ports:
+          - 27017:27017
     defaults:
       run:
         working-directory: server
@@ -96,15 +101,24 @@ jobs:
 
       - name: Boot smoke test
         env:
-          NODE_ENV: test
+          # Use development so Pino writes logs (test mode silences all output)
+          NODE_ENV: development
           JWT_SECRET: ci-secret
           JWT_REFRESH_SECRET: ci-refresh-secret
-          ENCRYPTION_KEY: ci-encryption-key-32-bytes-long!!
-          MONGODB_URI: mongodb://127.0.0.1:27999/smoketest
+          # Must be a 64-char hex string (32 bytes for AES-256)
+          ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+          MONGODB_URI: mongodb://127.0.0.1:27017/smoketest
           PORT: 5500
         run: |
-          timeout 8s node server.js > server.log 2>&1 || true
-          grep -q 'Server running on port' server.log
+          node server.js &
+          SERVER_PID=$!
+          # Poll until the health endpoint responds (max 15 s)
+          for i in $(seq 1 15); do
+            curl -sf http://localhost:5500/api/health && break
+            sleep 1
+          done
+          curl -sf http://localhost:5500/api/health
+          kill $SERVER_PID
 
   audit:
     name: npm audit (moderate+)
