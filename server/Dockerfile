@@ -1,7 +1,7 @@
 # =============================================
 # Stage 0: Development (hot-reload with nodemon)
 # =============================================
-FROM node:20-alpine AS dev
+FROM node:26-alpine AS dev
 WORKDIR /app
 COPY package*.json ./
 # Install ALL deps, including nodemon
@@ -13,7 +13,7 @@ CMD ["npm", "run", "dev"]
 # =============================================
 # Stage 1: Production dependencies only
 # =============================================
-FROM node:20-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
@@ -21,7 +21,7 @@ RUN npm ci --only=production && npm cache clean --force
 # =============================================
 # Stage 2: Production Runtime
 # =============================================
-FROM node:20-alpine AS production
+FROM node:26-alpine AS production
 
 # Security: non-root user
 RUN addgroup -g 1001 -S nodejs && \
