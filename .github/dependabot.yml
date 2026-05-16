@@ -16,6 +16,13 @@ updates:
     commit-message:
       prefix: "deps(client)"
       include: scope
+    ignore:
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
     groups:
       all-client-deps:
         patterns:
@@ -36,6 +43,9 @@ updates:
     commit-message:
       prefix: "deps(server)"
       include: scope
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
     groups:
       all-server-deps:
         patterns:
