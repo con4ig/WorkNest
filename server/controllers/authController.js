@@ -11,7 +11,6 @@ import Project from "../models/Project.js";
 
 const saltRounds = 10;
 
-// Pomocnicze funkcje do generowania tokenów
 const generateAccessToken = (user) => {
   return jwt.sign(
     {
@@ -21,15 +20,15 @@ const generateAccessToken = (user) => {
       company: user.company ? user.company._id : null,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "15m" } // Krótki czas życia - 15 minut
+    { expiresIn: "15m" }
   );
 };
 
 const generateRefreshToken = (user) => {
   return jwt.sign(
     { _id: user._id },
-    process.env.JWT_REFRESH_SECRET, // Osobny secret dla refresh token
-    { expiresIn: "7d" } // Długi czas życia - 7 dni
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: "7d" }
   );
 };
 
@@ -38,7 +37,7 @@ export const register = async (req, res) => {
     req.body;
 
   if (!username || !email || !password || !role) {
-    return res.status(400).json({ message: "Wszystkie pola są wymagane" });
+    return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
@@ -46,7 +45,7 @@ export const register = async (req, res) => {
     if (existingUser) {
       return res
         .status(409)
-        .json({ message: "Użytkownik o tym adresie email już istnieje" });
+        .json({ message: "A user with this email already exists" });
     }
 
     const session = await mongoose.startSession();
@@ -57,7 +56,7 @@ export const register = async (req, res) => {
       if (!companyName) {
         return res
           .status(400)
-          .json({ message: "Nazwa firmy jest wymagana dla administratora" });
+          .json({ message: "Company name is required for an administrator" });
       }
 
       let savedUser, savedCompany;
@@ -92,7 +91,7 @@ export const register = async (req, res) => {
       }
 
       return res.status(201).json({
-        message: "Firma i administrator zostali pomyślnie zarejestrowani",
+        message: "Company and administrator registered successfully",
         user: {
           _id: savedUser._id,
           username: savedUser.username,
@@ -108,7 +107,7 @@ export const register = async (req, res) => {
       if (!invitationCode) {
         return res
           .status(400)
-          .json({ message: "Kod zaproszenia jest wymagany" });
+          .json({ message: "Invitation code is required" });
       }
 
       const invitation = await Invitation.findOne({
@@ -119,20 +118,18 @@ export const register = async (req, res) => {
       if (!invitation) {
         return res
           .status(404)
-          .json({ message: "Nieprawidłowy lub wygasły kod zaproszenia" });
+          .json({ message: "Invalid or expired invitation code" });
       }
 
-      // Sprawdź czy kod nie został zużyty (dla bezpieczeństwa, choć expiresAt powinno wystarczyć, jeśli usuwamy)
       if (invitation.maxUses > 0 && invitation.uses >= invitation.maxUses) {
-        return res.status(400).json({ message: "Limit użyć tego kodu został wyczerpany" });
+        return res.status(400).json({ message: "Usage limit for this code has been exhausted" });
       }
 
       companyId = invitation.company;
 
-      // Zwiększ licznik użyć
       invitation.uses += 1;
 
-      // Jeśli osiągnięto limit -> usuń kod, w przeciwnym razie zapisz zaktualizowany licznik
+      // If limit reached -> delete code, otherwise save updated counter
       if (invitation.maxUses > 0 && invitation.uses >= invitation.maxUses) {
         await Invitation.findByIdAndDelete(invitation._id);
       } else {
@@ -143,14 +140,14 @@ export const register = async (req, res) => {
         username,
         email,
         password: hashedPassword,
-        role: invitation.role || role, // Użyj roli z zaproszenia (jeśli jest), fallback do roli z requestu (ale z zaproszenia bezpieczniej)
+        role: invitation.role || role,
         company: companyId,
       });
 
       const savedUser = await newUser.save();
 
       return res.status(201).json({
-        message: "Użytkownik został pomyślnie zarejestrowany",
+        message: "User registered successfully",
         user: {
           _id: savedUser._id,
           username: savedUser.username,
@@ -160,11 +157,11 @@ export const register = async (req, res) => {
     } else {
       return res
         .status(400)
-        .json({ message: "Nieprawidłowa rola użytkownika" });
+        .json({ message: "Invalid user role" });
     }
   } catch (err) {
     console.error("Registration error:", err);
-    res.status(500).json({ message: "Błąd serwera podczas rejestracji" });
+    res.status(500).json({ message: "Server error during registration" });
   }
 };
 
@@ -173,24 +170,22 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email i hasło są wymagane" });
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
     const user = await User.findOne({ email }).populate("company", "name");
     if (!user) {
-      return res.status(401).json({ message: "Nieprawidłowe dane logowania" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return res.status(401).json({ message: "Nieprawidłowe dane logowania" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generuj oba tokeny
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
-    // Ustaw refresh token w HttpOnly cookie
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -201,10 +196,9 @@ export const login = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, cookieOptions);
 
-    // Zwróć access token w body (będzie przechowywany w pamięci React)
     res.json({
-      message: "Zalogowano pomyślnie",
-      accessToken, // Krótki token do pamięci
+      message: "Logged in successfully",
+      accessToken,
       user: {
         _id: user._id,
         username: user.username,
@@ -217,7 +211,7 @@ export const login = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -226,20 +220,17 @@ export const refresh = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      return res.status(401).json({ message: "Brak refresh tokena" });
+      return res.status(401).json({ message: "Missing refresh token" });
     }
 
-    // Weryfikuj refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-    // Pobierz użytkownika
     const user = await User.findById(decoded._id).populate("company", "name");
 
     if (!user) {
-      return res.status(401).json({ message: "Użytkownik nie znaleziony" });
+      return res.status(401).json({ message: "User not found" });
     }
 
-    // Wygeneruj nowy access token
     const newAccessToken = generateAccessToken(user);
 
     res.json({
@@ -256,14 +247,14 @@ export const refresh = async (req, res) => {
     });
   } catch (err) {
     console.error("Refresh token error:", err);
-    // Czyść cookie jeśli refresh token jest zły
+    // Clear cookie if refresh token is bad
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: "/",
     });
-    return res.status(403).json({ message: "Nieprawidłowy lub wygasły refresh token" });
+    return res.status(403).json({ message: "Invalid or expired refresh token" });
   }
 };
 
@@ -276,30 +267,30 @@ export const logout = async (req, res) => {
   };
 
   try {
-    // Jeśli to użytkownik demo, wyczyść cały sandbox przy wylogowaniu
+    // If this is a demo user, clean up the entire sandbox on logout
     const refreshToken = req.cookies.refreshToken;
     if (refreshToken) {
       const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
       const user = await User.findById(decoded._id);
       if (user && user.isDemo && user.company) {
         const companyId = user.company;
-        console.log(`🧹 Czyszczenie sandboxu demo dla firmy: ${companyId}`);
+        console.log(`🧹 Cleaning demo sandbox for company: ${companyId}`);
         await User.deleteMany({ company: companyId, isDemo: true });
         await Leave.deleteMany({ company: companyId });
         await Project.deleteMany({ company: companyId });
         await Task.deleteMany({ company: companyId });
         await Company.deleteOne({ _id: companyId, isDemo: true });
-        console.log(`✅ Sandbox demo wyczyszczony.`);
+        console.log(`✅ Demo sandbox cleaned.`);
       }
     }
   } catch (err) {
-    // Błąd czyszczenia nie powinien blokować wylogowania
-    console.warn("Błąd podczas czyszczenia sandboxu demo:", err.message);
+    // Cleanup failure shouldn't block logout
+    console.warn("Error while cleaning demo sandbox:", err.message);
   }
 
   res.clearCookie("refreshToken", cookieOptions);
   res.clearCookie("token", cookieOptions);
-  res.json({ message: "Wylogowano pomyślnie" });
+  res.json({ message: "Logged out successfully" });
 };
 
 export const changePassword = async (req, res) => {
@@ -308,12 +299,12 @@ export const changePassword = async (req, res) => {
     const userId = req.user._id;
 
     if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ message: "Hasło musi mieć co najmniej 6 znaków" });
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -323,11 +314,11 @@ export const changePassword = async (req, res) => {
     user.mustChangePassword = false;
     await user.save();
 
-    res.json({ message: "Hasło zostało zmienione pomyślnie" });
+    res.json({ message: "Password changed successfully" });
 
   } catch (err) {
     console.error("Change password error:", err);
-    res.status(500).json({ message: "Błąd serwera podczas zmiany hasła" });
+    res.status(500).json({ message: "Server error during password change" });
   }
 };
 
@@ -338,7 +329,7 @@ export const demoLogin = async (req, res) => {
     const DEMO_EMAIL = `demo-${demoSuffix}@worknest.com`;
     const DEMO_COMPANY_NAME = `Demo Company ${demoSuffix}`;
 
-    // TTL: 24 godziny jako fallback (cleanup przy wylogowaniu jest główną metodą)
+    // TTL: 24 hours fallback (logout cleanup is the primary method)
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     const session = await mongoose.startSession();
@@ -391,7 +382,7 @@ export const demoLogin = async (req, res) => {
         await demoHR.save({ session });
 
         const demoEmp = new User({
-          username: `Jan Pracownik (Demo ${demoSuffix})`,
+          username: `John Employee (Demo ${demoSuffix})`,
           email: `employee-${demoSuffix}@demo.com`,
           password: hashedPassword,
           role: 'employee',
@@ -414,17 +405,17 @@ export const demoLogin = async (req, res) => {
           startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
           endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5),
           days: 5,
-          reason: 'Wakacje w sandboxie',
+          reason: 'Sandbox vacation',
           status: 'approved',
           reviewedBy: demoHR._id,
           reviewedAt: new Date(),
-          expiresAt // Ensure related data also has TTL if needed (or it will just be orphaned and harmless)
+          expiresAt
         });
         await approvedLeave.save({ session });
 
         const projectWeb = new Project({
-          name: 'Budowa Portfolia',
-          description: 'Projekt demonstracyjny pomyślnie wyizolowany w Twoim własnym sandboxie!',
+          name: 'Portfolio Build',
+          description: 'Demo project successfully isolated in your own sandbox!',
           status: 'running',
           priority: 'high',
           startDate: new Date(),
@@ -437,8 +428,8 @@ export const demoLogin = async (req, res) => {
         await projectWeb.save({ session });
 
         const task1 = new Task({
-          title: 'Weryfikacja Izolacji',
-          description: 'Sprawdź, czy Twoje zmiany nie są widoczne dla innych użytkowników demo.',
+          title: 'Isolation Verification',
+          description: 'Check that your changes are not visible to other demo users.',
           status: 'in-progress',
           priority: 'high',
           dueDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
@@ -469,15 +460,15 @@ export const demoLogin = async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, cookieOptions);
 
-    console.log(`🔑 Wygenerowano tokeny dla: ${DEMO_EMAIL}`);
-    console.log(`👤 Dane użytkownika demo:`, { id: user._id, role: user.role });
+    console.log(`🔑 Tokens generated for: ${DEMO_EMAIL}`);
+    console.log(`👤 Demo user data:`, { id: user._id, role: user.role });
 
     res.json({
-      message: "Uruchomiono Twój osobisty sandbox Demo. Dane wygasną za 2 godziny.",
+      message: "Your personal Demo sandbox is running. Data expires in 2 hours.",
       accessToken,
       user: {
-        id: user._id, // Zmieniam na id (bez podkreślnika) dla spójności, jeśli frontend tego szuka
-        _id: user._id, // Zachowuję _id dla bezpieczeństwa
+        id: user._id,
+        _id: user._id,
         username: user.username,
         email: user.email,
         role: user.role,
@@ -490,6 +481,6 @@ export const demoLogin = async (req, res) => {
 
   } catch (err) {
     console.error("Demo login error:", err);
-    res.status(500).json({ message: "Błąd podczas generowania wersji demo" });
+    res.status(500).json({ message: "Error generating demo version" });
   }
 };

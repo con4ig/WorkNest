@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Cancel superseded runs on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  client:
+    name: Client (lint + test + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify locale parity (pl ↔ en)
+        # Cheap, fast, runs before lint so a missing key fails the run
+        # immediately. The script lives at the repo root.
+        working-directory: ${{ github.workspace }}
+        run: node scripts/verify-locale-parity.mjs
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+        env:
+          CI: "true"
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist
+          retention-days: 7
+
+  server:
+    name: Server (test + smoke)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check (node --check)
+        run: |
+          find . -path ./node_modules -prune -o -name '*.js' -print \
+            | xargs -n1 node --check
+
+      # Restores a cached MongoDB binary for `mongodb-memory-server` so
+      # subsequent runs skip the 50 MB download.
+      - name: Cache mongodb-memory-server binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('server/package-lock.json') }}
+          restore-keys: |
+            mongodb-binaries-${{ runner.os }}-
+
+      - name: Run tests
+        run: npm test
+        env:
+          CI: "true"
+
+      - name: Boot smoke test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-secret
+          JWT_REFRESH_SECRET: ci-refresh-secret
+          ENCRYPTION_KEY: ci-encryption-key-32-bytes-long!!
+          MONGODB_URI: mongodb://127.0.0.1:27999/smoketest
+          PORT: 5500
+        run: |
+          timeout 8s node server.js > server.log 2>&1 || true
+          grep -q 'Server running on port' server.log
+
+  audit:
+    name: npm audit (moderate+)
+    runs-on: ubuntu-latest
+    # Non-blocking — we want visibility, not a wedged main branch when
+    # a transient advisory lands. Promote to a hard fail by removing
+    # `continue-on-error` once the policy is stable.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        workspace: [client, server]
+    defaults:
+      run:
+        working-directory: ${{ matrix.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.workspace }}/package-lock.json
+      - run: npm ci
+      - name: Audit production deps
+        run: npm audit --omit=dev --audit-level=moderate

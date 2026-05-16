@@ -12,7 +12,7 @@ export const getCommentsByProject = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       projectQuery.company = req.user.company._id;
@@ -21,7 +21,7 @@ export const getCommentsByProject = async (req, res) => {
     if (!project) {
       return res
         .status(404)
-        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+        .json({ message: "Project not found or access denied." });
     }
 
     const query = { project: projectId, parentComment: null };
@@ -34,7 +34,6 @@ export const getCommentsByProject = async (req, res) => {
       .populate("mentions", "username")
       .sort({ createdAt: -1 });
 
-    // Dla każdego komentarza pobierz odpowiedzi
     const commentsWithReplies = await Promise.all(
       comments.map(async (comment) => {
         const replies = await Comment.find({ parentComment: comment._id })
@@ -65,7 +64,7 @@ export const createComment = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       projectQuery.company = req.user.company._id;
@@ -74,7 +73,7 @@ export const createComment = async (req, res) => {
     if (!projectDoc) {
       return res
         .status(404)
-        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+        .json({ message: "Project not found or access denied." });
     }
 
     const comment = new Comment({
@@ -90,14 +89,13 @@ export const createComment = async (req, res) => {
     await savedComment.populate("author", "username email profileImage");
     await savedComment.populate("mentions", "username");
 
-    // Dodaj aktywność
     await Activity.create({
       project,
       user: req.user._id,
       action: parentComment ? "comment_replied" : "comment_added",
       description: parentComment
-        ? `odpowiedział(a) na komentarz`
-        : `dodał(a) komentarz`,
+        ? `replied to a comment`
+        : `added a comment`,
       metadata: { commentId: savedComment._id },
       company: projectDoc.company,
     });
@@ -114,7 +112,7 @@ export const updateComment = async (req, res) => {
     const comment = await Comment.findById(req.params.id);
 
     if (!comment) {
-      return res.status(404).json({ message: "Komentarz nie znaleziony" });
+      return res.status(404).json({ message: "Comment not found" });
     }
 
     // Company isolation
@@ -122,11 +120,11 @@ export const updateComment = async (req, res) => {
       req.user.role !== "superadmin" &&
       comment.company.toString() !== req.user.company.toString()
     ) {
-      return res.status(404).json({ message: "Komentarz nie znaleziony" });
+      return res.status(404).json({ message: "Comment not found" });
     }
 
     if (comment.author.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Brak uprawnień" });
+      return res.status(403).json({ message: "Insufficient permissions" });
     }
 
     comment.content = req.body.content;
@@ -151,7 +149,7 @@ export const deleteComment = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       commentQuery.company = req.user.company._id;
@@ -161,31 +159,28 @@ export const deleteComment = async (req, res) => {
     if (!comment) {
       return res
         .status(404)
-        .json({ message: "Komentarz nie znaleziony lub brak dostępu." });
+        .json({ message: "Comment not found or access denied." });
     }
 
-    // Sprawdź czy użytkownik jest autorem lub adminem
     if (
       comment.author.toString() !== req.user._id.toString() &&
       req.user.role !== "admin"
     ) {
-      return res.status(403).json({ message: "Brak uprawnień" });
+      return res.status(403).json({ message: "Insufficient permissions" });
     }
 
-    // Usuń też wszystkie odpowiedzi do tego komentarza
     await Comment.deleteMany({ parentComment: comment._id });
 
-    // Dodaj aktywność
     await Activity.create({
       project: comment.project,
       user: req.user._id,
       action: "comment_deleted",
-      description: `usunął(a) komentarz`,
+      description: `deleted a comment`,
       company: comment.company,
     });
 
     await comment.deleteOne();
-    res.json({ message: "Komentarz usunięty" });
+    res.json({ message: "Comment deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

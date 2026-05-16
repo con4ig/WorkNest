@@ -13,7 +13,7 @@ export const getTasksByProject = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       projectQuery.company = req.user.company._id;
@@ -22,7 +22,7 @@ export const getTasksByProject = async (req, res) => {
     if (!project) {
       return res
         .status(404)
-        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+        .json({ message: "Project not found or access denied." });
     }
 
     const query = { project: projectId };
@@ -53,7 +53,7 @@ export const createTask = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       projectQuery.company = req.user.company._id;
@@ -62,7 +62,7 @@ export const createTask = async (req, res) => {
     if (!projectDoc) {
       return res
         .status(404)
-        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+        .json({ message: "Project not found or access denied." });
     }
 
     const task = new Task({
@@ -73,19 +73,18 @@ export const createTask = async (req, res) => {
       priority: priority || "medium",
       dueDate: dueDate || null,
       createdBy: req.user._id,
-      company: projectDoc.company, // Set company from project
+      company: projectDoc.company,
     });
 
     const savedTask = await task.save();
     await savedTask.populate("assignedTo", "username email");
     await savedTask.populate("createdBy", "username");
 
-    // Dodaj aktywność
     await Activity.create({
       project,
       user: req.user._id,
       action: "task_created",
-      description: `utworzył(a) zadanie "${title}"`,
+      description: `created task "${title}"`,
       metadata: { taskId: savedTask._id, title },
       company: projectDoc.company,
     });
@@ -105,7 +104,7 @@ export const updateTask = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       taskQuery.company = req.user.company._id;
@@ -114,7 +113,7 @@ export const updateTask = async (req, res) => {
     if (!task) {
       return res
         .status(404)
-        .json({ message: "Zadanie nie znalezione lub brak dostępu." });
+        .json({ message: "Task not found or access denied." });
     }
 
     const oldStatus = task.status;
@@ -125,7 +124,7 @@ export const updateTask = async (req, res) => {
       }
     });
 
-    // Jeśli zadanie jest ukończone, ustaw datę ukończenia
+    // If task is completed, set completion date
     if (req.body.status === "completed" && oldStatus !== "completed") {
       task.completedAt = new Date();
 
@@ -133,7 +132,7 @@ export const updateTask = async (req, res) => {
         project: task.project,
         user: req.user._id,
         action: "task_completed",
-        description: `ukończył(a) zadanie "${task.title}"`,
+        description: `completed task "${task.title}"`,
         metadata: { taskId: task._id, title: task.title },
         company: task.company,
       });
@@ -142,7 +141,7 @@ export const updateTask = async (req, res) => {
         project: task.project,
         user: req.user._id,
         action: "task_updated",
-        description: `zmienił(a) status zadania "${task.title}" z "${oldStatus}" na "${req.body.status}"`,
+        description: `changed task "${task.title}" status from "${oldStatus}" to "${req.body.status}"`,
         metadata: { taskId: task._id, title: task.title, oldStatus, newStatus: req.body.status },
         company: task.company,
       });
@@ -167,7 +166,7 @@ export const deleteTask = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       taskQuery.company = req.user.company._id;
@@ -176,21 +175,20 @@ export const deleteTask = async (req, res) => {
     if (!task) {
       return res
         .status(404)
-        .json({ message: "Zadanie nie znalezione lub brak dostępu." });
+        .json({ message: "Task not found or access denied." });
     }
 
-    // Dodaj aktywność
     await Activity.create({
       project: task.project,
       user: req.user._id,
       action: "task_deleted",
-      description: `usunął(ęła) zadanie "${task.title}"`,
+      description: `deleted task "${task.title}"`,
       metadata: { title: task.title },
       company: task.company,
     });
 
     await task.deleteOne();
-    res.json({ message: "Zadanie usunięte" });
+    res.json({ message: "Task deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

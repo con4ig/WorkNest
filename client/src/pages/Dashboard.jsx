@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api.js';
 import { ChevronRight, Key } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ import {
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import LoadingScreen from '../components/LoadingScreen.jsx';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import {
     Card,
     CardHeader,
@@ -32,7 +32,6 @@ import { Button } from '../components/ui/Button';
 import AnimatedNumber from '../components/ui/AnimatedNumber';
 import { useCountUp } from '../hooks/useCountUp';
 
-// Komponent do wyświetlania wykresu postępu projektu
 const ProjectProgressChart = ({ stats }) => {
     const { t } = useTranslation();
     const [hoveredSection, setHoveredSection] = useState(null);
@@ -48,7 +47,6 @@ const ProjectProgressChart = ({ stats }) => {
             : 0;
     const animatedPercentage = useCountUp(targetPercentage);
 
-    // Dane dla wykresu kołowego z wszystkimi statusami
     const chartData =
         totalProjects > 0
             ? [
@@ -100,7 +98,7 @@ const ProjectProgressChart = ({ stats }) => {
     return (
         <div className="flex w-full flex-col gap-4 p-4">
             <h3 className="text-base font-bold tracking-tight text-foreground sm:text-xl">
-                {t('dashboard.charts.projectProgress') || 'Postęp Projektów'}
+                {t('dashboard.charts.projectProgress') || 'Project Progress'}
             </h3>
 
             {/* On mobile: chart centered, legend below. On sm+: side by side */}
@@ -139,7 +137,7 @@ const ProjectProgressChart = ({ stats }) => {
                             {animatedPercentage}%
                         </span>
                         <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
-                            OGÓLNIE
+                            {t('dashboard.charts.overall') || 'OVERALL'}
                         </span>
                     </div>
                 </div>
@@ -188,13 +186,10 @@ const ProjectProgressChart = ({ stats }) => {
 export default function Dashboard() {
     const { t, i18n } = useTranslation();
     const [projects, setProjects] = useState([]);
-    const [username, setUsername] = useState('');
-    const [role, setRole] = useState('');
     const [stats, setStats] = useState([]);
-    const [profileImage, setProfileImage] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const [rawActivity, setRawActivity] = useState([]);
 
     // Re-format activity labels when language changes — no refetch needed
@@ -228,16 +223,11 @@ export default function Dashboard() {
         }
     };
 
-    // Połączona funkcja do pobierania wszystkich danych
     const fetchDashboardData = async () => {
         if (!user) return;
 
         setLoading(true);
         try {
-            setUsername(user.username);
-            setRole(user.role);
-            setProfileImage(user.profileImage);
-
             const companyId = user.company?._id;
             if (!companyId) {
                 setLoading(false);
@@ -351,6 +341,9 @@ export default function Dashboard() {
         if (user) {
             fetchDashboardData();
         }
+        // fetchDashboardData is intentionally omitted: it is defined as a plain
+        // async function and would change on every render, causing an infinite loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     if (loading) {

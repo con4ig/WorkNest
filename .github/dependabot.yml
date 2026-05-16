@@ -1,0 +1,88 @@
+version: 2
+
+updates:
+  # Frontend
+  - package-ecosystem: npm
+    directory: /client
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Warsaw
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - client
+    commit-message:
+      prefix: "deps(client)"
+      include: scope
+    groups:
+      # One PR per week for dev tools — they upgrade together.
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      # Minor/patch runtime bumps grouped so the review queue stays sane.
+      runtime-minor:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+
+  # Backend
+  - package-ecosystem: npm
+    directory: /server
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Warsaw
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - server
+    commit-message:
+      prefix: "deps(server)"
+      include: scope
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      runtime-minor:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+
+  # GitHub Actions versions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Warsaw
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: "deps(ci)"
+
+  # Docker base images
+  - package-ecosystem: docker
+    directory: /client
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+      - docker
+  - package-ecosystem: docker
+    directory: /server
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+      - docker

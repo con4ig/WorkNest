@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { pl } from 'date-fns/locale';
@@ -9,6 +10,7 @@ import { X, Calendar as CalendarIcon, Clock, Check, AlertCircle } from 'lucide-r
 import { clsx } from 'clsx';
 
 export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         leaveType: 'vacation',
         startDate: null,
@@ -60,6 +62,8 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
         return count;
     };
 
+    const days = calculateDays();
+
     // Determine if reason is mandatory
     const isReasonRequired = () => {
         const optionalTypes = ['vacation', 'on_demand', 'maternity', 'paternity', 'parental'];
@@ -70,24 +74,24 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
         e.preventDefault();
 
         if (!formData.startDate || !formData.endDate) {
-            setError('Wybierz zakres dat.');
+            setError(t('leaves.errors.dateRange') || 'Select a date range.');
             return;
         }
 
         if (isReasonRequired() && !formData.reason.trim()) {
-            setError('Podanie powodu jest wymagane dla tego typu urlopu.');
+            setError(t('leaves.errors.reasonRequired') || 'A reason is required for this leave type.');
             return;
         }
 
-        const days = calculateDays();
+        const totalDays = calculateDays();
 
-        if (days <= 0) {
-            setError('Brak dni roboczych w wybranym zakresie.');
+        if (totalDays <= 0) {
+            setError(t('leaves.errors.noWorkingDays') || 'No working days in the selected range.');
             return;
         }
 
         if (!user || !user.company) {
-            setError('Brak danych firmy dla bieżącego użytkownika.');
+            setError(t('leaves.errors.noCompany') || 'No company data for the current user.');
             return;
         }
 
@@ -95,9 +99,9 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            await api.post('/leaves', { 
-                ...formData, 
-                days, 
+            await api.post('/leaves', {
+                ...formData,
+                days: totalDays,
                 company: user.company._id,
                 startDate: formData.startDate.toISOString(),
                 endDate: formData.endDate.toISOString()
@@ -107,7 +111,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
             onClose();
         } catch (err) {
             console.error('Error creating leave request:', err);
-            setError(err.response?.data?.message || 'Błąd składania wniosku');
+            setError(err.response?.data?.message || t('leaves.errors.submitError') || 'Error submitting request');
         } finally {
             setLoading(false);
         }
@@ -115,18 +119,18 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div 
+            <div
                 className="absolute inset-0 bg-foreground/25 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
                 onClick={onClose}
             />
-            
+
             <div className="relative w-full max-w-lg scale-100 overflow-hidden rounded-[2.5rem] border border-black/10 dark:border-white/5 bg-white dark:bg-zinc-900 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] dark:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-all animate-in zoom-in-95 duration-300">
                 {/* Header */}
                 <div className="relative flex items-center justify-between border-b border-black/5 dark:border-white/5 p-8 sm:p-10">
                     <div className="absolute -left-4 -top-4 rounded-full bg-primary/10 p-12 blur-3xl" />
                     <div className="relative z-10">
                         <h2 className="text-2xl font-black uppercase tracking-tight text-foreground">{t('leaves.myLeaves.newRequest')}</h2>
-                        <p className="mt-1 text-sm font-medium text-muted-foreground">{t('leaves.myLeaves.modalSubtitle') || 'Wypełnij formularz aby złożyć wniosek urlopowy'}</p>
+                        <p className="mt-1 text-sm font-medium text-muted-foreground">{t('leaves.myLeaves.modalSubtitle') || 'Fill out the form to submit a leave request'}</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -158,25 +162,25 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                     onChange={handleChange}
                                     className="w-full appearance-none rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 px-4 py-4 font-bold text-foreground outline-none transition-all focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
                                 >
-                                    <optgroup label="Podstawowe" className="bg-white dark:bg-zinc-900 font-sans">
-                                        <option value="vacation">Urlop wypoczynkowy</option>
-                                        <option value="on_demand">Urlop na żądanie</option>
-                                        <option value="sick">Zwolnienie lekarskie</option>
+                                    <optgroup label={t('leaves.types.groups.basic') || 'Basic'} className="bg-white dark:bg-zinc-900 font-sans">
+                                        <option value="vacation">{t('leaves.types.vacation') || 'Annual leave'}</option>
+                                        <option value="on_demand">{t('leaves.types.on_demand') || 'On-demand leave'}</option>
+                                        <option value="sick">{t('leaves.types.sick') || 'Sick leave'}</option>
                                     </optgroup>
-                                    <optgroup label="Rodzicielskie" className="bg-white dark:bg-zinc-900 font-sans">
-                                        <option value="maternity">Urlop macierzyński</option>
-                                        <option value="paternity">Urlop ojcowski</option>
-                                        <option value="parental">Urlop rodzicielski</option>
-                                        <option value="childcare">Urlop wychowawczy</option>
+                                    <optgroup label={t('leaves.types.groups.parental') || 'Parental'} className="bg-white dark:bg-zinc-900 font-sans">
+                                        <option value="maternity">{t('leaves.types.maternity') || 'Maternity leave'}</option>
+                                        <option value="paternity">{t('leaves.types.paternity') || 'Paternity leave'}</option>
+                                        <option value="parental">{t('leaves.types.parental') || 'Parental leave'}</option>
+                                        <option value="childcare">{t('leaves.types.childcare') || 'Childcare leave'}</option>
                                     </optgroup>
-                                    <optgroup label="Inne" className="bg-white dark:bg-zinc-900 font-sans">
-                                        <option value="occasional">Urlop okolicznościowy</option>
-                                        <option value="care">Urlop opiekuńczy</option>
-                                        <option value="training">Urlop szkoleniowy</option>
-                                        <option value="unpaid">Urlop bezpłatny</option>
-                                        <option value="job_search">Na poszukiwanie pracy</option>
-                                        <option value="health">Zdrowotny/Rehabilitacyjny</option>
-                                        <option value="other">Inny</option>
+                                    <optgroup label={t('leaves.types.groups.other') || 'Other'} className="bg-white dark:bg-zinc-900 font-sans">
+                                        <option value="occasional">{t('leaves.types.occasional') || 'Occasional leave'}</option>
+                                        <option value="care">{t('leaves.types.care') || 'Care leave'}</option>
+                                        <option value="training">{t('leaves.types.training') || 'Training leave'}</option>
+                                        <option value="unpaid">{t('leaves.types.unpaid') || 'Unpaid leave'}</option>
+                                        <option value="job_search">{t('leaves.types.job_search') || 'Job search'}</option>
+                                        <option value="health">{t('leaves.types.health') || 'Health/Rehabilitation'}</option>
+                                        <option value="other">{t('leaves.types.other') || 'Other'}</option>
                                     </optgroup>
                                 </select>
                                 <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-muted-foreground">
@@ -203,7 +207,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                     locale={pl}
                                     dateFormat="dd/MM/yyyy"
                                     minDate={new Date()}
-                                    placeholderText="Wybierz zakres dat"
+                                    placeholderText={t('leaves.myLeaves.dateRangePlaceholder') || 'Select a date range'}
                                     className="w-full rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 py-4 pl-12 pr-4 font-bold text-foreground outline-none transition-all focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
                                     wrapperClassName="w-full"
                                 />
@@ -218,10 +222,10 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                             <div className="flex items-center justify-between rounded-2xl border border-primary/20 bg-primary/10 px-5 py-4 text-primary">
                                 <div className="flex items-center gap-2">
                                     <Check className="h-5 w-5 stroke-[3]" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Czas trwania</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{t('leaves.myLeaves.duration') || 'Duration'}</span>
                                 </div>
                                 <span className="text-lg font-black italic">
-                                    {days} {days === 1 ? 'dzień roboczy' : 'dni roboczych'}
+                                    {days} {days === 1 ? (t('leaves.myLeaves.workingDay') || 'working day') : (t('leaves.myLeaves.workingDays') || 'working days')}
                                 </span>
                             </div>
                         </div>
@@ -238,7 +242,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                 onChange={handleChange}
                                 rows="3"
                                 className="w-full resize-none rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 px-4 py-4 font-medium text-foreground outline-none transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:border-primary/50 focus:bg-black/[0.08] dark:focus:bg-white/[0.08]"
-                                placeholder={isReasonRequired() ? "Opisz powód wniosku (wymagane)..." : "Dodatkowe informacje (opcjonalne)..."}
+                                placeholder={isReasonRequired() ? (t('leaves.myLeaves.reasonRequiredPlaceholder') || 'Describe the reason (required)...') : (t('leaves.myLeaves.reasonOptionalPlaceholder') || 'Additional information (optional)...')}
                                 required={isReasonRequired()}
                             />
                         </div>
@@ -252,7 +256,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                             className="rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground transition-all hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground"
                             disabled={loading}
                         >
-                            Anuluj
+                            {t('common.cancel') || 'Cancel'}
                         </button>
                         <button
                             type="submit"
@@ -263,16 +267,16 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                             {loading ? (
                                 <>
                                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black"></div>
-                                    <span className="uppercase tracking-widest text-xs text-black">Przetwarzanie...</span>
-                                </> 
+                                    <span className="uppercase tracking-widest text-xs text-black">{t('common.processing') || 'Processing...'}</span>
+                                </>
                             ) : (
-                                <span className="uppercase tracking-widest text-xs text-black">Złóż wniosek</span>
+                                <span className="uppercase tracking-widest text-xs text-black">{t('leaves.myLeaves.submit') || 'Submit request'}</span>
                             )}
                         </button>
                     </div>
                 </form>
             </div>
-            
+
             <style>{`
                 .react-datepicker {
                     background-color: white !important;

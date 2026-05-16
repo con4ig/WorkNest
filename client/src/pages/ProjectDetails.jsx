@@ -11,7 +11,7 @@ import {
     translateProjectStatus,
     translatePriority,
 } from '../utils/translations';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import KanbanBoard from '../components/KanbanBoard.jsx';
 import {
@@ -280,7 +280,6 @@ const CommentItem = ({
     );
 };
 
-// Główny komponent
 export default function ProjectDetails() {
     const { t, i18n: i18nInstance } = useTranslation();
     const { id } = useParams();
@@ -298,14 +297,11 @@ export default function ProjectDetails() {
     const [editData, setEditData] = useState({});
     const [isSaving, setIsSaving] = useState(false);
 
-    // States dla zadań
     const [tasks, setTasks] = useState([]);
 
-    // States dla komentarzy
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
 
-    // States dla aktywności
     const [activities, setActivities] = useState([]);
     const [showActivities, setShowActivities] = useState(false);
 
@@ -331,13 +327,13 @@ export default function ProjectDetails() {
                     description: res.data.description,
                     status: res.data.status,
                     priority: res.data.priority,
-                    // progress: res.data.progress || 0, // Automatyczne wyliczanie
+                    // progress: res.data.progress || 0, // Calculated automatically
                     startDate: formatDateForInput(res.data.startDate),
                     endDate: formatDateForInput(res.data.endDate),
                 });
                 setError(null);
             } catch (err) {
-                console.error('Błąd pobierania projektu:', err);
+                console.error('Error fetching project:', err);
                 setError(
                     `${t('projects.details.errors.fetchErrorDetail')}: ${err.response?.data?.message || err.message}`,
                 );
@@ -345,7 +341,7 @@ export default function ProjectDetails() {
                 if (showLoader) setLoading(false);
             }
         },
-        [id],
+        [id, t],
     );
 
     const fetchTasks = useCallback(async () => {
@@ -353,7 +349,7 @@ export default function ProjectDetails() {
             const res = await api.get(`/tasks/project/${id}`);
             setTasks(res.data);
         } catch (err) {
-            console.error('Błąd pobierania zadań:', err);
+            console.error('Error fetching tasks:', err);
         }
     }, [id]);
 
@@ -362,7 +358,7 @@ export default function ProjectDetails() {
             const res = await api.get(`/comments/project/${id}`);
             setComments(res.data);
         } catch (err) {
-            console.error('Błąd pobierania komentarzy:', err);
+            console.error('Error fetching comments:', err);
         }
     }, [id]);
 
@@ -371,7 +367,7 @@ export default function ProjectDetails() {
             const res = await api.get(`/activities/project/${id}`);
             setActivities(res.data.activities);
         } catch (err) {
-            console.error('Błąd pobierania aktywności:', err);
+            console.error('Error fetching activities:', err);
         }
     }, [id]);
 
@@ -515,9 +511,9 @@ export default function ProjectDetails() {
         return <LoadingScreen message={t('projects.details.loading')} />;
     }
 
-    // Fallback do ręcznego progressu jest niepotrzebny, jeśli chcemy full automation,
-    // ale może warto zostawić jako fallback wizualny, gdy zadania się jeszcze ładują?
-    // W sumie loader to obsłuży.
+    // A manual progress fallback is unnecessary if we want full automation,
+    // but it might be worth keeping as a visual fallback while tasks are still loading?
+    // The loader handles that anyway.
 
     const isAdmin =
         currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
@@ -685,7 +681,7 @@ export default function ProjectDetails() {
                         )}
                     </StatCard>
 
-                    {/* Statystyki zadań */}
+                    {/* Task statistics */}
                     <StatCard
                         icon={<Icon.ListTodo className="h-5 w-5" />}
                         title={t('projects.details.statCardTitle')}
@@ -946,7 +942,7 @@ export default function ProjectDetails() {
                         </div>
                     </ContentCard>
 
-                    {/* HISTORIA AKTYWNOŚCI */}
+                    {/* ACTIVITY HISTORY */}
                     <ContentCard
                         icon={<Icon.Activity />}
                         title={`${t('projects.details.activityTitle')} (${activities.length})`}

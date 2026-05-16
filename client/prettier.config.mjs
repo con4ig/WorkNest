@@ -1,16 +1,14 @@
-// prettier.config.js (lub prettier.config.mjs)
+// prettier.config.js (or prettier.config.mjs)
 
 /** @type {import('prettier').Config} */
 const config = {
-  // Lista wtyczek - podajemy nazwy wtyczek jako stringi.
-  // Prettier sam zajmie się ich załadowaniem.
-  plugins: ['prettier-plugin-tailwindcss'], 
+  // Plugin list — names as strings. Prettier loads them automatically.
+  plugins: ['prettier-plugin-tailwindcss'],
 
-  // Twoje pozostałe opcje:
+  // Other options:
   tabWidth: 4,
   singleQuote: true,
   semi: true,
-  // ... inne opcje
 };
 
 export default config;

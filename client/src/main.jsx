@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, Suspense, lazy } from 'react';
+import { StrictMode, Suspense, lazy } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
 import { createRoot } from 'react-dom/client';
@@ -6,7 +6,6 @@ import {
     BrowserRouter as Router,
     Routes,
     Route,
-    useNavigate,
 } from 'react-router-dom';
 import './styles/fonts.css';
 import './styles/index.css';
@@ -16,13 +15,13 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Forgot from './pages/Forgot.jsx';
 import App from './App.jsx';
-import Regulamin from './pages/Regulamin.jsx';
-import Polityka from './pages/Polityka_prywatnosc.jsx';
+import Terms from './pages/Terms.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 
 // Protected app pages — lazy loaded, split from main bundle
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const EmployeeList = lazy(() => import('./pages/EmployeeList.jsx'));
-const Projekty = lazy(() => import('./pages/Projekty.jsx'));
+const Projects = lazy(() => import('./pages/Projects.jsx'));
 const ProjectDetails = lazy(() => import('./pages/ProjectDetails.jsx'));
 const MyLeaves = lazy(() => import('./pages/MyLeaves.jsx'));
 const LeaveApprovals = lazy(() => import('./pages/LeaveApprovals.jsx'));
@@ -30,40 +29,17 @@ const UserDetails = lazy(() => import('./pages/UserDetails.jsx'));
 const Upload = lazy(() => import('./pages/Upload.jsx'));
 const GenerateCode = lazy(() => import('./pages/GenerateCode.jsx'));
 const ForcePasswordChange = lazy(() => import('./pages/ForcePasswordChange.jsx'));
-import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './pages/ErrorBoundary.jsx';
 import LoadingScreen from './components/LoadingScreen.jsx';
 import Layout from './components/layout/Layout.jsx';
-
-// Komponent do obsługi globalnych błędów autoryzacji
-const AuthErrorHandler = () => {
-    const navigate = useNavigate();
-    const { logout } = useAuth();
-
-    useEffect(() => {
-        const handleAuthError = () => {
-            console.log(
-                'Wykryto błąd autoryzacji. Wylogowywanie i przekierowywanie.',
-            );
-            logout();
-            navigate('/login');
-        };
-
-        window.addEventListener('auth-error', handleAuthError);
-
-        return () => {
-            window.removeEventListener('auth-error', handleAuthError);
-        };
-    }, [navigate, logout]);
-
-    return null; // Ten komponent niczego nie renderuje
-};
+import AuthErrorHandler from './components/AuthErrorHandler.jsx';
 
 // ====================================================================
-// Główny komponent aplikacji
+// Main application component
 // ====================================================================
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -81,8 +57,9 @@ createRoot(document.getElementById('root')).render(
                                 toastOptions={{
                                     duration: 5000,
                                     style: {
-                                        background: '#333',
-                                        color: '#fff',
+                                        background: 'rgb(var(--card))',
+                                        color: 'rgb(var(--card-foreground))',
+                                        border: '1px solid rgb(var(--border))',
                                     },
                                 }}
                             />
@@ -95,11 +72,11 @@ createRoot(document.getElementById('root')).render(
                                 />
                                 <Route
                                     path="/regulamin"
-                                    element={<Regulamin />}
+                                    element={<Terms />}
                                 />
                                 <Route
                                     path="/polityka-prywatnosci"
-                                    element={<Polityka />}
+                                    element={<PrivacyPolicy />}
                                 />
 
                                 <Route element={<ProtectedRoute />}>
@@ -114,7 +91,7 @@ createRoot(document.getElementById('root')).render(
                                         />
                                         <Route
                                             path="/projects"
-                                            element={<Projekty />}
+                                            element={<Projects />}
                                         />
 
                                         <Route

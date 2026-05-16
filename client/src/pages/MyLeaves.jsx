@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import RequestLeaveModal from '../components/RequestLeaveModal';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import LoadingScreen from '../components/LoadingScreen.jsx';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
 
@@ -42,6 +42,9 @@ export default function MyLeaves() {
         if (user && user.company) {
             fetchLeaves();
         }
+        // fetchLeaves is intentionally omitted: it is defined as a plain async
+        // function and would change on every render, causing an infinite loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchLeaves = async () => {
@@ -353,7 +356,7 @@ export default function MyLeaves() {
                                     </div>
                                     {leave.reason && (
                                         <div className="pt-2 border-t border-border">
-                                            <span className="font-black uppercase tracking-widest text-muted-foreground text-[10px]">Powód</span>
+                                            <span className="font-black uppercase tracking-widest text-muted-foreground text-[10px]">{t('leaves.myLeaves.reason') || 'Reason'}</span>
                                             <p className="mt-1 text-sm font-medium text-muted-foreground leading-relaxed italic">
                                                 "{leave.reason}"
                                             </p>

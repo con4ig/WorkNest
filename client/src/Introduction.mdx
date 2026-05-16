@@ -1,0 +1,40 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Introduction" />
+
+# WorkNest design system
+
+This Storybook hosts the reusable UI primitives that power the WorkNest
+HR platform. It is intentionally small — the goal is a high-fidelity
+catalogue of the pieces that show up everywhere (buttons, inputs,
+cards), not a full screenshot library.
+
+## Conventions
+
+- **Tailwind tokens.** Colours, radii, and shadows resolve via CSS
+  custom properties defined in `src/styles/index.css`. Switching the
+  Storybook **theme** toolbar between light and dark mirrors the
+  in-app toggle.
+- **Variants and sizes are props.** Components expose `variant` /
+  `size` controls; the story controls panel surfaces every option.
+- **Accessibility.** The `@storybook/addon-a11y` panel runs axe-core
+  on every render. Stories must not regress contrast or focus
+  visibility.
+- **No mock data here.** Domain widgets (Kanban, leave forms,
+  dashboards) are tested with the real API in
+  [Playwright E2E](#) and [Vitest](#) suites.
+
+## Where things live
+
+| Surface              | Path                                  |
+|----------------------|---------------------------------------|
+| Primitives           | `src/components/ui/*.jsx`             |
+| Class merging helper | `src/lib/utils.js`                    |
+| Theme tokens         | `src/styles/index.css`                |
+| Theme provider       | `src/context/ThemeContext.jsx`        |
+
+## Related
+
+- [Architecture Decision Records](../docs/adr/) for the engineering
+  decisions behind the platform.
+- [`README`](../README.md) for the high-level project overview.

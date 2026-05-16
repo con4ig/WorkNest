@@ -25,7 +25,7 @@ export const getLeaves = async (req, res) => {
       query.company = req.user.company;
     }
 
-    // Employee widzi tylko swoje
+    // Employee sees only their own
     if (req.user.role === "employee") {
       query.user = req.user._id;
     }
@@ -103,7 +103,7 @@ export const getLeaves = async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching leaves:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -130,7 +130,7 @@ export const getMyLeaves = async (req, res) => {
     res.json({ leaves: leavesWithDays, stats });
   } catch (err) {
     console.error("Error fetching my leaves:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -139,18 +139,18 @@ export const createLeave = async (req, res) => {
 
   if (!startDate || !endDate) {
     return res.status(400).json({
-      message: "Data rozpoczęcia i zakończenia są wymagane",
+      message: "Start and end dates are required",
     });
   }
 
-  // Oblicz liczbę dni
+  // Calculate number of days
   const start = new Date(startDate);
   const end = new Date(endDate);
   const days = getWorkingDays(start, end);
 
   if (days <= 0) {
     return res.status(400).json({
-      message: "Data zakończenia musi być po dacie rozpoczęcia",
+      message: "End date must be after start date",
     });
   }
 
@@ -174,12 +174,12 @@ export const createLeave = async (req, res) => {
     );
 
     res.status(201).json({
-      message: "Wniosek urlopowy złożony pomyślnie",
+      message: "Leave request submitted successfully",
       leave: populatedLeave,
     });
   } catch (err) {
     console.error("Error creating leave:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -206,16 +206,16 @@ export const approveLeave = async (req, res) => {
       .populate("reviewedBy", "username");
 
     if (!leave) {
-      return res.status(404).json({ message: "Wniosek nie znaleziony" });
+      return res.status(404).json({ message: "Leave request not found" });
     }
 
     res.json({
-      message: "Wniosek zatwierdzony",
+      message: "Leave request approved",
       leave,
     });
   } catch (err) {
     console.error("Error approving leave:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -224,7 +224,7 @@ export const rejectLeave = async (req, res) => {
 
   if (!reviewNote) {
     return res.status(400).json({
-      message: "Powód odrzucenia jest wymagany",
+      message: "Rejection reason is required",
     });
   }
 
@@ -248,16 +248,16 @@ export const rejectLeave = async (req, res) => {
       .populate("reviewedBy", "username");
 
     if (!leave) {
-      return res.status(404).json({ message: "Wniosek nie znaleziony" });
+      return res.status(404).json({ message: "Leave request not found" });
     }
 
     res.json({
-      message: "Wniosek odrzucony",
+      message: "Leave request rejected",
       leave,
     });
   } catch (err) {
     console.error("Error rejecting leave:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -271,26 +271,26 @@ export const deleteLeave = async (req, res) => {
     const leave = await Leave.findOne(query);
 
     if (!leave) {
-      return res.status(404).json({ message: "Wniosek nie znaleziony" });
+      return res.status(404).json({ message: "Leave request not found" });
     }
 
-    // Tylko własne wnioski
-    if (leave.user.toString() !== req.user._id) {
-      return res.status(403).json({ message: "Brak uprawnień" });
+    // Only own requests
+    if (leave.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Insufficient permissions" });
     }
 
-    // Tylko pending można usunąć
+    // Only pending can be deleted
     if (leave.status !== "pending") {
       return res.status(400).json({
-        message: "Można usunąć tylko oczekujące wnioski",
+        message: "Only pending requests can be deleted",
       });
     }
 
     await leave.deleteOne();
 
-    res.json({ message: "Wniosek usunięty" });
+    res.json({ message: "Leave request deleted" });
   } catch (err) {
     console.error("Error deleting leave:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };

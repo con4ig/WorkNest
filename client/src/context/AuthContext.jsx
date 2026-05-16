@@ -1,13 +1,9 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-// 1. ZMIEŃ IMPORT: Importujemy naszą skonfigurowaną instancję `api`
-import api from '../services/api'; // Upewnij się, że ścieżka jest poprawna!
+import React, { createContext, useState, useEffect } from 'react';
+import api from '../services/api';
+import { connectRealtime, disconnectRealtime } from '../services/realtime';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
-
-// Dodaj ten hook, aby ułatwić dostęp do kontekstu
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -24,7 +20,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Sprawdzanie stanu zalogowania przy starcie aplikacji
+    // Check login state on application start
     useEffect(() => {
         const checkLoggedIn = async () => {
             const token = localStorage.getItem('accessToken');
@@ -42,8 +38,9 @@ export const AuthProvider = ({ children }) => {
                     localStorage.setItem('accessToken', refreshData.accessToken);
                     const { data: userData } = await api.get('/users/me');
                     setUser(userData);
+                    connectRealtime(refreshData.accessToken);
                 } catch (error) {
-                    console.error('Sesja wygasła, nie udało się odświeżyć tokenu', error);
+                    console.error('Session expired, failed to refresh token', error);
                     localStorage.removeItem('accessToken');
                 }
                 setLoading(false);
@@ -54,29 +51,34 @@ export const AuthProvider = ({ children }) => {
             try {
                 const { data } = await api.get('/users/me');
                 setUser(data);
+                connectRealtime(token);
             } catch (error) {
-                console.error('Sesja wygasła lub błąd tokenu', error);
+                console.error('Session expired or token error', error);
                 localStorage.removeItem('accessToken');
             }
             setLoading(false);
         };
         checkLoggedIn();
+
+        // Tear the socket down when the provider unmounts.
+        return () => disconnectRealtime();
     }, []);
 
     const login = async (email, password) => {
         try {
-            // 3. UŻYJ `api` ZAMIAST `axios`
             const { data } = await api.post('/auth/login', { email, password });
             localStorage.setItem('accessToken', data.accessToken);
             setUser(data.user);
+            connectRealtime(data.accessToken);
             return data;
         } catch (error) {
-            console.error('Błąd logowania:', error);
-            throw error; // Rzuć błąd dalej, aby komponent logowania mógł go obsłużyć
+            console.error('Login error:', error);
+            throw error; // Rethrow so the login component can handle it
         }
     };
 
     const logout = () => {
+        disconnectRealtime();
         localStorage.removeItem('accessToken');
         setUser(null);
         // Clear the httpOnly refresh-token cookie on the server so it can't
@@ -89,25 +91,26 @@ export const AuthProvider = ({ children }) => {
             const { data } = await api.post('/auth/demo-login');
             console.log('Demo login response data:', data);
             if (!data.accessToken) {
-                console.error('Brak accessToken w odpowiedzi!');
+                console.error('Missing accessToken in response!');
             }
             localStorage.setItem('accessToken', data.accessToken);
             setUser(data.user);
+            connectRealtime(data.accessToken);
             return data;
         } catch (error) {
-            console.error('Błąd logowania demo (Frontend):', error);
+            console.error('Demo login error (Frontend):', error);
             throw error;
         }
     };
 
-    // Funkcja do odświeżania danych użytkownika (np. po zmianie zdjęcia profilowego)
+    // Function to refresh user data (e.g. after changing profile photo)
     const refreshUser = async () => {
         try {
             const { data } = await api.get('/users/me');
             setUser(data);
             return data;
         } catch (error) {
-            console.error('Błąd odświeżania danych użytkownika:', error);
+            console.error('Error refreshing user data:', error);
         }
     };
 

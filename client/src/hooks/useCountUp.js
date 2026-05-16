@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 
 export const useCountUp = (endValue, duration = 1500) => {
     const [count, setCount] = useState(0);
-    const frameRate = 1000 / 60;
-    const totalFrames = Math.round(duration / frameRate);
 
     useEffect(() => {
+        const frameRate = 1000 / 60;
+        const totalFrames = Math.round(duration / frameRate);
         let frame = 0;
         const counter = setInterval(() => {
             frame++;

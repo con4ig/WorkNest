@@ -19,7 +19,7 @@ import {
 
 const router = express.Router();
 
-// Konfiguracja multer - przechowuj w pamięci, nie na dysku
+// Multer config - store in memory, not on disk
 const storage = multer.memoryStorage();
 const upload = multer({
   storage,
@@ -50,34 +50,158 @@ const csvUpload = multer({
   },
 });
 
-// ============================================
-// GET /api/users
-// Lista wszystkich pracowników (HR i Admin)
-// ============================================
+/**
+ * @openapi
+ * /api/users:
+ *   get:
+ *     tags: [Users]
+ *     summary: List employees in the caller's company (hr/admin)
+ *     description: |
+ *       Tenant-scoped: returns only users from the caller's company unless
+ *       the caller is a superadmin. Optional `search` performs a
+ *       case-insensitive partial match across username, email, firstName and
+ *       lastName.
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema: { type: string, minLength: 2 }
+ *         description: Free-text filter. Ignored if shorter than 2 chars.
+ *     responses:
+ *       200:
+ *         description: User list.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count: { type: integer }
+ *                 users:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/User' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ */
 router.get("/", authenticate, authorize("hr", "admin"), getUsers);
 
-// ============================================
-// GET /api/users/me
-// Pobieranie danych zalogowanego użytkownika
-// ============================================
+/**
+ * @openapi
+ * /api/users/me:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get the currently authenticated user
+ *     description: |
+ *       Returns the user document already populated by the `authenticate`
+ *       middleware (including the embedded `company` object). The frontend
+ *       calls this on app boot to hydrate the auth context.
+ *     responses:
+ *       200:
+ *         description: Current user.
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/User' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ */
 router.get("/me", authenticate, getCurrentUser);
 
-// ============================================
-// GET /api/users/:id
-// Pobieranie danych konkretnego pracownika
-// ============================================
-// router.get("/:id", authenticate, getUserById); // Moved down to avoid collision with /invitations
-
-// ============================================
-// PATCH /api/users/:id
-// Aktualizacja danych pracownika
-// ============================================
+/**
+ * @openapi
+ * /api/users/{id}:
+ *   patch:
+ *     tags: [Users]
+ *     summary: Update employee data (self, or hr/admin for others)
+ *     description: |
+ *       Employees may edit their own profile only; HR/admin may edit any
+ *       user inside the same tenant. Role changes are admin-only — an
+ *       employee passing `role` gets 403. Email uniqueness is enforced.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:     { type: string }
+ *               email:        { type: string, format: email }
+ *               firstName:    { type: string }
+ *               lastName:     { type: string }
+ *               phoneNumber:  { type: string }
+ *               position:     { type: string }
+ *               department:   { type: string }
+ *               hireDate:     { type: string, format: date }
+ *               salary:       { type: number, minimum: 0 }
+ *               status:
+ *                 type: string
+ *                 enum: [active, inactive, on-leave, terminated]
+ *               contractType:
+ *                 type: string
+ *                 enum: [full-time, part-time, contract, temporary]
+ *               role:
+ *                 type: string
+ *                 enum: [employee, hr, admin]
+ *                 description: Admin only — ignored for non-admin callers.
+ *               address:      { type: string }
+ *               city:         { type: string }
+ *               peselOrId:    { type: string }
+ *               notes:        { type: string }
+ *               employmentHistory:
+ *                 type: array
+ *                 items: { type: object }
+ *     responses:
+ *       200:
+ *         description: User updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 user:    { $ref: '#/components/schemas/User' }
+ *       400: { $ref: '#/components/responses/ValidationError' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ *       404: { $ref: '#/components/responses/NotFound' }
+ */
 router.patch("/:id", authenticate, updateUser);
 
-// ============================================
-// PATCH /api/users/:id/role
-// Zmiana roli użytkownika (tylko Admin)
-// ============================================
+/**
+ * @openapi
+ * /api/users/{id}/role:
+ *   patch:
+ *     tags: [Users]
+ *     summary: Change a user's role (admin only)
+ *     description: |
+ *       Dedicated endpoint so RBAC can audit role escalations independently
+ *       of generic profile edits. Tenant-scoped: admins cannot change roles
+ *       of users in another company.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [role]
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [employee, hr, admin]
+ *     responses:
+ *       200:
+ *         description: Role updated.
+ *       400: { $ref: '#/components/responses/ValidationError' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ *       404: { $ref: '#/components/responses/NotFound' }
+ */
 router.patch(
   "/:id/role",
   authenticate,
@@ -85,6 +209,50 @@ router.patch(
   updateUserRole
 );
 
+/**
+ * @openapi
+ * /api/users/generate-invitation:
+ *   post:
+ *     tags: [Users]
+ *     summary: Generate an invitation code for new employees/HR (admin)
+ *     description: |
+ *       Issues a single-use (or multi-use) code bound to the admin's company.
+ *       Recipients redeem it on `POST /api/auth/register` to be auto-attached
+ *       to the right tenant — see ADR-0003.
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               maxUses:
+ *                 type: integer
+ *                 minimum: 1
+ *                 default: 1
+ *               expiresIn:
+ *                 type: string
+ *                 description: 'Duration suffixed with `m`, `h` or `d` (e.g. "30m", "24h", "7d"). Defaults to 5 minutes.'
+ *                 example: 24h
+ *               role:
+ *                 type: string
+ *                 enum: [employee, hr]
+ *                 default: employee
+ *     responses:
+ *       201:
+ *         description: Invitation created.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:        { type: string }
+ *                 invitationCode: { type: string }
+ *                 invitation:     { type: object }
+ *       400: { $ref: '#/components/responses/ValidationError' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ */
 router.post(
   "/generate-invitation",
   authenticate,
@@ -92,6 +260,28 @@ router.post(
   generateInvitation
 );
 
+/**
+ * @openapi
+ * /api/users/invitations:
+ *   get:
+ *     tags: [Users]
+ *     summary: List invitation codes for the admin's company
+ *     description: |
+ *       Lazily purges expired invitations before returning the list, so the
+ *       admin dashboard always sees a fresh state.
+ *     responses:
+ *       200:
+ *         description: Invitations list.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: { type: object }
+ *       400:
+ *         description: Caller has no company assigned.
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ */
 router.get(
   "/invitations",
   authenticate,
@@ -99,6 +289,27 @@ router.get(
   getInvitations
 );
 
+/**
+ * @openapi
+ * /api/users/invitations/{id}:
+ *   delete:
+ *     tags: [Users]
+ *     summary: Revoke an invitation code (admin)
+ *     description: |
+ *       Tenant-scoped: an admin can only revoke invitations belonging to
+ *       their own company.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Invitation removed.
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ *       404: { $ref: '#/components/responses/NotFound' }
+ */
 router.delete(
   "/invitations/:id",
   authenticate,
@@ -106,7 +317,53 @@ router.delete(
   revokeInvitation
 );
 
-// Endpoint do importu CSV
+/**
+ * @openapi
+ * /api/users/import-csv:
+ *   post:
+ *     tags: [Users]
+ *     summary: Bulk-create users from a CSV file (hr/admin)
+ *     description: |
+ *       Accepts a UTF-8 CSV (max 5 MB) whose first row holds the column
+ *       headers matching User schema fields. Each row becomes a new user
+ *       inside the caller's company; duplicates by email are skipped and
+ *       returned in `failedSamples`. Imported users are forced to change
+ *       their password on first login.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [file]
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: 'CSV file with headers matching user fields (e.g. "email,username,firstName,...").'
+ *               password:
+ *                 type: string
+ *                 description: Temporary password for all imported users. Defaults to `WorkNest123!`.
+ *     responses:
+ *       200:
+ *         description: Import summary.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:         { type: string }
+ *                 processed:       { type: integer }
+ *                 created:         { type: integer }
+ *                 failedCount:     { type: integer }
+ *                 failedSamples:
+ *                   type: array
+ *                   items: { type: object }
+ *                 defaultPassword: { type: string }
+ *       400: { $ref: '#/components/responses/ValidationError' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ */
 router.post(
   "/import-csv",
   authenticate,
@@ -115,7 +372,43 @@ router.post(
   importUsersFromCSV
 );
 
-// Endpoint do uploadu zdjęcia profilowego
+/**
+ * @openapi
+ * /api/users/profile-image:
+ *   put:
+ *     tags: [Users]
+ *     summary: Upload or replace the caller's profile image
+ *     description: |
+ *       Accepts an image file (max 5 MB). The file is stored inline as a
+ *       base64 data URL on the User document so it can be served without an
+ *       object store — see ADR-0006.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [image]
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Image saved.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:      { type: string }
+ *                 profileImage:
+ *                   type: string
+ *                   description: 'Data URL, e.g. "data:image/png;base64,iVBOR..."'
+ *       400: { $ref: '#/components/responses/ValidationError' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       404: { $ref: '#/components/responses/NotFound' }
+ */
 router.put(
   "/profile-image",
   authenticate,
@@ -123,19 +416,69 @@ router.put(
   uploadProfileImage
 );
 
-// Endpoint do pobierania zdjęcia profilowego (opcjonalny)
+/**
+ * @openapi
+ * /api/users/profile-image:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get the caller's profile image as a data URL
+ *     responses:
+ *       200:
+ *         description: Image data URL.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 profileImage: { type: string }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       404:
+ *         description: No profile image set.
+ */
 router.get("/profile-image", authenticate, getProfileImage);
 
-// Endpoint do usunięcia zdjęcia profilowego
+/**
+ * @openapi
+ * /api/users/profile-image:
+ *   delete:
+ *     tags: [Users]
+ *     summary: Remove the caller's profile image
+ *     responses:
+ *       200:
+ *         description: Image cleared.
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       404: { $ref: '#/components/responses/NotFound' }
+ */
 router.delete("/profile-image", authenticate, deleteProfileImage);
 
 
 
-// ============================================
-// GET /api/users/:id
-// Pobieranie danych konkretnego pracownika
-// ============================================
-// To musi być NA SAMYM KOŃCU, żeby nie przechwytywać innych tras (np. /invitations)
+/**
+ * @openapi
+ * /api/users/{id}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get full profile of a single user
+ *     description: |
+ *       Tenant-scoped (ADR-0002). Employees may only read their own profile;
+ *       HR/admin may read any user in the same company. Declared LAST in
+ *       this router so the `/invitations`, `/me`, `/profile-image`, etc.
+ *       paths don't get swallowed by the `:id` wildcard.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: User profile (all known fields, empty strings for unset).
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/User' }
+ *       401: { $ref: '#/components/responses/Unauthorized' }
+ *       403: { $ref: '#/components/responses/Forbidden' }
+ *       404: { $ref: '#/components/responses/NotFound' }
+ */
 router.get("/:id", authenticate, getUserById);
 
 export default router;

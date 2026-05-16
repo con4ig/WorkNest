@@ -1,16 +1,17 @@
 import Project from "../models/Project.js";
+import { emitToCompany } from "../lib/realtime.js";
 
 export const updateProjectUsers = async (req, res) => {
   const { userId, action } = req.body;
 
   if (!userId || !action) {
-    return res.status(400).json({ message: "userId i action są wymagane" });
+    return res.status(400).json({ message: "userId and action are required" });
   }
 
   if (!["add", "remove"].includes(action)) {
     return res
       .status(400)
-      .json({ message: 'action musi być "add" lub "remove"' });
+      .json({ message: 'action must be "add" or "remove"' });
   }
 
   try {
@@ -20,7 +21,7 @@ export const updateProjectUsers = async (req, res) => {
     if (req.user.role !== "superadmin") {
       if (!req.user.company) {
         return res.status(403).json({
-          message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+          message: "No company assigned to the current user.",
         });
       }
       query.company = req.user.company._id;
@@ -29,20 +30,19 @@ export const updateProjectUsers = async (req, res) => {
     const project = await Project.findOne(query);
 
     if (!project) {
-      return res.status(404).json({ message: "Projekt nie znaleziony" });
+      return res.status(404).json({ message: "Project not found" });
     }
 
     if (action === "add") {
-      // Dodaj użytkownika (jeśli nie jest już przypisany)
       if (!project.assignedUsers.includes(userId)) {
         project.assignedUsers.push(userId);
       }
     } else if (action === "remove") {
-      // Usuń użytkownika (ale nie twórcy projektu)
+      // Cannot remove project creator
       if (project.createdBy.toString() === userId) {
         return res
           .status(400)
-          .json({ message: "Nie można usunąć twórcy projektu" });
+          .json({ message: "Cannot remove the project creator" });
       }
       project.assignedUsers = project.assignedUsers.filter(
         (id) => id.toString() !== userId
@@ -51,19 +51,17 @@ export const updateProjectUsers = async (req, res) => {
 
     await project.save();
 
-    // Zwróć zaktualizowany projekt z populated users
     const updatedProject = await Project.findById(project._id)
       .populate("assignedUsers", "username email role")
       .populate("createdBy", "username");
 
     res.json({
-      message: `Użytkownik ${action === "add" ? "dodany" : "usunięty"
-        } pomyślnie`,
+      message: `User ${action === "add" ? "added" : "removed"} successfully`,
       project: updatedProject,
     });
   } catch (err) {
     console.error("Error updating project users:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -73,10 +71,10 @@ export const getProjects = async (req, res) => {
 
     let query = {};
 
-    // ✅ KRYTYCZNE ZABEZPIECZENIE: Sprawdź, czy middleware zadziałało
+    // ✅ Critical safeguard: verify middleware ran
     if (!req.user) {
       return res.status(401).json({
-        message: "Brak autoryzacji - req.user nie jest zdefiniowany.",
+        message: "Unauthorized - req.user is not defined.",
       });
     }
 
@@ -85,58 +83,47 @@ export const getProjects = async (req, res) => {
       query.company = req.user.company;
     }
 
-    // Filtrowanie po archiwizacji (domyślnie pokazuj tylko aktywne)
-    // $ne: true obsługuje przypadki: false, null, undefined (brak pola)
+    // Filter by archive (default to active only)
+    // $ne: true handles cases: false, null, undefined (missing field)
     if (isArchived === "true") {
       query.isArchived = true;
     } else {
-      // Pokaż projekty gdzie isArchived NIE jest true (czyli false, null lub brak pola)
       query.isArchived = { $ne: true };
     }
 
-    // Nowość: Filtrowanie po nazwie projektu (jeśli podano)
+    // Filter by project name (if provided)
     if (name) {
       query.name = { $regex: name, $options: "i" };
     }
 
-    // Domyślne opcje sortowania (można je nadpisać)
     let sortOptions = { createdAt: -1 };
 
-    // 2. FILTROWANIE PO ROLI/UŻYTKOWNIKU
-    // Jeśli user jest 'employee', filtrujemy po przypisanych użytkownikach
+    // Role/user filtering
     if (req.user.role === "employee") {
-      // Używamy ID użytkownika do filtrowania projektów, do których jest przypisany
       query.assignedUsers = req.user._id;
     }
 
-    // 3. FILTROWANIE PO STATUSIE (OPCJONALNE)
+    // Optional status filtering
     if (status) {
       query.status = status;
     }
 
-    // 4. USTALANIE SORTOWANIA
-    // Na podstawie parametru sortBy (np. ?sortBy=createdAt:desc)
     if (sortBy === "createdAt:desc") {
       sortOptions = { createdAt: -1 };
     } else if (sortBy === "name:asc") {
-      // Przykład innego sortowania
       sortOptions = { name: 1 };
     }
 
-    // 5. BUDOWANIE ZAPYTANIA
     let projectsQuery = Project.find(query)
       .populate("assignedUsers", "username email")
       .populate("createdBy", "username")
-      .populate("tasks", "status") // Populate tasks to calculate stats
-      .sort(sortOptions); // Zastosowanie dynamicznych opcji sortowania
+      .populate("tasks", "status")
+      .sort(sortOptions);
 
-    // 6. LIMITOWANIE (KLUCZOWY KROK DLA TWOJEGO ZAGADNIENIA)
     if (limit && parseInt(limit) > 0) {
-      // Zastosowanie limitu po sortowaniu
       projectsQuery = projectsQuery.limit(parseInt(limit));
     }
 
-    // 7. WYKONANIE ZAPYTANIA
     const projects = await projectsQuery.exec();
 
     res.json({
@@ -145,16 +132,15 @@ export const getProjects = async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching projects:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 export const getProjectStats = async (req, res) => {
   try {
-    // Tylko aktywne projekty ($ne: true obsługuje false, null i brak pola)
+    // Active projects only ($ne: true handles false, null, missing)
     let query = { isArchived: { $ne: true } };
 
-    // Company isolation
     if (req.user.role !== "superadmin") {
       query.company = req.user.company;
     }
@@ -184,7 +170,7 @@ export const getProjectStats = async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching stats:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -192,11 +178,10 @@ export const getProjectById = async (req, res) => {
   try {
     let query = { _id: req.params.id };
 
-    // Company isolation: Only allow fetching projects from the same company
     if (req.user.role !== "superadmin") {
       if (!req.user.company) {
         return res.status(403).json({
-          message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+          message: "No company assigned to the current user.",
         });
       }
       query.company = req.user.company._id;
@@ -207,10 +192,10 @@ export const getProjectById = async (req, res) => {
       .populate("createdBy", "username");
 
     if (!project) {
-      return res.status(404).json({ message: "Projekt nie znaleziony" });
+      return res.status(404).json({ message: "Project not found" });
     }
 
-    // Employee może zobaczyć tylko swoje projekty
+    // Employee can only see their own projects
     if (req.user.role === "employee") {
       const isAssigned = project.assignedUsers.some(
         (u) => u._id.toString() === req.user._id.toString()
@@ -218,14 +203,14 @@ export const getProjectById = async (req, res) => {
       if (!isAssigned) {
         return res
           .status(403)
-          .json({ message: "Brak dostępu do tego projektu" });
+          .json({ message: "Access denied to this project" });
       }
     }
 
     res.json(project);
   } catch (err) {
     console.error("Error fetching project:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -241,7 +226,7 @@ export const createProject = async (req, res) => {
   } = req.body;
 
   if (!name) {
-    return res.status(400).json({ message: "Nazwa projektu jest wymagana" });
+    return res.status(400).json({ message: "Project name is required" });
   }
 
   try {
@@ -264,12 +249,12 @@ export const createProject = async (req, res) => {
       .populate("createdBy", "username");
 
     res.status(201).json({
-      message: "Projekt utworzony pomyślnie",
+      message: "Project created successfully",
       project: project,
     });
   } catch (err) {
     console.error("Error creating project:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -289,10 +274,10 @@ export const updateProject = async (req, res) => {
     });
 
     if (!result) {
-      return res.status(404).json({ message: "Projekt nie znaleziony." });
+      return res.status(404).json({ message: "Project not found." });
     }
 
-    res.json({ message: "Projekt zaktualizowany pomyślnie.", project: result });
+    res.json({ message: "Project updated successfully.", project: result });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -308,13 +293,13 @@ export const deleteProject = async (req, res) => {
     const project = await Project.findOneAndDelete(query);
 
     if (!project) {
-      return res.status(404).json({ message: "Projekt nie znaleziony" });
+      return res.status(404).json({ message: "Project not found" });
     }
 
-    res.json({ message: "Projekt usunięty" });
+    res.json({ message: "Project deleted" });
   } catch (err) {
     console.error("Error deleting project:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -322,14 +307,13 @@ export const getUserAssignedProjectsSummary = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Opcjonalne zabezpieczenie: użytkownik może pobrać tylko swoje dane
+    // Optional safeguard: user can only fetch their own data
     if (req.user._id.toString() !== userId && req.user.role !== "admin") {
       return res
         .status(403)
-        .json({ error: "Brak dostępu do danych innych użytkowników" });
+        .json({ error: "Access denied to other users' data" });
     }
 
-    // Tylko aktywne projekty ($ne: true obsługuje false, null i brak pola)
     const companyQuery = { isArchived: { $ne: true } };
     if (req.user.role !== "superadmin") {
       companyQuery.company = req.user.company;
@@ -361,31 +345,30 @@ export const getUserAssignedProjectsSummary = async (req, res) => {
       pending,
     });
   } catch (error) {
-    console.error("Błąd podczas pobierania statystyk użytkownika:", error);
-    res.status(500).json({ error: "Błąd podczas pobierania danych" });
+    console.error("Error fetching user stats:", error);
+    res.status(500).json({ error: "Error fetching data" });
   }
 };
 
 export const getStatsSummary = async (req, res) => {
   try {
-    // Tylko aktywne projekty ($ne: true obsługuje false, null i brak pola)
     const query = { isArchived: { $ne: true } };
     if (req.user.role !== "superadmin") {
-      // Pobierz ID firmy z zapytania lub od zalogowanego użytkownika
+      // Get company ID from query or from logged-in user
       const requestedCompanyId = req.query.company;
       const userCompanyId = req.user.company?._id.toString();
 
-      // Sprawdź, czy admin/hr ma prawo dostępu do żądanej firmy
+      // Check whether admin/hr has access to the requested company
       if (requestedCompanyId && requestedCompanyId !== userCompanyId) {
         return res
           .status(403)
-          .json({ message: "Brak uprawnień do danych tej firmy." });
+          .json({ message: "Insufficient permissions for this company's data." });
       }
 
       if (!userCompanyId) {
         return res
           .status(403)
-          .json({ message: "Użytkownik nie jest przypisany do firmy." });
+          .json({ message: "User is not assigned to a company." });
       }
       query.company = userCompanyId;
     }
@@ -404,12 +387,12 @@ export const getStatsSummary = async (req, res) => {
       completed,
     });
   } catch (error) {
-    console.error("Błąd podczas pobierania statystyk:", error);
-    res.status(500).json({ error: "Błąd podczas pobierania statystyk" });
+    console.error("Error fetching stats:", error);
+    res.status(500).json({ error: "Error fetching stats" });
   }
 };
 
-// Archiwizuj projekt (soft delete)
+// Archive project (soft delete)
 export const archiveProject = async (req, res) => {
   try {
     const query = { _id: req.params.id };
@@ -424,17 +407,23 @@ export const archiveProject = async (req, res) => {
     );
 
     if (!project) {
-      return res.status(404).json({ message: "Projekt nie znaleziony" });
+      return res.status(404).json({ message: "Project not found" });
     }
 
-    res.json({ message: "Projekt zarchiwizowany pomyślnie", project });
+    emitToCompany(project.company, "project:archived", {
+      projectId: project._id,
+      by: req.user._id,
+      at: new Date().toISOString(),
+    });
+
+    res.json({ message: "Project archived successfully", project });
   } catch (err) {
     console.error("Error archiving project:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Przywróć projekt z archiwum
+// Restore project from archive
 export const restoreProject = async (req, res) => {
   try {
     const query = { _id: req.params.id };
@@ -449,17 +438,23 @@ export const restoreProject = async (req, res) => {
     );
 
     if (!project) {
-      return res.status(404).json({ message: "Projekt nie znaleziony" });
+      return res.status(404).json({ message: "Project not found" });
     }
 
-    res.json({ message: "Projekt przywrócony pomyślnie", project });
+    emitToCompany(project.company, "project:restored", {
+      projectId: project._id,
+      by: req.user._id,
+      at: new Date().toISOString(),
+    });
+
+    res.json({ message: "Project restored successfully", project });
   } catch (err) {
     console.error("Error restoring project:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Szybka aktualizacja statusu (dla Kanban drag & drop)
+// Quick status update (for Kanban drag & drop)
 export const updateProjectStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -468,7 +463,7 @@ export const updateProjectStatus = async (req, res) => {
       !status ||
       !["pending", "running", "completed", "on-hold"].includes(status)
     ) {
-      return res.status(400).json({ message: "Nieprawidłowy status" });
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     const query = { _id: req.params.id };
@@ -483,26 +478,33 @@ export const updateProjectStatus = async (req, res) => {
     ).populate("assignedUsers", "username email");
 
     if (!project) {
-      return res.status(404).json({ message: "Projekt nie znaleziony" });
+      return res.status(404).json({ message: "Project not found" });
     }
 
-    res.json({ message: "Status zaktualizowany pomyślnie", project });
+    emitToCompany(project.company, "project:status-changed", {
+      projectId: project._id,
+      status: project.status,
+      updatedBy: req.user._id,
+      at: new Date().toISOString(),
+    });
+
+    res.json({ message: "Status updated successfully", project });
   } catch (err) {
     console.error("Error updating project status:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Operacje masowe na projektach
+// Bulk operations on projects
 export const bulkProjectAction = async (req, res) => {
   try {
     const { projectIds, action, payload } = req.body;
 
     if (!Array.isArray(projectIds) || projectIds.length === 0) {
-      return res.status(400).json({ message: "Brak zaznaczonych projektów" });
+      return res.status(400).json({ message: "No projects selected" });
     }
 
-    // Budowanie query (zabezpieczenie per firma)
+    // Build query (per-company safeguard)
     const query = { _id: { $in: projectIds } };
     if (req.user.role !== "superadmin") {
       query.company = req.user.company;
@@ -514,22 +516,22 @@ export const bulkProjectAction = async (req, res) => {
     switch (action) {
       case "archive":
         result = await Project.updateMany(query, { isArchived: true });
-        message = `Zarchiwizowano ${result.modifiedCount} projektów`;
+        message = `Archived ${result.modifiedCount} projects`;
         break;
 
       case "restore":
         result = await Project.updateMany(query, { isArchived: false });
-        message = `Przywrócono ${result.modifiedCount} projektów`;
+        message = `Restored ${result.modifiedCount} projects`;
         break;
 
       case "delete":
         if (req.user.role !== "admin" && req.user.role !== "superadmin") {
           return res
             .status(403)
-            .json({ message: "Brak uprawnień do usuwania" });
+            .json({ message: "Insufficient permissions to delete" });
         }
         result = await Project.deleteMany(query);
-        message = `Usunięto trwale ${result.deletedCount} projektów`;
+        message = `Permanently deleted ${result.deletedCount} projects`;
         break;
 
       case "status":
@@ -539,20 +541,20 @@ export const bulkProjectAction = async (req, res) => {
             payload.status
           )
         ) {
-          return res.status(400).json({ message: "Nieprawidłowy status" });
+          return res.status(400).json({ message: "Invalid status" });
         }
         result = await Project.updateMany(query, { status: payload.status });
-        message = `Zmieniono status dla ${result.modifiedCount} projektów`;
+        message = `Changed status for ${result.modifiedCount} projects`;
         break;
 
       default:
-        return res.status(400).json({ message: "Nieznana akcja" });
+        return res.status(400).json({ message: "Unknown action" });
     }
 
     res.json({ message, count: result.modifiedCount || result.deletedCount });
   } catch (err) {
     console.error("Error in bulk action:", err);
-    res.status(500).json({ message: "Błąd serwera podczas operacji masowej" });
+    res.status(500).json({ message: "Server error during bulk operation" });
   }
 };
 
@@ -564,7 +566,7 @@ export const getWeeklyActivity = async (req, res) => {
       const companyId = req.user.company?._id || req.user.company;
       if (!companyId) {
         return res.status(403).json({
-          message: "Użytkownik nie jest przypisany do firmy.",
+          message: "User is not assigned to a company.",
         });
       }
       query.company = companyId;
@@ -597,7 +599,7 @@ export const getWeeklyActivity = async (req, res) => {
 
     res.json(activity);
   } catch (error) {
-    console.error('Błąd podczas pobierania aktywności tygodniowej:', error);
-    res.status(500).json({ message: 'Błąd serwera' });
+    console.error('Error fetching weekly activity:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };

@@ -1,0 +1,79 @@
+name: 🐛 Bug report
+description: Something is broken or behaves differently than documented.
+title: "bug: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report.
+        Please fill in as much detail as you can — the more we know,
+        the faster we can fix it.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One-sentence description of the bug.
+      placeholder: "Drag-and-drop on the Kanban board sometimes drops the card into the wrong column."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered list. Include sample data if relevant.
+      placeholder: |
+        1. Log in as admin
+        2. Open /projects
+        3. Drag a card from "Pending" to "Running"
+        4. Observe the card snaps back
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include any error from the browser console or `npm run dev` output.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - Frontend (client)
+        - Backend (server / API)
+        - Docker / infra
+        - Documentation
+        - Other / unsure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit SHA / version
+      placeholder: "abc1234 or v1.2.3"
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        - OS:          Windows 11
+        - Browser:     Chrome 130
+        - Node:        20.18.0
+        - MongoDB:     8.0
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I have searched existing issues and this is not a duplicate.
+          required: true
+        - label: I am not reporting a security vulnerability (those go through the Security tab).
+          required: true

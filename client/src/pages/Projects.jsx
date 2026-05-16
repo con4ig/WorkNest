@@ -20,14 +20,16 @@ import AddProjectModal from '../components/AddProjectModal.jsx';
 import ViewSwitcher from '../components/ViewSwitcher.jsx';
 import GridView from '../components/GridView.jsx';
 import KanbanView from '../components/KanbanView.jsx';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import ListView from '../components/ListView';
 import BulkActionsHeader from '../components/projects/BulkActionsHeader';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { useProjectRealtime } from '../hooks/useProjectRealtime';
+import toast from 'react-hot-toast';
 
-export default function Projekty() {
+export default function Projects() {
     const { t } = useTranslation();
     const { user, loading: authLoading } = useAuth();
     const companyId = user?.company?._id;
@@ -69,7 +71,7 @@ export default function Projekty() {
         return () => clearTimeout(timer);
     }, [searchTerm, statusFilter]);
 
-    // Funkcja do otwierania modala potwierdzającego
+    // Open confirmation modal
     const askForConfirmation = (props) => {
         setConfirmationProps({ isOpen: true, ...props });
     };
@@ -190,19 +192,19 @@ export default function Projekty() {
                 setIsFiltering(false);
             }
         },
-        [companyId, navigate, showArchived, searchTerm, statusFilter],
+        [companyId, navigate, showArchived, searchTerm, statusFilter, t],
     );
 
-    // Połączony useEffect do ładowania danych
+    // Combined data-loading effect
     useEffect(() => {
         if (authLoading || !companyId) return;
 
-        // Jeśli to jest pierwsze ładowanie lub ręczne odświeżenie
+        // First load or manual refresh
         if (initialLoad.current) {
             fetchProjects(true);
             initialLoad.current = false;
         } else {
-            // W przeciwnym razie to zmiana filtrów (triggered by refreshKey incremented in debounce or manual refresh)
+            // Otherwise it's a filter change (triggered by refreshKey incremented in debounce or manual refresh)
             fetchProjects(false);
         }
     }, [
@@ -211,6 +213,44 @@ export default function Projekty() {
         refreshKey,
         fetchProjects,
     ]);
+
+    // Live updates from other clients in the same tenant — apply the
+    // mutation optimistically against the in-memory list so the user
+    // sees the change without a refetch round-trip.
+    useProjectRealtime({
+        onStatusChanged: ({ projectId, status }) => {
+            setProjects((prev) =>
+                prev.map((p) =>
+                    p._id === projectId ? { ...p, status } : p,
+                ),
+            );
+        },
+        onArchived: ({ projectId }) => {
+            setProjects((prev) => {
+                const target = prev.find((p) => p._id === projectId);
+                if (target && !showArchived) {
+                    toast(
+                        t('projects.realtime.archivedByTeammate', {
+                            name: target.name,
+                            defaultValue: `"${target.name}" was archived by a teammate`,
+                        }),
+                        { icon: '📦' },
+                    );
+                    return prev.filter((p) => p._id !== projectId);
+                }
+                return prev.map((p) =>
+                    p._id === projectId ? { ...p, isArchived: true } : p,
+                );
+            });
+        },
+        onRestored: ({ projectId }) => {
+            setProjects((prev) =>
+                prev.map((p) =>
+                    p._id === projectId ? { ...p, isArchived: false } : p,
+                ),
+            );
+        },
+    });
 
     const handleArchive = (projectId) => {
         askForConfirmation({

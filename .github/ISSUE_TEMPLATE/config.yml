@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔐 Security vulnerability
+    url: https://github.com/yourusername/worknest/security/advisories/new
+    about: Privately report a security issue (do NOT open a public issue).
+  - name: 💬 General question
+    url: https://github.com/yourusername/worknest/discussions
+    about: Ask a question or start a discussion.

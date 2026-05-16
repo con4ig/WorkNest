@@ -1,0 +1,20 @@
+# Normalise line endings — avoid CRLF surprises on Windows clones.
+* text=auto eol=lf
+
+# Source code — explicit LF.
+*.{js,jsx,ts,tsx,mjs,cjs} text eol=lf
+*.{json,jsonc,yml,yaml,md,mdx} text eol=lf
+*.{css,scss,html} text eol=lf
+*.{sh,bash} text eol=lf
+
+# Lockfiles — diffable, but very large.
+package-lock.json linguist-generated=true
+yarn.lock        linguist-generated=true
+
+# Generated translation files.
+client/public/locales/**/translation.json linguist-generated=true
+
+# Binary assets — never modified by tooling.
+*.{png,jpg,jpeg,gif,ico,webp,avif} binary
+*.{woff,woff2,ttf,otf,eot}         binary
+*.{pdf,zip,gz}                     binary

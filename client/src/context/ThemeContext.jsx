@@ -1,14 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 
-const ThemeContext = createContext();
-
-export const useTheme = () => {
-    const context = useContext(ThemeContext);
-    if (!context) {
-        throw new Error('useTheme must be used within a ThemeProvider');
-    }
-    return context;
-};
+// eslint-disable-next-line react-refresh/only-export-components
+export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
     const [theme, setTheme] = useState(() => {
@@ -18,7 +11,7 @@ export const ThemeProvider = ({ children }) => {
             if (savedTheme) {
                 return savedTheme;
             }
-            // Optional: User said "Moim zdaniem użytkownik powinien mieć możliwość wyboru kolorystyki."
+            // Optional: User said "In my opinion, the user should have the option to choose the color scheme."
             // We can default to light theme as it's the safest.
             return 'dark';
         }
