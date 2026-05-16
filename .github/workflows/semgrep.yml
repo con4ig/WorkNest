@@ -32,7 +32,7 @@ jobs:
         # detects (JavaScript/TypeScript, Node, Express, React, plus
         # OWASP Top 10 and security-audit packs).
         run: semgrep ci --config auto --sarif --output=semgrep.sarif
-        env:
+
           # Optional: connect to Semgrep Cloud (semgrep.dev) for a
           # dashboard. Free tier; remove this env var to run purely in
           # CI without dashboard.
