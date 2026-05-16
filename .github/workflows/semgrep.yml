@@ -25,7 +25,7 @@ jobs:
     # Skip on Dependabot PRs — they don't carry the SARIF upload token.
     if: (github.actor != 'dependabot[bot]')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run Semgrep
         # `auto` config picks the right rulesets for the languages it
