@@ -236,6 +236,7 @@
         "cancel": "Anuluj",
         "edit": "Edytuj",
         "delete": "Usuń",
+        "archive": "Archiwizuj",
         "actions": "Akcje",
         "search": "Szukaj",
         "searching": "Szukam...",
@@ -642,7 +643,11 @@
             "none": "Brak",
             "restore": "Przywróć",
             "archive": "Archiwizuj",
-            "delete": "Usuń trwale"
+            "delete": "Usuń trwale",
+            "team": "Zespół"
+        },
+        "projectCard": {
+            "progress": "Postęp"
         },
         "projectGridCard": {
             "archiveTitle": "Zarchiwizuj projekt",

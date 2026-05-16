@@ -1,25 +1,25 @@
 import axios from 'axios';
 
-// W trybie produkcyjnym używamy pełnego adresu backendu na Renderze,
-// a lokalnie używamy proxy /api.
+// In production we use the full backend URL on Render,
+// while locally we use the /api proxy.
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // Niezbędne do wysyłania i odbierania ciasteczek (np. z refresh tokenem)
+  withCredentials: true, // Required for sending and receiving cookies (e.g. with refresh token)
   timeout: 15000, // Abort after 15 s — prevents infinite hang during Render cold start
 });
 
-// --- Interceptor Żądania (Request Interceptor) ---
-// Ten interceptor dodaje token autoryzacyjny do każdego wychodzącego żądania.
+// --- Request Interceptor ---
+// This interceptor adds the authorization token to each outgoing request.
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
-    // Nie dodawaj tokenu do żądania odświeżającego!
+    // Do not add the token to the refresh request!
     if (token && config.url !== '/auth/refresh') {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    // console.log(`🔑 Dodawanie tokena do żądania: ${config.url}`);
+    // console.log(`🔑 Adding token to request: ${config.url}`);
     return config;
   },
   (error) => {
@@ -27,9 +27,9 @@ api.interceptors.request.use(
   }
 );
 
-// --- Interceptor Odpowiedzi (Response Interceptor) ---
-// Ten interceptor obsługuje błędy, w szczególności 401 Unauthorized,
-// próbując odświeżyć token i ponowić oryginalne zapytanie.
+// --- Response Interceptor ---
+// This interceptor handles errors, particularly 401 Unauthorized,
+// by attempting to refresh the token and retry the original request.
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -54,7 +54,7 @@ api.interceptors.response.use(
 
     // Timeout or network error during refresh — force logout immediately
     if (!error.response && originalRequest.url === '/auth/refresh') {
-      console.error("🔴 Brak odpowiedzi serwera podczas odświeżania tokenu. Wylogowywanie...");
+      console.error("🔴 No server response while refreshing token. Logging out...");
       localStorage.removeItem('accessToken');
       processQueue(error, null);
       window.dispatchEvent(new Event('auth-error'));
@@ -62,16 +62,16 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 401 && originalRequest.url === '/auth/refresh') {
-      console.error("🔴 Refresh token wygasł. Wylogowywanie...");
+      console.error("🔴 Refresh token expired. Logging out...");
       localStorage.removeItem('accessToken');
       window.dispatchEvent(new Event('auth-error'));
       return Promise.reject(error);
     }
 
-    // Sprawdzamy, czy błąd to 401 i czy nie jest to ponowna próba po odświeżeniu
+    // Check whether the error is a 401 and is not a retry after a refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
 
-      // Jeśli inny proces już odświeża token, dodaj to zapytanie do kolejki
+      // If another process is already refreshing the token, queue this request
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
@@ -89,25 +89,25 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Wywołaj endpoint do odświeżania tokenu. Zakładam, że używasz ciasteczek httpOnly dla refresh tokenu.
+        // Call the token refresh endpoint. Assumes httpOnly cookies are used for the refresh token.
         const { data } = await api.post('/auth/refresh');
         const newAccessToken = data.accessToken;
 
         localStorage.setItem('accessToken', newAccessToken);
         api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
 
-        // Ponów wszystkie zapytania z kolejki z nowym tokenem
+        // Retry all queued requests with the new token
         processQueue(null, newAccessToken);
 
-        // Ponów oryginalne zapytanie
+        // Retry the original request
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return api(originalRequest);
 
       } catch (refreshError) {
-        console.error("🔴 Błąd odświeżania tokenu. Wylogowywanie...", refreshError);
+        console.error("🔴 Token refresh error. Logging out...", refreshError);
         processQueue(refreshError, null);
-        // W przypadku błędu odświeżania, emituj zdarzenie, aby wylogować użytkownika
-        // i przekierować go w komponencie React.
+        // On refresh error, emit an event to log the user out
+        // and redirect them in the React component.
         window.dispatchEvent(new Event('auth-error'));
         return Promise.reject(refreshError);
       } finally {

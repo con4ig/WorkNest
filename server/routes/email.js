@@ -9,7 +9,7 @@
 // const generateOtp = () =>
 //   Math.floor(100000 + Math.random() * 900000).toString();
 
-// // Konfiguracja Gmail SMTP
+// // Gmail SMTP configuration
 // const transporter = nodemailer.createTransport({
 //   host: "smtp.gmail.com",
 //   port: 465,
@@ -20,12 +20,12 @@
 //   },
 // });
 
-// // Weryfikacja połączenia przy starcie
+// // Verify connection at startup
 // transporter.verify((error, success) => {
 //   if (error) {
-//     console.error("❌ Błąd połączenia z Gmail:", error);
+//     console.error("❌ Gmail connection error:", error);
 //   } else {
-//     console.log("✅ Gmail SMTP gotowe do wysyłki maili");
+//     console.log("✅ Gmail SMTP ready to send emails");
 //   }
 // });
 
@@ -33,54 +33,54 @@
 //   const { email } = req.body;
 
 //   if (!email) {
-//     return res.status(400).json({ message: "Brak adresu email" });
+//     return res.status(400).json({ message: "Missing email address" });
 //   }
 
 //   const otp = generateOtp();
-//   const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minut
+//   const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
 //   try {
-//     // Zapis OTP w bazie
+//     // Save OTP in database
 //     await Otp.create({ email, code: otp, expiresAt });
 
-//     // Wysłanie maila
+//     // Send email
 //     const mailOptions = {
 //       from: process.env.GMAIL_USER,
 //       to: email,
-//       subject: "Twój kod OTP - WorkNest",
+//       subject: "Your OTP code - WorkNest",
 //       html: `
 //         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
 //           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
 //             <h1 style="color: white; margin: 0; text-align: center;">WorkNest</h1>
 //           </div>
 //           <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-//             <h2 style="color: #333; margin-top: 0;">Kod weryfikacyjny</h2>
-//             <p style="color: #666; font-size: 16px;">Twój kod jednorazowy to:</p>
+//             <h2 style="color: #333; margin-top: 0;">Verification code</h2>
+//             <p style="color: #666; font-size: 16px;">Your one-time code is:</p>
 //             <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
 //               <h1 style="color: #667eea; letter-spacing: 8px; margin: 0; font-size: 36px;">${otp}</h1>
 //             </div>
-//             <p style="color: #666; font-size: 14px;">Kod jest ważny przez <strong>5 minut</strong>.</p>
+//             <p style="color: #666; font-size: 14px;">The code is valid for <strong>5 minutes</strong>.</p>
 //             <p style="color: #999; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-//               Jeśli nie prosiłeś o ten kod, zignoruj tę wiadomość.
+//               If you did not request this code, ignore this message.
 //             </p>
 //           </div>
 //         </div>
 //       `,
-//       text: `WorkNest - Twój kod weryfikacyjny\n\nTwój kod jednorazowy to: ${otp}\n\nKod jest ważny przez 5 minut.\n\nJeśli nie prosiłeś o ten kod, zignoruj tę wiadomość.`,
+//       text: `WorkNest - Your verification code\n\nYour one-time code is: ${otp}\n\nThe code is valid for 5 minutes.\n\nIf you did not request this code, ignore this message.`,
 //     };
 //     await transporter.sendMail(mailOptions);
 
 //     return res.status(200).json({
-//       message: "Kod OTP wysłany pomyślnie",
+//       message: "OTP code sent successfully",
 //     });
 //   } catch (err) {
-//     console.error("❌ Błąd wysyłki lub zapisu:", err);
-//     console.error("Szczegóły błędu:", err.message);
+//     console.error("❌ Send or save error:", err);
+//     console.error("Error details:", err.message);
 //     if (err.response) {
-//       console.error("Odpowiedź serwera:", err.response);
+//       console.error("Server response:", err.response);
 //     }
 //     return res.status(500).json({
-//       message: "Błąd serwera",
+//       message: "Server error",
 //       error: process.env.NODE_ENV === "development" ? err.message : undefined,
 //     });
 //   }
@@ -90,28 +90,28 @@
 //   const { email, code } = req.body;
 
 //   if (!email || !code) {
-//     return res.status(400).json({ message: "Brak email lub kodu" });
+//     return res.status(400).json({ message: "Missing email or code" });
 //   }
 
 //   try {
 //     const record = await Otp.findOne({ email, code });
 
 //     if (!record) {
-//       return res.status(400).json({ message: "Nieprawidłowy kod" });
+//       return res.status(400).json({ message: "Invalid code" });
 //     }
 
 //     if (record.expiresAt < new Date()) {
 //       await Otp.deleteOne({ _id: record._id });
-//       return res.status(400).json({ message: "Kod wygasł" });
+//       return res.status(400).json({ message: "Code expired" });
 //     }
 
-//     // Usuń OTP po poprawnym użyciu
+//     // Remove OTP after successful use
 //     await Otp.deleteOne({ _id: record._id });
 
-//     return res.status(200).json({ message: "Kod poprawny" });
+//     return res.status(200).json({ message: "Code valid" });
 //   } catch (err) {
-//     console.error("❌ Błąd weryfikacji:", err);
-//     return res.status(500).json({ message: "Błąd serwera" });
+//     console.error("❌ Verification error:", err);
+//     return res.status(500).json({ message: "Server error" });
 //   }
 // });
 

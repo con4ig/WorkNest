@@ -7,25 +7,24 @@ const authenticate = async (req, res, next) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res
         .status(401)
-        .json({ message: "Brak tokenu lub nieprawidłowy format." });
+        .json({ message: "Missing token or invalid format." });
     }
 
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Znajdź użytkownika i dołącz dane firmy
     const user = await User.findById(decoded._id)
-      .populate("company") // KLUCZOWA ZMIANA: Zawsze dołączaj pełne dane firmy
+      .populate("company")
       .select("-password");
 
     if (!user) {
-      return res.status(401).json({ message: "Użytkownik nie znaleziony" });
+      return res.status(401).json({ message: "User not found" });
     }
 
     req.user = user;
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Token jest nieprawidłowy lub wygasł." });
+    return res.status(401).json({ message: "Token is invalid or expired." });
   }
 };
 

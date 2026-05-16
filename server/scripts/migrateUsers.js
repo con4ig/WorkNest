@@ -1,5 +1,5 @@
 // scripts/migrateUsers.js
-// Uruchom: node scripts/migrateUsers.js
+// Run: node scripts/migrateUsers.js
 
 import mongoose from "mongoose";
 import User from "../models/User.js";
@@ -11,11 +11,11 @@ const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/hr-system";
 
 async function migrateUsers() {
   try {
-    console.log("🔄 Łączenie z bazą danych...");
+    console.log("🔄 Connecting to database...");
     await mongoose.connect(mongoUri);
-    console.log("✅ Połączono z bazą danych");
+    console.log("✅ Connected to database");
 
-    console.log("📝 Aktualizowanie istniejących użytkowników...");
+    console.log("📝 Updating existing users...");
 
     const result = await User.updateMany(
       {},
@@ -62,17 +62,17 @@ async function migrateUsers() {
       }
     );
 
-    console.log(`✅ Aktualizowano ${result.modifiedCount} użytkowników`);
+    console.log(`✅ Updated ${result.modifiedCount} users`);
 
-    // Wyświetl próbkę
+    // Display sample
     const sample = await User.findOne().select("-password");
-    console.log("\n📊 Przykład zaktualizowanego użytkownika:");
+    console.log("\n📊 Example of an updated user:");
     console.log(JSON.stringify(sample, null, 2));
 
-    console.log("\n✅ Migracja ukończona!");
+    console.log("\n✅ Migration completed!");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Błąd podczas migracji:", error);
+    console.error("❌ Error during migration:", error);
     process.exit(1);
   }
 }

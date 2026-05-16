@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../context/useAuth';
 import { X, UserPlus, UserMinus, Search, Loader2, Shield, User, Star } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -16,9 +16,9 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
     const [searchError, setSearchError] = useState(null);
     const [isUpdating, setIsUpdating] = useState(false);
 
-    const handleSearch = async (term) => {
+    const handleSearch = useCallback(async (term) => {
         if (!companyId) return;
-        
+
         if (term.trim().length === 1) {
             return;
         }
@@ -36,14 +36,14 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
 
             setAvailableUsers(filteredUsers);
         } catch (err) {
-            console.error('Błąd podczas wyszukiwania użytkowników:', err);
+            console.error('Error while searching users:', err);
             setSearchError(
                 err.response?.data?.message || t('projects.details.userModal.errors.searchError'),
             );
         } finally {
             setLoadingSearch(false);
         }
-    };
+    }, [companyId, project, t]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -51,7 +51,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchTerm, project, companyId]);
+    }, [searchTerm, handleSearch]);
 
     const isSearchActive = searchTerm.trim().length >= 2;
     const displayedUsers = isSearchActive 
@@ -75,7 +75,7 @@ export default function UserManagementModal({ project, onClose, onUpdate }) {
             }
         } catch (err) {
             console.error(
-                `Błąd podczas ${action === 'add' ? 'dodawania' : 'usuwania'} użytkownika:`,
+                `Error while ${action === 'add' ? 'adding' : 'removing'} user:`,
                 err,
             );
         } finally {

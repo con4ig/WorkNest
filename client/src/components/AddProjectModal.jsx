@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, User, Calendar, AlertCircle, Plus, Check } from 'lucide-react';
 import api from '../services/api.js';
-import { useAuth } from '../context/AuthContext.jsx';
+import { useAuth } from '../context/useAuth';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
@@ -24,13 +24,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        if (isOpen && companyId) {
-            fetchUsers();
-        }
-    }, [isOpen, companyId]);
-
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         try {
             const res = await api.get('/users', {
                 params: { company: companyId },
@@ -39,7 +33,13 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
         } catch (err) {
             console.error('Error fetching users:', err);
         }
-    };
+    }, [companyId]);
+
+    useEffect(() => {
+        if (isOpen && companyId) {
+            fetchUsers();
+        }
+    }, [isOpen, companyId, fetchUsers]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

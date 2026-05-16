@@ -12,7 +12,7 @@ export const getActivitiesByProject = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       projectQuery.company = req.user.company._id;
@@ -21,7 +21,7 @@ export const getActivitiesByProject = async (req, res) => {
     if (!project) {
       return res
         .status(404)
-        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+        .json({ message: "Project not found or access denied." });
     }
 
     const query = { project: projectId };
@@ -63,7 +63,7 @@ export const createActivity = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       projectQuery.company = req.user.company._id;
@@ -72,7 +72,7 @@ export const createActivity = async (req, res) => {
     if (!projectDoc) {
       return res
         .status(404)
-        .json({ message: "Projekt nie znaleziony lub brak dostępu." });
+        .json({ message: "Project not found or access denied." });
     }
 
     const activity = new Activity({

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import LoadingScreen from '../components/LoadingScreen';
 import CalendarComponent from '../components/CalendarComponent';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import {
     ArrowLeft,
     Check,

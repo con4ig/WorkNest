@@ -22,7 +22,7 @@ import moment from 'moment';
 import 'moment/locale/pl';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../components/ConfirmationModal';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import {
     Card,
     CardHeader,
@@ -80,7 +80,7 @@ export default function GenerateCode() {
             });
             setInvitations(sorted);
         } catch (err) {
-            console.error('Błąd pobierania zaproszeń:', err);
+            console.error('Error fetching invitations:', err);
         }
     }, []);
 
@@ -105,7 +105,7 @@ export default function GenerateCode() {
             await api.post('/users/generate-invitation', payload);
             await fetchInvitations();
         } catch (err) {
-            setError(err.response?.data?.message || t('generateCode.generateError') || 'Błąd generowania kodu');
+            setError(err.response?.data?.message || t('generateCode.generateError') || 'Error generating code');
         } finally {
             setLoading(false);
         }
@@ -121,7 +121,7 @@ export default function GenerateCode() {
                 try {
                     await api.delete(`/users/invitations/${id}`);
                     await fetchInvitations();
-                    toast.success('Kod został usunięty');
+                    toast.success(t('generateCode.revokeSuccess') || 'Code revoked');
                 } catch (err) {
                     toast.error(t('generateCode.revokeError'));
                 }

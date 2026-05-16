@@ -1,56 +1,56 @@
 import i18n from '../i18n';
 
 /**
- * Tłumaczy rolę użytkownika
+ * Translates user role
  */
 export const translateRole = (role) => {
     return i18n.t(`common.roles.${role}`, { defaultValue: role });
 };
 
 /**
- * Tłumaczy status użytkownika
+ * Translates user status
  */
 export const translateStatus = (status) => {
     return i18n.t(`common.employeeStatus.${status}`, { defaultValue: status });
 };
 
 /**
- * Tłumaczy typ kontraktu
+ * Translates contract type
  */
 export const translateContractType = (contractType) => {
     return i18n.t(`common.contractType.${contractType}`, { defaultValue: contractType });
 };
 
 /**
- * Tłumaczy status projektu
+ * Translates project status
  */
 export const translateProjectStatus = (status) => {
     return i18n.t(`common.projectStatus.${status}`, { defaultValue: status });
 };
 
 /**
- * Tłumaczy status zadania
+ * Translates task status
  */
 export const translateTaskStatus = (status) => {
     return i18n.t(`common.taskStatus.${status}`, { defaultValue: status });
 };
 
 /**
- * Tłumaczy priorytet
+ * Translates priority
  */
 export const translatePriority = (priority) => {
     return i18n.t(`common.priority.${priority}`, { defaultValue: priority });
 };
 
 /**
- * Tłumaczy status urlopu
+ * Translates leave status
  */
 export const translateLeaveStatus = (status) => {
     return i18n.t(`common.leaveStatus.${status}`, { defaultValue: status });
 };
 
 /**
- * Tłumaczy typ urlopu
+ * Translates leave type
  */
 export const translateLeaveType = (type) => {
     return i18n.t(`common.leaveType.${type}`, { defaultValue: type });

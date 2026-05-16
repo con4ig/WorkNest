@@ -28,11 +28,11 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
         e.preventDefault();
         setError('');
         if (!file) {
-            setError(t('employees.list.importModal.fileRequired') || 'Wybierz plik CSV');
+            setError(t('employees.list.importModal.fileRequired') || 'Select a CSV file');
             return;
         }
         if (!tempPassword || tempPassword.length < 6) {
-            setError(t('auth.validation.passwordMin') || 'Hasło tymczasowe musi mieć min. 6 znaków');
+            setError(t('auth.validation.passwordMin') || 'Temporary password must be at least 6 characters');
             return;
         }
         onImport(file, tempPassword);

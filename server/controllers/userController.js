@@ -8,18 +8,18 @@ export const getUsers = async (req, res) => {
 
     let query = {};
 
-    // Company isolation - pobierz ID firmy bezpiecznie
+    // Company isolation - safely fetch company ID
     if (req.user.role !== "superadmin") {
       const userCompanyId = req.user.company?._id || req.user.company;
 
       if (!userCompanyId) {
-        return res.status(403).json({ message: "Brak przypisanej firmy" });
+        return res.status(403).json({ message: "No company assigned" });
       }
 
       query.company = userCompanyId;
     }
 
-    // Jeśli jest parametr search - filtruj po username, email, firstName lub lastName
+    // If search param is provided - filter by username, email, firstName or lastName
     if (search && search.trim().length >= 2) {
       const searchQuery = {
         $or: [
@@ -36,29 +36,29 @@ export const getUsers = async (req, res) => {
     res.json({ count: users.length, users: users });
   } catch (err) {
     console.error("Error fetching users:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 export const getCurrentUser = async (req, res) => {
   try {
-    // req.user jest już dostępne dzięki middleware 'authenticate'
-    // i zawiera dane z populate('company')
+    // req.user is already available thanks to 'authenticate' middleware
+    // and contains data from populate('company')
     res.json(req.user);
   } catch (err) {
     console.error("Error fetching current user:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 export const getUserById = async (req, res) => {
   try {
-    // Sprawdzenie czy middleware authenticate ustawił req.user
+    // Check if authenticate middleware set req.user
     if (!req.user) {
       console.error(
-        "❌ req.user jest undefined - middleware authenticate nie działa"
+        "❌ req.user is undefined - authenticate middleware is not working"
       );
-      return res.status(401).json({ message: "Nie jesteś zalogowany" });
+      return res.status(401).json({ message: "You are not logged in" });
     }
 
     let query = { _id: req.params.id };
@@ -69,7 +69,7 @@ export const getUserById = async (req, res) => {
         return res
           .status(403)
           .json({
-            message: "Brak przypisanej firmy dla bieżącego użytkownika.",
+            message: "No company assigned to the current user.",
           });
       }
       query.company = req.user.company._id;
@@ -78,20 +78,20 @@ export const getUserById = async (req, res) => {
     const user = await User.findOne(query);
 
     if (!user) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Sprawdzenie uprawnień: user może obejrzeć swoje dane, HR/Admin mogą obejrzeć każdego
+    // Permission check: user can view their own data, HR/Admin can view everyone
     if (
       req.user._id.toString() !== req.params.id &&
       !["hr", "admin"].includes(req.user.role)
     ) {
       return res
         .status(403)
-        .json({ message: "Brak uprawnień do przeglądania tego profilu" });
+        .json({ message: "No permission to view this profile" });
     }
 
-    // Zwróć wszystkie dostępne pola, nawet jeśli są puste
+    // Return all available fields, even if empty
     res.json({
       _id: user._id,
       username: user.username || "",
@@ -116,7 +116,7 @@ export const getUserById = async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching user:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -126,11 +126,11 @@ export const updateUser = async (req, res) => {
     const isOwnProfile = req.user._id.toString() === userId;
     const isAdmin = ["hr", "admin"].includes(req.user.role);
 
-    // Sprawdzenie uprawnień: tylko HR/Admin mogą edytować cudze dane
+    // Permission check: only HR/Admin can edit other people's data
     if (!isOwnProfile && !isAdmin) {
       return res
         .status(403)
-        .json({ message: "Możesz edytować tylko swoje dane" });
+        .json({ message: "You can only edit your own data" });
     }
 
     const {
@@ -153,11 +153,11 @@ export const updateUser = async (req, res) => {
       employmentHistory,
     } = req.body;
 
-    // Walidacja danych
+    // Data validation
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: "Nieprawidłowy format email" });
+        return res.status(400).json({ message: "Invalid email format" });
       }
     }
 
@@ -167,7 +167,7 @@ export const updateUser = async (req, res) => {
     ) {
       return res.status(400).json({
         message:
-          "Nieprawidłowy status. Dozwolone: active, inactive, on-leave, terminated",
+          "Invalid status. Allowed: active, inactive, on-leave, terminated",
       });
     }
 
@@ -179,60 +179,60 @@ export const updateUser = async (req, res) => {
     ) {
       return res.status(400).json({
         message:
-          "Nieprawidłowy typ umowy. Dozwolone: full-time, part-time, contract, temporary",
+          "Invalid contract type. Allowed: full-time, part-time, contract, temporary",
       });
     }
 
     if (role && !["employee", "hr", "admin"].includes(role)) {
       return res.status(400).json({
-        message: "Nieprawidłowa rola. Dozwolone: employee, hr, admin",
+        message: "Invalid role. Allowed: employee, hr, admin",
       });
     }
 
-    // Pracownicy nie mogą zmieniać swojej roli
+    // Employees cannot change their own role
     if (!isAdmin && role) {
       return res
         .status(403)
-        .json({ message: "Nie możesz zmieniać swojej roli" });
+        .json({ message: "You cannot change your own role" });
     }
 
     if (salary !== undefined && salary < 0) {
-      return res.status(400).json({ message: "Pensja nie może być ujemna" });
+      return res.status(400).json({ message: "Salary cannot be negative" });
     }
     
     const existingUser = await User.findById(userId);
     if (!existingUser) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ TERAZ SPRAWDŹ COMPANY ISOLATION
+    // ✅ NOW CHECK COMPANY ISOLATION
     if (req.user.role !== "superadmin") {
-      // Pobierz ID firmy z obiektu lub bezpośrednio
+      // Get company ID from object or directly
       const userCompanyId = req.user.company?._id || req.user.company;
       const existingUserCompanyId =
         existingUser.company?._id || existingUser.company;
 
       if (!userCompanyId) {
-        return res.status(403).json({ message: "Brak przypisanej firmy" });
+        return res.status(403).json({ message: "No company assigned" });
       }
 
       if (userCompanyId.toString() !== existingUserCompanyId.toString()) {
         return res.status(403).json({
           message:
-            "Nie masz uprawnień do edycji danych użytkownika z innej firmy",
+            "You don't have permission to edit a user from another company",
         });
       }
     }
 
-    // Sprawdzenie czy email już istnieje (jeśli zmienia się email)
+    // Check if email already exists (if email is being changed)
     if (email && email !== existingUser.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
-        return res.status(400).json({ message: "Email jest już w użyciu" });
+        return res.status(400).json({ message: "Email is already in use" });
       }
     }
 
-    // Przygotowanie obiektu do aktualizacji w sposób dynamiczny
+    // Prepare update object dynamically
     const updateData = {};
     const allowedFields = [
       "username", "email", "firstName", "lastName", "phoneNumber",
@@ -246,7 +246,7 @@ export const updateUser = async (req, res) => {
       }
     });
 
-    // Specjalna obsługa dla roli (tylko admin)
+    // Special handling for role (admin only)
     if (isAdmin && req.body.role !== undefined) {
       updateData.role = req.body.role;
     }
@@ -257,7 +257,7 @@ export const updateUser = async (req, res) => {
     }).select("-password");
 
     res.json({
-      message: "Dane pracownika zaktualizowane pomyślnie",
+      message: "Employee data updated successfully",
       user: updatedUser,
     });
   } catch (err) {
@@ -265,52 +265,52 @@ export const updateUser = async (req, res) => {
     if (err.name === "ValidationError") {
       return res.status(400).json({ message: err.message });
     }
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 export const updateUserRole = async (req, res) => {
   const { role } = req.body;
 
-  // Walidacja roli
+  // Role validation
   if (!["employee", "hr", "admin"].includes(role)) {
     return res.status(400).json({
-      message: "Nieprawidłowa rola. Dozwolone: employee, hr, admin",
+      message: "Invalid role. Allowed: employee, hr, admin",
     });
   }
 
   try {
-    // ✅ NAJPIERW POBIERZ UŻYTKOWNIKA
+    // ✅ FIRST FETCH THE USER
     const userToUpdate = await User.findById(req.params.id);
 
     if (!userToUpdate) {
-      return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // ✅ TERAZ SPRAWDŹ COMPANY ISOLATION
+    // ✅ NOW CHECK COMPANY ISOLATION
     if (req.user.role !== "superadmin") {
-      // Pobierz ID firmy z obiektu lub bezpośrednio
+      // Get company ID from object or directly
       const adminCompanyId = req.user.company?._id || req.user.company;
       const userCompanyId = userToUpdate.company?._id || userToUpdate.company;
 
       if (!adminCompanyId) {
-        return res.status(403).json({ message: "Brak przypisanej firmy" });
+        return res.status(403).json({ message: "No company assigned" });
       }
 
       if (adminCompanyId.toString() !== userCompanyId.toString()) {
         return res.status(403).json({
           message:
-            "Nie masz uprawnień do zmiany roli użytkownika z innej firmy",
+            "You don't have permission to change the role of a user from another company",
         });
       }
     }
 
-    // ✅ Zmień rolę
+    // ✅ Change role
     userToUpdate.role = role;
     const updatedUser = await userToUpdate.save();
 
     res.json({
-      message: "Rola zmieniona pomyślnie",
+      message: "Role changed successfully",
       user: {
         _id: updatedUser._id,
         username: updatedUser.username,
@@ -320,7 +320,7 @@ export const updateUserRole = async (req, res) => {
     });
   } catch (err) {
     console.error("Error updating role:", err);
-    res.status(500).json({ message: "Błąd serwera" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -335,11 +335,11 @@ export const uploadProfileImage = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Konwertuj buffer na Base64 string
+    // Convert buffer to Base64 string
     const base64Image = req.file.buffer.toString("base64");
     const mimeType = req.file.mimetype;
 
-    // Zapisz jako data URL (łatwiejsze do wyświetlenia w frontendzie)
+    // Save as data URL (easier to display in the frontend)
     user.profileImage = `data:${mimeType};base64,${base64Image}`;
 
     await user.save();
@@ -392,7 +392,7 @@ export const deleteProfileImage = async (req, res) => {
 
 export const generateInvitation = async (req, res) => {
   try {
-    const { maxUses, expiresIn, role } = req.body; // Pobierz parametry
+    const { maxUses, expiresIn, role } = req.body; // Get parameters
     const companyId = req.user.company?._id || req.user.company;
 
     if (!companyId) {
@@ -401,10 +401,10 @@ export const generateInvitation = async (req, res) => {
         .json({ message: "User is not assigned to a company." });
     }
 
-    // Oblicz datę wygaśnięcia
+    // Calculate expiration date
     let expirationDate = new Date();
     if (expiresIn) {
-      // Obsługa różnych formatów czasu (np. "30m", "24h", "7d") lub milliseconds
+      // Support different time formats (e.g. "30m", "24h", "7d") or milliseconds
       const timeValue = parseInt(expiresIn);
       const timeUnit = expiresIn.slice(-1);
 
@@ -429,7 +429,7 @@ export const generateInvitation = async (req, res) => {
     res.status(201).json({
       message: "Invitation code generated successfully.",
       invitationCode: newInvitation.code,
-      invitation: newInvitation // Zwróć cały obiekt
+      invitation: newInvitation // Return the whole object
     });
   } catch (err) {
     console.error("Error generating invitation code:", err);
@@ -440,14 +440,14 @@ export const generateInvitation = async (req, res) => {
 export const getInvitations = async (req, res) => {
   try {
     const companyId = req.user.company?._id || req.user.company;
-     if (!companyId) return res.status(400).json({ message: "Brak firmy" });
+     if (!companyId) return res.status(400).json({ message: "No company" });
 
     // Lazy remove expired invitations
     await Invitation.deleteMany({ expiresAt: { $lt: new Date() } });
 
-    // Pobierz tylko aktywne zaproszenia (lub wszystkie i filtruj na froncie - lepiej wszystkie dla historii?)
-    // Pobieramy wszystkie, które jeszcze nie wygasły LUB mają jeszcze użycia
-    // Ale admin może chcieć widzieć listę aktywnych kodów.
+    // Get only active invitations (or all and filter in the frontend - better all for history?)
+    // We fetch all that have not yet expired OR still have uses left
+    // But admin may want to see a list of active codes.
     const invitations = await Invitation.find({ company: companyId })
       .sort({ createdAt: -1 })
       .populate('createdBy', 'username');
@@ -462,19 +462,19 @@ export const getInvitations = async (req, res) => {
 export const revokeInvitation = async (req, res) => {
   try {
      const { id } = req.params;
-     // Sprawdź czy to zaproszenie należy do firmy admina (security)
+     // Check that this invitation belongs to the admin's company (security)
      const invitation = await Invitation.findById(id);
 
-     if (!invitation) return res.status(404).json({ message: "Nie znaleziono zaproszenia" });
+     if (!invitation) return res.status(404).json({ message: "Invitation not found" });
 
-     // Sprawdź uprawnienia firmy
+     // Check company permissions
      const userCompanyId = req.user.company?._id || req.user.company;
      if (invitation.company.toString() !== userCompanyId.toString()) {
-        return res.status(403).json({ message: "Brak uprawnień" });
+        return res.status(403).json({ message: "No permission" });
      }
 
      await Invitation.findByIdAndDelete(id);
-     res.json({ message: "Zaproszenie usunięte" });
+     res.json({ message: "Invitation removed" });
   } catch (err) {
     console.error("Error revoking invitation:", err);
     res.status(500).json({ message: "Server error" });
@@ -538,14 +538,14 @@ export const importUsersFromCSV = async (req, res) => {
         });
 
         if (!userData.email || !userData.username) {
-            failed.push({ row: i + 1, message: "Brak wymaganych pól (email, username)" });
+            failed.push({ row: i + 1, message: "Missing required fields (email, username)" });
             continue;
         }
 
         try {
             const existingUser = await User.findOne({ email: userData.email });
             if (existingUser) {
-                 failed.push({ row: i + 1, email: userData.email, message: "Użytkownik o takim adresie email już istnieje" });
+                 failed.push({ row: i + 1, email: userData.email, message: "A user with this email already exists" });
                  continue;
             }
 
@@ -571,7 +571,7 @@ export const importUsersFromCSV = async (req, res) => {
     }
 
     res.json({
-        message: "Import zakończony",
+        message: "Import completed",
         processed,
         created,
         failedCount: failed.length,
@@ -581,6 +581,6 @@ export const importUsersFromCSV = async (req, res) => {
 
   } catch (err) {
     console.error("CSV Import error:", err);
-    res.status(500).json({ message: "Błąd serwera podczas przetwarzania CSV" });
+    res.status(500).json({ message: "Server error while processing CSV" });
   }
 };

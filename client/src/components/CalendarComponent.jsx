@@ -39,8 +39,8 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
     };
 
     const viewButtons = {
-        month: 'Miesiąc',
-        week: 'Tydzień',
+        month: 'Month',
+        week: 'Week',
         agenda: 'Agenda',
     };
 
@@ -59,7 +59,7 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
                         onClick={goToCurrent}
                         className="rounded-lg px-4 py-1.5 text-xs font-black uppercase tracking-widest text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white active:scale-95"
                     >
-                        Dziś
+                        Today
                     </button>
                     <button
                         onClick={goToNext}
@@ -302,7 +302,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
                 }}
                 popup={true}
                 messages={{
-                    showMore: (total) => `+${total} więcej`,
+                    showMore: (total) => `+${total} more`,
                 }}
                 formats={{
                     dayHeaderFormat: 'EEEE, d MMMM',

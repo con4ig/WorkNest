@@ -8,7 +8,7 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    // Zaktualizuj stan, aby następny render pokazał interfejs awaryjny.
+    // Update state so the next render shows the fallback UI.
     return { hasError: true, error };
   }
 
@@ -28,19 +28,19 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 py-12 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-300">
-          {/* Dekoracyjne elementy tła */}
+          {/* Decorative background elements */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-100 dark:bg-red-900/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-30 animate-pulse"></div>
             <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-100 dark:bg-slate-800/20 rounded-full mix-blend-multiply dark:mix-blend-normal filter blur-xl opacity-30 animate-pulse"></div>
           </div>
 
-          {/* Główna karta */}
+          {/* Main card */}
           <div className="relative w-full max-w-lg">
             <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl shadow-slate-200/50 dark:shadow-black/50 px-8 py-12 sm:px-12 sm:py-16 border border-slate-100 dark:border-white/5">
-              {/* Ikona błędu z animacją */}
+              {/* Error icon with animation */}
               <div className="flex justify-center mb-8">
                 <div className="relative">
-                  {/* Outer ring - pulsujący efekt */}
+                  {/* Outer ring - pulsing effect */}
                   <div className="absolute inset-0 rounded-full bg-red-100 dark:bg-red-900/20 animate-ping opacity-75"></div>
                   
                   {/* Main icon container */}
@@ -64,7 +64,7 @@ class ErrorBoundary extends React.Component {
                 </div>
               </div>
 
-              {/* Treść */}
+              {/* Content */}
               <div className="text-center space-y-4">
                 <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
                   {t('common.errorBoundary.title')}
@@ -107,4 +107,5 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default withTranslation()(ErrorBoundary);
+const ErrorBoundaryWithTranslation = withTranslation()(ErrorBoundary);
+export default ErrorBoundaryWithTranslation;

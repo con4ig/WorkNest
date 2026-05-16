@@ -98,7 +98,7 @@ const Icon = {
     ),
 };
 
-// --- Funkcje stylizujące ---
+// --- Styling helpers ---
 const getStatusClasses = (status) => {
     switch (status) {
         case 'active':
@@ -233,7 +233,7 @@ const EditableField = ({
     );
 };
 
-// --- Główny komponent ---
+// --- Main component ---
 export default function UserDetails() {
     const { t, i18n } = useTranslation();
     const { id } = useParams();
@@ -255,7 +255,7 @@ export default function UserDetails() {
 
             const res = await api.get(`/users/${id}`);
 
-            // Ustaw domyślne wartości dla pól HR jeśli ich nie ma
+            // Set default values for HR fields if missing
             const userData = {
                 username: res.data.username || '',
                 email: res.data.email || '',
@@ -284,7 +284,7 @@ export default function UserDetails() {
         } catch (err) {
             console.error('Error fetching user:', err);
             setError(
-                `Nie udało się załadować danych pracownika: ${err.message}`,
+                `Failed to load employee data: ${err.message}`,
             );
         } finally {
             setLoading(false);
@@ -387,7 +387,7 @@ export default function UserDetails() {
 
             const updatedUser = response.data.user;
 
-            // Zaktualizuj stany bezpośrednio z odpowiedzi API
+            // Update state directly from API response
             setUser(updatedUser);
             setEmploymentHistory(updatedUser.employmentHistory || []);
 

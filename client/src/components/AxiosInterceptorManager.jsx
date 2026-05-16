@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 const AxiosInterceptorManager = ({ children }) => {
     const { setAccessToken, logout } = useAuth();
@@ -49,7 +49,7 @@ const AxiosInterceptorManager = ({ children }) => {
                         const res = await axios.post('/api/auth/refresh');
                         const newAccessToken = res.data.accessToken;
                         
-                        setAccessToken(newAccessToken); // Użyj funkcji z kontekstu
+                        setAccessToken(newAccessToken); // Use function from context
                         
                         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                         
@@ -58,7 +58,7 @@ const AxiosInterceptorManager = ({ children }) => {
                         return axios(originalRequest);
                     } catch (refreshError) {
                         processQueue(refreshError, null);
-                        logout(); // Użyj funkcji logout z kontekstu
+                        logout(); // Use logout function from context
                         return Promise.reject(refreshError);
                     } finally {
                         isRefreshing = false;

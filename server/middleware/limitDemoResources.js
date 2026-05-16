@@ -24,7 +24,7 @@ export const limitDemoResources = async (req, res, next) => {
     if (req.method === 'POST' && req.baseUrl.includes('projects')) {
         const count = await Project.countDocuments({ company: req.user.company });
         if (count >= LIMITS.projects) {
-            return res.status(403).json({ message: `Limit projektów (max ${LIMITS.projects}) w wersji Demo został osiągnięty.` });
+            return res.status(403).json({ message: `Project limit (max ${LIMITS.projects}) reached on Demo plan.` });
         }
     }
 
@@ -32,7 +32,7 @@ export const limitDemoResources = async (req, res, next) => {
     if (req.method === 'POST' && req.baseUrl.includes('tasks')) {
         const count = await Task.countDocuments({ company: req.user.company });
         if (count >= LIMITS.tasks) {
-            return res.status(403).json({ message: `Limit zadań (max ${LIMITS.tasks}) w wersji Demo został osiągnięty.` });
+            return res.status(403).json({ message: `Task limit (max ${LIMITS.tasks}) reached on Demo plan.` });
         }
     }
 
@@ -40,7 +40,7 @@ export const limitDemoResources = async (req, res, next) => {
     if (req.method === 'POST' && req.baseUrl.includes('leaves')) {
         const count = await Leave.countDocuments({ company: req.user.company });
         if (count >= LIMITS.leaves) {
-            return res.status(403).json({ message: `Limit wniosków (max ${LIMITS.leaves}) w wersji Demo został osiągnięty.` });
+            return res.status(403).json({ message: `Leave request limit (max ${LIMITS.leaves}) reached on Demo plan.` });
         }
     }
 
@@ -49,7 +49,7 @@ export const limitDemoResources = async (req, res, next) => {
     if (req.method === 'POST' && req.baseUrl.includes('users')) {
          const count = await User.countDocuments({ company: req.user.company });
          if (count >= LIMITS.users) {
-             return res.status(403).json({ message: `Limit użytkowników (max ${LIMITS.users}) w wersji Demo został osiągnięty.` });
+             return res.status(403).json({ message: `User limit (max ${LIMITS.users}) reached on Demo plan.` });
          }
     }
 

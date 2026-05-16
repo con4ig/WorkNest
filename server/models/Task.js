@@ -56,7 +56,7 @@ const taskSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index dla szybszego wyszukiwania zadań po projekcie
+// Index for faster task lookup by project
 taskSchema.index({ project: 1, order: 1 });
 
 export default mongoose.model("Task", taskSchema);

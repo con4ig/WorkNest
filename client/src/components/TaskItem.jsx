@@ -11,11 +11,8 @@ import { enGB } from 'date-fns/locale/en-GB';
 registerLocale('pl', pl);
 registerLocale('en', enGB);
 
-import { translateTaskStatus, translatePriority } from '../utils/translations';
 import {
     Icon,
-    getStatusClasses,
-    getPriorityClasses,
     getStatusColor,
     getPriorityColor,
     formatDateForInput,
@@ -39,7 +36,7 @@ const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
 CustomDateInput.displayName = 'CustomDateInput';
 
 
-const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEditing }) => {
+const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEditing: _isProjectEditing }) => {
     const { t, i18n } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({

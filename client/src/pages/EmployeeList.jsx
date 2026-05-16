@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api.js';
 import LoadingScreen from '../components/LoadingScreen';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import Toast from '../components/ui/Toast';
 import RoleChangeModal from '../components/employees/RoleChangeModal';
 import ImportModal from '../components/employees/ImportModal';

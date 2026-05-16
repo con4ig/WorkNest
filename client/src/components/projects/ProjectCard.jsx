@@ -126,7 +126,7 @@ const ProjectCard = ({
                                     e.stopPropagation();
                                     onCardClick(project._id);
                                 }}
-                                title="Szczegóły"
+                                title="Details"
                                 className="rounded p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
                             >
                                 <Eye className="h-3.5 w-3.5" />
@@ -136,7 +136,7 @@ const ProjectCard = ({
                                     e.stopPropagation();
                                     onArchive(project._id);
                                 }}
-                                title="Archiwizuj"
+                                title="Archive"
                                 className="rounded p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-yellow-500"
                             >
                                 <Archive className="h-3.5 w-3.5" />
@@ -146,7 +146,7 @@ const ProjectCard = ({
                                     e.stopPropagation();
                                     onPermanentDelete(project._id);
                                 }}
-                                title="Usuń trwale"
+                                title="Delete permanently"
                                 className="rounded p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                             >
                                 <Trash2 className="h-3.5 w-3.5" />

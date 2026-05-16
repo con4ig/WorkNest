@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 import {
     LayoutDashboard,
     FolderKanban,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/Button';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '../../context/useTheme';
 
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
     const { t } = useTranslation();
@@ -32,7 +32,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
         setTimeout(logout, 0);
     };
 
-    const NavItem = ({ to, icon: Icon, label, exact = false }) => {
+    const NavItem = ({ to, icon: _Icon, label, exact = false }) => {
         const isActive = exact
             ? location.pathname === to
             : location.pathname.startsWith(to);

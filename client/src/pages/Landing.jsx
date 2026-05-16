@@ -2,7 +2,7 @@ import Navbar from '../components/Navbar.jsx';
 import demo from '../assets/demo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import toast from 'react-hot-toast';
 import { useTranslation, Trans } from 'react-i18next';
 import {
@@ -76,9 +76,9 @@ function Landing() {
                         </p>
                         <h1 className="mb-6 text-3xl font-extrabold leading-tight tracking-tighter text-foreground sm:text-4xl md:mb-8 md:text-6xl lg:text-7xl xl:text-8xl">
                             <Trans i18nKey="landing.hero.Title">
-                                Odkryj nowy wymiar
+                                Discover a new dimension of
                                 <span className="block text-primary">
-                                    efektywności w Twoim HR
+                                    efficiency in your HR
                                 </span>
                             </Trans>
                         </h1>
@@ -93,7 +93,7 @@ function Landing() {
                                         await demoLogin();
                                         navigate('/dashboard');
                                     } catch (err) {
-                                        toast.error('Błąd logowania do demo');
+                                        toast.error(t('landing.hero.LoginError') || 'Demo login error');
                                         console.error(err);
                                     } finally {
                                         setIsLoading(false);
@@ -175,7 +175,7 @@ function Landing() {
                                 <div className="relative rounded-3xl border border-border bg-card p-8 shadow-2xl">
                                     <div className="mb-6 flex items-center justify-between">
                                         <span className="text-xl font-semibold text-foreground">
-                                            Panel Zarządzania
+                                            {t('landing.integration.PanelLabel') || 'Management Panel'}
                                         </span>
                                         <div className="h-3 w-16 rounded-full bg-primary"></div>
                                     </div>

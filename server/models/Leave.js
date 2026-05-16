@@ -15,18 +15,18 @@ const leaveSchema = new mongoose.Schema(
     leaveType: {
       type: String,
       enum: [
-        "vacation", // Wypoczynkowy
-        "on_demand", // Na żądanie
-        "unpaid", // Bezpłatny
-        "occasional", // Okolicznościowy
-        "maternity", // Macierzyński
-        "paternity", // Ojcowski
-        "parental", // Rodzicielski
-        "childcare", // Wychowawczy
-        "care", // Opiekuńczy
-        "training", // Szkoleniowy
-        "job_search", // Na poszukiwanie pracy
-        "health", // Zdrowotny/Rehabilitacyjny (zastępuje sick w ui ale zostawiamy dla wstecznej kompatybilności)
+        "vacation", // Vacation
+        "on_demand", // On demand
+        "unpaid", // Unpaid
+        "occasional", // Occasional
+        "maternity", // Maternity
+        "paternity", // Paternity
+        "parental", // Parental
+        "childcare", // Childcare
+        "care", // Care
+        "training", // Training
+        "job_search", // Job search
+        "health", // Health/Rehabilitation (replaces sick in UI but kept for backward compatibility)
         "sick", 
         "personal", 
         "other"

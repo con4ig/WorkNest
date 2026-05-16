@@ -23,7 +23,7 @@ const invitationSchema = new mongoose.Schema(
     },
     maxUses: {
       type: Number,
-      default: 1, // Domyślnie jednorazowy
+      default: 1, // Single-use by default
     },
     uses: {
       type: Number,
@@ -46,9 +46,9 @@ invitationSchema.pre("save", function (next) {
   next();
 });
 
-// Automatyczne usuwanie wygasłych zaproszeń (TTL Index)
-// expiredAt: dokument zostanie usunięty natychmiast po dacie 'expiresAt'
-// MongoDB sprawdza to w tle co ok. 60 sekund.
+// Automatic removal of expired invitations (TTL Index)
+// expiredAt: document will be removed immediately after 'expiresAt' date
+// MongoDB checks this in the background roughly every 60 seconds.
 invitationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.model("Invitation", invitationSchema);

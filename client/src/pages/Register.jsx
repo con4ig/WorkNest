@@ -85,7 +85,7 @@ export default function Register() {
                 invitationCode: data.invitationCode,
             };
 
-            // Oczyszczanie danych przed wysłaniem
+            // Clean data before sending
             if (registrationData.role === 'admin') {
                 delete registrationData.invitationCode;
             } else if (registrationData.role === 'employee') {

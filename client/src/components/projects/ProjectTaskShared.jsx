@@ -65,7 +65,7 @@ export const Icon = {
     ),
 };
 
-export const getStatusClasses = (status) => {
+export const getStatusClasses = (_status) => {
     return 'bg-secondary/50 text-muted-foreground ring-1 ring-border';
 };
 
@@ -85,7 +85,7 @@ export const getStatusColor = (status) => {
     }
 };
 
-export const getPriorityClasses = (priority) => {
+export const getPriorityClasses = (_priority) => {
     return 'bg-secondary/50 text-muted-foreground ring-1 ring-border';
 };
 

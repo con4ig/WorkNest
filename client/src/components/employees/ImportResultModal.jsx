@@ -143,9 +143,9 @@ const ImportResultModal = ({ isOpen, onClose, results }) => {
                                 <CheckCircle2 size={32} />
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight mb-1">Import zakończony sukcesem!</h3>
+                                <h3 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight mb-1">Import completed successfully!</h3>
                                 <p className="text-zinc-500 text-xs max-w-sm mx-auto font-medium">
-                                    Wszyscy pracownicy zostali pomyślnie zaimportowani do systemu.
+                                    All employees were imported into the system.
                                 </p>
                             </div>
                         </div>

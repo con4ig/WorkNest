@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ProjectRow from './projects/ProjectRow';
 import ProjectGridCard from './projects/ProjectGridCard';
-import clsx from 'clsx';
 
 const ListView = ({
     projects,

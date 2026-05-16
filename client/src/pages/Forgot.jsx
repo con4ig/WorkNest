@@ -17,7 +17,7 @@ function Forgot() {
     } = useForm();
     const navigate = useNavigate();
 
-    // Logika zostaje w oddzielnych funkcjach dla czytelności
+    // Logic is split into separate functions for readability
     const handleSendOtp = async (data) => {
         try {
             await api.post('/email/send-otp', { email: data.email });
@@ -31,7 +31,7 @@ function Forgot() {
     const handleVerifyOtp = async (data) => {
         try {
             const response = await api.post('/email/verify-otp', {
-                email: email, // Używamy email zapisanego w stanie
+                email: email, // Use the email stored in state
                 code: data.otp,
             });
             if (response.data.message === 'Kod poprawny') {
@@ -50,7 +50,7 @@ function Forgot() {
             }
 
             await api.post('/auth/reset-password', {
-                email: email, // Używamy email zapisanego w stanie
+                email: email, // Use the email stored in state
                 newPassword: data.newPassword,
             });
 
@@ -61,7 +61,7 @@ function Forgot() {
         }
     };
 
-    // JEDNA funkcja "master" do obsługi submit
+    // ONE master function to handle submit
     const onMasterSubmit = (data) => {
         if (step === 1) {
             handleSendOtp(data);
@@ -74,7 +74,7 @@ function Forgot() {
 
     return (
         <div className="flex min-h-screen flex-col md:flex-row">
-            {/* Left Panel - PRZYWRÓCONA TREŚĆ */}
+            {/* Left Panel */}
             <div className="relative hidden overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 p-12 md:flex md:w-1/2">
                 <div className="relative z-10 mt-auto">
                     <h2 className="mb-6 text-4xl font-bold text-white">
@@ -92,7 +92,7 @@ function Forgot() {
             {/* Right Panel */}
             <div className="flex flex-1 items-center justify-center bg-gray-50 p-8">
                 <div className="w-full max-w-md space-y-8">
-                    {/* PRZYWRÓCONE NAGŁÓWKI I LOGO */}
+                    {/* Headings and logo */}
                     <div className="text-center">
                         <div className="mb-2 inline-flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg">
                             <span className="text-3xl font-bold text-white">
@@ -115,7 +115,7 @@ function Forgot() {
                         </p>
                     </div>
 
-                    {/* JEDEN FORMULARZ, który owija wszystkie kroki */}
+                    {/* ONE form wrapping all steps */}
                     <form
                         onSubmit={handleSubmit(onMasterSubmit)}
                         className="mt-8 space-y-6"

@@ -45,7 +45,6 @@ const KanbanColumn = ({
     projects,
     onCardClick,
     color,
-    bgHeader,
     onArchive,
     onPermanentDelete,
     currentUserRole,
@@ -67,7 +66,7 @@ const KanbanColumn = ({
                 </span>
             </div>
 
-            {/* Lista projektów */}
+            {/* Project list */}
             <SortableContext
                 items={projects.map((p) => p._id)}
                 strategy={verticalListSortingStrategy}
@@ -93,7 +92,6 @@ const KanbanColumn = ({
     );
 };
 
-// Główny komponent Kanban
 const KanbanView = ({
     projects,
     onStatusChange,
@@ -135,7 +133,6 @@ const KanbanView = ({
         },
     ];
 
-    // Grupowanie projektów po statusie
     const projectsByStatus = columns.reduce((acc, col) => {
         acc[col.status] = projects.filter((p) => p.status === col.status);
         return acc;
@@ -152,13 +149,13 @@ const KanbanView = ({
 
         let targetStatus = null;
 
-        // 1. Najpierw sprawdź czy over.id to status kolumny (dla pustych kolumn z DroppableArea)
+        // 1. First check if over.id is a column status (for empty columns with DroppableArea)
         const column = columns.find((c) => c.status === over.id);
         if (column) {
             targetStatus = column.status;
         }
 
-        // 2. Jeśli nie, sprawdź czy upuszczono na inny projekt
+        // 2. Otherwise, check whether it was dropped on another project
         if (!targetStatus) {
             const overProject = projects.find((p) => p._id === over.id);
             if (overProject) {
@@ -166,7 +163,7 @@ const KanbanView = ({
             }
         }
 
-        // 3. Jeśli status się zmienił, wywołaj callback
+        // 3. If status changed, invoke the callback
         if (targetStatus && activeProject.status !== targetStatus) {
             onStatusChange(activeProject._id, targetStatus);
         }

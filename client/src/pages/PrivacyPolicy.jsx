@@ -1,7 +1,7 @@
 import Navbar from '../components/Navbar';
 import { Shield, Mail, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { siteConfig } from '../config'; // Importuj konfigurację
+import { siteConfig } from '../config';
 
 function PrivacyPolicy() {
     const { t } = useTranslation();

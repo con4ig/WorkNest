@@ -2,7 +2,7 @@ import { Listbox, Transition } from '@headlessui/react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import React, { Fragment } from 'react';
 
-export default function CustomSelect({ options, selected, onChange, placeholder = "Wybierz opcję" }) {
+export default function CustomSelect({ options, selected, onChange, placeholder = "Select option" }) {
     const selectedOption = options.find(option => option.id === selected) || null;
 
     return (

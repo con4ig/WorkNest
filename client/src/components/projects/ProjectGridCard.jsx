@@ -80,7 +80,7 @@ const ProjectGridCard = ({
         );
     };
 
-    const handleCardClick = (e) => {
+    const handleCardClick = (_e) => {
         if (currentUserRole !== 'employee') {
             onToggleSelect(project._id);
         } else {
