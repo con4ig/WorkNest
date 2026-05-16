@@ -9,7 +9,7 @@ updates:
       day: monday
       time: "06:00"
       timezone: Europe/Warsaw
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     labels:
       - dependencies
       - client
@@ -17,18 +17,9 @@ updates:
       prefix: "deps(client)"
       include: scope
     groups:
-      # One PR per week for dev tools — they upgrade together.
-      dev-dependencies:
-        dependency-type: development
-        update-types:
-          - minor
-          - patch
-      # Minor/patch runtime bumps grouped so the review queue stays sane.
-      runtime-minor:
-        dependency-type: production
-        update-types:
-          - minor
-          - patch
+      all-client-deps:
+        patterns:
+          - "*"
 
   # Backend
   - package-ecosystem: npm
@@ -38,7 +29,7 @@ updates:
       day: monday
       time: "06:00"
       timezone: Europe/Warsaw
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     labels:
       - dependencies
       - server
@@ -46,16 +37,9 @@ updates:
       prefix: "deps(server)"
       include: scope
     groups:
-      dev-dependencies:
-        dependency-type: development
-        update-types:
-          - minor
-          - patch
-      runtime-minor:
-        dependency-type: production
-        update-types:
-          - minor
-          - patch
+      all-server-deps:
+        patterns:
+          - "*"
 
   # GitHub Actions versions
   - package-ecosystem: github-actions
@@ -65,24 +49,40 @@ updates:
       day: monday
       time: "06:00"
       timezone: Europe/Warsaw
+    open-pull-requests-limit: 1
     labels:
       - dependencies
       - ci
     commit-message:
       prefix: "deps(ci)"
+    groups:
+      all-actions:
+        patterns:
+          - "*"
 
   # Docker base images
   - package-ecosystem: docker
     directory: /client
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
     labels:
       - dependencies
       - docker
+    groups:
+      all-client-docker:
+        patterns:
+          - "*"
+
   - package-ecosystem: docker
     directory: /server
     schedule:
       interval: weekly
+    open-pull-requests-limit: 1
     labels:
       - dependencies
       - docker
+    groups:
+      all-server-docker:
+        patterns:
+          - "*"
