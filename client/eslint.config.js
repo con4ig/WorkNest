@@ -1,23 +1,24 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 
-export default defineConfig([
-    globalIgnores(['dist', 'storybook-static', '.lighthouseci']),
-
-    // App source.
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+    {
+        ignores: ['dist', 'storybook-static', '.lighthouseci', 'node_modules'],
+    },
     {
         files: ['src/**/*.{js,jsx}'],
-        extends: [
-            js.configs.recommended,
-            reactHooks.configs['recommended-latest'],
-            reactRefresh.configs.vite,
-        ],
+        plugins: {
+            'react-hooks': reactHooks,
+            'react-refresh': reactRefresh,
+        },
         languageOptions: {
             ecmaVersion: 2020,
-            globals: globals.browser,
+            globals: {
+                ...globals.browser,
+            },
             parserOptions: {
                 ecmaVersion: 'latest',
                 ecmaFeatures: { jsx: true },
@@ -25,6 +26,8 @@ export default defineConfig([
             },
         },
         rules: {
+            ...js.configs.recommended.rules,
+            ...reactHooks.configs.recommended.rules,
             'no-unused-vars': [
                 'error',
                 {
@@ -33,18 +36,12 @@ export default defineConfig([
                     caughtErrorsIgnorePattern: '^_|^err$',
                 },
             ],
-            // Context files legitimately export both the Provider component
-            // and the matching `useX` hook. Allowing constant exports keeps
-            // HMR sensible without forcing a file split.
             'react-refresh/only-export-components': [
                 'warn',
                 { allowConstantExport: true },
             ],
         },
     },
-
-    // Vitest test files — globals are explicit imports, but jsdom env
-    // applies and some helpers reach for `global`.
     {
         files: ['src/**/*.{test,spec}.{js,jsx}', 'src/test/**/*.{js,jsx}'],
         languageOptions: {
@@ -54,8 +51,6 @@ export default defineConfig([
             'react-refresh/only-export-components': 'off',
         },
     },
-
-    // Storybook story files — default exports are configs, not components.
     {
         files: ['src/**/*.stories.{js,jsx}', '.storybook/**/*.{js,jsx}'],
         rules: {
@@ -63,8 +58,6 @@ export default defineConfig([
             'no-unused-vars': 'off',
         },
     },
-
-    // Tooling / config files run in Node.
     {
         files: ['*.config.{js,mjs}', 'vite.config.js', 'vitest.config.js'],
         languageOptions: {
@@ -74,4 +67,4 @@ export default defineConfig([
             'react-refresh/only-export-components': 'off',
         },
     },
-])
+];
