@@ -1,68 +1,69 @@
 {
-  "name": "worknest",
-  "private": true,
-  "version": "1.0.0",
-  "description": "WorkNest monorepo root — holds repository-wide dev tooling (Husky, lint-staged, commitlint). Application code lives in `client/` and `server/`.",
-  "engines": {
-    "node": ">=20",
-    "npm": ">=10"
-  },
-  "scripts": {
-    "prepare": "husky",
-    "lint-staged": "lint-staged",
-    "test": "npm test --prefix server",
-    "test:client": "npm test --prefix client",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:install": "playwright install --with-deps chromium",
-    "verify:locales": "node scripts/verify-locale-parity.mjs"
-  },
-  "lint-staged": {
-    "client/**/*.{js,jsx}": [
-      "prettier --write --config client/prettier.config.mjs"
-    ],
-    "server/**/*.js": [
-      "prettier --write"
-    ],
-    "**/*.{json,md,yml,yaml}": [
-      "prettier --write"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "header-max-length": [
-        2,
-        "always",
-        100
-      ],
-      "scope-enum": [
-        1,
-        "always",
-        [
-          "client",
-          "server",
-          "ci",
-          "docs",
-          "deps",
-          "infra",
-          "test",
-          "auth",
-          "projects",
-          "leaves",
-          "i18n"
+    "name": "worknest",
+    "private": true,
+    "version": "1.0.0",
+    "description": "WorkNest monorepo root — holds repository-wide dev tooling (Husky, lint-staged, commitlint). Application code lives in `client/` and `server/`.",
+    "engines": {
+        "node": ">=20",
+        "npm": ">=10"
+    },
+    "scripts": {
+        "prepare": "husky",
+        "lint-staged": "lint-staged",
+        "test": "npm test --prefix server",
+        "test:client": "npm test --prefix client",
+        "test:e2e": "playwright test",
+        "test:e2e:ui": "playwright test --ui",
+        "test:e2e:install": "playwright install --with-deps chromium",
+        "verify:locales": "node scripts/verify-locale-parity.mjs"
+    },
+    "lint-staged": {
+        "client/**/*.{js,jsx}": [
+            "prettier --write --config client/prettier.config.mjs"
+        ],
+        "server/**/*.js": [
+            "prettier --write"
+        ],
+        "**/*.{json,md,yml,yaml}": [
+            "prettier --write"
         ]
-      ]
+    },
+    "commitlint": {
+        "extends": [
+            "@commitlint/config-conventional"
+        ],
+        "rules": {
+            "header-max-length": [
+                2,
+                "always",
+                100
+            ],
+            "scope-enum": [
+                1,
+                "always",
+                [
+                    "client",
+                    "server",
+                    "ci",
+                    "docs",
+                    "deps",
+                    "infra",
+                    "test",
+                    "auth",
+                    "projects",
+                    "leaves",
+                    "i18n"
+                ]
+            ]
+        }
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^19.6.1",
+        "@commitlint/config-conventional": "^19.6.0",
+        "@playwright/test": "^1.49.1",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.3.0",
+        "prettier": "^3.4.2",
+        "prettier-plugin-tailwindcss": "^0.8.0"
     }
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^19.6.1",
-    "@commitlint/config-conventional": "^19.6.0",
-    "@playwright/test": "^1.49.1",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.3.0",
-    "prettier": "^3.4.2"
-  }
 }

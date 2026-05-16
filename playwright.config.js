@@ -53,7 +53,7 @@ export default defineConfig({
       cwd: "./server",
       port: 5500,
       reuseExistingServer: !process.env.CI,
-      timeout: 60_000,
+      timeout: 120_000,
       env: {
         NODE_ENV: "test",
         PORT: "5500",
@@ -69,11 +69,11 @@ export default defineConfig({
       },
     },
     {
-      command: "npm run dev -- --port 5173 --strictPort",
+      command: "npm run dev -- --port 5173 --strictPort --host 127.0.0.1",
       cwd: "./client",
       port: PORT,
       reuseExistingServer: !process.env.CI,
-      timeout: 60_000,
+      timeout: 120_000,
       env: {
         VITE_API_TARGET: "http://127.0.0.1:5500",
       },
