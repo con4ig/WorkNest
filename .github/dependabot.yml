@@ -1,6 +1,26 @@
 version: 2
 
 updates:
+  # Root tooling used by E2E and repo automation
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Warsaw
+    open-pull-requests-limit: 1
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: "deps(ci)"
+      include: scope
+    groups:
+      all-root-tooling:
+        patterns:
+          - "*"
+
   # Frontend
   - package-ecosystem: npm
     directory: /client
