@@ -27,20 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
-    # Provide a real MongoDB instance — the demo-login flow writes
-    # actual rows, and we want the same code path the production demo
-    # button takes.
-    services:
-      mongo:
-        image: mongo:7
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -53,6 +39,20 @@ jobs:
             package-lock.json
             client/package-lock.json
             server/package-lock.json
+
+      - name: Start MongoDB Replica Set
+        run: |
+          docker run --name mongo -d -p 27017:27017 mongo:7 mongod --replSet rs0 --bind_ip_all
+          echo "Waiting for MongoDB to start..."
+          until docker exec mongo mongosh --eval "db.runCommand({ ping: 1 }).ok" --quiet; do
+            sleep 1
+          done
+          echo "Initiating Replica Set..."
+          docker exec mongo mongosh --eval "rs.initiate({_id:'rs0', members:[{_id:0, host:'localhost:27017'}]})"
+          until docker exec mongo mongosh --eval "rs.status().ok" --quiet; do
+            sleep 1
+          done
+          echo "MongoDB is ready."
 
       - name: Install root tooling (Playwright + Husky scaffolding)
         run: npm ci --no-fund --no-audit
