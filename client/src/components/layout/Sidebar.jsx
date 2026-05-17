@@ -32,7 +32,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
         setTimeout(logout, 0);
     };
 
-    const NavItem = ({ to, icon: Icon, label, exact = false }) => {
+    const NavItem = ({ to, icon, label, exact = false }) => {
+        const Icon = icon;
         const isActive = exact
             ? location.pathname === to
             : location.pathname.startsWith(to);

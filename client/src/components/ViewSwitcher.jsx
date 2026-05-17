@@ -25,15 +25,10 @@ const ViewSwitcher = ({
     return (
         <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-secondary/20 p-1 backdrop-blur-sm">
             {views.map(
-                ({
-                    id,
-                    icon: Icon,
-                    label,
-                    disabledInArchive,
-                    forceDisabled,
-                }) => {
+                ({ id, icon, label, disabledInArchive, forceDisabled }) => {
                     if (forceDisabled) return null;
 
+                    const Icon = icon;
                     const isDisabled = disabledInArchive && showArchived;
                     return (
                         <button
