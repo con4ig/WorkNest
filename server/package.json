@@ -35,10 +35,12 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "esbuild": "^0.28.0",
     "mongodb-memory-server": "^10.1.4",
     "nodemon": "^3.1.10",
     "pino-pretty": "^11.2.2",
     "supertest": "^7.1.0",
-    "vitest": "^2.1.8"
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6"
   }
 }
