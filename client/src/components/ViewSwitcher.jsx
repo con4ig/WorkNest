@@ -27,7 +27,7 @@ const ViewSwitcher = ({
             {views.map(
                 ({
                     id,
-                    icon: _Icon,
+                    icon: Icon,
                     label,
                     disabledInArchive,
                     forceDisabled,

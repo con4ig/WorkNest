@@ -302,6 +302,10 @@
             "home": "Strona główna",
             "expand": "Rozwiń menu",
             "collapse": "Zwiń menu",
+            "editProfile": "Edytuj profil",
+            "avatarAlt": "Zdjęcie profilowe użytkownika {{name}}",
+            "lightMode": "Przełącz na tryb jasny",
+            "darkMode": "Przełącz na tryb ciemny",
             "logout": "Wyloguj"
         },
         "stats": {
@@ -326,7 +330,8 @@
             "projectProgress": "Postęp Projektów",
             "progress": "Postęp Projektów",
             "progressDesc": "Status realizacji aktywnych projektów.",
-            "general": "Ogólnie"
+            "general": "Ogólnie",
+            "overall": "Ogólnie"
         },
         "reminders": {
             "title": "Przypomnienia",

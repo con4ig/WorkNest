@@ -32,7 +32,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
         setTimeout(logout, 0);
     };
 
-    const NavItem = ({ to, icon: _Icon, label, exact = false }) => {
+    const NavItem = ({ to, icon: Icon, label, exact = false }) => {
         const isActive = exact
             ? location.pathname === to
             : location.pathname.startsWith(to);
@@ -47,7 +47,12 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                 role="link"
                 tabIndex={0}
                 onClick={handleNav}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNav(); } }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleNav();
+                    }
+                }}
                 aria-label={label}
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
@@ -91,7 +96,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                 isSidebarOpen
                     ? 'w-72 shadow-2xl'
                     : isMobile
-                      ? '-translate-x-full w-72'
+                      ? 'w-72 -translate-x-full'
                       : 'w-20',
                 isMobile && 'rounded-r-2xl',
             )}
@@ -106,9 +111,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setIsSidebarOpen(true)}
-                                aria-label={t('dashboard.sidebar.expand', { defaultValue: 'Expand sidebar' })}
+                                aria-label={t('dashboard.sidebar.expand', {
+                                    defaultValue: 'Expand sidebar',
+                                })}
                             >
-                                <ChevronRight className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                                <ChevronRight
+                                    className="h-5 w-5 text-muted-foreground"
+                                    aria-hidden="true"
+                                />
                             </Button>
                         </div>
                     )}
@@ -120,15 +130,28 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                 <div
                                     role="button"
                                     tabIndex={0}
-                                    className="relative cursor-pointer transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full"
+                                    className="relative cursor-pointer rounded-full transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     onClick={() => navigate('/upload')}
-                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/upload'); }}
-                                    aria-label={t('dashboard.sidebar.editProfile', { defaultValue: 'Edit profile' })}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ')
+                                            navigate('/upload');
+                                    }}
+                                    aria-label={t(
+                                        'dashboard.sidebar.editProfile',
+                                        { defaultValue: 'Edit profile' },
+                                    )}
                                 >
                                     {profileImage ? (
                                         <img
                                             src={profileImage}
-                                            alt={t('dashboard.sidebar.avatarAlt', { defaultValue: 'Profile picture', name: username })}
+                                            alt={t(
+                                                'dashboard.sidebar.avatarAlt',
+                                                {
+                                                    defaultValue:
+                                                        'Profile picture',
+                                                    name: username,
+                                                },
+                                            )}
                                             loading="lazy"
                                             className="h-10 w-10 rounded-full border border-border object-cover"
                                         />
@@ -159,9 +182,15 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                     size="icon"
                                     onClick={() => setIsSidebarOpen(false)}
                                     className="-mr-2 text-muted-foreground hover:text-foreground"
-                                    aria-label={t('dashboard.sidebar.collapse', { defaultValue: 'Collapse sidebar' })}
+                                    aria-label={t(
+                                        'dashboard.sidebar.collapse',
+                                        { defaultValue: 'Collapse sidebar' },
+                                    )}
                                 >
-                                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                                    <ChevronLeft
+                                        className="h-5 w-5"
+                                        aria-hidden="true"
+                                    />
                                 </Button>
                             )}
                         </div>
@@ -227,7 +256,15 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                             !isSidebarOpen && 'justify-center',
                         )}
                         onClick={toggleTheme}
-                        aria-label={theme === 'dark' ? t('dashboard.sidebar.lightMode', { defaultValue: 'Switch to light mode' }) : t('dashboard.sidebar.darkMode', { defaultValue: 'Switch to dark mode' })}
+                        aria-label={
+                            theme === 'dark'
+                                ? t('dashboard.sidebar.lightMode', {
+                                      defaultValue: 'Switch to light mode',
+                                  })
+                                : t('dashboard.sidebar.darkMode', {
+                                      defaultValue: 'Switch to dark mode',
+                                  })
+                        }
                     >
                         {theme === 'dark' ? (
                             <Sun className="h-5 w-5" aria-hidden="true" />
@@ -244,7 +281,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                     {isSidebarOpen ? (
                         <Button
                             variant="ghost"
-                            className="border-destructive/20 bg-destructive/5 w-full justify-start gap-3 border text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                            className="w-full justify-start gap-3 border border-destructive/20 bg-destructive/5 text-destructive hover:bg-destructive hover:text-destructive-foreground"
                             onClick={handleLogout}
                         >
                             <LogOut className="h-4 w-4" aria-hidden="true" />
@@ -256,10 +293,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                 variant="ghost"
                                 size="icon"
                                 onClick={handleLogout}
-                                className="border-destructive/20 border text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                                className="border border-destructive/20 text-destructive hover:bg-destructive hover:text-destructive-foreground"
                                 aria-label={t('dashboard.sidebar.logout')}
                             >
-                                <LogOut className="h-5 w-5" aria-hidden="true" />
+                                <LogOut
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                />
                             </Button>
                         </div>
                     )}

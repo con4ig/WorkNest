@@ -302,6 +302,10 @@
             "home": "Home",
             "expand": "Expand menu",
             "collapse": "Collapse menu",
+            "editProfile": "Edit profile",
+            "avatarAlt": "Profile picture of {{name}}",
+            "lightMode": "Switch to light mode",
+            "darkMode": "Switch to dark mode",
             "logout": "Logout"
         },
         "stats": {
@@ -326,7 +330,8 @@
             "projectProgress": "Project Progress",
             "progress": "Projects Progress",
             "progressDesc": "Status of active projects.",
-            "general": "Overall"
+            "general": "Overall",
+            "overall": "Overall"
         },
         "reminders": {
             "title": "Reminders",
