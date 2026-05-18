@@ -1,6 +1,6 @@
-# 💼 Projekt: WorkNest - Kompleksowy System HR dla Firm
+# Projekt: WorkNest - Kompleksowy System HR dla Firm
 
-## 📋 Spis Treści
+## Spis Treści
 
 1. [Opis Projektu](#opis-projektu)
 2. [Cele Projektu](#cele-projektu)
@@ -15,7 +15,7 @@
 
 ---
 
-## 🎯 Opis Projektu
+## Opis Projektu
 
 **Nazwa:** WorkNest - All-in-One HR Management System
 
@@ -26,7 +26,7 @@ WorkNest to nowoczesna, kompleksowa platforma HR zaprojektowana dla małych i ś
 
 **Problem do Rozwiązania:**
 
-❌ **Aktualne Problemy w Firmach:**
+**Aktualne Problemy w Firmach:**
 
 - Rozproszenie narzędzi HR (Excel, maile, papier)
 - Brak centralnej bazy danych pracowników
@@ -39,7 +39,7 @@ WorkNest to nowoczesna, kompleksowa platforma HR zaprojektowana dla małych i ś
 
 **Rozwiązanie:**
 
-✅ **WorkNest oferuje:**
+**WorkNest oferuje:**
 
 - Jeden system do wszystkich procesów HR
 - Automatyzacja powtarzalnych zadań
@@ -52,7 +52,7 @@ WorkNest to nowoczesna, kompleksowa platforma HR zaprojektowana dla małych i ś
 
 ---
 
-## 🎯 Cele Projektu
+## Cele Projektu
 
 ### Cele Biznesowe:
 
@@ -126,7 +126,7 @@ WorkNest to nowoczesna, kompleksowa platforma HR zaprojektowana dla małych i ś
 
 ---
 
-## 👥 Grupa Docelowa
+## Grupa Docelowa
 
 ### Segment Główny: SMB (Small & Medium Business)
 
@@ -177,28 +177,28 @@ WorkNest to nowoczesna, kompleksowa platforma HR zaprojektowana dla małych i ś
 
 ### User Personas:
 
-**👔 Persona 1: Marek - HR Manager (35 lat)**
+**Persona 1: Marek - HR Manager (35 lat)**
 
 - Zarządza działem HR w firmie 150 osób
 - Frustracja: dużo czasu na admin, mało na strategię
 - Tech-savvy, lubi nowoczesne narzędzia
 - Oczekiwania: automatyzacja, analytics, łatwość użycia
 
-**👩‍💼 Persona 2: Anna - CEO Small Business (42 lata)**
+**Persona 2: Anna - CEO Small Business (42 lata)**
 
 - Prowadzi firmę 25 osób, sama zajmuje się HR
 - Frustracja: brak czasu, chaos w dokumentach
 - Podstawowa znajomość IT
 - Oczekiwania: prostota, niski koszt, oszczędność czasu
 
-**👨‍💻 Persona 3: Piotr - Pracownik (28 lat)**
+**Persona 3: Piotr - Pracownik (28 lat)**
 
 - Developer w średniej firmie IT
 - Frustracja: nieczytelne procesy, długi czas odpowiedzi HR
 - Digital native
 - Oczekiwania: self-service, mobile app, transparentność
 
-**📊 Persona 4: Kasia - CFO (45 lat)**
+**Persona 4: Kasia - CFO (45 lat)**
 
 - Odpowiada za finanse i payroll
 - Frustracja: błędy w rozliczeniach, brak raportów
@@ -207,26 +207,26 @@ WorkNest to nowoczesna, kompleksowa platforma HR zaprojektowana dla małych i ś
 
 ---
 
-## ⚙️ Funkcjonalności
+## Funkcjonalności
 
-### 🏢 1. Moduł Core HR (Employee Management)
+### 1. Moduł Core HR (Employee Management)
 
 **Baza Pracowników:**
 
-- ✅ Centralna baza danych wszystkich pracowników
-- ✅ Profile pracowników z pełnymi danymi
+- Centralna baza danych wszystkich pracowników
+- Profile pracowników z pełnymi danymi
   - Dane osobowe (RODO compliant)
   - Dane kontaktowe
   - Dane umowy (typ, stanowisko, wynagrodzenie)
   - Historia zatrudnienia
   - Dokumenty (umowy, aneksy, świadectwa)
   - Zdjęcie profilowe
-- ✅ Organizational Chart
+- Organizational Chart
   - Interaktywny organigram
   - Hierarchia firmowa
   - Struktura działów
   - Relacje manager-pracownik
-- ✅ Employee Directory
+- Employee Directory
   - Wyszukiwarka pracowników
   - Filtry i sortowanie
   - Karty kontaktowe
@@ -234,339 +234,339 @@ WorkNest to nowoczesna, kompleksowa platforma HR zaprojektowana dla małych i ś
 
 **Zarządzanie Dokumentami:**
 
-- 📄 Digital document repository
-- 📄 E-podpisy
-- 📄 Automatyczne generowanie umów
-- 📄 Wersjonowanie dokumentów
-- 📄 Powiadomienia o wygasających dokumentach
-- 📄 Bezpieczne przechowywanie (szyfrowane)
+- Digital document repository
+- E-podpisy
+- Automatyczne generowanie umów
+- Wersjonowanie dokumentów
+- Powiadomienia o wygasających dokumentach
+- Bezpieczne przechowywanie (szyfrowane)
 
 ---
 
-### 🎯 2. Moduł Rekrutacji (Recruitment & ATS)
+### 2. Moduł Rekrutacji (Recruitment & ATS)
 
 **Applicant Tracking System:**
 
-- 📢 Tworzenie ogłoszeń o pracę
-- 📢 Multi-channel posting (własna strona + LinkedIn, Pracuj.pl)
-- 📢 Career page builder
-- 📢 Formularz aplikacyjny
-- 📢 CV parsing (automatyczne wyciąganie danych)
+- Tworzenie ogłoszeń o pracę
+- Multi-channel posting (własna strona + LinkedIn, Pracuj.pl)
+- Career page builder
+- Formularz aplikacyjny
+- CV parsing (automatyczne wyciąganie danych)
 
 **Pipeline Rekrutacyjny:**
 
-- 📊 Kanban board z etapami rekrutacji
+- Kanban board z etapami rekrutacji
   - Nowe aplikacje
   - Screening CV
   - Rozmowa telefoniczna
   - Rozmowa techniczna
   - Oferta
   - Hired/Rejected
-- 📊 Drag & drop przesuwanie kandydatów
-- 📊 Notatki i komentarze
-- 📊 Oceny kandydatów (scorecards)
-- 📊 Email templates
-- 📊 Interview scheduling
+- Drag & drop przesuwanie kandydatów
+- Notatki i komentarze
+- Oceny kandydatów (scorecards)
+- Email templates
+- Interview scheduling
 
 **Analytics:**
 
-- 📈 Time to hire
-- 📈 Source of hire
-- 📈 Conversion rates
-- 📈 Recruitment funnel
-- 📈 Cost per hire
+- Time to hire
+- Source of hire
+- Conversion rates
+- Recruitment funnel
+- Cost per hire
 
 ---
 
-### 📅 3. Moduł Time & Attendance
+### 3. Moduł Time & Attendance
 
 **System Czasu Pracy:**
 
-- ⏰ Time clock (punch in/out)
-- ⏰ Timesheet tracking
-- ⏰ GPS location tracking (mobile)
-- ⏰ Overtime tracking
-- ⏰ Break management
-- ⏰ Shift scheduling
+- Time clock (punch in/out)
+- Timesheet tracking
+- GPS location tracking (mobile)
+- Overtime tracking
+- Break management
+- Shift scheduling
 
 **Urlopy i Nieobecności:**
 
-- 🏖️ Employee self-service portal
-- 🏖️ Wnioski o urlop online
-- 🏖️ Multi-level approval workflow
-- 🏖️ Różne typy urlopów:
+- Employee self-service portal
+- Wnioski o urlop online
+- Multi-level approval workflow
+- Różne typy urlopów:
   - Urlop wypoczynkowy
   - Urlop na żądanie
   - Zwolnienie lekarskie (L4)
   - Opieka nad dzieckiem
   - Urlop okolicznościowy
   - Urlop bezpłatny
-- 🏖️ Kalendarz zespołu (kto jest na urlopie)
-- 🏖️ Balance tracking (ile dni zostało)
-- 🏖️ Automatic accrual
-- 🏖️ Email notifications
-- 🏖️ Conflict detection (np. zbyt wielu na urlopie)
+- Kalendarz zespołu (kto jest na urlopie)
+- Balance tracking (ile dni zostało)
+- Automatic accrual
+- Email notifications
+- Conflict detection (np. zbyt wielu na urlopie)
 
 **Kalendarze:**
 
-- 📆 Personal calendar
-- 📆 Team calendar
-- 📆 Company calendar
-- 📆 Holiday calendar
-- 📆 Meeting scheduler
-- 📆 Integration z Google Calendar / Outlook
+- Personal calendar
+- Team calendar
+- Company calendar
+- Holiday calendar
+- Meeting scheduler
+- Integration z Google Calendar / Outlook
 
 ---
 
-### 💰 4. Moduł Payroll & Benefits
+### 4. Moduł Payroll & Benefits
 
 **Wynagrodzenia:**
 
-- 💵 Payroll processing
-- 💵 Salary calculator
-- 💵 Tax calculations
-- 💵 ZUS contributions
-- 💵 Deductions management
-- 💵 Bonuses & commissions
-- 💵 Pay slips generation
-- 💵 Bank transfer files (Elixir)
+- Payroll processing
+- Salary calculator
+- Tax calculations
+- ZUS contributions
+- Deductions management
+- Bonuses & commissions
+- Pay slips generation
+- Bank transfer files (Elixir)
 
 **Employee Self-Service:**
 
-- 📱 Dostęp do pay slips
-- 📱 YTD earnings
-- 📱 Tax documents (PIT)
-- 📱 Benefit status
-- 📱 Download/print opcje
+- Dostęp do pay slips
+- YTD earnings
+- Tax documents (PIT)
+- Benefit status
+- Download/print opcje
 
 **Benefits Management:**
 
-- 🎁 Benefit packages
-- 🎁 Health insurance
-- 🎁 Multisport card
-- 🎁 Meal vouchers
-- 🎁 Retirement plans
-- 🎁 Stock options
-- 🎁 Custom benefits
+- Benefit packages
+- Health insurance
+- Multisport card
+- Meal vouchers
+- Retirement plans
+- Stock options
+- Custom benefits
 
 **Raporty Finansowe:**
 
-- 📊 Payroll reports
-- 📊 Cost center analysis
-- 📊 Budget vs actual
-- 📊 Tax reports
-- 📊 Export dla księgowości
+- Payroll reports
+- Cost center analysis
+- Budget vs actual
+- Tax reports
+- Export dla księgowości
 
 ---
 
-### 🎓 5. Moduł Onboarding & Offboarding
+### 5. Moduł Onboarding & Offboarding
 
 **Onboarding Nowych Pracowników:**
 
-- 🎯 Customizable onboarding workflows
-- 🎯 Task checklists
+- Customizable onboarding workflows
+- Task checklists
   - Dla nowego pracownika
   - Dla managera
   - Dla HR
   - Dla IT
-- 🎯 Welcome package
-- 🎯 Company handbook
-- 🎯 Training materials
-- 🎯 Equipment assignment
-- 🎯 Access provisioning
-- 🎯 Buddy system
-- 🎯 30-60-90 day plans
+- Welcome package
+- Company handbook
+- Training materials
+- Equipment assignment
+- Access provisioning
+- Buddy system
+- 30-60-90 day plans
 
 **Offboarding:**
 
-- 👋 Exit interviews
-- 👋 Knowledge transfer checklist
-- 👋 Equipment return
-- 👋 Access revocation
-- 👋 Final paycheck calculation
-- 👋 COBRA notifications
-- 👋 Alumni network
+- Exit interviews
+- Knowledge transfer checklist
+- Equipment return
+- Access revocation
+- Final paycheck calculation
+- COBRA notifications
+- Alumni network
 
 ---
 
-### 📈 6. Moduł Performance Management
+### 6. Moduł Performance Management
 
 **Oceny Pracowników:**
 
-- ⭐ Performance review cycles
-- ⭐ 360-degree feedback
-- ⭐ Self-assessment
-- ⭐ Manager assessment
-- ⭐ Peer reviews
-- ⭐ Goal setting (OKRs / KPIs)
-- ⭐ Rating scales
-- ⭐ Competency matrix
+- Performance review cycles
+- 360-degree feedback
+- Self-assessment
+- Manager assessment
+- Peer reviews
+- Goal setting (OKRs / KPIs)
+- Rating scales
+- Competency matrix
 
 **One-on-Ones:**
 
-- 💬 Meeting templates
-- 💬 Agenda builder
-- 💬 Notes & action items
-- 💬 Meeting history
-- 💬 Feedback log
+- Meeting templates
+- Agenda builder
+- Notes & action items
+- Meeting history
+- Feedback log
 
 **Development Plans:**
 
-- 🚀 Individual development plans (IDP)
-- 🚀 Career paths
-- 🚀 Skill gap analysis
-- 🚀 Training recommendations
-- 🚀 Succession planning
+- Individual development plans (IDP)
+- Career paths
+- Skill gap analysis
+- Training recommendations
+- Succession planning
 
 **Recognition & Rewards:**
 
-- 🏆 Peer recognition
-- 🏆 Badges & achievements
-- 🏆 Points system
-- 🏆 Leaderboards
-- 🏆 Reward redemption
+- Peer recognition
+- Badges & achievements
+- Points system
+- Leaderboards
+- Reward redemption
 
 ---
 
-### 📚 7. Moduł Learning & Development
+### 7. Moduł Learning & Development
 
 **Training Management:**
 
-- 📖 Course catalog
-- 📖 Training calendar
-- 📖 Enrollment system
-- 📖 Attendance tracking
-- 📖 Certificates
-- 📖 Training budget tracking
+- Course catalog
+- Training calendar
+- Enrollment system
+- Attendance tracking
+- Certificates
+- Training budget tracking
 
 **E-Learning:**
 
-- 🎓 LMS (Learning Management System)
-- 🎓 Video courses
-- 🎓 Quizzes & assessments
-- 🎓 Progress tracking
-- 🎓 Completion certificates
-- 🎓 Mobile learning
+- LMS (Learning Management System)
+- Video courses
+- Quizzes & assessments
+- Progress tracking
+- Completion certificates
+- Mobile learning
 
 **Compliance Training:**
 
-- ✅ Mandatory trainings
-- ✅ Deadline tracking
-- ✅ Automated reminders
-- ✅ Compliance reports
-- ✅ Audit trail
+- Mandatory trainings
+- Deadline tracking
+- Automated reminders
+- Compliance reports
+- Audit trail
 
 ---
 
-### 💬 8. Moduł Communication & Engagement
+### 8. Moduł Communication & Engagement
 
 **Internal Communication:**
 
-- 📣 Company news feed
-- 📣 Announcements
-- 📣 Polls & surveys
-- 📣 Comments & reactions
-- 📣 @mentions
-- 📣 Department channels
+- Company news feed
+- Announcements
+- Polls & surveys
+- Comments & reactions
+- @mentions
+- Department channels
 
 **Employee Engagement:**
 
-- 😊 Pulse surveys
-- 😊 eNPS tracking
-- 😊 Sentiment analysis
-- 😊 Anonymous feedback
-- 😊 Suggestion box
-- 😊 Action plans
+- Pulse surveys
+- eNPS tracking
+- Sentiment analysis
+- Anonymous feedback
+- Suggestion box
+- Action plans
 
 **Social Features:**
 
-- 👥 Employee profiles
-- 👥 Birthday/anniversary reminders
-- 👥 Company events
-- 👥 Photo galleries
-- 👥 Social wall
+- Employee profiles
+- Birthday/anniversary reminders
+- Company events
+- Photo galleries
+- Social wall
 
 ---
 
-### 📊 9. Moduł Analytics & Reporting
+### 9. Moduł Analytics & Reporting
 
 **HR Dashboards:**
 
-- 📈 Executive dashboard
-- 📈 HR manager dashboard
-- 📈 Department dashboards
-- 📈 Real-time metrics
-- 📈 Customizable widgets
+- Executive dashboard
+- HR manager dashboard
+- Department dashboards
+- Real-time metrics
+- Customizable widgets
 
 **Key HR Metrics:**
 
-- 📊 Headcount & demographics
-- 📊 Turnover rate
-- 📊 Time to hire
-- 📊 Absenteeism
-- 📊 Training hours
-- 📊 Performance ratings distribution
-- 📊 Salary benchmarking
-- 📊 Cost per employee
-- 📊 Diversity & inclusion metrics
+- Headcount & demographics
+- Turnover rate
+- Time to hire
+- Absenteeism
+- Training hours
+- Performance ratings distribution
+- Salary benchmarking
+- Cost per employee
+- Diversity & inclusion metrics
 
 **Custom Reports:**
 
-- 🔍 Report builder
-- 🔍 Saved reports
-- 🔍 Scheduled reports (email)
-- 🔍 Export formats (PDF, Excel, CSV)
-- 🔍 Data visualization (charts, graphs)
+- Report builder
+- Saved reports
+- Scheduled reports (email)
+- Export formats (PDF, Excel, CSV)
+- Data visualization (charts, graphs)
 
 **Predictive Analytics:**
 
-- 🔮 Turnover prediction
-- 🔮 Flight risk indicators
-- 🔮 Workforce planning
-- 🔮 Talent pipeline
+- Turnover prediction
+- Flight risk indicators
+- Workforce planning
+- Talent pipeline
 
 ---
 
-### ⚙️ 10. Moduł Administration & Settings
+### 10. Moduł Administration & Settings
 
 **Company Settings:**
 
-- 🏢 Company profile
-- 🏢 Departments & locations
-- 🏢 Working hours
-- 🏢 Holiday calendar
-- 🏢 Email templates
-- 🏢 Branding (logo, colors)
+- Company profile
+- Departments & locations
+- Working hours
+- Holiday calendar
+- Email templates
+- Branding (logo, colors)
 
 **User Management:**
 
-- 👤 User roles & permissions
-- 👤 Access control (RBAC)
-- 👤 Multi-level hierarchy
-- 👤 Delegation
-- 👤 Audit logs
+- User roles & permissions
+- Access control (RBAC)
+- Multi-level hierarchy
+- Delegation
+- Audit logs
 
 **Integrations:**
 
-- 🔗 Slack
-- 🔗 Microsoft Teams
-- 🔗 Google Workspace
-- 🔗 Zoom
-- 🔗 LinkedIn
-- 🔗 Accounting software
-- 🔗 SSO (SAML, OAuth)
+- Slack
+- Microsoft Teams
+- Google Workspace
+- Zoom
+- LinkedIn
+- Accounting software
+- SSO (SAML, OAuth)
 
 **API & Webhooks:**
 
-- 🔌 RESTful API
-- 🔌 API documentation
-- 🔌 Webhook events
-- 🔌 Rate limiting
-- 🔌 API keys management
+- RESTful API
+- API documentation
+- Webhook events
+- Rate limiting
+- API keys management
 
 ---
 
-## 🏗️ Architektura Systemu MERN
+## Architektura Systemu MERN
 
 ### Stack Overview:
 
@@ -934,11 +934,11 @@ const roleCheck = (...allowedRoles) => {
 
 ---
 
-## 👔 Role w Projekcie
+## Role w Projekcie
 
 Jako **Solo Full-Stack Developer** prowadzący projekt WorkNest w stacku MERN, pełnisz **WSZYSTKIE role**:
 
-### 🎯 Twoje Główne Role:
+### Twoje Główne Role:
 
 #### 1. **Product Owner & Business Analyst**
 
@@ -1317,10 +1317,10 @@ employeeSchema.index({ department: 1, hireDate: -1 });
 leaveSchema.index({ employee: 1, startDate: -1 });
 
 // Query Optimization Examples
-// Bad ❌
+// Bad
 const employees = await Employee.find().populate("department");
 
-// Good ✅
+// Good
 const employees = await Employee.find()
   .populate("department", "name") // Only needed fields
   .select("firstName lastName email position") // Projection
@@ -1432,7 +1432,7 @@ Production Environment:
 
 ---
 
-## 📅 Timeline Projektu (Solo Developer)
+## Timeline Projektu (Solo Developer)
 
 ### Realistyczny Plan na 6 Miesięcy (MVP)
 
@@ -1440,23 +1440,23 @@ Production Environment:
 
 **Tydzień 1-2: Planning & Design (80h)**
 
-- ✅ Market research (8h)
-- ✅ Competitor analysis (8h)
-- ✅ Feature prioritization (8h)
-- ✅ Database schema design (12h)
-- ✅ Wireframing w Figma (16h)
-- ✅ UI Design (20h)
-- ✅ Design system (8h)
+- Market research (8h)
+- Competitor analysis (8h)
+- Feature prioritization (8h)
+- Database schema design (12h)
+- Wireframing w Figma (16h)
+- UI Design (20h)
+- Design system (8h)
 
 **Tydzień 3-4: Project Setup (80h)**
 
-- ✅ Repository setup (4h)
-- ✅ Frontend boilerplate (React + Redux) (12h)
-- ✅ Backend boilerplate (Node + Express) (12h)
-- ✅ MongoDB connection & models (16h)
-- ✅ Authentication system (JWT) (20h)
-- ✅ Basic routing (8h)
-- ✅ CI/CD setup (8h)
+- Repository setup (4h)
+- Frontend boilerplate (React + Redux) (12h)
+- Backend boilerplate (Node + Express) (12h)
+- MongoDB connection & models (16h)
+- Authentication system (JWT) (20h)
+- Basic routing (8h)
+- CI/CD setup (8h)
 
 ---
 
@@ -1578,7 +1578,7 @@ Niedziela: Odpoczynek (ważne!)
 
 ---
 
-## 🛠️ Stack Technologiczny MERN - Szczegóły
+## Stack Technologiczny MERN - Szczegóły
 
 ### Complete Tech Stack:
 
@@ -1658,7 +1658,7 @@ Niedziela: Odpoczynek (ważne!)
 
 ---
 
-## 📊 Metryki Sukcesu
+## Metryki Sukcesu
 
 ### Business Metrics (Rok 1):
 
@@ -1693,43 +1693,43 @@ Niedziela: Odpoczynek (ważne!)
 
 ---
 
-## 🚀 Roadmap - Przyszłe Funkcjonalności
+## Roadmap - Przyszłe Funkcjonalności
 
 ### Q1 2026: Post-MVP Enhancements
 
-- 📱 Mobile app (React Native)
-- 🤖 Chatbot support (AI)
-- 📧 Advanced email automation
-- 🔔 Push notifications
-- 🌐 Multi-language (EN, DE, FR)
+- Mobile app (React Native)
+- Chatbot support (AI)
+- Advanced email automation
+- Push notifications
+- Multi-language (EN, DE, FR)
 
 ### Q2 2026: Advanced Features
 
-- 📊 Advanced analytics (ML)
-- 🎓 LMS expansion
-- 💰 Expense management
-- 🚗 Fleet management
-- 📝 E-signature integration
+- Advanced analytics (ML)
+- LMS expansion
+- Expense management
+- Fleet management
+- E-signature integration
 
 ### Q3 2026: Integrations
 
-- 📧 Outlook/Gmail calendar sync
-- 💼 LinkedIn integration
-- 💳 Accounting software (QuickBooks)
-- 📞 VoIP integration (Zoom, Teams)
-- 🏦 Bank integrations (payroll)
+- Outlook/Gmail calendar sync
+- LinkedIn integration
+- Accounting software (QuickBooks)
+- VoIP integration (Zoom, Teams)
+- Bank integrations (payroll)
 
 ### Q4 2026: Enterprise Features
 
-- 🏢 Multi-company support
-- 🔐 SSO (SAML, LDAP)
-- 📋 Custom workflows
-- 🎨 White-label solution
-- 🌍 Global compliance
+- Multi-company support
+- SSO (SAML, LDAP)
+- Custom workflows
+- White-label solution
+- Global compliance
 
 ---
 
-## 💰 Model Biznesowy
+## Model Biznesowy
 
 ### Pricing Tiers:
 
@@ -1770,7 +1770,7 @@ Total Year 1 ARR: ~300,000 PLN (~$72,000)
 
 ---
 
-## 📞 Wsparcie & Maintenance
+## Wsparcie & Maintenance
 
 ### Support Levels:
 
@@ -1797,7 +1797,7 @@ Total Year 1 ARR: ~300,000 PLN (~$72,000)
 
 ---
 
-## 🎯 Marketing Strategy
+## Marketing Strategy
 
 ### Target Channels:
 
@@ -1854,7 +1854,7 @@ Phase 3: Public Launch (Month 7+)
 
 ---
 
-## 📝 Dokumentacja Techniczna
+## Dokumentacja Techniczna
 
 ### API Documentation (Swagger):
 
@@ -1903,11 +1903,11 @@ const swaggerOptions = {
 
 ---
 
-## 🔒 Compliance & Security
+## Compliance & Security
 
 ### RODO Compliance:
 
-✅ **Data Protection Measures:**
+**Data Protection Measures:**
 
 - Szyfrowanie danych (AES-256)
 - Secure password storage (bcrypt)
@@ -1924,7 +1924,7 @@ const swaggerOptions = {
 ```javascript
 // Security Checklist
 
-✅ Authentication & Authorization
+ Authentication & Authorization
 - JWT with expiration
 - Password complexity requirements
 - Multi-factor authentication (MFA)
@@ -1932,7 +1932,7 @@ const swaggerOptions = {
 - Rate limiting
 - Account lockout after failed attempts
 
-✅ Data Protection
+ Data Protection
 - HTTPS everywhere (SSL/TLS)
 - Database encryption at rest
 - Secure file uploads
@@ -1941,7 +1941,7 @@ const swaggerOptions = {
 - XSS protection
 - CSRF tokens
 
-✅ Infrastructure
+ Infrastructure
 - Regular security audits
 - Dependency updates
 - Firewall configuration
@@ -1949,7 +1949,7 @@ const swaggerOptions = {
 - Regular backups
 - Disaster recovery plan
 
-✅ Monitoring
+ Monitoring
 - Login attempt monitoring
 - Suspicious activity detection
 - Error logging (without sensitive data)
@@ -1959,7 +1959,7 @@ const swaggerOptions = {
 
 ---
 
-## 📚 Resources & Learning
+## Resources & Learning
 
 ### Recommended Learning Path:
 
@@ -1994,9 +1994,9 @@ const swaggerOptions = {
 
 ---
 
-## 🎓 Lessons Learned (Tips dla Solo Dev)
+## Lessons Learned (Tips dla Solo Dev)
 
-### ✅ Do's:
+### Do's:
 
 1. **MVP First**: Nie buduj wszystkiego od razu
 2. **Automation**: Automatyzuj deployment i testing
@@ -2007,7 +2007,7 @@ const swaggerOptions = {
 7. **Breaks**: Rób regularne przerwy, unikaj wypalenia
 8. **Backup**: Backup, backup, backup!
 
-### ❌ Don'ts:
+### Don'ts:
 
 1. **Premature Optimization**: Nie optymalizuj przedwcześnie
 2. **Feature Creep**: Nie dodawaj features bez walidacji
@@ -2020,7 +2020,7 @@ const swaggerOptions = {
 
 ---
 
-## 💡 Pro Tips dla Solo MERN Developer
+## Pro Tips dla Solo MERN Developer
 
 ### 1. **Component Library - Buduj Raz, Używaj Wszędzie**
 
@@ -2501,7 +2501,7 @@ describe("EmployeeList", () => {
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### Szybkie Uruchomienie Projektu:
 
@@ -2585,7 +2585,7 @@ worknest/
 
 ---
 
-## 📞 Kontakt i Support
+## Kontakt i Support
 
 **Developer:**
 
@@ -2607,17 +2607,17 @@ worknest/
 
 ---
 
-## 📄 Licencja
+## Licencja
 
 Copyright (c) 2026 Szymon (WorkNest). Wszelkie prawa zastrzeżone. Projekt zastrzeżony i poufny.
 
 ---
 
-## 🎉 Podsumowanie
+## Podsumowanie
 
 WorkNest to **ambitny ale wykonalny projekt** dla solo MERN developera. Kluczowe punkty:
 
-### ✅ Zalety Tego Podejścia:
+### Zalety Tego Podejścia:
 
 - **Pełna kontrola** nad kodem i decyzjami
 - **Szybkie iteracje** bez biurokracji
@@ -2626,7 +2626,7 @@ WorkNest to **ambitny ale wykonalny projekt** dla solo MERN developera. Kluczowe
 - **Realne problemy biznesowe** do rozwiązania
 - **Recurring revenue** model
 
-### ⚠️ Wyzwania:
+### Wyzwania:
 
 - **Czasochłonne** - realistycznie 6+ miesięcy
 - **Wymagająca** wiedza techniczna i biznesowa
@@ -2634,7 +2634,7 @@ WorkNest to **ambitny ale wykonalny projekt** dla solo MERN developera. Kluczowe
 - **Wszystkie role** na jednej osobie
 - **Risk** - może nie zadziałać komercyjnie
 
-### 🎯 Rekomendacje:
+### Rekomendacje:
 
 1. **Zacznij od MVP** - nie wszystko na raz
 2. **Waliduj pomysł** - porozmawiaj z potencjalnymi klientami
@@ -2645,7 +2645,7 @@ WorkNest to **ambitny ale wykonalny projekt** dla solo MERN developera. Kluczowe
 7. **Document** - przyda się w przyszłości
 8. **Iterate** - improvement over perfection
 
-### 💪 Success Factors:
+### Success Factors:
 
 - Konsystencja w pracy
 - Focus na problemie użytkownika
@@ -2656,7 +2656,7 @@ WorkNest to **ambitny ale wykonalny projekt** dla solo MERN developera. Kluczowe
 
 ---
 
-**Powodzenia z WorkNest! 🚀**
+**Powodzenia z WorkNest! **
 
 Pamiętaj: Każdy duży system zaczyna się od pierwszej linii kodu.
-Stay focused, stay consistent, and keep building! 💪
+Stay focused, stay consistent, and keep building!

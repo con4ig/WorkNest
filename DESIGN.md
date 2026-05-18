@@ -15,39 +15,41 @@ All colors derive from CSS custom properties for consistent theming and dark-mod
 ### Light Mode
 
 ```css
---background: 248 250 252;           /* Slate-50 */
---foreground: 9 9 11;                /* Zinc-900 */
---primary: 5 150 105;                /* Emerald-600 */
---primary-foreground: 255 255 255;   /* White */
---secondary: 241 245 249;            /* Slate-100 */
---muted: 241 245 249;                /* Slate-100 */
---muted-foreground: 100 116 139;     /* Slate-500 */
---destructive: 239 68 68;            /* Red-500 */
---border: 226 232 240;               /* Slate-200 */
+--background: 248 250 252; /* Slate-50 */
+--foreground: 9 9 11; /* Zinc-900 */
+--primary: 5 150 105; /* Emerald-600 */
+--primary-foreground: 255 255 255; /* White */
+--secondary: 241 245 249; /* Slate-100 */
+--muted: 241 245 249; /* Slate-100 */
+--muted-foreground: 100 116 139; /* Slate-500 */
+--destructive: 239 68 68; /* Red-500 */
+--border: 226 232 240; /* Slate-200 */
 ```
 
 ### Dark Mode
 
 ```css
---background: 9 9 11;                /* Zinc-900 */
---foreground: 248 250 252;           /* Slate-50 */
---primary: 62 207 142;               /* Emerald-500 (higher chroma for dark) */
---primary-foreground: 6 32 22;       /* Dark emerald for text on primary */
---secondary: 30 41 59;               /* Slate-800 */
---muted: 30 41 59;                   /* Slate-800 */
---muted-foreground: 148 163 184;     /* Slate-400 */
---destructive: 127 29 29;            /* Red-900 (darkened for dark mode) */
---border: 30 41 59;                  /* Slate-800 */
+--background: 9 9 11; /* Zinc-900 */
+--foreground: 248 250 252; /* Slate-50 */
+--primary: 62 207 142; /* Emerald-500 (higher chroma for dark) */
+--primary-foreground: 6 32 22; /* Dark emerald for text on primary */
+--secondary: 30 41 59; /* Slate-800 */
+--muted: 30 41 59; /* Slate-800 */
+--muted-foreground: 148 163 184; /* Slate-400 */
+--destructive: 127 29 29; /* Red-900 (darkened for dark mode) */
+--border: 30 41 59; /* Slate-800 */
 ```
 
 ### Calendar-Specific Variables (Both Modes)
 
 Event states use semantic colors with opacity modulation:
+
 - **Pending**: Amber 500 (`245 158 11`) — awaiting approval, needs attention
 - **Approved**: Emerald 500 (`16 185 129`) — confirmed, move forward
 - **Rejected**: Rose/Red 500 (`244 63 94`) — declined, user action needed
 
 Dark mode adjusts backgrounds and borders for legibility:
+
 - Pending: `245 158 11 / 0.45` background, `/ 0.8` border
 - Approved: `16 185 129 / 0.45` background, `/ 0.8` border
 - Rejected: `244 63 94 / 0.45` background, `/ 0.8` border
@@ -55,6 +57,7 @@ Dark mode adjusts backgrounds and borders for legibility:
 ### Chart Colors (`/config/colors.js`)
 
 Semantic mapping for data visualization:
+
 - **Primary**: `#059669` (Emerald 600, light mode brand)
 - **Success**: `#10B981` (Emerald 500, completed items)
 - **Warning**: `#F59E0B` (Amber 500, in-progress items)
@@ -83,6 +86,7 @@ Hierarchy established through weight contrast (800 to 400) and size (not always 
 ## Spacing
 
 Tailwind default scale (4px base). Key modular increments:
+
 - `gap-1` to `gap-6`: component spacing
 - `p-2` to `p-8`: surface padding
 - `mb-4` to `mb-8`: vertical rhythm
@@ -168,6 +172,7 @@ Mobile-first Tailwind approach:
 - **Large (`lg:` 1024px+)**: Extended content areas, three-column grids for data
 
 Key breakpoint patterns:
+
 - Padding: `p-4 md:p-6 lg:p-8`
 - Grid columns: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
 - Font sizes: `text-sm md:text-base lg:text-lg`
@@ -182,12 +187,14 @@ Key breakpoint patterns:
 ## Dark Mode Specifics
 
 Tailwind's dark mode is class-based (`.dark` on `<html>`). All component styles must account for:
+
 - Text colors: `text-foreground` (white), `text-muted-foreground` (gray)
 - Backgrounds: `bg-background` (zinc-900/30 with transparency), `bg-card` (zinc-900)
 - Borders: `border-border` (slate-800 in dark)
 - Hover states: `dark:hover:bg-white/10` (not always matching light `bg-black/10`)
 
 **Elevation in dark mode**: Layering is critical. Use rgba with alpha to create depth:
+
 - Surface 0: `bg-background` (zinc-900 at 30% opacity)
 - Surface 1: `bg-zinc-900/50` (slightly darker)
 - Surface 2: `bg-zinc-800` (darker still)
@@ -203,13 +210,13 @@ Tailwind's dark mode is class-based (`.dark` on `<html>`). All component styles 
 
 ## Constraints & Absolute Bans
 
-✗ **Side-stripe borders** (>1px colored left/right border): Use full borders, tints, or icons instead  
-✗ **Gradient text** (`background-clip: text`): Use solid colors, emphasize via weight/size  
-✗ **Glassmorphism by default**: Rare and purposeful, not decorative  
-✗ **Identical card grids**: Vary card sizes, content hierarchy, or spacing  
-✗ **Nested cards**: Use spacing and visual hierarchy instead  
-✗ **Hero-metric template**: Avoid the "big number + small label + stats + gradient" SaaS cliché  
-✗ **Modal as first thought**: Prefer inline or progressive alternatives
+**Side-stripe borders** (>1px colored left/right border): Use full borders, tints, or icons instead  
+**Gradient text** (`background-clip: text`): Use solid colors, emphasize via weight/size  
+**Glassmorphism by default**: Rare and purposeful, not decorative  
+**Identical card grids**: Vary card sizes, content hierarchy, or spacing  
+**Nested cards**: Use spacing and visual hierarchy instead  
+**Hero-metric template**: Avoid the "big number + small label + stats + gradient" SaaS cliché  
+**Modal as first thought**: Prefer inline or progressive alternatives
 
 ## Quality Standards
 
