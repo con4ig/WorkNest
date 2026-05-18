@@ -105,4 +105,4 @@ Every code change goes through an automated verification pipeline defined in `.g
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for details.
+Copyright (c) 2026 Szymon (WorkNest). All rights reserved. Proprietary and confidential.
