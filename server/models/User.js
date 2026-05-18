@@ -20,7 +20,7 @@ function encrypt(text) {
 
     if (key.length !== 32) {
       console.warn(
-        "⚠️ ENCRYPTION_KEY must be a 64-character hex string (32 bytes)!"
+        "⚠️ ENCRYPTION_KEY must be a 64-character hex string (32 bytes)!",
       );
       return text;
     }
@@ -52,7 +52,7 @@ function decrypt(text) {
     let decipher = crypto.createDecipheriv(
       "aes-256-cbc",
       Buffer.from(ENCRYPTION_KEY, "hex"),
-      iv
+      iv,
     );
     let decrypted = decipher.update(encryptedText);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
@@ -189,15 +189,14 @@ const schema = new mongoose.Schema(
     timestamps: true,
     toJSON: { getters: true }, // Important: apply getters when converting to JSON
     toObject: { getters: true },
-  }
+  },
 );
 
-schema.pre("save", function (next) {
+schema.pre("save", function () {
   if (this.profileImage && this.profileImage.length > 10 * 1024 * 1024) {
     // 10MB as string (Base64 is ~33% larger than the original file)
-    return next(new Error("Profile image is too large (max 10MB as Base64)"));
+    throw new Error("Profile image is too large (max 10MB as Base64)");
   }
-  next();
 });
 
 export default mongoose.model("User", schema);
