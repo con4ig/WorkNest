@@ -24,8 +24,7 @@ const definition = {
       "response body and a longer-lived refresh token (7 days) set as an `httpOnly` " +
       "cookie. See [ADR-0001](https://github.com/) for the rationale.",
     license: {
-      name: "MIT",
-      url: "https://opensource.org/licenses/MIT",
+      name: "Proprietary",
     },
     contact: {
       name: "WorkNest",
@@ -57,7 +56,8 @@ const definition = {
         type: "apiKey",
         in: "cookie",
         name: "refreshToken",
-        description: "httpOnly cookie set by login; used only by `/refresh` and `/logout`.",
+        description:
+          "httpOnly cookie set by login; used only by `/refresh` and `/logout`.",
       },
     },
     schemas: {
@@ -72,7 +72,11 @@ const definition = {
         properties: {
           _id: { type: "string", example: "65f1e3a4b8c9d2e3f4a5b6c7" },
           username: { type: "string", example: "jane.doe" },
-          email: { type: "string", format: "email", example: "jane@example.com" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "jane@example.com",
+          },
           role: {
             type: "string",
             enum: ["employee", "hr", "admin", "superadmin"],
@@ -87,7 +91,10 @@ const definition = {
         type: "object",
         properties: {
           message: { type: "string", example: "Logged in successfully" },
-          accessToken: { type: "string", description: "JWT, expires in 15 minutes" },
+          accessToken: {
+            type: "string",
+            description: "JWT, expires in 15 minutes",
+          },
           user: { $ref: "#/components/schemas/User" },
         },
       },
@@ -206,7 +213,8 @@ const definition = {
         },
       },
       Forbidden: {
-        description: "Authenticated but not permitted (RBAC or tenant isolation).",
+        description:
+          "Authenticated but not permitted (RBAC or tenant isolation).",
         content: {
           "application/json": {
             schema: { $ref: "#/components/schemas/Error" },

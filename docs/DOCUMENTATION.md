@@ -7,6 +7,7 @@
 > [`CONTRIBUTING`](../CONTRIBUTING.md).
 
 ## Table of Contents
+
 1. [Project Overview](#project-overview)
 2. [Project Goals](#project-goals)
 3. [Target Audience](#target-audience)
@@ -32,6 +33,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 **The Problem It Solves:**
 
 **Current pain points at companies:**
+
 - HR tooling scattered across Excel, email and paper
 - No central employee database
 - Time-consuming administrative work
@@ -44,6 +46,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 **The Solution:**
 
 **WorkNest offers:**
+
 - A single system for every HR workflow
 - Automation of repetitive tasks
 - A self-service portal for employees
@@ -134,6 +137,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### Primary Segment: SMB (Small & Medium Business)
 
 **1. Small Businesses (10-50 employees)**
+
 - **Pain Points:**
   - No dedicated HR team
   - Owner/founder handles HR manually
@@ -149,6 +153,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - **Budget:** 50-200 PLN/month
 
 **2. Medium Businesses (50-200 employees)**
+
 - **Pain Points:**
   - Outdated HR systems
   - Tools that don't talk to each other
@@ -164,6 +169,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - **Budget:** 500-2000 PLN/month
 
 **3. Larger Organisations (200-500 employees)**
+
 - **Pain Points:**
   - Complex organisational structures
   - Compliance and audits
@@ -181,24 +187,28 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### User Personas:
 
 **Persona 1: Marek - HR Manager (35)**
+
 - Runs the HR team in a 150-person company
 - Frustration: too much time on admin, not enough on strategy
 - Tech-savvy, enjoys modern tools
 - Expectations: automation, analytics, ease of use
 
 **Persona 2: Anna - CEO of a small business (42)**
+
 - Runs a 25-person company, handles HR herself
 - Frustration: no time, document chaos
 - Basic IT skills
 - Expectations: simplicity, low cost, time savings
 
 **Persona 3: Piotr - Employee (28)**
+
 - Developer at a mid-sized IT firm
 - Frustration: opaque processes, slow HR turnaround
 - Digital native
 - Expectations: self-service, mobile app, transparency
 
 **Persona 4: Kasia - CFO (45)**
+
 - Owns finance and payroll
 - Frustration: payroll errors, missing reports
 - Demands precision and compliance
@@ -211,6 +221,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 1. Core HR Module (Employee Management)
 
 **Employee Database:**
+
 - Central database of all employees
 - Employee profiles with full data
   - Personal data (GDPR compliant)
@@ -233,6 +244,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
   - Status (active/inactive/on leave)
 
 **Document Management:**
+
 - Digital document repository
 - E-signatures
 - Automated contract generation
@@ -245,6 +257,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 2. Recruitment Module (Recruitment & ATS)
 
 **Applicant Tracking System:**
+
 - Creating job postings
 - Multi-channel posting (own site + LinkedIn, Pracuj.pl)
 - Career page builder
@@ -252,6 +265,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - CV parsing (automatic data extraction)
 
 **Recruitment Pipeline:**
+
 - Kanban board with recruitment stages
   - New applications
   - CV screening
@@ -267,6 +281,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Interview scheduling
 
 **Analytics:**
+
 - Time to hire
 - Source of hire
 - Conversion rates
@@ -278,6 +293,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 3. Time & Attendance Module
 
 **Working-time System:**
+
 - Time clock (punch in/out)
 - Timesheet tracking
 - GPS location tracking (mobile)
@@ -286,6 +302,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Shift scheduling
 
 **Leave and Absences:**
+
 - Employee self-service portal
 - Online leave requests
 - Multi-level approval workflow
@@ -304,6 +321,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Conflict detection (e.g. too many people on leave)
 
 **Calendars:**
+
 - Personal calendar
 - Team calendar
 - Company calendar
@@ -316,6 +334,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 4. Payroll & Benefits Module
 
 **Salaries:**
+
 - Payroll processing
 - Salary calculator
 - Tax calculations
@@ -326,6 +345,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Bank transfer files (Elixir)
 
 **Employee Self-Service:**
+
 - Access to pay slips
 - YTD earnings
 - Tax documents (PIT)
@@ -333,6 +353,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Download/print options
 
 **Benefits Management:**
+
 - Benefit packages
 - Health insurance
 - Multisport card
@@ -342,6 +363,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Custom benefits
 
 **Financial Reports:**
+
 - Payroll reports
 - Cost centre analysis
 - Budget vs actual
@@ -353,6 +375,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 5. Onboarding & Offboarding Module
 
 **Onboarding New Employees:**
+
 - Customisable onboarding workflows
 - Task checklists
   - For the new hire
@@ -369,6 +392,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - 30-60-90 day plans
 
 **Offboarding:**
+
 - Exit interviews
 - Knowledge transfer checklist
 - Equipment return
@@ -382,6 +406,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 6. Performance Management Module
 
 **Performance Reviews:**
+
 - Performance review cycles
 - 360-degree feedback
 - Self-assessment
@@ -392,6 +417,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Competency matrix
 
 **One-on-Ones:**
+
 - Meeting templates
 - Agenda builder
 - Notes & action items
@@ -399,6 +425,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Feedback log
 
 **Development Plans:**
+
 - Individual development plans (IDP)
 - Career paths
 - Skill gap analysis
@@ -406,6 +433,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Succession planning
 
 **Recognition & Rewards:**
+
 - Peer recognition
 - Badges & achievements
 - Points system
@@ -417,6 +445,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 7. Learning & Development Module
 
 **Training Management:**
+
 - Course catalogue
 - Training calendar
 - Enrolment system
@@ -425,6 +454,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Training budget tracking
 
 **E-Learning:**
+
 - LMS (Learning Management System)
 - Video courses
 - Quizzes & assessments
@@ -433,6 +463,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Mobile learning
 
 **Compliance Training:**
+
 - Mandatory trainings
 - Deadline tracking
 - Automated reminders
@@ -444,6 +475,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 8. Communication & Engagement Module
 
 **Internal Communication:**
+
 - Company news feed
 - Announcements
 - Polls & surveys
@@ -452,6 +484,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Department channels
 
 **Employee Engagement:**
+
 - Pulse surveys
 - eNPS tracking
 - Sentiment analysis
@@ -460,6 +493,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Action plans
 
 **Social Features:**
+
 - Employee profiles
 - Birthday/anniversary reminders
 - Company events
@@ -471,6 +505,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 9. Analytics & Reporting Module
 
 **HR Dashboards:**
+
 - Executive dashboard
 - HR manager dashboard
 - Department dashboards
@@ -478,6 +513,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Customisable widgets
 
 **Key HR Metrics:**
+
 - Headcount & demographics
 - Turnover rate
 - Time to hire
@@ -489,6 +525,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Diversity & inclusion metrics
 
 **Custom Reports:**
+
 - Report builder
 - Saved reports
 - Scheduled reports (email)
@@ -496,6 +533,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Data visualisation (charts, graphs)
 
 **Predictive Analytics:**
+
 - Turnover prediction
 - Flight risk indicators
 - Workforce planning
@@ -506,6 +544,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 ### 10. Administration & Settings Module
 
 **Company Settings:**
+
 - Company profile
 - Departments & locations
 - Working hours
@@ -514,6 +553,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Branding (logo, colours)
 
 **User Management:**
+
 - User roles & permissions
 - Access control (RBAC)
 - Multi-level hierarchy
@@ -521,6 +561,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - Audit logs
 
 **Integrations:**
+
 - Slack
 - Microsoft Teams
 - Google Workspace
@@ -530,6 +571,7 @@ WorkNest is a modern, comprehensive HR platform designed for small and medium bu
 - SSO (SAML, OAuth)
 
 **API & Webhooks:**
+
 - RESTful API
 - API documentation
 - Webhook events
@@ -627,6 +669,7 @@ worknest-frontend/
 ```
 
 **Frontend Tech Stack:**
+
 ```json
 {
   "dependencies": {
@@ -719,6 +762,7 @@ worknest-backend/
 ```
 
 **Backend Tech Stack:**
+
 ```json
 {
   "dependencies": {
@@ -763,95 +807,103 @@ worknest-backend/
 
 ```javascript
 // Employee Model
-const employeeSchema = new mongoose.Schema({
-  // Personal Information
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  phone: String,
-  dateOfBirth: Date,
-  gender: { type: String, enum: ['Male', 'Female', 'Other'] },
-  address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String
-  },
+const employeeSchema = new mongoose.Schema(
+  {
+    // Personal Information
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: String,
+    dateOfBirth: Date,
+    gender: { type: String, enum: ["Male", "Female", "Other"] },
+    address: {
+      street: String,
+      city: String,
+      state: String,
+      zipCode: String,
+      country: String,
+    },
 
-  // Employment Information
-  employeeId: { type: String, unique: true },
-  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
-  position: String,
-  manager: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
-  hireDate: Date,
-  employmentType: {
-    type: String,
-    enum: ['Full-time', 'Part-time', 'Contract', 'Intern']
-  },
-  status: {
-    type: String,
-    enum: ['Active', 'Inactive', 'On Leave', 'Terminated'],
-    default: 'Active'
-  },
+    // Employment Information
+    employeeId: { type: String, unique: true },
+    department: { type: mongoose.Schema.Types.ObjectId, ref: "Department" },
+    position: String,
+    manager: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
+    hireDate: Date,
+    employmentType: {
+      type: String,
+      enum: ["Full-time", "Part-time", "Contract", "Intern"],
+    },
+    status: {
+      type: String,
+      enum: ["Active", "Inactive", "On Leave", "Terminated"],
+      default: "Active",
+    },
 
-  // Compensation
-  salary: {
-    amount: Number,
-    currency: { type: String, default: 'PLN' },
-    frequency: { type: String, enum: ['Monthly', 'Hourly'] }
+    // Compensation
+    salary: {
+      amount: Number,
+      currency: { type: String, default: "PLN" },
+      frequency: { type: String, enum: ["Monthly", "Hourly"] },
+    },
+
+    // Leave Balance
+    leaveBalance: {
+      annual: { type: Number, default: 20 },
+      sick: { type: Number, default: 10 },
+      personal: { type: Number, default: 5 },
+    },
+
+    // Documents
+    documents: [
+      {
+        name: String,
+        type: String,
+        url: String,
+        uploadDate: Date,
+      },
+    ],
+
+    // Metadata
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
   },
-
-  // Leave Balance
-  leaveBalance: {
-    annual: { type: Number, default: 20 },
-    sick: { type: Number, default: 10 },
-    personal: { type: Number, default: 5 }
+  {
+    timestamps: true,
   },
-
-  // Documents
-  documents: [{
-    name: String,
-    type: String,
-    url: String,
-    uploadDate: Date
-  }],
-
-  // Metadata
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-}, {
-  timestamps: true
-});
+);
 
 // Leave Request Model
-const leaveSchema = new mongoose.Schema({
-  employee: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employee',
-    required: true
+const leaveSchema = new mongoose.Schema(
+  {
+    employee: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      required: true,
+    },
+    leaveType: {
+      type: String,
+      enum: ["Annual", "Sick", "Personal", "Maternity", "Paternity", "Unpaid"],
+      required: true,
+    },
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: true },
+    days: { type: Number, required: true },
+    reason: String,
+    status: {
+      type: String,
+      enum: ["Pending", "Approved", "Rejected", "Cancelled"],
+      default: "Pending",
+    },
+    approver: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    approvalDate: Date,
+    comments: String,
   },
-  leaveType: {
-    type: String,
-    enum: ['Annual', 'Sick', 'Personal', 'Maternity', 'Paternity', 'Unpaid'],
-    required: true
+  {
+    timestamps: true,
   },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
-  days: { type: Number, required: true },
-  reason: String,
-  status: {
-    type: String,
-    enum: ['Pending', 'Approved', 'Rejected', 'Cancelled'],
-    default: 'Pending'
-  },
-  approver: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  approvalDate: Date,
-  comments: String
-}, {
-  timestamps: true
-});
+);
 ```
 
 > Sensitive personal identifiers (e.g. PESEL) are stored encrypted at rest. Deletions are soft deletes by default to preserve audit history; hard deletion happens only via a scheduled purge job.
@@ -861,11 +913,7 @@ const leaveSchema = new mongoose.Schema({
 ```javascript
 // JWT Authentication
 const generateToken = (userId) => {
-  return jwt.sign(
-    { id: userId },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
 // Password Hashing
@@ -877,18 +925,18 @@ const hashPassword = async (password) => {
 // Auth Middleware
 const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) throw new Error('No token provided');
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) throw new Error("No token provided");
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
 
-    if (!user) throw new Error('User not found');
+    if (!user) throw new Error("User not found");
 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Please authenticate' });
+    res.status(401).json({ error: "Please authenticate" });
   }
 };
 
@@ -896,11 +944,11 @@ const authMiddleware = async (req, res, next) => {
 const roleCheck = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Access denied' });
+      return res.status(403).json({ error: "Access denied" });
     }
 
     next();
@@ -919,9 +967,11 @@ As a **Solo Full-Stack Developer** running the WorkNest project on the MERN stac
 ### Your Main Roles:
 
 #### 1. **Product Owner & Business Analyst**
+
 **Time: 15% of the project**
 
 **Responsibilities:**
+
 - Defining the WorkNest product vision
 - Building the roadmap
 - Competitor analysis (BambooHR, Personio, Calamari)
@@ -929,12 +979,14 @@ As a **Solo Full-Stack Developer** running the WorkNest project on the MERN stac
 - User research and feedback
 
 **Weekly Tasks:**
+
 - Backlog grooming (2h)
 - Usage metrics review (1h)
 - Competitor research (1h)
 - Planning the next features (2h)
 
 **Tools:**
+
 - Notion / Trello (Product Backlog)
 - Google Analytics
 - Hotjar (User Behaviour)
@@ -943,9 +995,11 @@ As a **Solo Full-Stack Developer** running the WorkNest project on the MERN stac
 ---
 
 #### 2. **UX/UI Designer**
+
 **Time: 10% of the project**
 
 **Responsibilities:**
+
 - Designing the entire WorkNest interface
 - Building the design system
 - User flows and wireframes
@@ -953,6 +1007,7 @@ As a **Solo Full-Stack Developer** running the WorkNest project on the MERN stac
 - Accessibility
 
 **Workflow:**
+
 1. **Research** → Competitor analysis, best practices
 2. **Wireframing** → Layout sketches (Figma)
 3. **Design** → High-fidelity mockups
@@ -960,45 +1015,49 @@ As a **Solo Full-Stack Developer** running the WorkNest project on the MERN stac
 5. **Implementation** → React coding
 
 **Tools:**
+
 - Figma (Design & Prototyping)
 - Material-UI (Component Library)
 - Coolors (Colour Palettes)
 - Google Fonts
 
 **Your Design System:**
+
 ```javascript
 // theme.js - WorkNest Theme
 export const theme = {
   colors: {
-    primary: '#2563eb',      // Blue
-    secondary: '#10b981',    // Green
-    accent: '#f59e0b',       // Amber
-    danger: '#ef4444',       // Red
-    dark: '#1f2937',
-    light: '#f9fafb'
+    primary: "#2563eb", // Blue
+    secondary: "#10b981", // Green
+    accent: "#f59e0b", // Amber
+    danger: "#ef4444", // Red
+    dark: "#1f2937",
+    light: "#f9fafb",
   },
   typography: {
     fontFamily: "'Inter', sans-serif",
-    h1: { fontSize: '2.5rem', fontWeight: 700 },
-    h2: { fontSize: '2rem', fontWeight: 600 },
-    body: { fontSize: '1rem', lineHeight: 1.5 }
+    h1: { fontSize: "2.5rem", fontWeight: 700 },
+    h2: { fontSize: "2rem", fontWeight: 600 },
+    body: { fontSize: "1rem", lineHeight: 1.5 },
   },
   spacing: {
-    xs: '0.25rem',
-    sm: '0.5rem',
-    md: '1rem',
-    lg: '1.5rem',
-    xl: '2rem'
-  }
+    xs: "0.25rem",
+    sm: "0.5rem",
+    md: "1rem",
+    lg: "1.5rem",
+    xl: "2rem",
+  },
 };
 ```
 
 ---
 
 #### 3. **Frontend Developer (React.js)**
+
 **Time: 35% of the project**
 
 **Responsibilities:**
+
 - Building the entire UI in React
 - State management (Redux)
 - API integration
@@ -1054,24 +1113,24 @@ const EmployeeList = () => {
 // 3. Leave Request Form
 const LeaveRequestForm = () => {
   const { register, handleSubmit, errors } = useForm({
-    resolver: yupResolver(leaveSchema)
+    resolver: yupResolver(leaveSchema),
   });
 
   const onSubmit = async (data) => {
     try {
-      await api.post('/leaves', data);
-      toast.success('Leave request submitted!');
-      navigate('/leaves');
+      await api.post("/leaves", data);
+      toast.success("Leave request submitted!");
+      navigate("/leaves");
     } catch (error) {
-      toast.error('Failed to submit request');
+      toast.error("Failed to submit request");
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DateRangePicker {...register('dates')} />
-      <Select {...register('leaveType')} options={leaveTypes} />
-      <TextArea {...register('reason')} />
+      <DateRangePicker {...register("dates")} />
+      <Select {...register("leaveType")} options={leaveTypes} />
+      <TextArea {...register("reason")} />
       <Button type="submit">Submit Request</Button>
     </form>
   );
@@ -1079,6 +1138,7 @@ const LeaveRequestForm = () => {
 ```
 
 **Weekly Tasks:**
+
 - New feature development (25h)
 - Bug fixing (5h)
 - Code refactoring (3h)
@@ -1087,9 +1147,11 @@ const LeaveRequestForm = () => {
 ---
 
 #### 4. **Backend Developer (Node.js + Express)**
+
 **Time: 30% of the project**
 
 **Responsibilities:**
+
 - REST API design
 - Business logic implementation
 - Database design and optimisation
@@ -1176,18 +1238,12 @@ GET    /api/reports/custom
 
 ```javascript
 // employeeController.js
-const Employee = require('../models/Employee');
+const Employee = require("../models/Employee");
 
 // Get all employees with pagination and filters
 exports.getEmployees = async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 20,
-      department,
-      status,
-      search
-    } = req.query;
+    const { page = 1, limit = 20, department, status, search } = req.query;
 
     // Build query
     const query = {};
@@ -1195,16 +1251,16 @@ exports.getEmployees = async (req, res) => {
     if (status) query.status = status;
     if (search) {
       query.$or = [
-        { firstName: new RegExp(search, 'i') },
-        { lastName: new RegExp(search, 'i') },
-        { email: new RegExp(search, 'i') }
+        { firstName: new RegExp(search, "i") },
+        { lastName: new RegExp(search, "i") },
+        { email: new RegExp(search, "i") },
       ];
     }
 
     // Execute query with pagination
     const employees = await Employee.find(query)
-      .populate('department', 'name')
-      .populate('manager', 'firstName lastName')
+      .populate("department", "name")
+      .populate("manager", "firstName lastName")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 });
@@ -1215,7 +1271,7 @@ exports.getEmployees = async (req, res) => {
       employees,
       totalPages: Math.ceil(count / limit),
       currentPage: page,
-      total: count
+      total: count,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -1229,8 +1285,10 @@ exports.createEmployee = async (req, res) => {
 
     // Generate employee ID
     const lastEmployee = await Employee.findOne().sort({ createdAt: -1 });
-    const lastId = lastEmployee ? parseInt(lastEmployee.employeeId.slice(2)) : 0;
-    employeeData.employeeId = `WN${(lastId + 1).toString().padStart(4, '0')}`;
+    const lastId = lastEmployee
+      ? parseInt(lastEmployee.employeeId.slice(2))
+      : 0;
+    employeeData.employeeId = `WN${(lastId + 1).toString().padStart(4, "0")}`;
 
     // Create employee
     const employee = new Employee(employeeData);
@@ -1240,8 +1298,8 @@ exports.createEmployee = async (req, res) => {
     await emailService.sendWelcomeEmail(employee);
 
     res.status(201).json({
-      message: 'Employee created successfully',
-      employee
+      message: "Employee created successfully",
+      employee,
     });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -1250,6 +1308,7 @@ exports.createEmployee = async (req, res) => {
 ```
 
 **Weekly Tasks:**
+
 - API development (20h)
 - Database optimisation (3h)
 - Integration work (5h)
@@ -1258,9 +1317,11 @@ exports.createEmployee = async (req, res) => {
 ---
 
 #### 5. **Database Administrator (MongoDB)**
+
 **Time: 5% of the project**
 
 **Responsibilities:**
+
 - Schema design
 - Indexing strategy
 - Query optimisation
@@ -1275,7 +1336,7 @@ exports.createEmployee = async (req, res) => {
 employeeSchema.index({ email: 1 }, { unique: true });
 employeeSchema.index({ employeeId: 1 }, { unique: true });
 employeeSchema.index({ department: 1, status: 1 });
-employeeSchema.index({ firstName: 'text', lastName: 'text' });
+employeeSchema.index({ firstName: "text", lastName: "text" });
 
 // Compound indexes for common queries
 employeeSchema.index({ department: 1, hireDate: -1 });
@@ -1283,34 +1344,37 @@ leaveSchema.index({ employee: 1, startDate: -1 });
 
 // Query Optimisation Examples
 // Bad
-const employees = await Employee.find().populate('department');
+const employees = await Employee.find().populate("department");
 
 // Good
 const employees = await Employee.find()
-  .populate('department', 'name') // Only needed fields
-  .select('firstName lastName email position') // Projection
+  .populate("department", "name") // Only needed fields
+  .select("firstName lastName email position") // Projection
   .lean(); // Convert to plain JS object
 
 // Aggregation for complex reports
 const departmentStats = await Employee.aggregate([
-  { $match: { status: 'Active' } },
-  { $group: {
-      _id: '$department',
+  { $match: { status: "Active" } },
+  {
+    $group: {
+      _id: "$department",
       count: { $sum: 1 },
-      avgSalary: { $avg: '$salary.amount' }
-    }
+      avgSalary: { $avg: "$salary.amount" },
+    },
   },
-  { $lookup: {
-      from: 'departments',
-      localField: '_id',
-      foreignField: '_id',
-      as: 'departmentInfo'
-    }
-  }
+  {
+    $lookup: {
+      from: "departments",
+      localField: "_id",
+      foreignField: "_id",
+      as: "departmentInfo",
+    },
+  },
 ]);
 ```
 
 **Backup Strategy:**
+
 - Daily automated backups (MongoDB Atlas)
 - Point-in-time recovery
 - Weekly backup testing
@@ -1319,9 +1383,11 @@ const departmentStats = await Employee.aggregate([
 ---
 
 #### 6. **DevOps Engineer**
+
 **Time: 5% of the project**
 
 **Responsibilities:**
+
 - Deployment automation
 - Server management
 - CI/CD pipeline
@@ -1337,47 +1403,48 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
 
-    - name: Install dependencies
-      run: |
-        cd frontend && npm ci
-        cd ../backend && npm ci
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
 
-    - name: Run tests
-      run: |
-        cd backend && npm test
+      - name: Run tests
+        run: |
+          cd backend && npm test
 
-    - name: Build frontend
-      run: |
-        cd frontend && npm run build
+      - name: Build frontend
+        run: |
+          cd frontend && npm run build
 
-    - name: Deploy to server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SSH_KEY }}
-        script: |
-          cd /var/www/worknest
-          git pull
-          npm install
-          pm2 restart all
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/worknest
+            git pull
+            npm install
+            pm2 restart all
 ```
 
 **Server Infrastructure:**
+
 ```
 Production Environment:
 - Frontend: Vercel / Netlify
@@ -1398,6 +1465,7 @@ Production Environment:
 #### **Month 1: Foundation & Core Setup** (160h)
 
 **Weeks 1-2: Planning & Design (80h)**
+
 - Market research (8h)
 - Competitor analysis (8h)
 - Feature prioritisation (8h)
@@ -1407,6 +1475,7 @@ Production Environment:
 - Design system (8h)
 
 **Weeks 3-4: Project Setup (80h)**
+
 - Repository setup (4h)
 - Frontend boilerplate (React + Redux) (12h)
 - Backend boilerplate (Node + Express) (12h)
@@ -1420,6 +1489,7 @@ Production Environment:
 #### **Month 2: Core HR Module** (160h)
 
 **Employee Management (80h)**
+
 - Employee CRUD operations (24h)
 - Employee profile page (16h)
 - Department management (12h)
@@ -1427,6 +1497,7 @@ Production Environment:
 - Document upload (12h)
 
 **User Management (80h)**
+
 - Role-based access control (20h)
 - User permissions (16h)
 - Profile settings (12h)
@@ -1438,6 +1509,7 @@ Production Environment:
 #### **Month 3: Time & Attendance** (160h)
 
 **Leave Management (100h)**
+
 - Leave request form (20h)
 - Approval workflow (24h)
 - Leave calendar (20h)
@@ -1446,6 +1518,7 @@ Production Environment:
 - Reports (8h)
 
 **Attendance System (60h)**
+
 - Clock in/out functionality (20h)
 - Timesheet view (16h)
 - Attendance reports (16h)
@@ -1456,6 +1529,7 @@ Production Environment:
 #### **Month 4: Recruitment & Payroll** (160h)
 
 **Recruitment ATS (80h)**
+
 - Job posting (16h)
 - Application form (12h)
 - Candidate pipeline (Kanban) (24h)
@@ -1463,6 +1537,7 @@ Production Environment:
 - Email templates (12h)
 
 **Payroll Basics (80h)**
+
 - Salary management (20h)
 - Payslip generation (24h)
 - Tax calculations (20h)
@@ -1473,6 +1548,7 @@ Production Environment:
 #### **Month 5: Performance & Analytics** (160h)
 
 **Performance Management (80h)**
+
 - Review cycles (20h)
 - Goal setting (16h)
 - One-on-ones (16h)
@@ -1480,6 +1556,7 @@ Production Environment:
 - Reports (8h)
 
 **Analytics & Dashboards (80h)**
+
 - Executive dashboard (24h)
 - HR metrics (20h)
 - Custom reports (20h)
@@ -1490,16 +1567,19 @@ Production Environment:
 #### **Month 6: Polish & Launch** (160h)
 
 **Testing & Bug Fixing (60h)**
+
 - Manual testing (20h)
 - Bug fixes (30h)
 - Performance optimisation (10h)
 
 **Documentation (40h)**
+
 - User guides (16h)
 - API documentation (12h)
 - Video tutorials (12h)
 
 **Launch Preparation (60h)**
+
 - Marketing site (20h)
 - Onboarding flow (16h)
 - Production deployment (12h)
@@ -1609,40 +1689,41 @@ Total: ~40-44h/week = 160-176h/month
 
 ### Business Metrics (Year 1):
 
-| Metric | Target | How to Measure |
-|--------|--------|----------------|
-| **MRR** | $50,000 | Stripe dashboard |
-| **Customers** | 100 companies | Database count |
-| **Churn Rate** | < 5%/month | Analytics |
-| **CAC** | < $500 | Marketing spend / new customers |
-| **LTV** | > $3,000 | Average customer lifetime value |
-| **NPS** | > 50 | Quarterly surveys |
+| Metric         | Target        | How to Measure                  |
+| -------------- | ------------- | ------------------------------- |
+| **MRR**        | $50,000       | Stripe dashboard                |
+| **Customers**  | 100 companies | Database count                  |
+| **Churn Rate** | < 5%/month    | Analytics                       |
+| **CAC**        | < $500        | Marketing spend / new customers |
+| **LTV**        | > $3,000      | Average customer lifetime value |
+| **NPS**        | > 50          | Quarterly surveys               |
 
 ### Product Metrics:
 
-| Metric | Target | Tool |
-|--------|--------|------|
-| **DAU/MAU** | 40%+ | Google Analytics |
-| **Feature Adoption** | 70%+ | Mixpanel |
-| **Time in App** | 20min/day | Analytics |
-| **Task Completion** | 90%+ | User testing |
-| **Support Tickets** | < 3% of users | Zendesk |
+| Metric               | Target        | Tool             |
+| -------------------- | ------------- | ---------------- |
+| **DAU/MAU**          | 40%+          | Google Analytics |
+| **Feature Adoption** | 70%+          | Mixpanel         |
+| **Time in App**      | 20min/day     | Analytics        |
+| **Task Completion**  | 90%+          | User testing     |
+| **Support Tickets**  | < 3% of users | Zendesk          |
 
 ### Technical Metrics:
 
-| Metric | Target | Tool |
-|--------|--------|------|
-| **Page Load** | < 1.5s | Lighthouse |
-| **API Response** | < 150ms | Custom monitoring |
-| **Uptime** | 99.9% | UptimeRobot |
-| **Error Rate** | < 0.1% | Sentry |
-| **Test Coverage** | > 80% | Jest |
+| Metric            | Target  | Tool              |
+| ----------------- | ------- | ----------------- |
+| **Page Load**     | < 1.5s  | Lighthouse        |
+| **API Response**  | < 150ms | Custom monitoring |
+| **Uptime**        | 99.9%   | UptimeRobot       |
+| **Error Rate**    | < 0.1%  | Sentry            |
+| **Test Coverage** | > 80%   | Jest              |
 
 ---
 
 ## Roadmap - Future Features
 
 ### Q1 2026: Post-MVP Enhancements
+
 - Mobile app (React Native)
 - Chatbot support (AI)
 - Advanced email automation
@@ -1650,6 +1731,7 @@ Total: ~40-44h/week = 160-176h/month
 - Multi-language (EN, DE, FR)
 
 ### Q2 2026: Advanced Features
+
 - Advanced analytics (ML)
 - LMS expansion
 - Expense management
@@ -1657,6 +1739,7 @@ Total: ~40-44h/week = 160-176h/month
 - E-signature integration
 
 ### Q3 2026: Integrations
+
 - Outlook/Gmail calendar sync
 - LinkedIn integration
 - Accounting software (QuickBooks)
@@ -1664,6 +1747,7 @@ Total: ~40-44h/week = 160-176h/month
 - Bank integrations (payroll)
 
 ### Q4 2026: Enterprise Features
+
 - Multi-company support
 - SSO (SAML, LDAP)
 - Custom workflows
@@ -1677,12 +1761,14 @@ Total: ~40-44h/week = 160-176h/month
 ### Pricing Tiers:
 
 **Starter Plan - 99 PLN/month**
+
 - Up to 10 employees
 - Core HR + Leave Management
 - Email support
 - 5 GB storage
 
 **Professional Plan - 299 PLN/month**
+
 - Up to 50 employees
 - All features
 - Priority support
@@ -1690,6 +1776,7 @@ Total: ~40-44h/week = 160-176h/month
 - API access
 
 **Enterprise Plan - Custom**
+
 - Unlimited employees
 - Dedicated account manager
 - Custom integrations
@@ -1715,17 +1802,20 @@ Total Year 1 ARR: ~300,000 PLN (~$72,000)
 ### Support Levels:
 
 **Community Support (Free)**
+
 - Knowledge base
 - Community forum
 - Email (48h response)
 
 **Standard Support (included)**
+
 - Email support (24h)
 - Live chat (business hours)
 - Phone support (callback)
 - Training webinars
 
 **Premium Support (Enterprise)**
+
 - 24/7 support
 - Dedicated account manager
 - On-site training
@@ -1739,6 +1829,7 @@ Total Year 1 ARR: ~300,000 PLN (~$72,000)
 ### Target Channels:
 
 **1. Content Marketing**
+
 - HR blog (SEO)
 - Case studies
 - Whitepapers
@@ -1746,6 +1837,7 @@ Total Year 1 ARR: ~300,000 PLN (~$72,000)
 - LinkedIn posts
 
 **2. Direct Sales**
+
 - LinkedIn outreach
 - Cold email campaigns
 - Industry events
@@ -1753,6 +1845,7 @@ Total Year 1 ARR: ~300,000 PLN (~$72,000)
 - Webinars
 
 **3. Partnerships**
+
 - HR consultants
 - Accounting firms
 - Business coaches
@@ -1760,6 +1853,7 @@ Total Year 1 ARR: ~300,000 PLN (~$72,000)
 - Industry associations
 
 **4. Paid Advertising**
+
 - Google Ads (B2B keywords)
 - LinkedIn Ads
 - Facebook Ads
@@ -1795,40 +1889,42 @@ Phase 3: Public Launch (Month 7+)
 // swagger.js
 const swaggerOptions = {
   swaggerDefinition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'WorkNest API',
-      version: '1.0.0',
-      description: 'Complete HR Management System API',
+      title: "WorkNest API",
+      version: "1.0.0",
+      description: "Complete HR Management System API",
       contact: {
-        name: 'API Support',
-        email: 'api@worknest.com'
-      }
+        name: "API Support",
+        email: "api@worknest.com",
+      },
     },
     servers: [
       {
-        url: 'https://api.worknest.com/v1',
-        description: 'Production server'
+        url: "https://api.worknest.com/v1",
+        description: "Production server",
       },
       {
-        url: 'http://localhost:5000/v1',
-        description: 'Development server'
-      }
+        url: "http://localhost:5000/v1",
+        description: "Development server",
+      },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
-      }
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
     },
-    security: [{
-      bearerAuth: []
-    }]
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
-  apis: ['./routes/*.js']
+  apis: ["./routes/*.js"],
 };
 ```
 
@@ -1839,6 +1935,7 @@ const swaggerOptions = {
 ### GDPR Compliance:
 
 **Data Protection Measures:**
+
 - Data encryption (AES-256)
 - Secure password storage (bcrypt)
 - Data minimisation
@@ -1894,12 +1991,14 @@ const swaggerOptions = {
 ### Recommended Learning Path:
 
 **MERN Stack Mastery:**
+
 1. **MongoDB University** (free courses)
 2. **Node.js Documentation** (official)
 3. **React Documentation** (official)
 4. **Express.js Guide** (official)
 
 **Advanced Topics:**
+
 - MongoDB Performance Tuning
 - React Performance Optimisation
 - Node.js Best Practices
@@ -1907,12 +2006,14 @@ const swaggerOptions = {
 - Microservices Architecture
 
 **YouTube Channels:**
+
 - Traversy Media
 - Academind
 - The Net Ninja
 - Web Dev Simplified
 
 **Books:**
+
 - "Node.js Design Patterns"
 - "Pro MERN Stack"
 - "MongoDB: The Definitive Guide"
@@ -2000,26 +2101,26 @@ export const useAuth = () => {
   }, []);
 
   const checkAuth = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       try {
-        const response = await api.get('/auth/me');
+        const response = await api.get("/auth/me");
         setUser(response.data);
       } catch (error) {
-        localStorage.removeItem('token');
+        localStorage.removeItem("token");
       }
     }
     setLoading(false);
   };
 
   const login = async (credentials) => {
-    const { data } = await api.post('/auth/login', credentials);
-    localStorage.setItem('token', data.token);
+    const { data } = await api.post("/auth/login", credentials);
+    localStorage.setItem("token", data.token);
     setUser(data.user);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
   };
 
@@ -2044,7 +2145,7 @@ export const useEmployee = (id) => {
   const updateEmployee = async (updates) => {
     const { data } = await api.put(`/employees/${id}`, updates);
     setEmployee(data);
-    toast.success('Updated successfully!');
+    toast.success("Updated successfully!");
   };
 
   return { employee, loading, updateEmployee };
@@ -2062,41 +2163,41 @@ export const handleError = (error) => {
 
     switch (status) {
       case 400:
-        toast.error(data.message || 'Invalid request');
+        toast.error(data.message || "Invalid request");
         break;
       case 401:
-        toast.error('Please login again');
-        localStorage.removeItem('token');
-        window.location.href = '/login';
+        toast.error("Please login again");
+        localStorage.removeItem("token");
+        window.location.href = "/login";
         break;
       case 403:
-        toast.error('Access denied');
+        toast.error("Access denied");
         break;
       case 404:
-        toast.error('Resource not found');
+        toast.error("Resource not found");
         break;
       case 500:
-        toast.error('Server error. Please try again.');
+        toast.error("Server error. Please try again.");
         break;
       default:
-        toast.error('Something went wrong');
+        toast.error("Something went wrong");
     }
   } else if (error.request) {
     // Network error
-    toast.error('Network error. Check your connection.');
+    toast.error("Network error. Check your connection.");
   } else {
     toast.error(error.message);
   }
 
   // Log to Sentry in production
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === "production") {
     Sentry.captureException(error);
   }
 };
 
 // Use it like:
 try {
-  await api.post('/employees', data);
+  await api.post("/employees", data);
 } catch (error) {
   handleError(error);
 }
@@ -2106,23 +2207,23 @@ try {
 
 ```javascript
 // services/api/index.js
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  timeout: 10000
+  timeout: 10000,
 });
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response interceptor
@@ -2130,36 +2231,36 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // services/api/employeeService.js
 export const employeeService = {
-  getAll: (params) => api.get('/employees', { params }),
+  getAll: (params) => api.get("/employees", { params }),
   getById: (id) => api.get(`/employees/${id}`),
-  create: (data) => api.post('/employees', data),
+  create: (data) => api.post("/employees", data),
   update: (id, data) => api.put(`/employees/${id}`, data),
   delete: (id) => api.delete(`/employees/${id}`),
   bulkImport: (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    return api.post('/employees/bulk-import', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+    formData.append("file", file);
+    return api.post("/employees/bulk-import", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
-  }
+  },
 };
 
 // services/api/leaveService.js
 export const leaveService = {
-  getAll: (params) => api.get('/leaves', { params }),
-  create: (data) => api.post('/leaves', data),
+  getAll: (params) => api.get("/leaves", { params }),
+  create: (data) => api.post("/leaves", data),
   approve: (id) => api.put(`/leaves/${id}/approve`),
   reject: (id, reason) => api.put(`/leaves/${id}/reject`, { reason }),
-  getBalance: (employeeId) => api.get(`/leaves/balance/${employeeId}`)
+  getBalance: (employeeId) => api.get(`/leaves/balance/${employeeId}`),
 };
 ```
 
@@ -2219,14 +2320,14 @@ module.exports = {
 
 ```javascript
 // jobs/emailQueue.js
-const Queue = require('bull');
-const emailService = require('../services/emailService');
+const Queue = require("bull");
+const emailService = require("../services/emailService");
 
-const emailQueue = new Queue('email', {
+const emailQueue = new Queue("email", {
   redis: {
-    host: '127.0.0.1',
-    port: 6379
-  }
+    host: "127.0.0.1",
+    port: 6379,
+  },
 });
 
 // Process jobs
@@ -2234,41 +2335,44 @@ emailQueue.process(async (job) => {
   const { type, data } = job.data;
 
   switch (type) {
-    case 'welcome':
+    case "welcome":
       await emailService.sendWelcomeEmail(data);
       break;
-    case 'leave-approved':
+    case "leave-approved":
       await emailService.sendLeaveApproval(data);
       break;
-    case 'payslip':
+    case "payslip":
       await emailService.sendPayslip(data);
       break;
     default:
-      throw new Error('Unknown email type');
+      throw new Error("Unknown email type");
   }
 });
 
 // Add jobs
 exports.addEmailJob = (type, data) => {
-  emailQueue.add({ type, data }, {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 2000
-    }
-  });
+  emailQueue.add(
+    { type, data },
+    {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 2000,
+      },
+    },
+  );
 };
 
 // jobs/cronJobs.js
-const cron = require('node-cron');
-const Employee = require('../models/Employee');
+const cron = require("node-cron");
+const Employee = require("../models/Employee");
 
 // Run daily at midnight
-cron.schedule('0 0 * * *', async () => {
-  console.log('Running daily leave accrual...');
+cron.schedule("0 0 * * *", async () => {
+  console.log("Running daily leave accrual...");
 
   // Accrue leave for all active employees
-  const employees = await Employee.find({ status: 'Active' });
+  const employees = await Employee.find({ status: "Active" });
 
   for (const employee of employees) {
     const monthlyAccrual = 20 / 12; // 20 days per year
@@ -2276,13 +2380,13 @@ cron.schedule('0 0 * * *', async () => {
     await employee.save();
   }
 
-  console.log('Leave accrual completed');
+  console.log("Leave accrual completed");
 });
 
 // Check for expiring documents
-cron.schedule('0 9 * * 1', async () => {
+cron.schedule("0 9 * * 1", async () => {
   // Every Monday at 9 AM
-  console.log('Checking expiring documents...');
+  console.log("Checking expiring documents...");
   // Your logic here
 });
 ```
@@ -2291,59 +2395,61 @@ cron.schedule('0 9 * * 1', async () => {
 
 ```javascript
 // utils/logger.js
-const winston = require('winston');
+const winston = require("winston");
 
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
+  level: process.env.LOG_LEVEL || "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
-    winston.format.json()
+    winston.format.json(),
   ),
-  defaultMeta: { service: 'worknest-api' },
+  defaultMeta: { service: "worknest-api" },
   transports: [
     // Write to files
     new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error'
+      filename: "logs/error.log",
+      level: "error",
     }),
     new winston.transports.File({
-      filename: 'logs/combined.log'
-    })
-  ]
+      filename: "logs/combined.log",
+    }),
+  ],
 });
 
 // Console in development
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+  );
 }
 
 module.exports = logger;
 
 // Usage:
-logger.info('User logged in', { userId: user.id });
-logger.error('Failed to create employee', { error: err.message });
-logger.warn('High memory usage', { memory: process.memoryUsage() });
+logger.info("User logged in", { userId: user.id });
+logger.error("Failed to create employee", { error: err.message });
+logger.warn("High memory usage", { memory: process.memoryUsage() });
 ```
 
 ### 8. **Testing Strategy - Don't Skip It!**
 
 ```javascript
 // __tests__/employee.test.js
-const request = require('supertest');
-const app = require('../app');
-const Employee = require('../models/Employee');
+const request = require("supertest");
+const app = require("../app");
+const Employee = require("../models/Employee");
 
-describe('Employee API', () => {
+describe("Employee API", () => {
   let token;
 
   beforeAll(async () => {
     // Get auth token
     const response = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'admin@test.com', password: 'password' });
+      .post("/api/auth/login")
+      .send({ email: "admin@test.com", password: "password" });
     token = response.body.token;
   });
 
@@ -2351,70 +2457,70 @@ describe('Employee API', () => {
     await Employee.deleteMany({ email: /test/ });
   });
 
-  describe('POST /api/employees', () => {
-    it('should create a new employee', async () => {
+  describe("POST /api/employees", () => {
+    it("should create a new employee", async () => {
       const employeeData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.test@example.com',
-        position: 'Developer'
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.test@example.com",
+        position: "Developer",
       };
 
       const response = await request(app)
-        .post('/api/employees')
-        .set('Authorization', `Bearer ${token}`)
+        .post("/api/employees")
+        .set("Authorization", `Bearer ${token}`)
         .send(employeeData)
         .expect(201);
 
-      expect(response.body.employee).toHaveProperty('_id');
-      expect(response.body.employee.firstName).toBe('John');
+      expect(response.body.employee).toHaveProperty("_id");
+      expect(response.body.employee.firstName).toBe("John");
     });
 
-    it('should return 400 for invalid data', async () => {
+    it("should return 400 for invalid data", async () => {
       const response = await request(app)
-        .post('/api/employees')
-        .set('Authorization', `Bearer ${token}`)
-        .send({ firstName: 'John' }) // Missing required fields
+        .post("/api/employees")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ firstName: "John" }) // Missing required fields
         .expect(400);
     });
   });
 
-  describe('GET /api/employees', () => {
-    it('should return paginated employees', async () => {
+  describe("GET /api/employees", () => {
+    it("should return paginated employees", async () => {
       const response = await request(app)
-        .get('/api/employees?page=1&limit=10')
-        .set('Authorization', `Bearer ${token}`)
+        .get("/api/employees?page=1&limit=10")
+        .set("Authorization", `Bearer ${token}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('employees');
-      expect(response.body).toHaveProperty('totalPages');
+      expect(response.body).toHaveProperty("employees");
+      expect(response.body).toHaveProperty("totalPages");
     });
   });
 });
 
 // Frontend test example
 // __tests__/EmployeeList.test.jsx
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import EmployeeList from '../components/EmployeeList';
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import EmployeeList from "../components/EmployeeList";
 
-describe('EmployeeList', () => {
-  it('renders employee list', async () => {
+describe("EmployeeList", () => {
+  it("renders employee list", async () => {
     render(<EmployeeList />);
 
     await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
   });
 
-  it('filters employees by department', async () => {
+  it("filters employees by department", async () => {
     render(<EmployeeList />);
 
-    const select = screen.getByLabelText('Department');
-    userEvent.selectOptions(select, 'Engineering');
+    const select = screen.getByLabelText("Department");
+    userEvent.selectOptions(select, "Engineering");
 
     await waitFor(() => {
-      expect(screen.queryByText('Marketing Manager')).not.toBeInTheDocument();
+      expect(screen.queryByText("Marketing Manager")).not.toBeInTheDocument();
     });
   });
 });
@@ -2509,16 +2615,19 @@ worknest/
 ## Contact and Support
 
 **Developer:**
+
 - Email: developer@worknest.com
 - GitHub: github.com/yourname/worknest
 - LinkedIn: linkedin.com/in/yourname
 
 **Product:**
+
 - Website: worknest.com
 - Demo: demo.worknest.com
 - Status: status.worknest.com
 
 **Community:**
+
 - Discord: discord.gg/worknest
 - Forum: community.worknest.com
 - Twitter: @worknest
@@ -2527,13 +2636,7 @@ worknest/
 
 ## Licence
 
-MIT License
-
-Copyright (c) 2025 WorkNest
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction...
+Copyright (c) 2026 Szymon (WorkNest). All rights reserved. Proprietary and confidential.
 
 ---
 
@@ -2542,6 +2645,7 @@ in the Software without restriction...
 WorkNest is an **ambitious but doable project** for a solo MERN developer. Key points:
 
 ### Upsides of This Approach:
+
 - **Full control** over code and decisions
 - **Fast iteration** without bureaucracy
 - **100% equity** in the project
@@ -2550,6 +2654,7 @@ WorkNest is an **ambitious but doable project** for a solo MERN developer. Key p
 - **Recurring revenue** model
 
 ### Challenges:
+
 - **Time-consuming** - realistically 6+ months
 - **Demanding** technical and business knowledge
 - **Lonely** - no team to bounce ideas off
@@ -2557,6 +2662,7 @@ WorkNest is an **ambitious but doable project** for a solo MERN developer. Key p
 - **Risk** - may not work commercially
 
 ### Recommendations:
+
 1. **Start with the MVP** - not everything at once
 2. **Validate the idea** - talk to potential customers
 3. **Beta testing** - gather feedback early
@@ -2567,6 +2673,7 @@ WorkNest is an **ambitious but doable project** for a solo MERN developer. Key p
 8. **Iterate** - improvement beats perfection
 
 ### Success Factors:
+
 - Consistency in the work
 - Focus on the user's problem
 - Code quality from day one

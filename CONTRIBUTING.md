@@ -133,5 +133,4 @@ See [`SECURITY.md`](SECURITY.md) for the full disclosure policy.
 
 ## License
 
-By contributing you agree that your contributions are licensed under
-the [MIT License](LICENSE).
+This project is proprietary and confidential. External contributions are not accepted.
