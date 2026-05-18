@@ -1,10 +1,7 @@
 import React from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import startOfWeek from 'date-fns/startOfWeek';
-import getDay from 'date-fns/getDay';
-import pl from 'date-fns/locale/pl';
+import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { pl } from 'date-fns/locale/pl';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -48,22 +45,22 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
         <div className="mb-8 flex flex-col gap-4 px-2 md:flex-row md:items-center md:justify-between">
             {/* Left: Navigation and Title */}
             <div className="flex items-center gap-6">
-                <div className="flex items-center gap-1 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-1 shadow-inner">
+                <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-black/5 p-1 shadow-inner dark:border-white/10 dark:bg-white/5">
                     <button
                         onClick={goToBack}
-                        className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white active:scale-95"
+                        className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-black/10 hover:text-black active:scale-95 dark:hover:bg-white/10 dark:hover:text-white"
                     >
                         <ChevronLeft size={18} />
                     </button>
                     <button
                         onClick={goToCurrent}
-                        className="rounded-lg px-4 py-1.5 text-xs font-black uppercase tracking-widest text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white active:scale-95"
+                        className="rounded-lg px-4 py-1.5 text-xs font-black uppercase tracking-widest text-zinc-400 transition-all hover:bg-black/10 hover:text-black active:scale-95 dark:hover:bg-white/10 dark:hover:text-white"
                     >
                         Today
                     </button>
                     <button
                         onClick={goToNext}
-                        className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-black/10 dark:hover:bg-white/10 hover:text-black dark:hover:text-white active:scale-95"
+                        className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-black/10 hover:text-black active:scale-95 dark:hover:bg-white/10 dark:hover:text-white"
                     >
                         <ChevronRight size={18} />
                     </button>
@@ -75,7 +72,7 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
 
             {/* Right: View Switcher */}
             {views.length > 1 && (
-                <div className="flex items-center gap-1 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-1 shadow-inner">
+                <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-black/5 p-1 shadow-inner dark:border-white/10 dark:bg-white/5">
                     {views.map((viewName) => (
                         <button
                             key={viewName}
@@ -83,8 +80,8 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
                             className={clsx(
                                 'rounded-lg px-5 py-2 text-xs font-black uppercase tracking-widest transition-all active:scale-95',
                                 view === viewName
-                                    ? 'shadow-primary/20 bg-primary text-black shadow-lg'
-                                    : 'text-zinc-500 hover:bg-black/10 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-zinc-200',
+                                    ? 'bg-primary text-black shadow-lg shadow-primary/20'
+                                    : 'text-zinc-500 hover:bg-black/10 hover:text-zinc-900 dark:hover:bg-white/10 dark:hover:text-zinc-200',
                             )}
                         >
                             {viewButtons[viewName]}
@@ -167,22 +164,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
     };
 
     return (
-        <div className="shadow-3xl h-[calc(100vh-280px)] min-h-[420px] sm:min-h-[500px] lg:min-h-[600px] w-full rounded-[2.5rem] border border-black/10 dark:border-white/10 bg-white dark:bg-zinc-900/40 p-4 md:p-8 transition-colors duration-300
-            [--calendar-text-main:theme(colors.zinc.900)]
-            [--calendar-text-muted:theme(colors.zinc.400)]
-            [--calendar-bg-today:rgb(var(--calendar-bg-today))]
-            [--calendar-bg-view:rgb(var(--calendar-bg-view))]
-            [--calendar-border:rgb(var(--calendar-border))]
-            [--calendar-off-range:rgb(var(--calendar-off-range))]
-            [--calendar-event-pending-bg:rgb(var(--calendar-event-pending-bg))]
-            [--calendar-event-pending-border:rgb(var(--calendar-event-pending-border))]
-            [--calendar-event-approved-bg:rgb(var(--calendar-event-approved-bg))]
-            [--calendar-event-approved-border:rgb(var(--calendar-event-approved-border))]
-            [--calendar-event-rejected-bg:rgb(var(--calendar-event-rejected-bg))]
-            [--calendar-event-rejected-border:rgb(var(--calendar-event-rejected-border))]
-            dark:[--calendar-text-main:theme(colors.white)]
-            dark:[--calendar-text-muted:theme(colors.zinc.500)]
-        ">
+        <div className="shadow-3xl h-[calc(100vh-280px)] min-h-[420px] w-full rounded-[2.5rem] border border-black/10 bg-white p-4 transition-colors duration-300 [--calendar-bg-today:rgb(var(--calendar-bg-today))] [--calendar-bg-view:rgb(var(--calendar-bg-view))] [--calendar-border:rgb(var(--calendar-border))] [--calendar-event-approved-bg:rgb(var(--calendar-event-approved-bg))] [--calendar-event-approved-border:rgb(var(--calendar-event-approved-border))] [--calendar-event-pending-bg:rgb(var(--calendar-event-pending-bg))] [--calendar-event-pending-border:rgb(var(--calendar-event-pending-border))] [--calendar-event-rejected-bg:rgb(var(--calendar-event-rejected-bg))] [--calendar-event-rejected-border:rgb(var(--calendar-event-rejected-border))] [--calendar-off-range:rgb(var(--calendar-off-range))] [--calendar-text-main:theme(colors.zinc.900)] [--calendar-text-muted:theme(colors.zinc.400)] dark:border-white/10 dark:bg-zinc-900/40 dark:[--calendar-text-main:theme(colors.white)] dark:[--calendar-text-muted:theme(colors.zinc.500)] sm:min-h-[500px] md:p-8 lg:min-h-[600px]">
             <style>{`
                 .rbc-calendar { font-family: inherit; color: var(--calendar-text-main); }
                 .rbc-header {
