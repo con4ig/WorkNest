@@ -6,6 +6,7 @@ import {
     BrowserRouter as Router,
     Routes,
     Route,
+    Navigate,
 } from 'react-router-dom';
 import './styles/fonts.css';
 import './styles/index.css';
@@ -14,7 +15,6 @@ import './styles/index.css';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Forgot from './pages/Forgot.jsx';
-import App from './App.jsx';
 import Terms from './pages/Terms.jsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
 
@@ -28,7 +28,9 @@ const LeaveApprovals = lazy(() => import('./pages/LeaveApprovals.jsx'));
 const UserDetails = lazy(() => import('./pages/UserDetails.jsx'));
 const Upload = lazy(() => import('./pages/Upload.jsx'));
 const GenerateCode = lazy(() => import('./pages/GenerateCode.jsx'));
-const ForcePasswordChange = lazy(() => import('./pages/ForcePasswordChange.jsx'));
+const ForcePasswordChange = lazy(
+    () => import('./pages/ForcePasswordChange.jsx'),
+);
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -47,88 +49,95 @@ createRoot(document.getElementById('root')).render(
             <ThemeProvider>
                 <AuthProvider>
                     <I18nextProvider i18n={i18n}>
-                    <Suspense fallback={<LoadingScreen />}>
-                        <Router>
-                            <AuthErrorHandler />
-                            <Toaster
-                                containerStyle={{ zIndex: 9999 }}
-                                position="top-center"
-                                reverseOrder={false}
-                                toastOptions={{
-                                    duration: 5000,
-                                    style: {
-                                        background: 'rgb(var(--card))',
-                                        color: 'rgb(var(--card-foreground))',
-                                        border: '1px solid rgb(var(--border))',
-                                    },
-                                }}
-                            />
-                            <Routes>
-                                <Route path="/" element={<App />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route
-                                    path="/register"
-                                    element={<Register />}
+                        <Suspense fallback={<LoadingScreen />}>
+                            <Router>
+                                <AuthErrorHandler />
+                                <Toaster
+                                    containerStyle={{ zIndex: 9999 }}
+                                    position="top-center"
+                                    reverseOrder={false}
+                                    toastOptions={{
+                                        duration: 5000,
+                                        style: {
+                                            background: 'rgb(var(--card))',
+                                            color: 'rgb(var(--card-foreground))',
+                                            border: '1px solid rgb(var(--border))',
+                                        },
+                                    }}
                                 />
-                                <Route
-                                    path="/regulamin"
-                                    element={<Terms />}
-                                />
-                                <Route
-                                    path="/polityka-prywatnosci"
-                                    element={<PrivacyPolicy />}
-                                />
+                                <Routes>
+                                    <Route
+                                        path="/"
+                                        element={
+                                            <Navigate to="/login" replace />
+                                        }
+                                    />
+                                    <Route path="/login" element={<Login />} />
+                                    <Route
+                                        path="/register"
+                                        element={<Register />}
+                                    />
+                                    <Route
+                                        path="/regulamin"
+                                        element={<Terms />}
+                                    />
+                                    <Route
+                                        path="/polityka-prywatnosci"
+                                        element={<PrivacyPolicy />}
+                                    />
 
-                                <Route element={<ProtectedRoute />}>
-                                    <Route element={<Layout />}>
-                                        <Route
-                                            path="/dashboard"
-                                            element={<Dashboard />}
-                                        />
-                                        <Route
-                                            path="/employees"
-                                            element={<EmployeeList />}
-                                        />
-                                        <Route
-                                            path="/projects"
-                                            element={<Projects />}
-                                        />
+                                    <Route element={<ProtectedRoute />}>
+                                        <Route element={<Layout />}>
+                                            <Route
+                                                path="/dashboard"
+                                                element={<Dashboard />}
+                                            />
+                                            <Route
+                                                path="/employees"
+                                                element={<EmployeeList />}
+                                            />
+                                            <Route
+                                                path="/projects"
+                                                element={<Projects />}
+                                            />
 
-                                        <Route
-                                            path="/projects/:id"
-                                            element={<ProjectDetails />}
-                                        />
-                                        <Route
-                                            path="/employees/:id"
-                                            element={<UserDetails />}
-                                        />
-                                        <Route
-                                            path="/myleaves"
-                                            element={<MyLeaves />}
-                                        />
-                                        <Route
-                                            path="/leave-approvals"
-                                            element={<LeaveApprovals />}
-                                        />
-                                        <Route
-                                            path="/upload"
-                                            element={<Upload />}
-                                        />
-                                        <Route
-                                            path="/generate-code"
-                                            element={<GenerateCode />}
-                                        />
-                                        <Route
-                                            path="/force-password-change"
-                                            element={<ForcePasswordChange />}
-                                        />
+                                            <Route
+                                                path="/projects/:id"
+                                                element={<ProjectDetails />}
+                                            />
+                                            <Route
+                                                path="/employees/:id"
+                                                element={<UserDetails />}
+                                            />
+                                            <Route
+                                                path="/myleaves"
+                                                element={<MyLeaves />}
+                                            />
+                                            <Route
+                                                path="/leave-approvals"
+                                                element={<LeaveApprovals />}
+                                            />
+                                            <Route
+                                                path="/upload"
+                                                element={<Upload />}
+                                            />
+                                            <Route
+                                                path="/generate-code"
+                                                element={<GenerateCode />}
+                                            />
+                                            <Route
+                                                path="/force-password-change"
+                                                element={
+                                                    <ForcePasswordChange />
+                                                }
+                                            />
+                                        </Route>
                                     </Route>
-                                </Route>
-                            </Routes>
-                        </Router>
-                    </Suspense>
-                </I18nextProvider>
-            </AuthProvider>
+                                </Routes>
+                            </Router>
+                        </Suspense>
+                    </I18nextProvider>
+                </AuthProvider>
             </ThemeProvider>
         </ErrorBoundary>
     </StrictMode>,
