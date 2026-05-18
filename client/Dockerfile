@@ -1,7 +1,7 @@
 # =============================================
 # Stage 1: Build
 # =============================================
-FROM node:20-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 
 # Copy package files for layer cache
@@ -15,7 +15,7 @@ RUN npm run build
 # =============================================
 # Stage 2: Production (Nginx)
 # =============================================
-FROM nginx:1.27-alpine AS production
+FROM nginx:1.31-alpine AS production
 
 # Security: remove default nginx config
 RUN rm -rf /etc/nginx/conf.d/*
