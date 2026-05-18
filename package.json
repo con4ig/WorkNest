@@ -1,6 +1,7 @@
 {
     "name": "worknest",
     "private": true,
+    "license": "UNLICENSED",
     "version": "1.0.0",
     "description": "WorkNest monorepo root — holds repository-wide dev tooling (Husky, lint-staged, commitlint). Application code lives in `client/` and `server/`.",
     "engines": {
