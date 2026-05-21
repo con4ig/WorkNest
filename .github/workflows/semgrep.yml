@@ -25,7 +25,7 @@ jobs:
     # Skip on Dependabot PRs — they don't carry the SARIF upload token.
     if: (github.actor != 'dependabot[bot]')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Run Semgrep
         # `auto` config picks the right rulesets for the languages it
@@ -42,7 +42,7 @@ jobs:
         # Without GHAS the Security tab won't render SARIF, but the
         # artifact is still attached to the run for download.
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: semgrep-sarif
           path: semgrep.sarif
