@@ -12,7 +12,6 @@ import './styles/fonts.css';
 import './styles/index.css';
 
 // Auth + public pages — small, load eagerly (needed on first paint)
-import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Forgot from './pages/Forgot.jsx';
@@ -67,7 +66,12 @@ createRoot(document.getElementById('root')).render(
                                     }}
                                 />
                                 <Routes>
-                                    <Route path="/" element={<Landing />} />
+                                    <Route
+                                        path="/"
+                                        element={
+                                            <Navigate to="/login" replace />
+                                        }
+                                    />
                                     <Route path="/login" element={<Login />} />
                                     <Route
                                         path="/register"

@@ -18,7 +18,6 @@ module.exports = {
       startServerCommand: "npx serve dist -l 4173 --single",
       startServerReadyPattern: "Accepting connections|Serving|Local:",
       url: [
-        "http://127.0.0.1:4173/",
         "http://127.0.0.1:4173/login",
         "http://127.0.0.1:4173/regulamin",
       ],
