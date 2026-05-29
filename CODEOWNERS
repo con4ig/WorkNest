@@ -3,31 +3,31 @@
 # Docs:   https://docs.github.com/en/repositories/managing-your-repositories-settings-and-features/customizing-your-repository/about-code-owners
 
 # Catch-all — every PR pings the project maintainer.
-*                              @yourusername
+*                              @con4ig
 
 # Architecture / decisions — extra eyeballs on changes that move
 # the design forward.
-/docs/adr/                     @yourusername
-/CONTRIBUTING.md               @yourusername
-/SECURITY.md                   @yourusername
-/CONTEXT.md                    @yourusername
+/docs/adr/                     @con4ig
+/CONTRIBUTING.md               @con4ig
+/SECURITY.md                   @con4ig
+/CONTEXT.md                    @con4ig
 
 # CI / automation / security policy — the things that gate everything else.
-/.github/                      @yourusername
+/.github/                      @con4ig
 
 # Backend critical paths — auth, multi-tenancy, encryption, real-time.
-/server/controllers/authController.js     @yourusername
-/server/middleware/authenticate.js         @yourusername
-/server/middleware/authorize.js            @yourusername
-/server/middleware/limitDemoResources.js   @yourusername
-/server/lib/realtime.js                    @yourusername
-/server/models/User.js                     @yourusername
-/server/swagger.js                         @yourusername
+/server/controllers/authController.js     @con4ig
+/server/middleware/authenticate.js         @con4ig
+/server/middleware/authorize.js            @con4ig
+/server/middleware/limitDemoResources.js   @con4ig
+/server/lib/realtime.js                    @con4ig
+/server/models/User.js                     @con4ig
+/server/swagger.js                         @con4ig
 
 # Database schemas — once a field ships, migrating it later is painful.
-/server/models/                @yourusername
+/server/models/                @con4ig
 
 # Frontend auth / context — flows where a bug logs every user out.
-/client/src/context/           @yourusername
-/client/src/services/api.js    @yourusername
-/client/src/services/realtime.js @yourusername
+/client/src/context/           @con4ig
+/client/src/services/api.js    @con4ig
+/client/src/services/realtime.js @con4ig
