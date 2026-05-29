@@ -2636,7 +2636,7 @@ worknest/
 
 ## Licence
 
-Copyright (c) 2026 Szymon (WorkNest). All rights reserved. Proprietary and confidential.
+Copyright (c) 2026 con4ig (WorkNest). All rights reserved. Proprietary and confidential.
 
 ---
 

@@ -2609,7 +2609,7 @@ worknest/
 
 ## Licencja
 
-Copyright (c) 2026 Szymon (WorkNest). Wszelkie prawa zastrzeżone. Projekt zastrzeżony i poufny.
+Copyright (c) 2026 con4ig (WorkNest). Wszelkie prawa zastrzeżone. Projekt zastrzeżony i poufny.
 
 ---
 

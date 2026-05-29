@@ -105,4 +105,4 @@ Every code change goes through an automated verification pipeline defined in `.g
 
 ## License
 
-Copyright (c) 2026 Szymon (WorkNest). All rights reserved. Proprietary and confidential.
+Copyright (c) 2026 con4ig (WorkNest). All rights reserved. Proprietary and confidential.
