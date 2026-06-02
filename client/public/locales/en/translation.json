@@ -810,6 +810,8 @@
     "upload": {
         "title": "Change profile picture",
         "subtitle": "Add or update your avatar",
+        "cardTitle": "Profile Picture",
+        "cardSubtitle": "Choose a photo that will be visible to the team.",
         "previewAlt": "Preview",
         "selectImage": "Select photo",
         "selectAnother": "Select another photo",

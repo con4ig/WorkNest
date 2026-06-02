@@ -810,6 +810,8 @@
     "upload": {
         "title": "Zmień zdjęcie profilowe",
         "subtitle": "Dodaj lub zaktualizuj swój awatar",
+        "cardTitle": "Zdjęcie profilowe",
+        "cardSubtitle": "Wybierz zdjęcie, które będzie widoczne w zespole.",
         "previewAlt": "Podgląd",
         "selectImage": "Wybierz zdjęcie",
         "selectAnother": "Wybierz inne zdjęcie",
