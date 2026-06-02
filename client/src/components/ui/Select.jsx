@@ -138,7 +138,7 @@ const Select = React.forwardRef(
                 </div>
 
                 {isOpen && (
-                    <div className="animate-in fade-in zoom-in-95 absolute z-[110] mt-1 max-h-60 w-full overflow-auto rounded-md border border-border bg-card py-1 text-base shadow-md focus:outline-none sm:text-sm">
+                    <div className="animate-in fade-in zoom-in-95 absolute z-[9999] mt-1 max-h-60 w-full overflow-auto rounded-md border border-border bg-card py-1 text-base shadow-md focus:outline-none sm:text-sm">
                         {parsedOptions.map((opt, i) => {
                             if (opt.isGroup) {
                                 return (
