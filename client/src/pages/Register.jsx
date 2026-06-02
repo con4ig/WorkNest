@@ -7,49 +7,52 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Select } from '../components/ui/Select';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
 };
 
-const createRegistrationSchema = (t) => z
-    .object({
-        email: z
-            .string()
-            .min(1, { message: t('auth.validation.emailRequired') })
-            .email({ message: t('auth.validation.emailInvalid') }),
-        username: z
-            .string()
-            .min(1, { message: t('auth.validation.usernameRequired') }),
-        password: z
-            .string()
-            .min(6, { message: t('auth.validation.passwordMin') }),
-        role: z.enum(['admin', 'employee']),
-        companyName: z.string().optional(),
-        invitationCode: z.string().optional(),
-    })
-    .superRefine((data, ctx) => {
-        if (
-            data.role === 'admin' &&
-            (!data.companyName || data.companyName.trim().length === 0)
-        ) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['companyName'],
-                message: t('auth.validation.companyRequired'),
-            });
-        }
-        if (
-            data.role === 'employee' &&
-            (!data.invitationCode || data.invitationCode.trim().length === 0)
-        ) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['invitationCode'],
-                message: t('auth.validation.codeRequired'),
-            });
-        }
-    });
+const createRegistrationSchema = (t) =>
+    z
+        .object({
+            email: z
+                .string()
+                .min(1, { message: t('auth.validation.emailRequired') })
+                .email({ message: t('auth.validation.emailInvalid') }),
+            username: z
+                .string()
+                .min(1, { message: t('auth.validation.usernameRequired') }),
+            password: z
+                .string()
+                .min(6, { message: t('auth.validation.passwordMin') }),
+            role: z.enum(['admin', 'employee']),
+            companyName: z.string().optional(),
+            invitationCode: z.string().optional(),
+        })
+        .superRefine((data, ctx) => {
+            if (
+                data.role === 'admin' &&
+                (!data.companyName || data.companyName.trim().length === 0)
+            ) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['companyName'],
+                    message: t('auth.validation.companyRequired'),
+                });
+            }
+            if (
+                data.role === 'employee' &&
+                (!data.invitationCode ||
+                    data.invitationCode.trim().length === 0)
+            ) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['invitationCode'],
+                    message: t('auth.validation.codeRequired'),
+                });
+            }
+        });
 
 export default function Register() {
     const { t } = useTranslation();
@@ -97,7 +100,9 @@ export default function Register() {
             toast.success(t('auth.register.success'));
             navigate('/login');
         } catch (err) {
-            toast.error(err.response?.data?.message || t('auth.register.error'));
+            toast.error(
+                err.response?.data?.message || t('auth.register.error'),
+            );
         } finally {
             setIsLoading(false);
         }
@@ -156,7 +161,10 @@ export default function Register() {
                     >
                         <div className="space-y-5">
                             <div>
-                                <label htmlFor="register-email" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                <label
+                                    htmlFor="register-email"
+                                    className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                >
                                     {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
@@ -164,7 +172,9 @@ export default function Register() {
                                         id="register-email"
                                         {...register('email')}
                                         className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                                        placeholder={t('auth.login.emailPlaceholder')}
+                                        placeholder={t(
+                                            'auth.login.emailPlaceholder',
+                                        )}
                                     />
                                     {errors.email && (
                                         <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -185,7 +195,10 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <label htmlFor="register-username" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                <label
+                                    htmlFor="register-username"
+                                    className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                >
                                     {t('auth.register.usernameLabel')}
                                 </label>
                                 <div className="group relative">
@@ -193,7 +206,9 @@ export default function Register() {
                                         id="register-username"
                                         {...register('username')}
                                         className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                                        placeholder={t('auth.register.usernamePlaceholder')}
+                                        placeholder={t(
+                                            'auth.register.usernamePlaceholder',
+                                        )}
                                     />
                                     {errors.username && (
                                         <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -214,7 +229,10 @@ export default function Register() {
                             </div>
 
                             <div>
-                                <label htmlFor="register-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                <label
+                                    htmlFor="register-password"
+                                    className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                >
                                     {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
@@ -245,13 +263,15 @@ export default function Register() {
 
                             {/* Role Selection */}
                             <div>
-                                <label htmlFor="register-role" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                <label
+                                    htmlFor="register-role"
+                                    className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                >
                                     {t('auth.register.roleLabel')}
                                 </label>
-                                <select
+                                <Select
                                     id="register-role"
                                     {...register('role')}
-                                    className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                 >
                                     <option value="admin">
                                         {t('auth.register.roleAdmin')}
@@ -259,12 +279,15 @@ export default function Register() {
                                     <option value="employee">
                                         {t('auth.register.roleEmployee')}
                                     </option>
-                                </select>
+                                </Select>
                             </div>
 
                             {selectedRole === 'admin' ? (
                                 <div>
-                                    <label htmlFor="register-company" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                    <label
+                                        htmlFor="register-company"
+                                        className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                    >
                                         {t('auth.register.companyLabel')}
                                     </label>
                                     <div className="group relative">
@@ -272,7 +295,9 @@ export default function Register() {
                                             id="register-company"
                                             {...register('companyName')}
                                             className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                                            placeholder={t('auth.register.companyPlaceholder')}
+                                            placeholder={t(
+                                                'auth.register.companyPlaceholder',
+                                            )}
                                         />
                                         {errors.companyName && (
                                             <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -293,7 +318,10 @@ export default function Register() {
                                 </div>
                             ) : (
                                 <div>
-                                    <label htmlFor="register-code" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                    <label
+                                        htmlFor="register-code"
+                                        className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                    >
                                         {t('auth.register.codeLabel')}
                                     </label>
                                     <div className="group relative">
@@ -301,7 +329,9 @@ export default function Register() {
                                             id="register-code"
                                             {...register('invitationCode')}
                                             className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                                            placeholder={t('auth.register.codePlaceholder')}
+                                            placeholder={t(
+                                                'auth.register.codePlaceholder',
+                                            )}
                                         />
                                         {errors.invitationCode && (
                                             <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -328,7 +358,9 @@ export default function Register() {
                             disabled={isLoading}
                             className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition-all duration-200 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
-                            {isLoading ? t('auth.register.loading') : t('auth.register.submit')}
+                            {isLoading
+                                ? t('auth.register.loading')
+                                : t('auth.register.submit')}
                             {!isLoading && <Icon.ArrowRight />}
                         </button>
                     </form>

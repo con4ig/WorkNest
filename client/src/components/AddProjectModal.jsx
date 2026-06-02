@@ -5,6 +5,7 @@ import { useAuth } from '../context/useAuth';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { Button } from './ui/Button';
+import { Select } from './ui/Select';
 
 export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
     const { t } = useTranslation();
@@ -186,12 +187,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                             >
                                 {t('common.status')}
                             </label>
-                            <select
+                            <Select
                                 id="project-status"
                                 name="status"
                                 value={formData.status}
                                 onChange={handleChange}
-                                className="h-10 w-full cursor-pointer rounded-md border border-input bg-background px-3 text-sm text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-ring"
                             >
                                 <option
                                     value="pending"
@@ -217,7 +217,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 >
                                     {t('common.projectStatus.on-hold')}
                                 </option>
-                            </select>
+                            </Select>
                         </div>
 
                         <div className="space-y-1.5">
@@ -227,12 +227,11 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                             >
                                 {t('projects.labelPriority')}
                             </label>
-                            <select
+                            <Select
                                 id="project-priority"
                                 name="priority"
                                 value={formData.priority}
                                 onChange={handleChange}
-                                className="h-10 w-full cursor-pointer rounded-md border border-input bg-background px-3 text-sm text-foreground transition-all focus:outline-none focus:ring-2 focus:ring-ring"
                             >
                                 <option
                                     value="low"
@@ -258,7 +257,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                                 >
                                     {t('common.priority.critical')}
                                 </option>
-                            </select>
+                            </Select>
                         </div>
                     </div>
 

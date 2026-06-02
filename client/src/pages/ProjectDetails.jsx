@@ -25,6 +25,7 @@ import {
 } from '../components/projects/ProjectTaskShared.jsx';
 import { ChevronRight } from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
+import { Select } from '../components/ui/Select';
 
 // Moment locale is set dynamically in the component
 
@@ -54,13 +55,17 @@ const formatDateForInput = (dateString) => {
 };
 
 const StatCard = ({ icon, title, children }) => (
-    <div className="group flex items-center gap-3 rounded-xl border border-border bg-card/50 p-3 shadow-sm transition-all hover:bg-muted/50 hover:shadow-md hover:border-primary/20">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground border border-border group-hover:text-primary group-hover:border-primary/30 transition-colors">
+    <div className="group flex items-center gap-3 rounded-xl border border-border bg-card/50 p-3 shadow-sm transition-all hover:border-primary/20 hover:bg-muted/50 hover:shadow-md">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground transition-colors group-hover:border-primary/30 group-hover:text-primary">
             {icon}
         </div>
         <div className="min-w-0 flex-1">
-            <h3 className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/80">{title}</h3>
-            <div className="mt-0.5 text-lg font-bold tracking-tight text-foreground">{children}</div>
+            <h3 className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/80">
+                {title}
+            </h3>
+            <div className="mt-0.5 text-lg font-bold tracking-tight text-foreground">
+                {children}
+            </div>
         </div>
     </div>
 );
@@ -101,9 +106,18 @@ const CircularProgress = ({ progress }) => {
                     className="transition-all duration-1000 ease-in-out"
                 />
                 <defs>
-                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient
+                        id="progressGradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                    >
                         <stop offset="0%" stopColor="rgb(var(--primary))" />
-                        <stop offset="100%" stopColor="rgb(var(--primary) / 0.5)" />
+                        <stop
+                            offset="100%"
+                            stopColor="rgb(var(--primary) / 0.5)"
+                        />
                     </linearGradient>
                 </defs>
             </svg>
@@ -120,19 +134,17 @@ const CircularProgress = ({ progress }) => {
 };
 
 const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden transition-all hover:shadow-md">
+    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all hover:shadow-md">
         <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-card text-primary border border-border shadow-sm sm:h-9 sm:w-9">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-primary shadow-sm sm:h-9 sm:w-9">
                     {icon}
                 </div>
                 <h2 className="truncate text-sm font-bold uppercase tracking-widest text-foreground/90 sm:text-xl sm:normal-case sm:tracking-tight">
                     {title}
                 </h2>
             </div>
-            {actions && (
-                <div className="flex shrink-0 gap-2">{actions}</div>
-            )}
+            {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
         </div>
         <div className="p-4 sm:p-6">{children}</div>
     </div>
@@ -162,28 +174,28 @@ const CommentItem = ({
     };
 
     return (
-        <div className="relative border-l-2 border-border pl-6 pb-6">
+        <div className="relative border-l-2 border-border pb-6 pl-6">
             <div className="absolute left-[-5px] top-2 h-2.5 w-2.5 rounded-full border border-border bg-muted-foreground" />
-            
+
             <div className="flex gap-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground font-semibold border border-border">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted font-semibold text-muted-foreground">
                     {comment.author.username.charAt(0).toUpperCase()}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                     <div className="rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:bg-muted/30">
                         <div className="mb-2 flex items-center justify-between">
                             <div className="flex flex-col">
                                 <span className="text-sm font-bold text-foreground">
                                     {comment.author.username}
                                 </span>
-                                <span className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-wider">
+                                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
                                     {moment(comment.createdAt).fromNow()}
                                 </span>
                             </div>
                             {canDelete && (
                                 <button
                                     onClick={() => onDelete(comment._id)}
-                                    className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95"
+                                    className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95 sm:h-8 sm:w-8"
                                 >
                                     <Icon.Trash className="h-4 w-4" />
                                 </button>
@@ -548,11 +560,13 @@ export default function ProjectDetails() {
     };
 
     if (error) {
-        return <div className="py-10 text-center text-destructive">{error}</div>;
+        return (
+            <div className="py-10 text-center text-destructive">{error}</div>
+        );
     }
 
     return (
-        <div className="flex min-h-screen w-full max-w-full flex-col bg-background font-sans text-foreground lg:flex-row overflow-x-hidden">
+        <div className="flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-background font-sans text-foreground lg:flex-row">
             <ConfirmationModal
                 {...confirmationProps}
                 onClose={() =>
@@ -581,11 +595,13 @@ export default function ProjectDetails() {
                     </div>
                 </div>
 
-                <div className="flex flex-row items-center justify-center gap-6 bg-gradient-to-br from-card to-muted/30 rounded-2xl border border-border p-4 shadow-inner sm:flex-col sm:py-6 lg:flex-col">
+                <div className="flex flex-row items-center justify-center gap-6 rounded-2xl border border-border bg-gradient-to-br from-card to-muted/30 p-4 shadow-inner sm:flex-col sm:py-6 lg:flex-col">
                     <CircularProgress progress={calculatedProgress} />
                     <div className="flex flex-col items-center sm:mt-2">
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
-                            {calculatedProgress === 100 ? "Completed" : t('projects.details.progress')}
+                            {calculatedProgress === 100
+                                ? 'Completed'
+                                : t('projects.details.progress')}
                         </p>
                         <div className="mt-1 h-1 w-12 rounded-full bg-primary/20 sm:hidden"></div>
                     </div>
@@ -604,7 +620,7 @@ export default function ProjectDetails() {
                                     value={editData.startDate}
                                     onChange={handleEditChange}
                                     aria-label={t('projects.labelStartDate')}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary"
                                 />
                                 <input
                                     type="date"
@@ -612,15 +628,27 @@ export default function ProjectDetails() {
                                     value={editData.endDate}
                                     onChange={handleEditChange}
                                     aria-label={t('projects.labelEndDate')}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
+                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary"
                                 />
                             </div>
                         ) : (
                             <div className="text-xs font-bold tracking-tight sm:text-sm">
-                                <span className="block sm:inline">{formatDateForDisplay(project.startDate, i18nInstance.language)}</span>
+                                <span className="block sm:inline">
+                                    {formatDateForDisplay(
+                                        project.startDate,
+                                        i18nInstance.language,
+                                    )}
+                                </span>
                                 <span className="mx-1 hidden sm:inline">—</span>
-                                <span className="block text-muted-foreground sm:hidden">↓</span>
-                                <span className="block sm:inline">{formatDateForDisplay(project.endDate, i18nInstance.language)}</span>
+                                <span className="block text-muted-foreground sm:hidden">
+                                    ↓
+                                </span>
+                                <span className="block sm:inline">
+                                    {formatDateForDisplay(
+                                        project.endDate,
+                                        i18nInstance.language,
+                                    )}
+                                </span>
                             </div>
                         )}
                     </StatCard>
@@ -630,52 +658,74 @@ export default function ProjectDetails() {
                     >
                         {isEditing && isAdmin ? (
                             <div className="flex flex-col gap-2">
-                                <select
+                                <Select
                                     name="status"
                                     value={editData.status}
                                     onChange={handleEditChange}
                                     aria-label={t('common.status')}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer"
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
-                                            {translateProjectStatus(s, i18nInstance.language)}
+                                            {translateProjectStatus(
+                                                s,
+                                                i18nInstance.language,
+                                            )}
                                         </option>
                                     ))}
-                                </select>
-                                <select
+                                </Select>
+                                <Select
                                     name="priority"
                                     value={editData.priority}
                                     onChange={handleEditChange}
                                     aria-label={t('projects.labelPriority')}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none appearance-none cursor-pointer"
                                 >
                                     {AVAILABLE_PRIORITIES.map((p) => (
                                         <option key={p} value={p}>
-                                            {translatePriority(p, i18nInstance.language)}
+                                            {translatePriority(
+                                                p,
+                                                i18nInstance.language,
+                                            )}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </div>
                         ) : (
                             <div className="mt-2 flex flex-wrap items-center gap-2">
-                                <div className={clsx(
-                                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
-                                    getStatusClasses(project.status)
-                                )}>
-                                    <div className={clsx(
-                                        'h-1.5 w-1.5 rounded-full', 
-                                        getStatusColor(project.status),
-                                        project.status === 'running' && 'animate-pulse'
-                                    )} />
-                                    {translateProjectStatus(project.status, i18nInstance.language)}
+                                <div
+                                    className={clsx(
+                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
+                                        getStatusClasses(project.status),
+                                    )}
+                                >
+                                    <div
+                                        className={clsx(
+                                            'h-1.5 w-1.5 rounded-full',
+                                            getStatusColor(project.status),
+                                            project.status === 'running' &&
+                                                'animate-pulse',
+                                        )}
+                                    />
+                                    {translateProjectStatus(
+                                        project.status,
+                                        i18nInstance.language,
+                                    )}
                                 </div>
-                                <div className={clsx(
-                                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
-                                    getPriorityClasses(project.priority)
-                                )}>
-                                    <div className={clsx('h-1.5 w-1.5 rounded-full', getPriorityColor(project.priority))} />
-                                    {translatePriority(project.priority, i18nInstance.language)}
+                                <div
+                                    className={clsx(
+                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
+                                        getPriorityClasses(project.priority),
+                                    )}
+                                >
+                                    <div
+                                        className={clsx(
+                                            'h-1.5 w-1.5 rounded-full',
+                                            getPriorityColor(project.priority),
+                                        )}
+                                    />
+                                    {translatePriority(
+                                        project.priority,
+                                        i18nInstance.language,
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -688,16 +738,42 @@ export default function ProjectDetails() {
                     >
                         <div className="mt-2 space-y-2.5">
                             {[
-                                { label: t('projects.details.totalTasks'), value: taskStats.total, color: 'text-foreground' },
-                                { label: t('projects.details.completedTasks'), value: taskStats.completed, color: 'text-primary' },
-                                { label: t('projects.details.inProgressTasks'), value: taskStats.inProgress, color: 'text-blue-500' },
-                                { label: t('projects.details.todoTasks'), value: taskStats.todo, color: 'text-muted-foreground' }
+                                {
+                                    label: t('projects.details.totalTasks'),
+                                    value: taskStats.total,
+                                    color: 'text-foreground',
+                                },
+                                {
+                                    label: t('projects.details.completedTasks'),
+                                    value: taskStats.completed,
+                                    color: 'text-primary',
+                                },
+                                {
+                                    label: t(
+                                        'projects.details.inProgressTasks',
+                                    ),
+                                    value: taskStats.inProgress,
+                                    color: 'text-blue-500',
+                                },
+                                {
+                                    label: t('projects.details.todoTasks'),
+                                    value: taskStats.todo,
+                                    color: 'text-muted-foreground',
+                                },
                             ].map((stat) => (
-                                <div key={stat.label} className="flex items-center justify-between group">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-dotted border-border flex-1 mr-4">
+                                <div
+                                    key={stat.label}
+                                    className="group flex items-center justify-between"
+                                >
+                                    <span className="mr-4 flex-1 border-b border-dotted border-border text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                         {stat.label}
                                     </span>
-                                    <span className={clsx('text-sm font-bold tabular-nums', stat.color)}>
+                                    <span
+                                        className={clsx(
+                                            'text-sm font-bold tabular-nums',
+                                            stat.color,
+                                        )}
+                                    >
                                         {stat.value}
                                     </span>
                                 </div>
@@ -706,38 +782,41 @@ export default function ProjectDetails() {
                     </StatCard>
                 </div>
                 <div className="hidden lg:block">
-                <div className="mt-auto pt-8 text-center text-xs text-muted-foreground">
-                    <p>
-                        {t('projects.details.createdBy')}{' '}
-                        <span className="font-semibold text-foreground">
-                            {project.createdBy.username}
-                        </span>
-                    </p>
-                    <p>
-                        {formatDateForDisplay(
-                            project.createdAt,
-                            i18nInstance.language,
-                        )}
-                    </p>
-                </div>
+                    <div className="mt-auto pt-8 text-center text-xs text-muted-foreground">
+                        <p>
+                            {t('projects.details.createdBy')}{' '}
+                            <span className="font-semibold text-foreground">
+                                {project.createdBy.username}
+                            </span>
+                        </p>
+                        <p>
+                            {formatDateForDisplay(
+                                project.createdAt,
+                                i18nInstance.language,
+                            )}
+                        </p>
+                    </div>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden bg-background p-3 sm:p-6 lg:p-10">
+            <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden bg-background p-3 sm:p-6 lg:p-10">
                 <div className="space-y-4 sm:space-y-6 lg:space-y-10">
-                    <header className="relative rounded-lg border border-border bg-card p-4 sm:p-8 lg:p-10 shadow-sm">
+                    <header className="relative rounded-lg border border-border bg-card p-4 shadow-sm sm:p-8 lg:p-10">
                         <div className="relative z-10">
-                            
                             {isEditing && isAdmin ? (
                                 <input
                                     type="text"
                                     name="name"
                                     value={editData.name}
                                     onChange={handleEditChange}
-                                    aria-label={t('projects.details.projectNamePlaceholder')}
+                                    aria-label={t(
+                                        'projects.details.projectNamePlaceholder',
+                                    )}
                                     className="w-full border-b border-border bg-transparent text-2xl font-bold tracking-tight text-foreground focus:border-primary focus:outline-none sm:text-4xl lg:text-5xl"
-                                    placeholder={t('projects.details.projectNamePlaceholder')}
+                                    placeholder={t(
+                                        'projects.details.projectNamePlaceholder',
+                                    )}
                                 />
                             ) : (
                                 <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
@@ -752,17 +831,21 @@ export default function ProjectDetails() {
                                             <button
                                                 onClick={handleSave}
                                                 disabled={isSaving}
-                                                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95"
+                                                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95 disabled:opacity-50"
                                             >
                                                 {isSaving ? (
                                                     <div className="flex items-center gap-2">
                                                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-                                                        {t('projects.details.saving')}
+                                                        {t(
+                                                            'projects.details.saving',
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <>
                                                         <Icon.Save size={16} />
-                                                        {t('projects.details.saveChanges')}
+                                                        {t(
+                                                            'projects.details.saveChanges',
+                                                        )}
                                                     </>
                                                 )}
                                             </button>
@@ -780,18 +863,24 @@ export default function ProjectDetails() {
                                     ) : (
                                         <>
                                             <button
-                                                onClick={() => setIsEditing(true)}
+                                                onClick={() =>
+                                                    setIsEditing(true)
+                                                }
                                                 className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
                                             >
                                                 <Icon.Edit size={16} />
                                                 {t('projects.details.edit')}
                                             </button>
                                             <button
-                                                onClick={() => setShowUserModal(true)}
+                                                onClick={() =>
+                                                    setShowUserModal(true)
+                                                }
                                                 className="flex items-center gap-2 rounded-lg border border-border bg-muted px-5 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-secondary active:scale-95"
                                             >
                                                 <Icon.User size={16} />
-                                                {t('projects.details.manageTeam')}
+                                                {t(
+                                                    'projects.details.manageTeam',
+                                                )}
                                             </button>
                                         </>
                                     )}
@@ -801,213 +890,240 @@ export default function ProjectDetails() {
                     </header>
 
                     <div className="animate-fade-in space-y-8 pb-20">
-                    {/* PROJECT DESCRIPTION */}
-                    <ContentCard
-                        icon={<Icon.Description className="h-5 w-5" />}
-                        title={t('projects.details.description')}
-                    >
-                        {isEditing && isAdmin ? (
-                            <textarea
-                                name="description"
-                                value={editData.description}
-                                onChange={handleEditChange}
-                                rows={6}
-                                aria-label={t('projects.details.description')}
-                                className="w-full rounded-lg border border-border bg-background p-4 text-sm font-medium focus:border-primary focus:outline-none placeholder:text-muted-foreground/40"
-                                placeholder={t('projects.details.addDescriptionPlaceholder')}
-                            />
-                        ) : (
-                            <p className="whitespace-pre-wrap text-sm leading-loose text-muted-foreground/80">
-                                {project.description || t('projects.details.noDescription')}
-                            </p>
-                        )}
-                    </ContentCard>
-
-                    {/* TASKS KANBAN */}
-                    <div className="rounded-xl border border-border/50 bg-card overflow-hidden shadow-sm">
-                        <div className="flex items-center justify-between border-b border-border bg-muted/20 px-4 py-3 sm:px-8 sm:py-5">
-                            <div className="flex items-center gap-3">
-                                <Icon.ListTodo className="h-4 w-4 text-primary" />
-                                <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                                    {t('projects.details.tasksTitle')}
-                                    <span className="ml-2 text-primary/60">({tasks.length})</span>
-                                </h2>
-                            </div>
-                        </div>
-                        <div className="overflow-x-auto p-1 sm:p-4">
-                            <KanbanBoard
-                                tasks={tasks}
-                                onUpdate={fetchTasks}
-                                onDelete={handleDeleteTask}
-                                projectUsers={project.assignedUsers}
-                                isAdmin={isAdmin}
-                                projectId={id}
-                                onTaskCreated={fetchTasks}
-                                isProjectEditing={isEditing}
-                            />
-                        </div>
-                    </div>
-
-                    {/* PROJECT TEAM */}
-                    <ContentCard
-                        icon={<Icon.Users className="h-5 w-5" />}
-                        title={`${t('projects.details.teamTitle')} (${project.assignedUsers.length})`}
-                    >
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-                            {project.assignedUsers.map((user) => (
-                                <div
-                                    key={user._id}
-                                    className="group relative flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:bg-muted/40"
-                                >
-                                    <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100 rounded-lg" />
-                                    
-                                    <div className={clsx(
-                                        "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white",
-                                        user.role === 'admin' ? "bg-amber-500" : "bg-primary"
-                                    )}>
-                                        {user.username.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="truncate text-sm font-bold text-foreground">
-                                            {user.username}
-                                        </p>
-                                        <p className="truncate text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                            {user.role}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                            {project.assignedUsers.length === 0 && (
-                                <div className="col-span-full py-10 text-center">
-                                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground/40 border border-border">
-                                        <Icon.Users className="h-8 w-8" />
-                                    </div>
-                                    <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
-                                        {t('projects.details.noUsers')}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </ContentCard>
-
-                    {/* KOMENTARZE */}
-                    <ContentCard
-                        icon={<Icon.Message />}
-                        title={`${t('projects.details.commentsTitle')} (${comments.length})`}
-                    >
-                        <div className="mb-6">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={newComment}
-                                    onChange={(e) =>
-                                        setNewComment(e.target.value)
-                                    }
-                                    onKeyPress={(e) =>
-                                        e.key === 'Enter' && handleAddComment()
-                                    }
-                                    aria-label={t('projects.details.addCommentPlaceholder')}
-                                    placeholder={t(
-                                        'projects.details.addCommentPlaceholder',
+                        {/* PROJECT DESCRIPTION */}
+                        <ContentCard
+                            icon={<Icon.Description className="h-5 w-5" />}
+                            title={t('projects.details.description')}
+                        >
+                            {isEditing && isAdmin ? (
+                                <textarea
+                                    name="description"
+                                    value={editData.description}
+                                    onChange={handleEditChange}
+                                    rows={6}
+                                    aria-label={t(
+                                        'projects.details.description',
                                     )}
-                                    className="flex-1 rounded-lg border border-input bg-background px-4 py-2 focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                                    className="w-full rounded-lg border border-border bg-background p-4 text-sm font-medium placeholder:text-muted-foreground/40 focus:border-primary focus:outline-none"
+                                    placeholder={t(
+                                        'projects.details.addDescriptionPlaceholder',
+                                    )}
                                 />
-                                <button
-                                    onClick={handleAddComment}
-                                    className="flex-shrink-0 rounded-lg bg-primary p-3 text-primary-foreground hover:bg-primary/90 sm:p-2 sm:px-4"
-                                >
-                                    <Icon.Send />
-                                </button>
+                            ) : (
+                                <p className="whitespace-pre-wrap text-sm leading-loose text-muted-foreground/80">
+                                    {project.description ||
+                                        t('projects.details.noDescription')}
+                                </p>
+                            )}
+                        </ContentCard>
+
+                        {/* TASKS KANBAN */}
+                        <div className="overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm">
+                            <div className="flex items-center justify-between border-b border-border bg-muted/20 px-4 py-3 sm:px-8 sm:py-5">
+                                <div className="flex items-center gap-3">
+                                    <Icon.ListTodo className="h-4 w-4 text-primary" />
+                                    <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+                                        {t('projects.details.tasksTitle')}
+                                        <span className="ml-2 text-primary/60">
+                                            ({tasks.length})
+                                        </span>
+                                    </h2>
+                                </div>
+                            </div>
+                            <div className="overflow-x-auto p-1 sm:p-4">
+                                <KanbanBoard
+                                    tasks={tasks}
+                                    onUpdate={fetchTasks}
+                                    onDelete={handleDeleteTask}
+                                    projectUsers={project.assignedUsers}
+                                    isAdmin={isAdmin}
+                                    projectId={id}
+                                    onTaskCreated={fetchTasks}
+                                    isProjectEditing={isEditing}
+                                />
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            {comments.length === 0 ? (
-                                <p className="py-8 text-center text-muted-foreground">
-                                    {t('projects.details.noComments')}
-                                </p>
-                            ) : (
-                                comments.map((comment) => (
-                                    <CommentItem
-                                        key={comment._id}
-                                        comment={comment}
-                                        onDelete={handleDeleteComment}
-                                        onReply={handleReplyComment}
-                                        currentUserId={currentUser._id}
-                                        isAdmin={isAdmin}
-                                        t={t}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </ContentCard>
+                        {/* PROJECT TEAM */}
+                        <ContentCard
+                            icon={<Icon.Users className="h-5 w-5" />}
+                            title={`${t('projects.details.teamTitle')} (${project.assignedUsers.length})`}
+                        >
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+                                {project.assignedUsers.map((user) => (
+                                    <div
+                                        key={user._id}
+                                        className="group relative flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:bg-muted/40"
+                                    >
+                                        <div className="absolute inset-0 rounded-lg bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
 
-                    {/* ACTIVITY HISTORY */}
-                    <ContentCard
-                        icon={<Icon.Activity />}
-                        title={`${t('projects.details.activityTitle')} (${activities.length})`}
-                        actions={
-                            <button
-                                onClick={() =>
-                                    setShowActivities(!showActivities)
-                                }
-                                className="flex items-center gap-1 text-sm text-primary hover:text-primary/80"
-                            >
-                                {showActivities
-                                    ? t('projects.details.hide')
-                                    : t('projects.details.show')}
-                                {showActivities ? (
-                                    <Icon.ChevronDown />
-                                ) : (
-                                    <Icon.ChevronRight />
-                                )}
-                            </button>
-                        }
-                    >
-                        {showActivities && (
-                            <div className="divide-y divide-border/20">
-                                {activities.length === 0 ? (
-                                    <div className="py-20 text-center">
-                                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-muted text-muted-foreground/30 border border-border">
-                                            <Icon.Activity className="h-8 w-8" />
+                                        <div
+                                            className={clsx(
+                                                'flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white',
+                                                user.role === 'admin'
+                                                    ? 'bg-amber-500'
+                                                    : 'bg-primary',
+                                            )}
+                                        >
+                                            {user.username
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-bold text-foreground">
+                                                {user.username}
+                                            </p>
+                                            <p className="truncate text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                                                {user.role}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                                {project.assignedUsers.length === 0 && (
+                                    <div className="col-span-full py-10 text-center">
+                                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground/40">
+                                            <Icon.Users className="h-8 w-8" />
                                         </div>
                                         <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
-                                            {t('projects.details.noActivity')}
+                                            {t('projects.details.noUsers')}
                                         </p>
                                     </div>
+                                )}
+                            </div>
+                        </ContentCard>
+
+                        {/* KOMENTARZE */}
+                        <ContentCard
+                            icon={<Icon.Message />}
+                            title={`${t('projects.details.commentsTitle')} (${comments.length})`}
+                        >
+                            <div className="mb-6">
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={newComment}
+                                        onChange={(e) =>
+                                            setNewComment(e.target.value)
+                                        }
+                                        onKeyPress={(e) =>
+                                            e.key === 'Enter' &&
+                                            handleAddComment()
+                                        }
+                                        aria-label={t(
+                                            'projects.details.addCommentPlaceholder',
+                                        )}
+                                        placeholder={t(
+                                            'projects.details.addCommentPlaceholder',
+                                        )}
+                                        className="flex-1 rounded-lg border border-input bg-background px-4 py-2 focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                                    />
+                                    <button
+                                        onClick={handleAddComment}
+                                        className="flex-shrink-0 rounded-lg bg-primary p-3 text-primary-foreground hover:bg-primary/90 sm:p-2 sm:px-4"
+                                    >
+                                        <Icon.Send />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {comments.length === 0 ? (
+                                    <p className="py-8 text-center text-muted-foreground">
+                                        {t('projects.details.noComments')}
+                                    </p>
                                 ) : (
-                                    activities.map((activity) => (
-                                        <div
-                                            key={activity._id}
-                                            className="group relative flex items-start gap-3 p-3 sm:gap-4 sm:p-5 transition-colors hover:bg-muted/30"
-                                        >
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-primary border border-border group-hover:bg-primary group-hover:text-white transition-colors">
-                                                <span className="text-sm font-black">
-                                                    {activity.user.username.charAt(0).toUpperCase()}
-                                                </span>
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex items-center justify-between gap-4">
-                                                    <p className="text-sm font-bold text-foreground">
-                                                        {activity.user.username}
-                                                    </p>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-                                                        {moment(activity.createdAt).fromNow()}
-                                                    </span>
-                                                </div>
-                                                <p className="mt-1 text-sm leading-relaxed text-muted-foreground/70">
-                                                    {renderActivityDescription(activity)}
-                                                </p>
-                                            </div>
-                                        </div>
+                                    comments.map((comment) => (
+                                        <CommentItem
+                                            key={comment._id}
+                                            comment={comment}
+                                            onDelete={handleDeleteComment}
+                                            onReply={handleReplyComment}
+                                            currentUserId={currentUser._id}
+                                            isAdmin={isAdmin}
+                                            t={t}
+                                        />
                                     ))
                                 )}
                             </div>
-                        )}
-                    </ContentCard>
+                        </ContentCard>
+
+                        {/* ACTIVITY HISTORY */}
+                        <ContentCard
+                            icon={<Icon.Activity />}
+                            title={`${t('projects.details.activityTitle')} (${activities.length})`}
+                            actions={
+                                <button
+                                    onClick={() =>
+                                        setShowActivities(!showActivities)
+                                    }
+                                    className="flex items-center gap-1 text-sm text-primary hover:text-primary/80"
+                                >
+                                    {showActivities
+                                        ? t('projects.details.hide')
+                                        : t('projects.details.show')}
+                                    {showActivities ? (
+                                        <Icon.ChevronDown />
+                                    ) : (
+                                        <Icon.ChevronRight />
+                                    )}
+                                </button>
+                            }
+                        >
+                            {showActivities && (
+                                <div className="divide-y divide-border/20">
+                                    {activities.length === 0 ? (
+                                        <div className="py-20 text-center">
+                                            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground/30">
+                                                <Icon.Activity className="h-8 w-8" />
+                                            </div>
+                                            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
+                                                {t(
+                                                    'projects.details.noActivity',
+                                                )}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        activities.map((activity) => (
+                                            <div
+                                                key={activity._id}
+                                                className="group relative flex items-start gap-3 p-3 transition-colors hover:bg-muted/30 sm:gap-4 sm:p-5"
+                                            >
+                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                                                    <span className="text-sm font-black">
+                                                        {activity.user.username
+                                                            .charAt(0)
+                                                            .toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center justify-between gap-4">
+                                                        <p className="text-sm font-bold text-foreground">
+                                                            {
+                                                                activity.user
+                                                                    .username
+                                                            }
+                                                        </p>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                                                            {moment(
+                                                                activity.createdAt,
+                                                            ).fromNow()}
+                                                        </span>
+                                                    </div>
+                                                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground/70">
+                                                        {renderActivityDescription(
+                                                            activity,
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+                        </ContentCard>
+                    </div>
                 </div>
-            </div>
-            {showUserModal && (
+                {showUserModal && (
                     <UserManagementModal
                         project={project}
                         onClose={() => setShowUserModal(false)}

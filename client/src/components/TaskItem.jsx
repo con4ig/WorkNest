@@ -10,6 +10,7 @@ import { enGB } from 'date-fns/locale/en-GB';
 
 registerLocale('pl', pl);
 registerLocale('en', enGB);
+import { Select } from './ui/Select';
 
 import {
     Icon,
@@ -20,12 +21,12 @@ import {
     TASK_STATUSES,
 } from './projects/ProjectTaskShared.jsx';
 
-// Custom Input for DatePicker - defined outside to avoid re-renders if possible, 
+// Custom Input for DatePicker - defined outside to avoid re-renders if possible,
 // but it needs t() so let's move it into the component or pass t as prop
 const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
     <button
         type="button"
-        className="flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary min-w-0 max-w-[160px] truncate"
+        className="flex min-w-0 max-w-[160px] items-center gap-1.5 truncate rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary"
         onClick={onClick}
         ref={ref}
     >
@@ -35,8 +36,14 @@ const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
 ));
 CustomDateInput.displayName = 'CustomDateInput';
 
-
-const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEditing: _isProjectEditing }) => {
+const TaskItem = ({
+    task,
+    onUpdate,
+    onDelete,
+    projectUsers,
+    isAdmin,
+    isProjectEditing: _isProjectEditing,
+}) => {
     const { t, i18n } = useTranslation();
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
@@ -81,17 +88,17 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
     };
 
     // Data mapping for CustomSelect
-    const statusOptions = TASK_STATUSES.map(s => ({ 
-        id: s, 
-        name: t(`common.taskStatus.${s}`) 
+    const statusOptions = TASK_STATUSES.map((s) => ({
+        id: s,
+        name: t(`common.taskStatus.${s}`),
     }));
-    const priorityOptions = AVAILABLE_PRIORITIES.map(p => ({ 
-        id: p, 
-        name: t(`common.priority.${p}`) 
+    const priorityOptions = AVAILABLE_PRIORITIES.map((p) => ({
+        id: p,
+        name: t(`common.priority.${p}`),
     }));
     const userOptions = [
         { id: '', name: t('common.unassigned') },
-        ...projectUsers.map(u => ({ id: u._id, name: u.username }))
+        ...projectUsers.map((u) => ({ id: u._id, name: u.username })),
     ];
 
     return (
@@ -109,10 +116,15 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                             type="text"
                             value={editData.title}
                             onChange={(e) =>
-                                setEditData({ ...editData, title: e.target.value })
+                                setEditData({
+                                    ...editData,
+                                    title: e.target.value,
+                                })
                             }
                             className="mb-1 w-full rounded-md border border-input bg-muted px-2 py-1 text-base font-semibold text-foreground focus:border-primary focus:ring-primary/20"
-                            placeholder={t('projects.details.kanban.taskTitlePlaceholder')}
+                            placeholder={t(
+                                'projects.details.kanban.taskTitlePlaceholder',
+                            )}
                         />
                         <textarea
                             value={editData.description}
@@ -124,35 +136,37 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                             }
                             className="w-full rounded-md border border-input bg-muted px-2 py-1 text-sm text-muted-foreground focus:border-primary focus:ring-primary/20"
                             rows="2"
-                            placeholder={t('projects.details.addDescriptionPlaceholder')}
+                            placeholder={t(
+                                'projects.details.addDescriptionPlaceholder',
+                            )}
                         />
                     </div>
                 ) : (
                     <div className="flex flex-col gap-2">
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex items-center gap-2 overflow-hidden">
-                                <div 
+                                <div
                                     className={clsx(
-                                        "h-2 w-2 flex-shrink-0 rounded-full",
-                                        getStatusColor(task.status)
-                                    )} 
+                                        'h-2 w-2 flex-shrink-0 rounded-full',
+                                        getStatusColor(task.status),
+                                    )}
                                 />
                                 <h4
                                     className={clsx(
-                                        "truncate text-sm font-semibold tracking-tight transition-colors",
+                                        'truncate text-sm font-semibold tracking-tight transition-colors',
                                         task.status === 'completed'
                                             ? 'text-muted-foreground/60 line-through'
-                                            : 'text-foreground'
+                                            : 'text-foreground',
                                     )}
                                 >
                                     {task.title}
                                 </h4>
                             </div>
-                            <div 
+                            <div
                                 className={clsx(
-                                    "mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full",
-                                    getPriorityColor(task.priority)
-                                )} 
+                                    'mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full',
+                                    getPriorityColor(task.priority),
+                                )}
                                 title={t(`common.priority.${task.priority}`)}
                             />
                         </div>
@@ -170,49 +184,79 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                         <>
                             {/* Row 1: Status + Priority — full width each on mobile */}
                             <div className="grid grid-cols-2 gap-2">
-                                <select
+                                <Select
                                     value={editData.status}
-                                    onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-                                    className="w-full rounded-lg border border-input bg-muted py-1.5 pl-2 pr-1 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    onChange={(e) =>
+                                        setEditData({
+                                            ...editData,
+                                            status: e.target.value,
+                                        })
+                                    }
                                 >
-                                    {statusOptions.map(option => (
-                                        <option key={option.id} value={option.id}>
+                                    {statusOptions.map((option) => (
+                                        <option
+                                            key={option.id}
+                                            value={option.id}
+                                        >
                                             {option.name}
                                         </option>
                                     ))}
-                                </select>
-                                <select
+                                </Select>
+                                <Select
                                     value={editData.priority}
-                                    onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
-                                    className="w-full rounded-lg border border-input bg-muted py-1.5 pl-2 pr-1 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    onChange={(e) =>
+                                        setEditData({
+                                            ...editData,
+                                            priority: e.target.value,
+                                        })
+                                    }
                                 >
-                                    {priorityOptions.map(option => (
-                                        <option key={option.id} value={option.id}>
+                                    {priorityOptions.map((option) => (
+                                        <option
+                                            key={option.id}
+                                            value={option.id}
+                                        >
                                             {option.name}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </div>
 
                             {/* Row 2: Assignee (full width) + DatePicker */}
                             <div className="flex flex-col gap-2">
-                                <select
+                                <Select
                                     value={editData.assignedTo}
-                                    onChange={(e) => setEditData({ ...editData, assignedTo: e.target.value })}
-                                    className="w-full rounded-lg border border-input bg-muted py-1.5 pl-2 pr-1 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    onChange={(e) =>
+                                        setEditData({
+                                            ...editData,
+                                            assignedTo: e.target.value,
+                                        })
+                                    }
                                 >
-                                    {userOptions.map(option => (
-                                        <option key={option.id} value={option.id}>
+                                    {userOptions.map((option) => (
+                                        <option
+                                            key={option.id}
+                                            value={option.id}
+                                        >
                                             {option.name}
                                         </option>
                                     ))}
-                                </select>
-                                
+                                </Select>
+
                                 <DatePicker
-                                    selected={editData.dueDate ? new Date(editData.dueDate) : null}
+                                    selected={
+                                        editData.dueDate
+                                            ? new Date(editData.dueDate)
+                                            : null
+                                    }
                                     onChange={(date) => {
-                                        const formattedDate = date ? formatDateForInput(date) : '';
-                                        setEditData({ ...editData, dueDate: formattedDate });
+                                        const formattedDate = date
+                                            ? formatDateForInput(date)
+                                            : '';
+                                        setEditData({
+                                            ...editData,
+                                            dueDate: formattedDate,
+                                        });
                                     }}
                                     dateFormat="dd MMM yyyy"
                                     locale={i18n.language}
@@ -230,7 +274,9 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                     {task.assignedTo ? (
                                         <div className="flex items-center gap-1.5">
                                             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] font-medium text-muted-foreground">
-                                                {task.assignedTo.username.charAt(0).toUpperCase()}
+                                                {task.assignedTo.username
+                                                    .charAt(0)
+                                                    .toUpperCase()}
                                             </div>
                                             <span className="text-[10px] font-medium text-muted-foreground/80">
                                                 {task.assignedTo.username}
@@ -245,7 +291,10 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
 
                                 {task.dueDate && (
                                     <div className="flex items-center gap-1 text-[10px] font-medium text-muted-foreground/80">
-                                        <Icon.Calendar size={10} className="text-muted-foreground/40" />
+                                        <Icon.Calendar
+                                            size={10}
+                                            className="text-muted-foreground/40"
+                                        />
                                         {moment(task.dueDate).format('DD MMM')}
                                     </div>
                                 )}
@@ -274,7 +323,8 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                     onClick={() => setIsEditing(false)}
                                     className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-sm font-semibold text-foreground hover:bg-secondary/80"
                                 >
-                                    <Icon.Cancel size={14} /> {t('common.cancel')}
+                                    <Icon.Cancel size={14} />{' '}
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         ) : (
@@ -283,14 +333,14 @@ const TaskItem = ({ task, onUpdate, onDelete, projectUsers, isAdmin, isProjectEd
                                 <button
                                     type="button"
                                     onClick={() => setIsEditing(true)}
-                                    className="rounded p-1.5 text-muted-foreground hover:bg-secondary hover:text-primary active:scale-90 transition-transform"
+                                    className="rounded p-1.5 text-muted-foreground transition-transform hover:bg-secondary hover:text-primary active:scale-90"
                                 >
                                     <Icon.Edit3 />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => onDelete(task._id)}
-                                    className="rounded p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive active:scale-90 transition-transform"
+                                    className="rounded p-1.5 text-muted-foreground transition-transform hover:bg-destructive/10 hover:text-destructive active:scale-90"
                                 >
                                     <Icon.Trash />
                                 </button>

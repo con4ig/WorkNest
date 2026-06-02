@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, ListFilter, RefreshCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Select } from '../ui/Select';
 
 const FilterControls = ({
     onFilterChange,
@@ -35,23 +36,23 @@ const FilterControls = ({
 
     return (
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <div className="relative group">
-                <Search className="absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            <div className="group relative">
+                <Search className="h-4.5 w-4.5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
                 <input
                     type="text"
                     placeholder={t('projects.filter.searchPlaceholder')}
-                    className="w-full rounded-xl border border-input bg-background/50 py-2.5 pl-11 pr-4 text-base shadow-sm ring-offset-background transition-all text-foreground placeholder:text-muted-foreground hover:border-primary/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 md:w-80 md:text-sm"
+                    className="w-full rounded-xl border border-input bg-background/50 py-2.5 pl-11 pr-4 text-base text-foreground shadow-sm ring-offset-background transition-all placeholder:text-muted-foreground hover:border-primary/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 md:w-80 md:text-sm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
             <div className="flex gap-2">
-                <div className="relative flex-1 group">
-                    <ListFilter className="absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-                    <select
-                        className="w-full appearance-none rounded-xl border border-input bg-background/50 py-2.5 pl-11 pr-10 text-base shadow-sm ring-offset-background transition-all text-foreground hover:border-primary/50 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 md:text-sm"
+                <div className="group relative flex-1">
+                    <ListFilter className="h-4.5 w-4.5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                    <Select
                         value={status}
                         onChange={(e) => setStatus(e.target.value)}
+                        className="pl-11"
                     >
                         <option value="">
                             {t('projects.filter.allStatuses')}
@@ -68,10 +69,7 @@ const FilterControls = ({
                         <option value="on-hold">
                             {t('common.projectStatus.on-hold')}
                         </option>
-                    </select>
-                    <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        <ListFilter className="h-4 w-4 opacity-50" />
-                    </div>
+                    </Select>
                 </div>
                 {screenSize !== 'mobile' && (
                     <button

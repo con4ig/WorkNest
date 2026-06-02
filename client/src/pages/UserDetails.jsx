@@ -20,7 +20,7 @@ import moment from 'moment';
 import { clsx } from 'clsx';
 
 import LoadingScreen from '../components/LoadingScreen';
-
+import { Select } from '../components/ui/Select';
 // --- Pomocnicze funkcje formatowania ---
 const formatDateForDisplay = (dateString, language = 'pl') => {
     if (!dateString) return null;
@@ -49,7 +49,7 @@ const calculateWorkExperience = (hireDate, t) => {
         const years = now.diff(hire, 'years');
         hire.add(years, 'years');
         const months = now.diff(hire, 'months');
-        
+
         let result = '';
         if (years > 0) {
             result += `${years} ${t('common.years', { count: years })} `;
@@ -65,12 +65,8 @@ const calculateWorkExperience = (hireDate, t) => {
 
 // --- Komponenty Ikon ---
 const Icon = {
-    Mail: ({ className = '' }) => (
-        <Mail className={`h-5 w-5 ${className}`} />
-    ),
-    Phone: ({ className = '' }) => (
-        <Phone className={`h-5 w-5 ${className}`} />
-    ),
+    Mail: ({ className = '' }) => <Mail className={`h-5 w-5 ${className}`} />,
+    Phone: ({ className = '' }) => <Phone className={`h-5 w-5 ${className}`} />,
     Briefcase: ({ className = '' }) => (
         <Briefcase className={`h-5 w-5 ${className}`} />
     ),
@@ -87,9 +83,7 @@ const Icon = {
     Save: () => <Save className="h-4 w-4" />,
     Cancel: () => <X className="h-4 w-4" />,
     Back: () => <ArrowLeft className="h-4 w-4" />,
-    Badge: ({ className = '' }) => (
-        <Badge className={`h-5 w-5 ${className}`} />
-    ),
+    Badge: ({ className = '' }) => <Badge className={`h-5 w-5 ${className}`} />,
     Notes: ({ className = '' }) => (
         <FileText className={`h-5 w-5 ${className}`} />
     ),
@@ -142,21 +136,25 @@ const DEPARTMENTS = ['IT', 'HR', 'Sales', 'Marketing', 'Finance', 'Operations'];
 // --- Sub-komponenty ---
 const StatCard = ({ icon, title, children }) => (
     <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:bg-muted/50">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
             {icon}
         </div>
         <div className="min-w-0 flex-1">
-            <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{title}</h3>
-            <div className="mt-0.5 text-sm font-semibold tracking-tight text-foreground">{children}</div>
+            <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {title}
+            </h3>
+            <div className="mt-0.5 text-sm font-semibold tracking-tight text-foreground">
+                {children}
+            </div>
         </div>
     </div>
 );
 
 const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
         <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground border border-border">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
                     {icon}
                 </div>
                 <h2 className="truncate text-lg font-semibold tracking-tight text-foreground sm:text-xl">
@@ -165,9 +163,7 @@ const ContentCard = ({ icon, title, children, actions }) => (
             </div>
             {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
         </div>
-        <div className="p-4 sm:p-6">
-            {children}
-        </div>
+        <div className="p-4 sm:p-6">{children}</div>
     </div>
 );
 
@@ -181,21 +177,24 @@ const EditableField = ({
     options,
 }) => {
     const { t } = useTranslation();
-    const inputClasses = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none placeholder:text-muted-foreground/40";
+    const inputClasses =
+        'w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none placeholder:text-muted-foreground/40';
 
     return (
         <div className="flex flex-col gap-2">
-            <label htmlFor={`field-${name}`} className="ml-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <label
+                htmlFor={`field-${name}`}
+                className="ml-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+            >
                 {label}
             </label>
             {options ? (
-                <select
+                <Select
                     id={`field-${name}`}
                     name={name}
                     value={value}
                     onChange={onChange}
                     disabled={disabled}
-                    className={inputClasses}
                 >
                     <option value="">-- {t('common.select')} --</option>
                     {options.map((opt) => (
@@ -207,7 +206,7 @@ const EditableField = ({
                                   : opt}
                         </option>
                     ))}
-                </select>
+                </Select>
             ) : type === 'textarea' ? (
                 <textarea
                     id={`field-${name}`}
@@ -283,9 +282,7 @@ export default function UserDetails() {
             setError(null);
         } catch (err) {
             console.error('Error fetching user:', err);
-            setError(
-                `Failed to load employee data: ${err.message}`,
-            );
+            setError(`Failed to load employee data: ${err.message}`);
         } finally {
             setLoading(false);
         }
@@ -357,8 +354,6 @@ export default function UserDetails() {
         setEditData((prev) => ({ ...prev, documents: updatedDocuments }));
     };
 
-
-
     const handleSave = async () => {
         setIsSaving(true);
         try {
@@ -417,15 +412,15 @@ export default function UserDetails() {
             setIsEditing(false);
         } catch (err) {
             const errorMessage =
-                err.response?.data?.message ||
-                t('common.errors.unexpected');
+                err.response?.data?.message || t('common.errors.unexpected');
             alert(`${t('common.errors.saveFailed')}: ${errorMessage}`);
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (loading) return <LoadingScreen message={t('employees.loadingDetails')} />;
+    if (loading)
+        return <LoadingScreen message={t('employees.loadingDetails')} />;
 
     if (error)
         return (
@@ -475,7 +470,7 @@ export default function UserDetails() {
 
                 <div className="mb-10 flex flex-col items-center text-center">
                     <div className="relative mb-6">
-                        <div className="flex h-32 w-32 items-center justify-center rounded-full bg-primary/10 text-4xl font-black text-primary border-4 border-background shadow-lg">
+                        <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-background bg-primary/10 text-4xl font-black text-primary shadow-lg">
                             {fullName.charAt(0).toUpperCase()}
                         </div>
                     </div>
@@ -494,45 +489,49 @@ export default function UserDetails() {
                         title={t('employees.details.statusAndContract')}
                     >
                         {isEditing ? (
-                            <div className="space-y-2 mt-2">
-                                <select
+                            <div className="mt-2 space-y-2">
+                                <Select
                                     name="status"
                                     value={editData.status}
                                     onChange={handleEditChange}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                                 >
                                     {AVAILABLE_STATUSES.map((s) => (
                                         <option key={s} value={s}>
                                             {t(`common.employeeStatus.${s}`)}
                                         </option>
                                     ))}
-                                </select>
-                                <select
+                                </Select>
+                                <Select
                                     name="contractType"
                                     value={editData.contractType}
                                     onChange={handleEditChange}
-                                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
                                 >
                                     {AVAILABLE_CONTRACT_TYPES.map((c) => (
                                         <option key={c} value={c}>
                                             {t(`common.contractType.${c}`)}
                                         </option>
                                     ))}
-                                </select>
+                                </Select>
                             </div>
                         ) : (
-                            <div className="flex flex-wrap gap-2 mt-1">
-                                <span className={clsx(
-                                    "rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider border",
-                                    getStatusClasses(user.status)
-                                )}>
+                            <div className="mt-1 flex flex-wrap gap-2">
+                                <span
+                                    className={clsx(
+                                        'rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-wider',
+                                        getStatusClasses(user.status),
+                                    )}
+                                >
                                     {t(`common.employeeStatus.${user.status}`)}
                                 </span>
-                                <span className={clsx(
-                                    "rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider border",
-                                    getContractClasses(user.contractType)
-                                )}>
-                                    {t(`common.contractType.${user.contractType}`)}
+                                <span
+                                    className={clsx(
+                                        'rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-wider',
+                                        getContractClasses(user.contractType),
+                                    )}
+                                >
+                                    {t(
+                                        `common.contractType.${user.contractType}`,
+                                    )}
                                 </span>
                             </div>
                         )}
@@ -550,19 +549,22 @@ export default function UserDetails() {
                         title={t('common.department')}
                     >
                         {isEditing ? (
-                            <select
-                                name="department"
-                                value={editData.department}
-                                onChange={handleEditChange}
-                                className="w-full mt-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium focus:ring-1 focus:ring-primary focus:outline-none"
-                            >
-                                <option value="">-- {t('common.select')} --</option>
-                                {DEPARTMENTS.map((d) => (
-                                    <option key={d} value={d}>
-                                        {t(`common.departments.${d}`)}
+                            <div className="mt-2">
+                                <Select
+                                    name="department"
+                                    value={editData.department}
+                                    onChange={handleEditChange}
+                                >
+                                    <option value="">
+                                        -- {t('common.select')} --
                                     </option>
-                                ))}
-                            </select>
+                                    {DEPARTMENTS.map((d) => (
+                                        <option key={d} value={d}>
+                                            {t(`common.departments.${d}`)}
+                                        </option>
+                                    ))}
+                                </Select>
+                            </div>
                         ) : (
                             <span className="text-sm font-bold tracking-tight text-foreground">
                                 {user.department
@@ -577,7 +579,10 @@ export default function UserDetails() {
                     <p>
                         {t('common.createdAt')}{' '}
                         <span className="font-semibold text-foreground">
-                            {formatDateForDisplay(user.createdAt, i18n.language) || t('common.notSpecified')}
+                            {formatDateForDisplay(
+                                user.createdAt,
+                                i18n.language,
+                            ) || t('common.notSpecified')}
                         </span>
                     </p>
                 </div>
@@ -586,7 +591,7 @@ export default function UserDetails() {
             {/* --- MAIN CONTENT --- */}
             <main className="flex-1 overflow-y-auto bg-background p-6 lg:p-10">
                 <div className="space-y-10">
-                    <header className="relative rounded-lg border border-border bg-card p-10 sm:p-12 shadow-sm">
+                    <header className="relative rounded-lg border border-border bg-card p-10 shadow-sm sm:p-12">
                         <div className="relative z-10">
                             {isEditing ? (
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -620,7 +625,7 @@ export default function UserDetails() {
                                             <button
                                                 onClick={handleSave}
                                                 disabled={isSaving}
-                                                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50 active:scale-95"
+                                                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95 disabled:opacity-50"
                                             >
                                                 {isSaving ? (
                                                     <div className="flex items-center gap-2">
@@ -630,7 +635,9 @@ export default function UserDetails() {
                                                 ) : (
                                                     <>
                                                         <Icon.Save />
-                                                        {t('common.saveChanges')}
+                                                        {t(
+                                                            'common.saveChanges',
+                                                        )}
                                                     </>
                                                 )}
                                             </button>
@@ -660,476 +667,543 @@ export default function UserDetails() {
                     </header>
 
                     <div className="space-y-8 pb-20">
-                    {/* Sekcja Kontakt */}
-                    <ContentCard icon={<Icon.Mail />} title={t('common.contact')}>
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        {/* Sekcja Kontakt */}
+                        <ContentCard
+                            icon={<Icon.Mail />}
+                            title={t('common.contact')}
+                        >
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                {isEditing ? (
+                                    <>
+                                        <EditableField
+                                            label={t('common.email')}
+                                            name="email"
+                                            type="email"
+                                            value={editData.email}
+                                            onChange={handleEditChange}
+                                        />
+                                        <EditableField
+                                            label={t('common.phoneNumber')}
+                                            name="phoneNumber"
+                                            value={editData.phoneNumber}
+                                            onChange={handleEditChange}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t('common.email')}
+                                            </p>
+                                            <a
+                                                href={`mailto:${user.email}`}
+                                                className="text-base font-semibold text-primary hover:underline"
+                                            >
+                                                {user.email}
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t('common.phoneNumber')}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {user.phoneNumber ||
+                                                    t('common.notProvided')}
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </ContentCard>
+
+                        {/* Sekcja Praca */}
+                        <ContentCard
+                            icon={<Icon.Briefcase />}
+                            title={t('employees.details.professionalInfo')}
+                        >
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                {isEditing ? (
+                                    <>
+                                        <EditableField
+                                            label={t('common.position')}
+                                            name="position"
+                                            value={editData.position}
+                                            onChange={handleEditChange}
+                                        />
+                                        <EditableField
+                                            label={t('common.roleInSystem')}
+                                            name="role"
+                                            value={editData.role}
+                                            options={AVAILABLE_ROLES}
+                                            onChange={handleEditChange}
+                                        />
+                                        <EditableField
+                                            label={t('projects.labelStartDate')}
+                                            name="hireDate"
+                                            type="date"
+                                            value={editData.hireDate}
+                                            onChange={handleEditChange}
+                                        />
+                                        <EditableField
+                                            label={t(
+                                                'employees.details.salary',
+                                            )}
+                                            name="salary"
+                                            type="number"
+                                            value={editData.salary}
+                                            onChange={handleEditChange}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t('common.position')}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {user.position ||
+                                                    t('common.notSpecified')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t('common.role')}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {t(`common.roles.${user.role}`)}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t(
+                                                    'employees.details.hireDate',
+                                                )}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {formatDateForDisplay(
+                                                    user.hireDate,
+                                                    i18n.language,
+                                                ) || t('common.notSpecified')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t(
+                                                    'employees.details.salaryLabel',
+                                                )}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {user.salary > 0
+                                                    ? `${user.salary} PLN`
+                                                    : t('common.notSpecified')}
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </ContentCard>
+
+                        {/* Sekcja Adres */}
+                        <ContentCard
+                            icon={<Icon.Location />}
+                            title={t('common.address')}
+                        >
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                {isEditing ? (
+                                    <>
+                                        <EditableField
+                                            label={t('common.address')}
+                                            name="address"
+                                            value={editData.address}
+                                            onChange={handleEditChange}
+                                        />
+                                        <EditableField
+                                            label={t('common.city')}
+                                            name="city"
+                                            value={editData.city}
+                                            onChange={handleEditChange}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t('common.address')}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {user.address ||
+                                                    t('common.notProvided')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t('common.city')}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {user.city ||
+                                                    t('common.notProvided')}
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </ContentCard>
+
+                        {/* Sekcja Dane osobiste */}
+                        <ContentCard
+                            icon={<Icon.Badge />}
+                            title={t('employees.details.personalData')}
+                        >
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                {isEditing ? (
+                                    <>
+                                        <EditableField
+                                            label={t(
+                                                'employees.details.peselId',
+                                            )}
+                                            name="peselOrId"
+                                            value={editData.peselOrId}
+                                            onChange={handleEditChange}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <p className="mb-1 text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                {t('employees.details.peselId')}
+                                            </p>
+                                            <p className="text-base font-semibold text-foreground">
+                                                {user.peselOrId ||
+                                                    t('common.notProvided')}
+                                            </p>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </ContentCard>
+
+                        {/* Sekcja Notatki */}
+                        <ContentCard
+                            icon={<Icon.Notes />}
+                            title={t('common.notes')}
+                        >
                             {isEditing ? (
-                                <>
-                                    <EditableField
-                                        label={t('common.email')}
-                                        name="email"
-                                        type="email"
-                                        value={editData.email}
-                                        onChange={handleEditChange}
-                                    />
-                                    <EditableField
-                                        label={t('common.phoneNumber')}
-                                        name="phoneNumber"
-                                        value={editData.phoneNumber}
-                                        onChange={handleEditChange}
-                                    />
-                                </>
+                                <EditableField
+                                    label={t('employees.details.notesLabel')}
+                                    name="notes"
+                                    type="textarea"
+                                    value={editData.notes}
+                                    onChange={handleEditChange}
+                                />
                             ) : (
-                                <>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('common.email')}
-                                        </p>
-                                        <a
-                                            href={`mailto:${user.email}`}
-                                            className="text-base font-semibold text-primary hover:underline"
-                                        >
-                                            {user.email}
-                                        </a>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('common.phoneNumber')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {user.phoneNumber || t('common.notProvided')}
-                                        </p>
-                                    </div>
-                                </>
+                                <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground/80">
+                                    {user.notes ||
+                                        t('employees.details.noNotes')}
+                                </p>
                             )}
-                        </div>
-                    </ContentCard>
+                        </ContentCard>
 
-                    {/* Sekcja Praca */}
-                    <ContentCard
-                        icon={<Icon.Briefcase />}
-                        title={t('employees.details.professionalInfo')}
-                    >
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            {isEditing ? (
-                                <>
-                                    <EditableField
-                                        label={t('common.position')}
-                                        name="position"
-                                        value={editData.position}
-                                        onChange={handleEditChange}
-                                    />
-                                    <EditableField
-                                        label={t('common.roleInSystem')}
-                                        name="role"
-                                        value={editData.role}
-                                        options={AVAILABLE_ROLES}
-                                        onChange={handleEditChange}
-                                    />
-                                    <EditableField
-                                        label={t('projects.labelStartDate')}
-                                        name="hireDate"
-                                        type="date"
-                                        value={editData.hireDate}
-                                        onChange={handleEditChange}
-                                    />
-                                    <EditableField
-                                        label={t('employees.details.salary')}
-                                        name="salary"
-                                        type="number"
-                                        value={editData.salary}
-                                        onChange={handleEditChange}
-                                    />
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('common.position')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {user.position || t('common.notSpecified')}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('common.role')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {t(`common.roles.${user.role}`)}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('employees.details.hireDate')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {formatDateForDisplay(
-                                                user.hireDate,
-                                                i18n.language
-                                            ) || t('common.notSpecified')}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('employees.details.salaryLabel')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {user.salary > 0
-                                                ? `${user.salary} PLN`
-                                                : t('common.notSpecified')}
-                                        </p>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </ContentCard>
-
-                    {/* Sekcja Adres */}
-                    <ContentCard icon={<Icon.Location />} title={t('common.address')}>
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            {isEditing ? (
-                                <>
-                                    <EditableField
-                                        label={t('common.address')}
-                                        name="address"
-                                        value={editData.address}
-                                        onChange={handleEditChange}
-                                    />
-                                    <EditableField
-                                        label={t('common.city')}
-                                        name="city"
-                                        value={editData.city}
-                                        onChange={handleEditChange}
-                                    />
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('common.address')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {user.address || t('common.notProvided')}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('common.city')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {user.city || t('common.notProvided')}
-                                        </p>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </ContentCard>
-
-                    {/* Sekcja Dane osobiste */}
-                    <ContentCard icon={<Icon.Badge />} title={t('employees.details.personalData')}>
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            {isEditing ? (
-                                <>
-                                    <EditableField
-                                        label={t('employees.details.peselId')}
-                                        name="peselOrId"
-                                        value={editData.peselOrId}
-                                        onChange={handleEditChange}
-                                    />
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-1">
-                                            {t('employees.details.peselId')}
-                                        </p>
-                                        <p className="text-base font-semibold text-foreground">
-                                            {user.peselOrId ||
-                                                t('common.notProvided')}
-                                        </p>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </ContentCard>
-
-                    {/* Sekcja Notatki */}
-                    <ContentCard icon={<Icon.Notes />} title={t('common.notes')}>
-                        {isEditing ? (
-                            <EditableField
-                                label={t('employees.details.notesLabel')}
-                                name="notes"
-                                type="textarea"
-                                value={editData.notes}
-                                onChange={handleEditChange}
-                            />
-                        ) : (
-                            <p className="whitespace-pre-wrap leading-relaxed text-sm text-muted-foreground/80">
-                                {user.notes || t('employees.details.noNotes')}
-                            </p>
-                        )}
-                    </ContentCard>
-
-                    {/* Sekcja Historia Zatrudnienia */}
-                    <ContentCard
-                        icon={<Icon.Briefcase />}
-                        title={t('employees.details.employmentHistory')}
-                    >
-                        <div className="space-y-6">
-                            {isEditing
-                                ? editData.employmentHistory.map(
-                                      (item, index) => (
+                        {/* Sekcja Historia Zatrudnienia */}
+                        <ContentCard
+                            icon={<Icon.Briefcase />}
+                            title={t('employees.details.employmentHistory')}
+                        >
+                            <div className="space-y-6">
+                                {isEditing
+                                    ? editData.employmentHistory.map(
+                                          (item, index) => (
+                                              <div
+                                                  key={index}
+                                                  className="rounded-lg border border-border bg-muted/50 p-4"
+                                              >
+                                                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                      <EditableField
+                                                          label={t(
+                                                              'common.company',
+                                                          )}
+                                                          name="company"
+                                                          value={item.company}
+                                                          onChange={(e) =>
+                                                              handleHistoryChange(
+                                                                  index,
+                                                                  e,
+                                                              )
+                                                          }
+                                                      />
+                                                      <EditableField
+                                                          label={t(
+                                                              'common.position',
+                                                          )}
+                                                          name="position"
+                                                          value={item.position}
+                                                          onChange={(e) =>
+                                                              handleHistoryChange(
+                                                                  index,
+                                                                  e,
+                                                              )
+                                                          }
+                                                      />
+                                                      <EditableField
+                                                          label={t(
+                                                              'projects.labelStartDate',
+                                                          )}
+                                                          name="startDate"
+                                                          type="date"
+                                                          value={formatDateForInput(
+                                                              item.startDate,
+                                                          )}
+                                                          onChange={(e) =>
+                                                              handleHistoryChange(
+                                                                  index,
+                                                                  e,
+                                                              )
+                                                          }
+                                                      />
+                                                      <EditableField
+                                                          label={t(
+                                                              'projects.labelEndDate',
+                                                          )}
+                                                          name="endDate"
+                                                          type="date"
+                                                          value={formatDateForInput(
+                                                              item.endDate,
+                                                          )}
+                                                          onChange={(e) =>
+                                                              handleHistoryChange(
+                                                                  index,
+                                                                  e,
+                                                              )
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <textarea
+                                                      name="description"
+                                                      rows="3"
+                                                      placeholder={`${t('common.description')}...`}
+                                                      value={item.description}
+                                                      onChange={(e) =>
+                                                          handleHistoryChange(
+                                                              index,
+                                                              e,
+                                                          )
+                                                      }
+                                                      className="mt-4 w-full rounded-lg border border-input bg-card px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                                  ></textarea>
+                                                  <button
+                                                      onClick={() =>
+                                                          handleRemoveHistory(
+                                                              index,
+                                                          )
+                                                      }
+                                                      className="mt-2 text-sm font-semibold text-destructive hover:text-destructive/80"
+                                                  >
+                                                      {t('common.delete')}
+                                                  </button>
+                                              </div>
+                                          ),
+                                      )
+                                    : employmentHistory.map((item, index) => (
                                           <div
                                               key={index}
-                                              className="rounded-lg border border-border bg-muted/50 p-4"
+                                              className="group relative pb-8 pl-8 last:pb-0"
                                           >
-                                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                  <EditableField
-                                                      label={t('common.company')}
-                                                      name="company"
-                                                      value={item.company}
-                                                      onChange={(e) =>
-                                                          handleHistoryChange(
-                                                              index,
-                                                              e,
-                                                          )
-                                                      }
-                                                  />
-                                                  <EditableField
-                                                      label={t('common.position')}
-                                                      name="position"
-                                                      value={item.position}
-                                                      onChange={(e) =>
-                                                          handleHistoryChange(
-                                                              index,
-                                                              e,
-                                                          )
-                                                      }
-                                                  />
-                                                  <EditableField
-                                                      label={t('projects.labelStartDate')}
-                                                      name="startDate"
-                                                      type="date"
-                                                      value={formatDateForInput(
+                                              {/* Timeline line */}
+                                              <div className="absolute left-0 top-2 h-full w-[2px] bg-border last:hidden" />
+
+                                              {/* Timeline dot */}
+                                              <div className="absolute left-[-5px] top-1.5 h-3 w-3 rounded-full border-2 border-primary bg-background" />
+
+                                              <div>
+                                                  <p className="text-base font-bold text-foreground">
+                                                      {item.position}
+                                                  </p>
+                                                  <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                                                      <Icon.Building className="h-4 w-4" />
+                                                      {item.company}
+                                                  </p>
+                                                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                                      {formatDateForDisplay(
                                                           item.startDate,
-                                                      )}
-                                                      onChange={(e) =>
-                                                          handleHistoryChange(
-                                                              index,
-                                                              e,
-                                                          )
-                                                      }
-                                                  />
-                                                  <EditableField
-                                                      label={t('projects.labelEndDate')}
-                                                      name="endDate"
-                                                      type="date"
-                                                      value={formatDateForInput(
+                                                      )}{' '}
+                                                      —{' '}
+                                                      {formatDateForDisplay(
                                                           item.endDate,
                                                       )}
-                                                      onChange={(e) =>
-                                                          handleHistoryChange(
-                                                              index,
-                                                              e,
-                                                          )
-                                                      }
-                                                  />
+                                                  </p>
+                                                  <p className="mt-2 rounded-lg border border-border/10 bg-muted/20 p-3 text-sm leading-relaxed text-muted-foreground/80">
+                                                      {item.description}
+                                                  </p>
                                               </div>
-                                              <textarea
-                                                  name="description"
-                                                  rows="3"
-                                                  placeholder={`${t('common.description')}...`}
-                                                  value={item.description}
-                                                  onChange={(e) =>
-                                                      handleHistoryChange(
-                                                          index,
-                                                          e,
-                                                      )
-                                                  }
-                                                  className="mt-4 w-full rounded-lg border border-input bg-card px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                                              ></textarea>
-                                              <button
-                                                  onClick={() =>
-                                                      handleRemoveHistory(index)
-                                                  }
-                                                  className="mt-2 text-sm font-semibold text-destructive hover:text-destructive/80"
-                                              >
-                                                  {t('common.delete')}
-                                              </button>
                                           </div>
-                                      ),
-                                  )
-                                : employmentHistory.map((item, index) => (
-                                      <div
-                                          key={index}
-                                          className="group relative pl-8 pb-8 last:pb-0"
-                                      >
-                                          {/* Timeline line */}
-                                          <div className="absolute left-0 top-2 h-full w-[2px] bg-border last:hidden" />
-                                          
-                                          {/* Timeline dot */}
-                                          <div className="absolute left-[-5px] top-1.5 h-3 w-3 rounded-full bg-background border-2 border-primary" />
-                                          
-                                          <div>
-                                            <p className="text-base font-bold text-foreground">
-                                                {item.position}
-                                            </p>
-                                            <p className="flex items-center gap-2 text-sm font-medium text-primary">
-                                                <Icon.Building className="h-4 w-4" />
-                                                {item.company}
-                                            </p>
-                                            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                                {formatDateForDisplay(item.startDate)} — {formatDateForDisplay(item.endDate)}
-                                            </p>
-                                            <p className="mt-2 text-sm leading-relaxed text-muted-foreground/80 bg-muted/20 p-3 rounded-lg border border-border/10">
-                                                {item.description}
-                                            </p>
-                                          </div>
-                                      </div>
-                                  ))}
-                            {isEditing && (
-                                <button
-                                    onClick={handleAddHistory}
-                                    className="rounded-lg bg-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/30"
-                                >
-                                    + {t('employees.details.addHistoryEntry')}
-                                </button>
-                            )}
-                            {!isEditing &&
-                                employmentHistory.length === 0 && (
-                                    <p className="text-muted-foreground text-sm">
-                                        {t('employees.details.noHistory')}
-                                    </p>
+                                      ))}
+                                {isEditing && (
+                                    <button
+                                        onClick={handleAddHistory}
+                                        className="rounded-lg bg-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/30"
+                                    >
+                                        +{' '}
+                                        {t('employees.details.addHistoryEntry')}
+                                    </button>
                                 )}
-                        </div>
-                    </ContentCard>
+                                {!isEditing &&
+                                    employmentHistory.length === 0 && (
+                                        <p className="text-sm text-muted-foreground">
+                                            {t('employees.details.noHistory')}
+                                        </p>
+                                    )}
+                            </div>
+                        </ContentCard>
 
-                    {/* Sekcja Dokumenty i Umowy */}
-                    <ContentCard
-                        icon={<Icon.Documents />}
-                        title={t('employees.details.documentsAndAgreements')}
-                    >
-                        <div className="space-y-4">
-                            {isEditing
-                                ? (editData.documents || []).map(
-                                      (doc, index) => (
-                                          <div
-                                              key={index}
-                                              className="rounded-lg border border-border bg-muted/50 p-4"
-                                          >
-                                              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                  <EditableField
-                                                      label={t('employees.details.documentName')}
-                                                      name="name"
-                                                      value={doc.name}
-                                                      onChange={(e) =>
-                                                          handleDocumentChange(
-                                                              index,
-                                                              e,
-                                                          )
-                                                      }
-                                                  />
-                                                  <EditableField
-                                                      label={t('employees.details.fileUrl')}
-                                                      name="url"
-                                                      value={doc.url}
-                                                      onChange={(e) =>
-                                                          handleDocumentChange(
-                                                              index,
-                                                              e,
-                                                          )
-                                                      }
-                                                  />
-                                                  <EditableField
-                                                      label={t('employees.details.category')}
-                                                      name="category"
-                                                      value={doc.category}
-                                                      options={[
-                                                          'documentation',
-                                                          'agreement',
-                                                      ]}
-                                                      onChange={(e) =>
-                                                          handleDocumentChange(
-                                                              index,
-                                                              e,
-                                                          )
-                                                      }
-                                                  />
-                                              </div>
-                                              <button
-                                                  onClick={() =>
-                                                      handleRemoveDocument(index)
-                                                  }
-                                                  className="mt-4 text-sm font-semibold text-destructive hover:text-destructive/80"
+                        {/* Sekcja Dokumenty i Umowy */}
+                        <ContentCard
+                            icon={<Icon.Documents />}
+                            title={t(
+                                'employees.details.documentsAndAgreements',
+                            )}
+                        >
+                            <div className="space-y-4">
+                                {isEditing
+                                    ? (editData.documents || []).map(
+                                          (doc, index) => (
+                                              <div
+                                                  key={index}
+                                                  className="rounded-lg border border-border bg-muted/50 p-4"
                                               >
-                                                  {t('employees.details.removeDocument')}
-                                              </button>
-                                          </div>
-                                      ),
-                                  )
-                                : (user.documents || []).map((doc, index) => (
-                                      <div
-                                          key={index}
-                                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:bg-muted/30"
-                                      >
-                                          <div className="flex items-center gap-4">
-                                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary border border-border">
-                                                  <Icon.Documents />
+                                                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                      <EditableField
+                                                          label={t(
+                                                              'employees.details.documentName',
+                                                          )}
+                                                          name="name"
+                                                          value={doc.name}
+                                                          onChange={(e) =>
+                                                              handleDocumentChange(
+                                                                  index,
+                                                                  e,
+                                                              )
+                                                          }
+                                                      />
+                                                      <EditableField
+                                                          label={t(
+                                                              'employees.details.fileUrl',
+                                                          )}
+                                                          name="url"
+                                                          value={doc.url}
+                                                          onChange={(e) =>
+                                                              handleDocumentChange(
+                                                                  index,
+                                                                  e,
+                                                              )
+                                                          }
+                                                      />
+                                                      <EditableField
+                                                          label={t(
+                                                              'employees.details.category',
+                                                          )}
+                                                          name="category"
+                                                          value={doc.category}
+                                                          options={[
+                                                              'documentation',
+                                                              'agreement',
+                                                          ]}
+                                                          onChange={(e) =>
+                                                              handleDocumentChange(
+                                                                  index,
+                                                                  e,
+                                                              )
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <button
+                                                      onClick={() =>
+                                                          handleRemoveDocument(
+                                                              index,
+                                                          )
+                                                      }
+                                                      className="mt-4 text-sm font-semibold text-destructive hover:text-destructive/80"
+                                                  >
+                                                      {t(
+                                                          'employees.details.removeDocument',
+                                                      )}
+                                                  </button>
                                               </div>
-                                              <div className="flex flex-col">
+                                          ),
+                                      )
+                                    : (user.documents || []).map(
+                                          (doc, index) => (
+                                              <div
+                                                  key={index}
+                                                  className="flex flex-col justify-between gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:bg-muted/30 sm:flex-row sm:items-center"
+                                              >
+                                                  <div className="flex items-center gap-4">
+                                                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-primary">
+                                                          <Icon.Documents />
+                                                      </div>
+                                                      <div className="flex flex-col">
+                                                          <a
+                                                              href={doc.url}
+                                                              target="_blank"
+                                                              rel="noopener noreferrer"
+                                                              className="text-base font-bold text-foreground transition-colors hover:text-primary"
+                                                          >
+                                                              {doc.name}
+                                                          </a>
+                                                          <div className="mt-0.5 flex items-center gap-2">
+                                                              <span className="rounded border border-border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                                                  {doc.category ===
+                                                                  'agreement'
+                                                                      ? t(
+                                                                            'employees.details.agreement',
+                                                                        )
+                                                                      : t(
+                                                                            'employees.details.documentation',
+                                                                        )}
+                                                              </span>
+                                                              <span className="text-[10px] font-medium text-muted-foreground/60">
+                                                                  {t(
+                                                                      'common.Added',
+                                                                  )}
+                                                                  :{' '}
+                                                                  {formatDateForDisplay(
+                                                                      doc.uploadedAt,
+                                                                  )}
+                                                              </span>
+                                                          </div>
+                                                      </div>
+                                                  </div>
                                                   <a
                                                       href={doc.url}
                                                       target="_blank"
                                                       rel="noopener noreferrer"
-                                                      className="text-base font-bold text-foreground hover:text-primary transition-colors"
+                                                      className="flex items-center justify-center rounded-lg bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary transition-all hover:bg-primary hover:text-white active:scale-95"
                                                   >
-                                                      {doc.name}
+                                                      Open
                                                   </a>
-                                                  <div className="flex items-center gap-2 mt-0.5">
-                                                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1.5 py-0.5 rounded border border-border">
-                                                          {doc.category === 'agreement'
-                                                              ? t('employees.details.agreement')
-                                                              : t('employees.details.documentation')}
-                                                      </span>
-                                                      <span className="text-[10px] font-medium text-muted-foreground/60">
-                                                          {t('common.Added')}: {formatDateForDisplay(doc.uploadedAt)}
-                                                      </span>
-                                                  </div>
                                               </div>
-                                          </div>
-                                          <a
-                                              href={doc.url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="flex items-center justify-center rounded-lg bg-primary/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary hover:text-white transition-all active:scale-95"
-                                          >
-                                              Open
-                                          </a>
-                                      </div>
-                                  ))}
+                                          ),
+                                      )}
 
-                            {isEditing && (
-                                <button
-                                    onClick={handleAddDocument}
-                                    className="rounded-lg bg-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/30"
-                                >
-                                    + {t('employees.details.addDocument')}
-                                </button>
-                            )}
-
-                            {!isEditing &&
-                                (!user.documents ||
-                                    user.documents.length === 0) && (
-                                    <p className="text-muted-foreground text-sm">
-                                        {t('employees.details.noDocuments')}
-                                    </p>
+                                {isEditing && (
+                                    <button
+                                        onClick={handleAddDocument}
+                                        className="rounded-lg bg-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/30"
+                                    >
+                                        + {t('employees.details.addDocument')}
+                                    </button>
                                 )}
-                        </div>
-                    </ContentCard>
+
+                                {!isEditing &&
+                                    (!user.documents ||
+                                        user.documents.length === 0) && (
+                                        <p className="text-sm text-muted-foreground">
+                                            {t('employees.details.noDocuments')}
+                                        </p>
+                                    )}
+                            </div>
+                        </ContentCard>
+                    </div>
                 </div>
-            </div>
-        </main>
-    </div>
+            </main>
+        </div>
     );
 }
