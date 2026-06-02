@@ -151,8 +151,8 @@ const StatCard = ({ icon, title, children }) => (
 );
 
 const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
-        <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-3 sm:px-6 sm:py-4">
+    <div className="rounded-lg border border-border bg-card shadow-sm">
+        <div className="flex items-center justify-between rounded-t-lg border-b border-border bg-muted/30 px-4 py-3 sm:px-6 sm:py-4">
             <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground">
                     {icon}
