@@ -16,7 +16,7 @@ CMD ["npm", "run", "dev"]
 FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --omit=dev --no-audit --no-fund --legacy-peer-deps && npm cache clean --force
 
 # =============================================
 # Stage 2: Production Runtime

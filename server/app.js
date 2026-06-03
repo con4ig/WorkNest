@@ -23,6 +23,8 @@ const envOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
   : [];
 const allowedOrigins = [
+  "http://localhost",
+  "http://127.0.0.1",
   "http://localhost:5173",
   "http://localhost:5500",
   "https://worknest-1.onrender.com",
@@ -38,7 +40,11 @@ app.use(
       directives: {
         "default-src": ["'self'"],
         "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        "style-src": [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com",
+        ],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
         "img-src": ["'self'", "data:", "https:"],
         "connect-src": [
@@ -53,13 +59,13 @@ app.use(
     crossOriginEmbedderPolicy: false,
     referrerPolicy: { policy: "strict-origin-when-cross-origin" },
     xFrameOptions: { action: "sameorigin" },
-  })
+  }),
 );
 
 app.use((req, res, next) => {
   res.setHeader(
     "Permissions-Policy",
-    "geolocation=(), microphone=(), camera=()"
+    "geolocation=(), microphone=(), camera=()",
   );
   next();
 });
@@ -80,7 +86,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 app.use(express.json());
@@ -105,7 +111,7 @@ app.use(
       docExpansion: "list",
       defaultModelsExpandDepth: 1,
     },
-  })
+  }),
 );
 
 /**
@@ -141,8 +147,8 @@ app.get("/api/health", (req, res) => {
       readyState === 1
         ? "connected"
         : readyState === 2
-        ? "connecting"
-        : "disconnected",
+          ? "connecting"
+          : "disconnected",
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
   });
