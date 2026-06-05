@@ -32,6 +32,27 @@ import { Button } from '../components/ui/Button';
 import AnimatedNumber from '../components/ui/AnimatedNumber';
 import { useCountUp } from '../hooks/useCountUp';
 
+const CustomTooltip = ({ active, payload }) => {
+    const { t } = useTranslation();
+    if (active && payload && payload.length) {
+        const data = payload[0];
+        return (
+            <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md">
+                <p className="text-sm font-semibold text-foreground">
+                    {data.name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                    {data.value}{' '}
+                    {t('dashboard.stats.projectCount', {
+                        count: data.value,
+                    })}
+                </p>
+            </div>
+        );
+    }
+    return null;
+};
+
 const ProjectProgressChart = ({ stats }) => {
     const { t } = useTranslation();
     const [hoveredSection, setHoveredSection] = useState(null);
@@ -74,27 +95,6 @@ const ProjectProgressChart = ({ stats }) => {
                   },
               ];
 
-    const CustomTooltip = ({ active, payload }) => {
-        const { t } = useTranslation();
-        if (active && payload && payload.length) {
-            const data = payload[0];
-            return (
-                <div className="rounded-lg border border-border bg-background px-3 py-2 shadow-md">
-                    <p className="text-sm font-semibold text-foreground">
-                        {data.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        {data.value}{' '}
-                        {t('dashboard.stats.projectCount', {
-                            count: data.value,
-                        })}
-                    </p>
-                </div>
-            );
-        }
-        return null;
-    };
-
     return (
         <div className="flex w-full flex-col gap-4 p-4">
             <h3 className="text-base font-bold tracking-tight text-foreground sm:text-xl">
@@ -106,7 +106,12 @@ const ProjectProgressChart = ({ stats }) => {
                 {/* Pie chart */}
                 <div className="relative flex-shrink-0">
                     <div className="h-28 w-28 sm:h-32 sm:w-32">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                        <ResponsiveContainer
+                            width="100%"
+                            height="100%"
+                            minWidth={0}
+                            minHeight={0}
+                        >
                             <PieChart>
                                 <Pie
                                     data={chartData}
@@ -116,15 +121,24 @@ const ProjectProgressChart = ({ stats }) => {
                                     outerRadius={55}
                                     dataKey="value"
                                     stroke="none"
-                                    onMouseEnter={(_, index) => setHoveredSection(index)}
+                                    onMouseEnter={(_, index) =>
+                                        setHoveredSection(index)
+                                    }
                                     onMouseLeave={() => setHoveredSection(null)}
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
                                             fill={entry.color}
-                                            opacity={hoveredSection === null || hoveredSection === index ? 1 : 0.6}
-                                            style={{ transition: 'opacity 0.3s ease' }}
+                                            opacity={
+                                                hoveredSection === null ||
+                                                hoveredSection === index
+                                                    ? 1
+                                                    : 0.6
+                                            }
+                                            style={{
+                                                transition: 'opacity 0.3s ease',
+                                            }}
                                         />
                                     ))}
                                 </Pie>
@@ -205,7 +219,9 @@ export default function Dashboard() {
             day.setDate(today.getDate() - (6 - i));
             const dayString = format(day, 'yyyy-MM-dd');
             return {
-                day: format(day, 'EEE', { locale: i18n.language === 'pl' ? pl : undefined }),
+                day: format(day, 'EEE', {
+                    locale: i18n.language === 'pl' ? pl : undefined,
+                }),
                 fullDate: dayString,
                 val: activityMap[dayString] || 0,
             };
@@ -373,7 +389,9 @@ export default function Dashboard() {
                             className="gap-1.5 text-xs"
                         >
                             <Key className="h-3.5 w-3.5" />
-                            <span className="hidden sm:inline">{t('dashboard.generateCode')}</span>
+                            <span className="hidden sm:inline">
+                                {t('dashboard.generateCode')}
+                            </span>
                             <span className="sm:hidden">Kod</span>
                         </Button>
                     )}
@@ -399,16 +417,25 @@ export default function Dashboard() {
                             ];
                             const accent = accents[idx];
                             return (
-                                <div key={stat.id} className="flex flex-col justify-between gap-3 p-5 sm:p-6">
+                                <div
+                                    key={stat.id}
+                                    className="flex flex-col justify-between gap-3 p-5 sm:p-6"
+                                >
                                     <div className="flex items-center gap-2">
                                         {accent && (
-                                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${accent}`} />
+                                            <span
+                                                className={`h-1.5 w-1.5 shrink-0 rounded-full ${accent}`}
+                                            />
                                         )}
                                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
-                                            {t(`dashboard.stats.${stat.titleKey}`)}
+                                            {t(
+                                                `dashboard.stats.${stat.titleKey}`,
+                                            )}
                                         </span>
                                     </div>
-                                    <div className={`font-black tracking-tight text-foreground leading-none ${idx === 0 ? 'text-4xl sm:text-5xl' : 'text-2xl sm:text-3xl'}`}>
+                                    <div
+                                        className={`font-black leading-none tracking-tight text-foreground ${idx === 0 ? 'text-4xl sm:text-5xl' : 'text-2xl sm:text-3xl'}`}
+                                    >
                                         <AnimatedNumber value={stat.value} />
                                     </div>
                                 </div>
@@ -443,7 +470,12 @@ export default function Dashboard() {
                     onMouseDown={(e) => e.preventDefault()}
                 >
                     <div className="h-[300px] select-none">
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                        <ResponsiveContainer
+                            width="100%"
+                            height="100%"
+                            minWidth={0}
+                            minHeight={0}
+                        >
                             <BarChart
                                 data={weeklyActivity}
                                 className="select-none"
@@ -507,7 +539,7 @@ export default function Dashboard() {
                     </div>
                     <Button
                         variant="ghost"
-                        className="hover:bg-primary/10 text-primary hover:text-primary"
+                        className="text-primary hover:bg-primary/10 hover:text-primary"
                         onClick={() => navigate('/projects')}
                     >
                         {t('common.viewAll')}{' '}
@@ -521,14 +553,17 @@ export default function Dashboard() {
                                 <div
                                     key={project._id}
                                     className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-3 transition-colors hover:bg-muted active:scale-[0.99] sm:p-4"
-                                    onClick={() => navigate(`/projects/${project._id}`)}
+                                    onClick={() =>
+                                        navigate(`/projects/${project._id}`)
+                                    }
                                 >
                                     <div className="flex min-w-0 items-center gap-3">
                                         <div
                                             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border sm:h-10 sm:w-10 ${
                                                 project.status === 'completed'
-                                                    ? 'bg-primary/10 border-primary/20 text-primary'
-                                                    : project.status === 'in_progress'
+                                                    ? 'border-primary/20 bg-primary/10 text-primary'
+                                                    : project.status ===
+                                                        'in_progress'
                                                       ? 'border-amber-500/20 bg-amber-500/10 text-amber-500'
                                                       : 'border-border bg-muted text-muted-foreground'
                                             }`}
@@ -541,14 +576,20 @@ export default function Dashboard() {
                                             </h3>
                                             <p className="text-[10px] tracking-wide text-muted-foreground sm:text-xs">
                                                 {t('common.deadline')}:{' '}
-                                                {formatProjectDate(project.endDate)}
+                                                {formatProjectDate(
+                                                    project.endDate,
+                                                )}
                                             </p>
                                         </div>
                                     </div>
                                     <div className="ml-2 shrink-0 text-right">
                                         <div className="text-sm font-bold text-foreground">
-                                            {project.tasks?.filter((t) => t.status === 'completed')?.length || 0}
-                                            <span className="font-normal text-muted-foreground">/{project.tasks?.length || 0}</span>
+                                            {project.tasks?.filter(
+                                                (t) => t.status === 'completed',
+                                            )?.length || 0}
+                                            <span className="font-normal text-muted-foreground">
+                                                /{project.tasks?.length || 0}
+                                            </span>
                                         </div>
                                         <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
                                             {t('common.tasks')}

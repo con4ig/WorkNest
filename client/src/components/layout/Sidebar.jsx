@@ -19,6 +19,74 @@ import { cn } from '../../lib/utils';
 import { Button } from '../ui/Button';
 import { useTheme } from '../../context/useTheme';
 
+const NavItem = ({
+    to,
+    icon,
+    label,
+    exact = false,
+    isSidebarOpen,
+    isMobile,
+    setIsSidebarOpen,
+}) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const Icon = icon;
+    const isActive = exact
+        ? location.pathname === to
+        : location.pathname.startsWith(to);
+
+    const handleNav = () => {
+        navigate(to);
+        if (isMobile) setIsSidebarOpen(false);
+    };
+
+    return (
+        <li
+            role="link"
+            tabIndex={0}
+            onClick={handleNav}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNav();
+                }
+            }}
+            aria-label={label}
+            aria-current={isActive ? 'page' : undefined}
+            className={cn(
+                'group relative flex cursor-pointer items-center overflow-hidden rounded-lg transition-all duration-200',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                isSidebarOpen
+                    ? 'justify-start gap-3 px-4'
+                    : 'justify-center px-2',
+                isActive
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground',
+                'py-3',
+            )}
+        >
+            <Icon
+                className={cn(
+                    'h-5 w-5 flex-shrink-0',
+                    isActive
+                        ? 'text-primary-foreground'
+                        : 'text-muted-foreground group-hover:text-secondary-foreground',
+                )}
+            />
+            {isSidebarOpen && (
+                <span className="animate-in fade-in overflow-hidden text-ellipsis whitespace-nowrap font-medium duration-300">
+                    {label}
+                </span>
+            )}
+            {!isSidebarOpen && !isMobile && (
+                <div className="bg-popover text-popover-foreground absolute left-14 z-50 rounded-md border border-border px-2 py-1 text-xs opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+                    {label}
+                </div>
+            )}
+        </li>
+    );
+};
+
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -32,63 +100,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
         setTimeout(logout, 0);
     };
 
-    const NavItem = ({ to, icon, label, exact = false }) => {
-        const Icon = icon;
-        const isActive = exact
-            ? location.pathname === to
-            : location.pathname.startsWith(to);
-
-        const handleNav = () => {
-            navigate(to);
-            if (isMobile) setIsSidebarOpen(false);
-        };
-
-        return (
-            <li
-                role="link"
-                tabIndex={0}
-                onClick={handleNav}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleNav();
-                    }
-                }}
-                aria-label={label}
-                aria-current={isActive ? 'page' : undefined}
-                className={cn(
-                    'group relative flex cursor-pointer items-center overflow-hidden rounded-lg transition-all duration-200',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                    isSidebarOpen
-                        ? 'justify-start gap-3 px-4'
-                        : 'justify-center px-2',
-                    isActive
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground',
-                    'py-3',
-                )}
-            >
-                <Icon
-                    className={cn(
-                        'h-5 w-5 flex-shrink-0',
-                        isActive
-                            ? 'text-primary-foreground'
-                            : 'text-muted-foreground group-hover:text-secondary-foreground',
-                    )}
-                />
-                {isSidebarOpen && (
-                    <span className="animate-in fade-in overflow-hidden text-ellipsis whitespace-nowrap font-medium duration-300">
-                        {label}
-                    </span>
-                )}
-                {!isSidebarOpen && !isMobile && (
-                    <div className="bg-popover text-popover-foreground absolute left-14 z-50 rounded-md border border-border px-2 py-1 text-xs opacity-0 shadow-md transition-opacity group-hover:opacity-100">
-                        {label}
-                    </div>
-                )}
-            </li>
-        );
-    };
+    const navProps = { isSidebarOpen, isMobile, setIsSidebarOpen };
 
     return (
         <aside
@@ -202,12 +214,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                 <nav className="scrollbar-thin scrollbar-thumb-muted flex-1 overflow-y-auto overflow-x-hidden">
                     <ul className="space-y-1.5 px-1">
                         <NavItem
+                            {...navProps}
                             to="/dashboard"
                             icon={LayoutDashboard}
                             label={t('dashboard.sidebar.dashboard')}
                             exact
                         />
                         <NavItem
+                            {...navProps}
                             to="/projects"
                             icon={FolderKanban}
                             label={t('dashboard.sidebar.projects')}
@@ -215,6 +229,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
 
                         {(role === 'hr' || role === 'admin') && (
                             <NavItem
+                                {...navProps}
                                 to="/employees"
                                 icon={Users}
                                 label={t('dashboard.sidebar.team')}
@@ -223,6 +238,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
 
                         {(role === 'hr' || role === 'admin') && (
                             <NavItem
+                                {...navProps}
                                 to="/leave-approvals"
                                 icon={CalendarCheck}
                                 label={t('dashboard.sidebar.approvals')}
@@ -231,6 +247,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
 
                         {(role === 'employee' || role === 'hr') && (
                             <NavItem
+                                {...navProps}
                                 to="/myleaves"
                                 icon={CalendarCheck}
                                 label={t('dashboard.sidebar.leaves')}
@@ -240,6 +257,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                         <div className="mx-2 my-4 border-t border-border"></div>
 
                         <NavItem
+                            {...navProps}
                             to="/"
                             icon={Home}
                             label={t('dashboard.sidebar.home')}
