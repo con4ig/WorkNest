@@ -1,6 +1,8 @@
 import React from 'react';
 import ProjectGridCard from './projects/ProjectGridCard';
 
+const EMPTY_ARRAY = [];
+
 const GridView = ({
     projects,
     currentUserRole,
@@ -9,7 +11,7 @@ const GridView = ({
     onRestore,
     onCardClick,
     showArchived,
-    selectedProjects = [],
+    selectedProjects = EMPTY_ARRAY,
     onToggleSelect,
 }) => {
     return (

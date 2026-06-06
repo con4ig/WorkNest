@@ -1,10 +1,10 @@
-import React, { useState, useEffect, forwardRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import api from '../../src/services/api.js';
-import moment from 'moment';
-import 'moment/locale/pl';
+
 import DatePicker, { registerLocale } from 'react-datepicker';
+import { format } from 'date-fns';
 import { pl } from 'date-fns/locale/pl';
 import { enGB } from 'date-fns/locale/en-GB';
 
@@ -23,7 +23,7 @@ import {
 
 // Custom Input for DatePicker - defined outside to avoid re-renders if possible,
 // but it needs t() so let's move it into the component or pass t as prop
-const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
+const CustomDateInput = ({ value, onClick, placeholder, ref }) => (
     <button
         type="button"
         className="flex min-w-0 max-w-[160px] items-center gap-1.5 truncate rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary"
@@ -33,8 +33,10 @@ const CustomDateInput = forwardRef(({ value, onClick, placeholder }, ref) => (
         <Icon.Calendar size={12} className="shrink-0" />
         <span className="truncate">{value || placeholder}</span>
     </button>
-));
+);
 CustomDateInput.displayName = 'CustomDateInput';
+
+const CUSTOM_DATE_INPUT = <CustomDateInput />;
 
 const TaskItem = ({
     task,
@@ -56,21 +58,10 @@ const TaskItem = ({
     });
 
     useEffect(() => {
-        moment.locale(i18n.language);
+        // handled dynamically by date-fns locale
     }, [i18n.language]);
 
-    useEffect(() => {
-        if (!isEditing) {
-            setEditData({
-                title: task.title,
-                description: task.description,
-                status: task.status,
-                priority: task.priority,
-                assignedTo: task.assignedTo?._id || '',
-                dueDate: formatDateForInput(task.dueDate),
-            });
-        }
-    }, [task, isEditing]);
+    // removed sync effect
 
     const handleSave = async () => {
         const payload = {
@@ -115,6 +106,9 @@ const TaskItem = ({
                         <input
                             type="text"
                             value={editData.title}
+                            aria-label={t(
+                                'projects.details.kanban.taskTitlePlaceholder',
+                            )}
                             onChange={(e) =>
                                 setEditData({
                                     ...editData,
@@ -128,6 +122,9 @@ const TaskItem = ({
                         />
                         <textarea
                             value={editData.description}
+                            aria-label={t(
+                                'projects.details.addDescriptionPlaceholder',
+                            )}
                             onChange={(e) =>
                                 setEditData({
                                     ...editData,
@@ -262,7 +259,7 @@ const TaskItem = ({
                                     locale={i18n.language}
                                     isClearable
                                     placeholderText={t('common.selectDate')}
-                                    customInput={<CustomDateInput />}
+                                    customInput={CUSTOM_DATE_INPUT}
                                     popperPlacement="top-start"
                                 />
                             </div>
@@ -295,7 +292,16 @@ const TaskItem = ({
                                             size={10}
                                             className="text-muted-foreground/40"
                                         />
-                                        {moment(task.dueDate).format('DD MMM')}
+                                        {format(
+                                            new Date(task.dueDate),
+                                            'dd MMM',
+                                            {
+                                                locale:
+                                                    i18n.language === 'pl'
+                                                        ? pl
+                                                        : enGB,
+                                            },
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -332,7 +338,20 @@ const TaskItem = ({
                             <div className="flex gap-1 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
                                 <button
                                     type="button"
-                                    onClick={() => setIsEditing(true)}
+                                    onClick={() => {
+                                        setEditData({
+                                            title: task.title,
+                                            description: task.description,
+                                            status: task.status,
+                                            priority: task.priority,
+                                            assignedTo:
+                                                task.assignedTo?._id || '',
+                                            dueDate: formatDateForInput(
+                                                task.dueDate,
+                                            ),
+                                        });
+                                        setIsEditing(true);
+                                    }}
                                     className="rounded p-1.5 text-muted-foreground transition-transform hover:bg-secondary hover:text-primary active:scale-90"
                                 >
                                     <Icon.Edit3 />
