@@ -28,10 +28,22 @@ import {
 import { Button } from '../components/ui/Button';
 import AnimatedNumber from '../components/ui/AnimatedNumber';
 
+const getRoleBadgeColor = (role) => {
+    switch (role) {
+        case 'admin':
+            return 'bg-primary/10 text-primary border-primary/20';
+        case 'hr':
+            return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        case 'employee':
+            return 'bg-muted text-muted-foreground border-border';
+        default:
+            return 'bg-muted/50 text-muted-foreground border-border/50';
+    }
+};
+
 export default function EmployeeList() {
     const { t, i18n } = useTranslation();
     const [users, setUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -60,7 +72,6 @@ export default function EmployeeList() {
 
             const usersRes = await api.get('/users');
             setUsers(usersRes.data.users);
-            setFilteredUsers(usersRes.data.users);
             setLoading(false);
         } catch (err) {
             console.error('Error fetching data:', err);
@@ -79,21 +90,16 @@ export default function EmployeeList() {
         fetchData();
     }, [fetchData]);
 
-    useEffect(() => {
-        if (searchQuery.trim() === '') {
-            setFilteredUsers(users);
-        } else {
-            const query = searchQuery.toLowerCase();
-            setFilteredUsers(
-                users.filter(
-                    (u) =>
-                        u.username.toLowerCase().includes(query) ||
-                        u.email.toLowerCase().includes(query) ||
-                        u.role.toLowerCase().includes(query),
-                ),
-            );
-        }
-    }, [searchQuery, users]);
+    const query = searchQuery.trim().toLowerCase();
+    const filteredUsers =
+        query === ''
+            ? users
+            : users.filter(
+                  (u) =>
+                      u.username.toLowerCase().includes(query) ||
+                      u.email.toLowerCase().includes(query) ||
+                      u.role.toLowerCase().includes(query),
+              );
 
     const handleRoleChange = async (newRole) => {
         if (!selectedUser) return;
@@ -154,19 +160,6 @@ export default function EmployeeList() {
         }
     };
 
-    const getRoleBadgeColor = (role) => {
-        switch (role) {
-            case 'admin':
-                return 'bg-primary/10 text-primary border-primary/20';
-            case 'hr':
-                return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-            case 'employee':
-                return 'bg-muted text-muted-foreground border-border';
-            default:
-                return 'bg-muted/50 text-muted-foreground border-border/50';
-        }
-    };
-
     const getRoleLabel = (role) => {
         return t(`common.roles.${role}`);
     };
@@ -191,6 +184,7 @@ export default function EmployeeList() {
                         {error}
                     </div>
                     <Button
+                        type="button"
                         onClick={() => navigate('/dashboard')}
                         className="w-full"
                     >
@@ -231,7 +225,8 @@ export default function EmployeeList() {
             <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
                 <div>
                     <div className="flex items-center gap-2">
-                         <Button
+                        <Button
+                            type="button"
                             variant="ghost"
                             size="icon"
                             onClick={() => navigate('/dashboard')}
@@ -249,10 +244,11 @@ export default function EmployeeList() {
                         })}
                     </p>
                 </div>
-                
-                 <div className="flex flex-col gap-3 sm:flex-row md:items-center">
+
+                <div className="flex flex-col gap-3 sm:flex-row md:items-center">
                     {currentUser?.role === 'admin' && (
                         <Button
+                            type="button"
                             variant="outline"
                             onClick={() => setImportFormOpen(true)}
                             className="gap-2"
@@ -261,7 +257,7 @@ export default function EmployeeList() {
                             <span>{t('employees.list.importButton')}</span>
                         </Button>
                     )}
-                     <div className="relative w-full sm:w-auto">
+                    <div className="relative w-full sm:w-auto">
                         <input
                             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[250px]"
                             placeholder={t('employees.list.searchPlaceholder')}
@@ -300,12 +296,14 @@ export default function EmployeeList() {
 
             {/* Employees List */}
             <Card className="border-border bg-card shadow-sm">
-                 <CardHeader>
+                <CardHeader>
                     <CardTitle className="font-semibold text-foreground">
                         {t('employees.list.table.user')}
                     </CardTitle>
-                     <CardDescription className="text-xs tracking-wide text-muted-foreground">
-                        {t('employees.list.userCount', { count: filteredUsers.length })}
+                    <CardDescription className="text-xs tracking-wide text-muted-foreground">
+                        {t('employees.list.userCount', {
+                            count: filteredUsers.length,
+                        })}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -337,21 +335,28 @@ export default function EmployeeList() {
                                     <tr
                                         key={user._id}
                                         className="cursor-pointer transition-colors hover:bg-muted/50"
-                                        onClick={() => navigate(`/employees/${user._id}`)}
+                                        onClick={() =>
+                                            navigate(`/employees/${user._id}`)
+                                        }
                                     >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
                                                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 font-bold text-primary shadow-sm transition-transform group-hover:scale-110">
-                                                    {user.username.charAt(0).toUpperCase()}
+                                                    {user.username
+                                                        .charAt(0)
+                                                        .toUpperCase()}
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-foreground">
                                                         {user.username}
                                                     </div>
-                                                    {user._id === currentUser?._id && (
+                                                    {user._id ===
+                                                        currentUser?._id && (
                                                         <div className="flex items-center gap-1.5 text-[10px] font-semibold text-primary">
-                                                             <div className="h-1 w-1 rounded-full bg-current animate-pulse" />
-                                                            {t('common.itIsYou')}
+                                                            <div className="h-1 w-1 animate-pulse rounded-full bg-current" />
+                                                            {t(
+                                                                'common.itIsYou',
+                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
@@ -363,41 +368,55 @@ export default function EmployeeList() {
                                         <td className="px-6 py-4">
                                             <span
                                                 className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-medium ${getRoleBadgeColor(
-                                                    user.role
+                                                    user.role,
                                                 )}`}
                                             >
                                                 {getRoleLabel(user.role)}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-muted-foreground">
-                                            {new Date(user.createdAt).toLocaleDateString(
-                                                i18n.language === 'pl' ? 'pl-PL' : 'en-US',
+                                            {new Date(
+                                                user.createdAt,
+                                            ).toLocaleDateString(
+                                                i18n.language === 'pl'
+                                                    ? 'pl-PL'
+                                                    : 'en-US',
                                                 {
                                                     year: 'numeric',
                                                     month: 'short',
                                                     day: 'numeric',
-                                                }
+                                                },
                                             )}
                                         </td>
                                         {currentUser?.role === 'admin' && (
                                             <td
                                                 className="px-6 py-4 text-right"
-                                                onClick={(e) => e.stopPropagation()}
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
                                             >
-                                                {user._id === currentUser?._id ? (
+                                                {user._id ===
+                                                currentUser?._id ? (
                                                     <span className="text-xs text-muted-foreground">
-                                                        {t('employees.list.cannotChangeOwnRole')}
+                                                        {t(
+                                                            'employees.list.cannotChangeOwnRole',
+                                                        )}
                                                     </span>
                                                 ) : (
                                                     <Button
+                                                        type="button"
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => {
-                                                            setSelectedUser(user);
+                                                            setSelectedUser(
+                                                                user,
+                                                            );
                                                             setModalOpen(true);
                                                         }}
                                                     >
-                                                        {t('employees.list.changeRole')}
+                                                        {t(
+                                                            'employees.list.changeRole',
+                                                        )}
                                                     </Button>
                                                 )}
                                             </td>
@@ -407,7 +426,7 @@ export default function EmployeeList() {
                             </tbody>
                         </table>
                         {filteredUsers.length === 0 && (
-                             <div className="py-16 text-center">
+                            <div className="py-16 text-center">
                                 <div className="mb-3 text-4xl">🔍</div>
                                 <div className="text-base font-medium text-foreground">
                                     {t('common.noResults')}
@@ -423,15 +442,20 @@ export default function EmployeeList() {
                     <div className="block md:hidden">
                         <div className="divide-y divide-border">
                             {filteredUsers.map((user) => (
-                                <div
+                                <button
+                                    type="button"
                                     key={user._id}
-                                    className="p-4 transition-colors hover:bg-muted/50"
-                                    onClick={() => navigate(`/employees/${user._id}`)}
+                                    className="w-full p-4 text-left transition-colors hover:bg-muted/50"
+                                    onClick={() =>
+                                        navigate(`/employees/${user._id}`)
+                                    }
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 font-bold text-primary">
-                                                {user.username.charAt(0).toUpperCase()}
+                                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 font-bold text-primary">
+                                                {user.username
+                                                    .charAt(0)
+                                                    .toUpperCase()}
                                             </div>
                                             <div>
                                                 <div className="font-semibold text-foreground">
@@ -442,34 +466,38 @@ export default function EmployeeList() {
                                                 </div>
                                             </div>
                                         </div>
-                                         <span
-                                                className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${getRoleBadgeColor(
-                                                    user.role
-                                                )}`}
-                                            >
-                                                {getRoleLabel(user.role)}
+                                        <span
+                                            className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${getRoleBadgeColor(
+                                                user.role,
+                                            )}`}
+                                        >
+                                            {getRoleLabel(user.role)}
                                         </span>
                                     </div>
-                                    {currentUser?.role === 'admin' && user._id !== currentUser?._id && (
-                                        <div className="mt-3 flex justify-end">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setSelectedUser(user);
-                                                    setModalOpen(true);
-                                                }}
-                                            >
-                                                {t('employees.list.changeRole')}
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
+                                    {currentUser?.role === 'admin' &&
+                                        user._id !== currentUser?._id && (
+                                            <div className="mt-3 flex justify-end">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedUser(user);
+                                                        setModalOpen(true);
+                                                    }}
+                                                >
+                                                    {t(
+                                                        'employees.list.changeRole',
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        )}
+                                </button>
                             ))}
                         </div>
-                         {filteredUsers.length === 0 && (
-                             <div className="py-16 text-center">
+                        {filteredUsers.length === 0 && (
+                            <div className="py-16 text-center">
                                 <div className="mb-3 text-4xl">🔍</div>
                                 <div className="text-base font-medium text-foreground">
                                     {t('common.noResults')}
@@ -484,13 +512,14 @@ export default function EmployeeList() {
             </Card>
 
             <RoleChangeModal
+                key={modalOpen ? 'open' : 'closed'}
                 isOpen={modalOpen}
                 onClose={() => {
                     setModalOpen(false);
                     setSelectedUser(null);
                 }}
                 user={selectedUser}
-                currentRole={selectedUser?.role}
+                initialRole={selectedUser?.role}
                 onConfirm={handleRoleChange}
                 isChanging={changingRole === selectedUser?._id}
             />
