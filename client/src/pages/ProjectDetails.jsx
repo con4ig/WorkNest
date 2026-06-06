@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
 import api from '../services/api.js';
 import UserManagementModal from '../components/UserManagementModal.jsx';
-import moment from 'moment';
-import 'moment/locale/pl';
+
 import clsx from 'clsx';
 import {
     translateProjectStatus,
@@ -53,245 +52,14 @@ const formatDateForInput = (dateString) => {
         return '';
     }
 };
-
-const StatCard = ({ icon, title, children }) => (
-    <div className="group flex items-center gap-3 rounded-xl border border-border bg-card/50 p-3 shadow-sm transition-all hover:border-primary/20 hover:bg-muted/50 hover:shadow-md">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground transition-colors group-hover:border-primary/30 group-hover:text-primary">
-            {icon}
-        </div>
-        <div className="min-w-0 flex-1">
-            <h3 className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground/80">
-                {title}
-            </h3>
-            <div className="mt-0.5 text-lg font-bold tracking-tight text-foreground">
-                {children}
-            </div>
-        </div>
-    </div>
-);
-
-const CircularProgress = ({ progress }) => {
-    const radius = 60,
-        stroke = 10;
-    const normalizedRadius = radius - stroke;
-    const circumference = normalizedRadius * 2 * Math.PI;
-    const strokeDashoffset = circumference - (progress / 100) * circumference;
-
-    return (
-        <div className="relative flex h-32 w-32 items-center justify-center sm:h-40 sm:w-40">
-            <svg
-                height={radius * 2}
-                width={radius * 2}
-                className="-rotate-90 transform"
-            >
-                <circle
-                    stroke="currentColor"
-                    fill="transparent"
-                    strokeWidth={stroke}
-                    r={normalizedRadius}
-                    cx={radius}
-                    cy={radius}
-                    className="text-border/40"
-                />
-                <circle
-                    stroke="url(#progressGradient)"
-                    fill="transparent"
-                    strokeWidth={stroke}
-                    strokeLinecap="round"
-                    strokeDasharray={`${circumference} ${circumference}`}
-                    style={{ strokeDashoffset }}
-                    r={normalizedRadius}
-                    cx={radius}
-                    cy={radius}
-                    className="transition-all duration-1000 ease-in-out"
-                />
-                <defs>
-                    <linearGradient
-                        id="progressGradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="100%"
-                    >
-                        <stop offset="0%" stopColor="rgb(var(--primary))" />
-                        <stop
-                            offset="100%"
-                            stopColor="rgb(var(--primary) / 0.5)"
-                        />
-                    </linearGradient>
-                </defs>
-            </svg>
-            <div className="absolute flex flex-col items-center justify-center">
-                <span className="text-2xl font-black tracking-tighter text-foreground sm:text-3xl">
-                    {progress}%
-                </span>
-                <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                    Done
-                </span>
-            </div>
-        </div>
-    );
-};
-
-const ContentCard = ({ icon, title, children, actions }) => (
-    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all hover:shadow-md">
-        <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-4 py-3 sm:px-6 sm:py-4">
-            <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-primary shadow-sm sm:h-9 sm:w-9">
-                    {icon}
-                </div>
-                <h2 className="truncate text-sm font-bold uppercase tracking-widest text-foreground/90 sm:text-xl sm:normal-case sm:tracking-tight">
-                    {title}
-                </h2>
-            </div>
-            {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
-        </div>
-        <div className="p-4 sm:p-6">{children}</div>
-    </div>
-);
-
-// Komponent Komentarza
-const CommentItem = ({
-    comment,
-    onDelete,
-    onReply,
-    currentUserId,
-    isAdmin,
-    t,
-}) => {
-    const [showReplies, setShowReplies] = useState(false);
-    const [replyText, setReplyText] = useState('');
-    const [isReplying, setIsReplying] = useState(false);
-
-    const canDelete = comment.author._id === currentUserId || isAdmin;
-
-    const handleReply = async () => {
-        if (!replyText.trim()) return;
-        await onReply(comment._id, replyText);
-        setReplyText('');
-        setIsReplying(false);
-        setShowReplies(true);
-    };
-
-    return (
-        <div className="relative border-l-2 border-border pb-6 pl-6">
-            <div className="absolute left-[-5px] top-2 h-2.5 w-2.5 rounded-full border border-border bg-muted-foreground" />
-
-            <div className="flex gap-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted font-semibold text-muted-foreground">
-                    {comment.author.username.charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0 flex-1">
-                    <div className="rounded-lg border border-border bg-card p-4 shadow-sm transition-all hover:bg-muted/30">
-                        <div className="mb-2 flex items-center justify-between">
-                            <div className="flex flex-col">
-                                <span className="text-sm font-bold text-foreground">
-                                    {comment.author.username}
-                                </span>
-                                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
-                                    {moment(comment.createdAt).fromNow()}
-                                </span>
-                            </div>
-                            {canDelete && (
-                                <button
-                                    onClick={() => onDelete(comment._id)}
-                                    className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-95 sm:h-8 sm:w-8"
-                                >
-                                    <Icon.Trash className="h-4 w-4" />
-                                </button>
-                            )}
-                        </div>
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
-                            {comment.content}
-                        </p>
-                    </div>
-
-                    <div className="mt-3 flex items-center gap-4">
-                        <button
-                            onClick={() => setIsReplying(!isReplying)}
-                            className="text-[11px] font-bold uppercase tracking-widest text-primary hover:underline"
-                        >
-                            {t('projects.details.reply')}
-                        </button>
-                        {comment.replies && comment.replies.length > 0 && (
-                            <button
-                                onClick={() => setShowReplies(!showReplies)}
-                                className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground"
-                            >
-                                {showReplies ? (
-                                    <Icon.ChevronDown className="h-3.5 w-3.5" />
-                                ) : (
-                                    <Icon.ChevronRight className="h-3.5 w-3.5" />
-                                )}
-                                {comment.replies.length}{' '}
-                                {t('projects.details.replies', {
-                                    count: comment.replies.length,
-                                })}
-                            </button>
-                        )}
-                    </div>
-
-                    {isReplying && (
-                        <div className="mt-3 flex gap-2">
-                            <input
-                                type="text"
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                onKeyPress={(e) =>
-                                    e.key === 'Enter' && handleReply()
-                                }
-                                placeholder={t(
-                                    'projects.details.replyPlaceholder',
-                                )}
-                                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
-                            />{' '}
-                            <button
-                                onClick={handleReply}
-                                className="rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
-                            >
-                                <Icon.Send />
-                            </button>
-                        </div>
-                    )}
-
-                    {showReplies &&
-                        comment.replies &&
-                        comment.replies.length > 0 && (
-                            <div className="mt-3 space-y-3">
-                                {comment.replies.map((reply) => (
-                                    <div key={reply._id} className="flex gap-2">
-                                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted text-sm font-bold text-muted-foreground">
-                                            {reply.author.username
-                                                .charAt(0)
-                                                .toUpperCase()}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="rounded-lg border border-border bg-card p-2">
-                                                <div className="mb-1 flex items-center justify-between">
-                                                    <span className="text-sm font-semibold text-foreground">
-                                                        {reply.author.username}
-                                                    </span>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {moment(
-                                                            reply.createdAt,
-                                                        ).fromNow()}
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-foreground/80">
-                                                    {reply.content}
-                                                </p>
-                                            </div>{' '}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                </div>
-            </div>
-        </div>
-    );
-};
-
+import StatCard from '../components/projects/details/StatCard';
+import CircularProgress from '../components/projects/details/CircularProgress';
+import ContentCard from '../components/projects/details/ContentCard';
+import CommentItem from '../components/projects/details/CommentItem';
+import ProjectTeam from '../components/projects/details/ProjectTeam';
+import ProjectComments from '../components/projects/details/ProjectComments';
+import ProjectActivities from '../components/projects/details/ProjectActivities';
+import toast from 'react-hot-toast';
 export default function ProjectDetails() {
     const { t, i18n: i18nInstance } = useTranslation();
     const { id } = useParams();
@@ -300,7 +68,7 @@ export default function ProjectDetails() {
     const { user: currentUser } = useAuth(); // Use currentUser from AuthContext
 
     useEffect(() => {
-        moment.locale(i18nInstance.language);
+        // locale is handled dynamically in date-fns
     }, [i18nInstance.language]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -418,7 +186,7 @@ export default function ProjectDetails() {
             setIsEditing(false);
             setIsEditing(false);
         } catch (err) {
-            error(`${t('common.error')}: ${err.message}`, 'error');
+            toast.error(`${t('common.error')}: ${err.message}`);
         } finally {
             setIsSaving(false);
         }
@@ -438,7 +206,7 @@ export default function ProjectDetails() {
                     fetchTasks();
                     fetchActivities();
                 } catch (err) {
-                    error(`${t('common.error')}: ${err.message}`, 'error');
+                    toast.error(`${t('common.error')}: ${err.message}`);
                 }
             },
         });
@@ -456,7 +224,7 @@ export default function ProjectDetails() {
             fetchComments();
             fetchActivities();
         } catch (err) {
-            error(`${t('common.error')}: ${err.message}`, 'error');
+            toast.error(`${t('common.error')}: ${err.message}`);
         }
     };
 
@@ -469,7 +237,7 @@ export default function ProjectDetails() {
             });
             fetchComments();
         } catch (err) {
-            error(`${t('common.error')}: ${err.message}`, 'error');
+            toast.error(`${t('common.error')}: ${err.message}`);
         }
     };
 
@@ -485,7 +253,7 @@ export default function ProjectDetails() {
                     fetchComments();
                     fetchActivities();
                 } catch (err) {
-                    error(`${t('common.error')}: ${err.message}`, 'error');
+                    toast.error(`${t('common.error')}: ${err.message}`);
                 }
             },
         });
@@ -530,35 +298,6 @@ export default function ProjectDetails() {
     const isAdmin =
         currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
 
-    const renderActivityDescription = (activity) => {
-        if (!activity.action) return activity.description;
-
-        const { action, metadata } = activity;
-        const translateStatus = (status) =>
-            t(`common.taskStatus.${status}`) || status;
-
-        switch (action) {
-            case 'task_created':
-            case 'task_completed':
-            case 'task_deleted':
-                return t(`projects.details.activities.${action}`, {
-                    title: metadata?.title || '...',
-                });
-            case 'task_updated':
-                return t('projects.details.activities.task_updated', {
-                    title: metadata?.title || '...',
-                    oldStatus: translateStatus(metadata?.oldStatus),
-                    newStatus: translateStatus(metadata?.newStatus),
-                });
-            case 'comment_added':
-            case 'comment_replied':
-            case 'comment_deleted':
-                return t(`projects.details.activities.${action}`);
-            default:
-                return activity.description;
-        }
-    };
-
     if (error) {
         return (
             <div className="py-10 text-center text-destructive">{error}</div>
@@ -580,6 +319,7 @@ export default function ProjectDetails() {
             <aside className="flex w-full max-w-full flex-col border-b border-r-0 border-border bg-card px-3 py-4 sm:p-6 lg:min-h-screen lg:w-[360px] lg:max-w-[360px] lg:border-b-0 lg:border-r lg:p-8">
                 <div className="mb-6 flex items-center gap-4 lg:mb-10">
                     <button
+                        type="button"
                         onClick={() => navigate('/projects')}
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-primary active:scale-95"
                     >
@@ -829,6 +569,7 @@ export default function ProjectDetails() {
                                     {isEditing ? (
                                         <>
                                             <button
+                                                type="button"
                                                 onClick={handleSave}
                                                 disabled={isSaving}
                                                 className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95 disabled:opacity-50"
@@ -850,6 +591,7 @@ export default function ProjectDetails() {
                                                 )}
                                             </button>
                                             <button
+                                                type="button"
                                                 onClick={() => {
                                                     setIsEditing(false);
                                                     fetchData();
@@ -863,6 +605,7 @@ export default function ProjectDetails() {
                                     ) : (
                                         <>
                                             <button
+                                                type="button"
                                                 onClick={() =>
                                                     setIsEditing(true)
                                                 }
@@ -872,6 +615,7 @@ export default function ProjectDetails() {
                                                 {t('projects.details.edit')}
                                             </button>
                                             <button
+                                                type="button"
                                                 onClick={() =>
                                                     setShowUserModal(true)
                                                 }
@@ -945,182 +689,26 @@ export default function ProjectDetails() {
                         </div>
 
                         {/* PROJECT TEAM */}
-                        <ContentCard
-                            icon={<Icon.Users className="h-5 w-5" />}
-                            title={`${t('projects.details.teamTitle')} (${project.assignedUsers.length})`}
-                        >
-                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-                                {project.assignedUsers.map((user) => (
-                                    <div
-                                        key={user._id}
-                                        className="group relative flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-all hover:bg-muted/40"
-                                    >
-                                        <div className="absolute inset-0 rounded-lg bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
-
-                                        <div
-                                            className={clsx(
-                                                'flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white',
-                                                user.role === 'admin'
-                                                    ? 'bg-amber-500'
-                                                    : 'bg-primary',
-                                            )}
-                                        >
-                                            {user.username
-                                                .charAt(0)
-                                                .toUpperCase()}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="truncate text-sm font-bold text-foreground">
-                                                {user.username}
-                                            </p>
-                                            <p className="truncate text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                                {user.role}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                                {project.assignedUsers.length === 0 && (
-                                    <div className="col-span-full py-10 text-center">
-                                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground/40">
-                                            <Icon.Users className="h-8 w-8" />
-                                        </div>
-                                        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
-                                            {t('projects.details.noUsers')}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </ContentCard>
+                        <ProjectTeam assignedUsers={project.assignedUsers} />
 
                         {/* KOMENTARZE */}
-                        <ContentCard
-                            icon={<Icon.Message />}
-                            title={`${t('projects.details.commentsTitle')} (${comments.length})`}
-                        >
-                            <div className="mb-6">
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={newComment}
-                                        onChange={(e) =>
-                                            setNewComment(e.target.value)
-                                        }
-                                        onKeyPress={(e) =>
-                                            e.key === 'Enter' &&
-                                            handleAddComment()
-                                        }
-                                        aria-label={t(
-                                            'projects.details.addCommentPlaceholder',
-                                        )}
-                                        placeholder={t(
-                                            'projects.details.addCommentPlaceholder',
-                                        )}
-                                        className="flex-1 rounded-lg border border-input bg-background px-4 py-2 focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
-                                    />
-                                    <button
-                                        onClick={handleAddComment}
-                                        className="flex-shrink-0 rounded-lg bg-primary p-3 text-primary-foreground hover:bg-primary/90 sm:p-2 sm:px-4"
-                                    >
-                                        <Icon.Send />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                {comments.length === 0 ? (
-                                    <p className="py-8 text-center text-muted-foreground">
-                                        {t('projects.details.noComments')}
-                                    </p>
-                                ) : (
-                                    comments.map((comment) => (
-                                        <CommentItem
-                                            key={comment._id}
-                                            comment={comment}
-                                            onDelete={handleDeleteComment}
-                                            onReply={handleReplyComment}
-                                            currentUserId={currentUser._id}
-                                            isAdmin={isAdmin}
-                                            t={t}
-                                        />
-                                    ))
-                                )}
-                            </div>
-                        </ContentCard>
+                        <ProjectComments
+                            comments={comments}
+                            newComment={newComment}
+                            setNewComment={setNewComment}
+                            handleAddComment={handleAddComment}
+                            handleDeleteComment={handleDeleteComment}
+                            handleReplyComment={handleReplyComment}
+                            currentUser={currentUser}
+                            isAdmin={isAdmin}
+                        />
 
                         {/* ACTIVITY HISTORY */}
-                        <ContentCard
-                            icon={<Icon.Activity />}
-                            title={`${t('projects.details.activityTitle')} (${activities.length})`}
-                            actions={
-                                <button
-                                    onClick={() =>
-                                        setShowActivities(!showActivities)
-                                    }
-                                    className="flex items-center gap-1 text-sm text-primary hover:text-primary/80"
-                                >
-                                    {showActivities
-                                        ? t('projects.details.hide')
-                                        : t('projects.details.show')}
-                                    {showActivities ? (
-                                        <Icon.ChevronDown />
-                                    ) : (
-                                        <Icon.ChevronRight />
-                                    )}
-                                </button>
-                            }
-                        >
-                            {showActivities && (
-                                <div className="divide-y divide-border/20">
-                                    {activities.length === 0 ? (
-                                        <div className="py-20 text-center">
-                                            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground/30">
-                                                <Icon.Activity className="h-8 w-8" />
-                                            </div>
-                                            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground/40">
-                                                {t(
-                                                    'projects.details.noActivity',
-                                                )}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        activities.map((activity) => (
-                                            <div
-                                                key={activity._id}
-                                                className="group relative flex items-start gap-3 p-3 transition-colors hover:bg-muted/30 sm:gap-4 sm:p-5"
-                                            >
-                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-                                                    <span className="text-sm font-black">
-                                                        {activity.user.username
-                                                            .charAt(0)
-                                                            .toUpperCase()}
-                                                    </span>
-                                                </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center justify-between gap-4">
-                                                        <p className="text-sm font-bold text-foreground">
-                                                            {
-                                                                activity.user
-                                                                    .username
-                                                            }
-                                                        </p>
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-                                                            {moment(
-                                                                activity.createdAt,
-                                                            ).fromNow()}
-                                                        </span>
-                                                    </div>
-                                                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground/70">
-                                                        {renderActivityDescription(
-                                                            activity,
-                                                        )}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            )}
-                        </ContentCard>
+                        <ProjectActivities
+                            activities={activities}
+                            showActivities={showActivities}
+                            setShowActivities={setShowActivities}
+                        />
                     </div>
                 </div>
                 {showUserModal && (
