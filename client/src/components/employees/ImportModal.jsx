@@ -16,6 +16,57 @@ import {
 import clsx from 'clsx';
 import { Button } from '../ui/Button';
 
+const handleDownloadTemplate = () => {
+    const headers = [
+        'email',
+        'username',
+        'firstName',
+        'lastName',
+        'position',
+        'department',
+        'salary',
+        'role',
+    ];
+    const exampleRows = [
+        [
+            'jan.kowalski@firma.pl',
+            'janek',
+            'Jan',
+            'Kowalski',
+            'Programista',
+            'IT',
+            '8000',
+            'employee',
+        ],
+        [
+            'anna.nowak@firma.pl',
+            'anowak',
+            'Anna',
+            'Nowak',
+            'HR Manager',
+            'HR',
+            '9500',
+            'hr',
+        ],
+    ];
+
+    const csvContent = [
+        headers.join(','),
+        ...exampleRows.map((row) => row.join(',')),
+    ].join('\n');
+    const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;',
+    });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'worknest_import_template.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
 const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
     const { t } = useTranslation();
     const [file, setFile] = useState(null);
@@ -69,61 +120,12 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
         }
     };
 
-    const handleDownloadTemplate = () => {
-        const headers = [
-            'email',
-            'username',
-            'firstName',
-            'lastName',
-            'position',
-            'department',
-            'salary',
-            'role',
-        ];
-        const exampleRows = [
-            [
-                'jan.kowalski@firma.pl',
-                'janek',
-                'Jan',
-                'Kowalski',
-                'Programista',
-                'IT',
-                '8000',
-                'employee',
-            ],
-            [
-                'anna.nowak@firma.pl',
-                'anowak',
-                'Anna',
-                'Nowak',
-                'HR Manager',
-                'HR',
-                '9500',
-                'hr',
-            ],
-        ];
-
-        const csvContent = [
-            headers.join(','),
-            ...exampleRows.map((row) => row.join(',')),
-        ].join('\n');
-        const blob = new Blob([csvContent], {
-            type: 'text/csv;charset=utf-8;',
-        });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'szablon_pracownikow.csv');
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="animate-in fade-in absolute inset-0 bg-foreground/25 backdrop-blur-sm transition-opacity duration-200"
+                aria-hidden="true"
                 onClick={onClose}
             />
 
@@ -145,6 +147,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                         </div>
                     </div>
                     <button
+                        type="button"
                         onClick={onClose}
                         className="-mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
@@ -160,21 +163,18 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                 t('employees.list.importModal.instruction1'),
                                 t('employees.list.importModal.instruction2'),
                                 t('employees.list.importModal.instruction3'),
-                            ].map((step, idx) => (
+                            ].map((step, _idx) => (
                                 <div
-                                    key={idx}
+                                    key={step}
                                     className="flex items-start gap-3 rounded-xl border border-border bg-background p-3"
                                 >
                                     <Info
                                         size={14}
                                         className="mt-1 shrink-0 text-muted-foreground"
                                     />
-                                    <p
-                                        className="text-sm leading-relaxed text-muted-foreground"
-                                        dangerouslySetInnerHTML={{
-                                            __html: step,
-                                        }}
-                                    ></p>
+                                    <p className="text-sm leading-relaxed text-muted-foreground">
+                                        {step}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -219,9 +219,9 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                                 color: 'text-purple-600 dark:text-purple-400',
                                                 label: t('common.roles.admin'),
                                             },
-                                        ].map((row, idx) => (
+                                        ].map((row, _idx) => (
                                             <tr
-                                                key={idx}
+                                                key={row.val}
                                                 className="transition-colors hover:bg-muted/50"
                                             >
                                                 <td
@@ -281,6 +281,10 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                                 <input
                                     type="file"
                                     accept=".csv"
+                                    aria-label={
+                                        t('employees.list.importModal.title') ||
+                                        'Upload CSV'
+                                    }
                                     onChange={(e) => setFile(e.target.files[0])}
                                     className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
                                 />
@@ -332,6 +336,9 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                             <input
                                 type="text"
                                 value={tempPassword}
+                                aria-label={t(
+                                    'employees.list.importModal.tempPasswordLabel',
+                                )}
                                 onChange={(e) =>
                                     setTempPassword(e.target.value)
                                 }
@@ -375,6 +382,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
                         {t('common.cancel')}
                     </Button>
                     <Button
+                        type="button"
                         onClick={handleSubmit}
                         disabled={!file || isLoading}
                         isLoading={isLoading}
