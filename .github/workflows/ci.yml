@@ -39,6 +39,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: React Doctor Check
+        run: npx react-doctor@latest .
+
       - name: Run tests
         run: npm test
         env:
