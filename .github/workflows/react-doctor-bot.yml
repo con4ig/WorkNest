@@ -1,0 +1,33 @@
+name: React Doctor Bot
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Codziennie o północy
+  workflow_dispatch: # Pozwala odpalić ręcznie
+
+jobs:
+  auto-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run React Doctor Auto-Fix
+        working-directory: client
+        run: npx react-doctor@latest . --fix
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "fix: auto-fix React Doctor issues"
+          title: "🤖 Auto-fix React Doctor issues"
+          body: |
+            React Doctor found code improvements.
+            Auto-fixed and ready for review.
+          branch: react-doctor-fixes
+          labels: automated-pr, refactor
