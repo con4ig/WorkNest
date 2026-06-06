@@ -2,33 +2,17 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import { useNavigate } from 'react-router-dom';
-import {
-    FolderKanban,
-    Archive,
-    ArrowLeft,
-    Search,
-    Plus,
-    LayoutGrid,
-    LayoutList,
-    LayoutDashboard,
-    ListFilter,
-    RefreshCcw,
-} from 'lucide-react';
 
 import LoadingScreen from '../components/LoadingScreen';
 import AddProjectModal from '../components/AddProjectModal.jsx';
-import ViewSwitcher from '../components/ViewSwitcher.jsx';
-import GridView from '../components/GridView.jsx';
-import KanbanView from '../components/KanbanView.jsx';
 import { useAuth } from '../context/useAuth';
-import ListView from '../components/ListView';
-import BulkActionsHeader from '../components/projects/BulkActionsHeader';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
-import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { useProjectRealtime } from '../hooks/useProjectRealtime';
 import toast from 'react-hot-toast';
-import { Select } from '../components/ui/Select';
+
+import ProjectsHeader from '../components/projects/list/ProjectsHeader';
+import ProjectsFilterBar from '../components/projects/list/ProjectsFilterBar';
+import ProjectsContent from '../components/projects/list/ProjectsContent';
 
 export default function Projects() {
     const { t } = useTranslation();
@@ -210,9 +194,7 @@ export default function Projects() {
         }
     }, [authLoading, companyId, refreshKey, fetchProjects]);
 
-    // Live updates from other clients in the same tenant — apply the
-    // mutation optimistically against the in-memory list so the user
-    // sees the change without a refetch round-trip.
+    // Live updates from other clients in the same tenant
     useProjectRealtime({
         onStatusChanged: ({ projectId, status }) => {
             setProjects((prev) =>
@@ -351,6 +333,7 @@ export default function Projects() {
                     </div>
                     <div className="text-sm">{error}</div>
                     <button
+                        type="button"
                         onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-destructive px-4 py-2 text-destructive-foreground transition-colors hover:bg-destructive/90 sm:w-auto"
                     >
@@ -372,6 +355,7 @@ export default function Projects() {
                         {t('projects.misc.noCompanyAssignedMessage')}
                     </div>
                     <button
+                        type="button"
                         onClick={() => navigate('/dashboard')}
                         className="mt-4 w-full rounded-lg bg-yellow-500 px-4 py-2 text-white transition-colors hover:bg-yellow-600 sm:w-auto"
                     >
@@ -394,225 +378,62 @@ export default function Projects() {
                 }
             />
 
-            {/* Header */}
-            <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-end">
-                <div>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => navigate('/dashboard')}
-                            className="mr-2 md:hidden"
-                        >
-                            <ArrowLeft className="h-5 w-5" />
-                        </Button>
-                        <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-                            {t('projects.projectListHeader.title')}
-                        </h1>
-                    </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        {t('projects.projectListHeader.subtitle')}
-                    </p>
-                </div>
+            <ProjectsHeader
+                navigate={navigate}
+                t={t}
+                currentUserRole={currentUserRole}
+                setIsModalOpen={setIsModalOpen}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+            />
 
-                <div className="flex flex-col gap-3 sm:flex-row md:items-center">
-                    {(currentUserRole === 'admin' ||
-                        currentUserRole === 'hr') && (
-                        <Button
-                            onClick={() => setIsModalOpen(true)}
-                            variant="outline"
-                            className="gap-2"
-                        >
-                            <Plus className="h-4 w-4" />
-                            <span>
-                                {t('projects.projectListHeader.addProject')}
-                            </span>
-                        </Button>
-                    )}
-                    <div className="relative w-full sm:w-auto">
-                        <input
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[250px]"
-                            placeholder={t('projects.filter.searchPlaceholder')}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                            <Search className="h-4 w-4" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ProjectsFilterBar
+                t={t}
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                showArchived={showArchived}
+                setShowArchived={setShowArchived}
+                screenSize={screenSize}
+                isFiltering={isFiltering}
+                handleRefresh={handleRefresh}
+                currentView={currentView}
+                handleViewChange={handleViewChange}
+            />
 
-            {/* Filters & View Switcher - Styled to match the flow */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                    <div className="relative">
-                        <Select
-                            className="h-10 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-8 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-[200px]"
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option value="">
-                                {t('projects.filter.allStatuses')}
-                            </option>
-                            <option value="pending">
-                                {t('common.projectStatus.pending')}
-                            </option>
-                            <option value="running">
-                                {t('common.projectStatus.running')}
-                            </option>
-                            <option value="completed">
-                                {t('common.projectStatus.completed')}
-                            </option>
-                            <option value="on-hold">
-                                {t('common.projectStatus.on-hold')}
-                            </option>
-                        </Select>
-                        <ListFilter className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    </div>
+            <ProjectsContent
+                isFiltering={isFiltering}
+                projects={projects}
+                currentUserRole={currentUserRole}
+                selectedProjects={selectedProjects}
+                setSelectedProjects={setSelectedProjects}
+                handleBulkAction={handleBulkAction}
+                showArchived={showArchived}
+                screenSize={screenSize}
+                currentView={currentView}
+                handleArchive={handleArchive}
+                handleRestore={handleRestore}
+                handlePermanentDelete={handlePermanentDelete}
+                handleRowClick={handleRowClick}
+                toggleSelection={toggleSelection}
+                toggleSelectAll={toggleSelectAll}
+                handleStatusChange={handleStatusChange}
+                t={t}
+            />
 
-                    <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-1">
-                        <button
-                            onClick={() => setShowArchived(false)}
-                            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
-                                !showArchived
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:bg-muted'
-                            }`}
-                        >
-                            <FolderKanban className="h-3.5 w-3.5" />
-                            {t('projects.misc.active')}
-                        </button>
-                        <button
-                            onClick={() => setShowArchived(true)}
-                            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
-                                showArchived
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:bg-muted'
-                            }`}
-                        >
-                            <Archive className="h-3.5 w-3.5" />
-                            {t('projects.misc.archive')}
-                        </button>
-                    </div>
-                    {screenSize !== 'mobile' && (
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleRefresh}
-                            className={`h-10 w-10 ${isFiltering ? 'animate-spin' : ''}`}
-                            title={t('projects.filter.refresh')}
-                        >
-                            <RefreshCcw className="h-4 w-4" />
-                        </Button>
-                    )}
-                </div>
-
-                {screenSize !== 'mobile' && (
-                    <ViewSwitcher
-                        currentView={currentView}
-                        onViewChange={handleViewChange}
-                        showArchived={showArchived}
-                        disableKanban={screenSize !== 'desktop'}
-                    />
-                )}
-            </div>
-
-            {/* Main Content Card */}
-            <Card
-                className={`transition-opacity duration-300 ${
-                    isFiltering ? 'opacity-60' : 'opacity-100'
-                } h-full border-border bg-card shadow-sm`}
+            <footer
+                suppressHydrationWarning
+                className="mt-8 text-center text-xs uppercase tracking-widest text-muted-foreground"
             >
-                <CardContent className="h-full p-0">
-                    {currentUserRole !== 'employee' &&
-                        selectedProjects.length > 0 && (
-                            <div className="border-b border-border bg-muted/30 p-4">
-                                <BulkActionsHeader
-                                    selectedCount={selectedProjects.length}
-                                    onClearSelection={() =>
-                                        setSelectedProjects([])
-                                    }
-                                    onArchive={() =>
-                                        handleBulkAction('archive')
-                                    }
-                                    onRestore={() =>
-                                        handleBulkAction('restore')
-                                    }
-                                    onDelete={() => handleBulkAction('delete')}
-                                    showArchived={showArchived}
-                                />
-                            </div>
-                        )}
-
-                    <div className="h-full p-4 md:p-6">
-                        {projects.length === 0 ? (
-                            <div className="py-16 text-center text-muted-foreground">
-                                <div className="mb-4 flex justify-center">
-                                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                                        <FolderKanban className="h-8 w-8 text-muted-foreground/50" />
-                                    </div>
-                                </div>
-                                <h3 className="text-lg font-semibold text-foreground">
-                                    {showArchived
-                                        ? t('projects.misc.noArchivedProjects')
-                                        : t('projects.misc.noProjectsFound')}
-                                </h3>
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                    {t('common.tryDifferentSearch')}
-                                </p>
-                            </div>
-                        ) : screenSize === 'mobile' ||
-                          currentView === 'grid' ||
-                          (currentView === 'kanban' &&
-                              (showArchived || screenSize !== 'desktop')) ? (
-                            <GridView
-                                projects={projects}
-                                currentUserRole={currentUserRole}
-                                onArchive={handleArchive}
-                                onRestore={handleRestore}
-                                onDelete={handlePermanentDelete}
-                                onCardClick={handleRowClick}
-                                showArchived={showArchived}
-                                selectedProjects={selectedProjects}
-                                onToggleSelect={toggleSelection}
-                            />
-                        ) : currentView === 'kanban' ? (
-                            <KanbanView
-                                projects={projects}
-                                onStatusChange={handleStatusChange}
-                                onCardClick={handleRowClick}
-                                onArchive={handleArchive}
-                                onPermanentDelete={handlePermanentDelete}
-                                currentUserRole={currentUserRole}
-                            />
-                        ) : (
-                            <ListView
-                                projects={projects}
-                                currentUserRole={currentUserRole}
-                                onArchive={handleArchive}
-                                onRestore={handleRestore}
-                                onPermanentDelete={handlePermanentDelete}
-                                onRowClick={handleRowClick}
-                                showArchived={showArchived}
-                                selectedProjects={selectedProjects}
-                                onToggleSelect={toggleSelection}
-                                onToggleSelectAll={toggleSelectAll}
-                            />
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-
-            <footer className="mt-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
                 © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
             </footer>
 
-            <AddProjectModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSuccess={handleProjectAdded}
-            />
+            {isModalOpen && (
+                <AddProjectModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSuccess={handleProjectAdded}
+                />
+            )}
         </div>
     );
 }
