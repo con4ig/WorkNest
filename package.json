@@ -63,7 +63,7 @@
         "@commitlint/config-conventional": "19.8.1",
         "@playwright/test": "^1.49.1",
         "husky": "^9.1.7",
-        "lint-staged": "^17.0.5",
+        "lint-staged": "^17.0.7",
         "prettier": "^3.4.2",
         "prettier-plugin-tailwindcss": "^0.8.0"
     }
