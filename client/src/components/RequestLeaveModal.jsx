@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api.js';
 import { useAuth } from '../context/useAuth';
@@ -16,7 +16,7 @@ import {
 import { clsx } from 'clsx';
 import { Select } from './ui/Select';
 
-export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
+export default function RequestLeaveModal({ onClose, onSuccess }) {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({
         leaveType: 'vacation',
@@ -28,19 +28,6 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { user } = useAuth();
-
-    // Reset success/error on open
-    useEffect(() => {
-        if (isOpen) {
-            setError('');
-            setFormData((prev) => ({
-                ...prev,
-                startDate: null,
-                endDate: null,
-                reason: '',
-            }));
-        }
-    }, [isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -152,6 +139,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div
                 className="animate-in fade-in absolute inset-0 bg-foreground/25 backdrop-blur-sm transition-opacity duration-300"
+                aria-hidden="true"
                 onClick={onClose}
             />
 
@@ -169,6 +157,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                         </p>
                     </div>
                     <button
+                        type="button"
                         onClick={onClose}
                         className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-black/5 text-muted-foreground transition-all hover:bg-black/10 hover:text-foreground active:scale-95 dark:bg-white/5 dark:hover:bg-white/10"
                     >
@@ -289,7 +278,7 @@ export default function RequestLeaveModal({ isOpen, onClose, onSuccess }) {
                                 {t('common.dates')}{' '}
                                 <span className="text-rose-500">*</span>
                             </label>
-                            <div className="relative">
+                            <div suppressHydrationWarning className="relative">
                                 <div className="pointer-events-none absolute inset-y-0 left-4 z-10 flex items-center text-muted-foreground">
                                     <CalendarIcon className="h-5 w-5" />
                                 </div>

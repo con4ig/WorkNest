@@ -41,48 +41,43 @@ const NavItem = ({
     };
 
     return (
-        <li
-            role="link"
-            tabIndex={0}
-            onClick={handleNav}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleNav();
-                }
-            }}
-            aria-label={label}
-            aria-current={isActive ? 'page' : undefined}
-            className={cn(
-                'group relative flex cursor-pointer items-center overflow-hidden rounded-lg transition-all duration-200',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                isSidebarOpen
-                    ? 'justify-start gap-3 px-4'
-                    : 'justify-center px-2',
-                isActive
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground',
-                'py-3',
-            )}
-        >
-            <Icon
+        <li className="w-full list-none">
+            <button
+                type="button"
+                onClick={handleNav}
+                aria-label={label}
+                aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                    'h-5 w-5 flex-shrink-0',
+                    'group relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg border-none bg-transparent transition-all duration-200',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    isSidebarOpen
+                        ? 'justify-start gap-3 px-4'
+                        : 'justify-center px-2',
                     isActive
-                        ? 'text-primary-foreground'
-                        : 'text-muted-foreground group-hover:text-secondary-foreground',
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground',
+                    'py-3',
                 )}
-            />
-            {isSidebarOpen && (
-                <span className="animate-in fade-in overflow-hidden text-ellipsis whitespace-nowrap font-medium duration-300">
-                    {label}
-                </span>
-            )}
-            {!isSidebarOpen && !isMobile && (
-                <div className="bg-popover text-popover-foreground absolute left-14 z-50 rounded-md border border-border px-2 py-1 text-xs opacity-0 shadow-md transition-opacity group-hover:opacity-100">
-                    {label}
-                </div>
-            )}
+            >
+                <Icon
+                    className={cn(
+                        'h-5 w-5 flex-shrink-0',
+                        isActive
+                            ? 'text-primary-foreground'
+                            : 'text-muted-foreground group-hover:text-secondary-foreground',
+                    )}
+                />
+                {isSidebarOpen && (
+                    <span className="animate-in fade-in overflow-hidden text-ellipsis whitespace-nowrap font-medium duration-300">
+                        {label}
+                    </span>
+                )}
+                {!isSidebarOpen && !isMobile && (
+                    <div className="bg-popover text-popover-foreground absolute left-14 z-50 rounded-md border border-border px-2 py-1 text-xs opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+                        {label}
+                    </div>
+                )}
+            </button>
         </li>
     );
 };
@@ -90,7 +85,7 @@ const NavItem = ({
 const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const location = useLocation();
+
     const { user, logout } = useAuth();
     const { role, username, profileImage } = user || {};
     const { theme, toggleTheme } = useTheme();
@@ -121,6 +116,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                     {!isSidebarOpen && !isMobile && (
                         <div className="flex w-full justify-center">
                             <Button
+                                type="button"
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setIsSidebarOpen(true)}
@@ -140,15 +136,10 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                     {(isSidebarOpen || isMobile) && (
                         <div className="flex w-full items-center justify-between overflow-hidden">
                             <div className="flex min-w-0 items-center gap-3">
-                                <div
-                                    role="button"
-                                    tabIndex={0}
-                                    className="relative cursor-pointer rounded-full transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                <button
+                                    type="button"
+                                    className="relative cursor-pointer rounded-full border-none bg-transparent p-0 transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                     onClick={() => navigate('/upload')}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ')
-                                            navigate('/upload');
-                                    }}
                                     aria-label={t(
                                         'dashboard.sidebar.editProfile',
                                         { defaultValue: 'Edit profile' },
@@ -171,14 +162,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                                     ) : (
                                         <div
                                             className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground"
-                                            role="img"
                                             aria-label={`${username} avatar`}
                                         >
                                             {username?.charAt(0).toUpperCase()}
                                         </div>
                                     )}
                                     <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-primary"></div>
-                                </div>
+                                </button>
                                 <div className="min-w-0 flex-1">
                                     <h3 className="truncate text-sm font-semibold text-foreground">
                                         {username}
@@ -191,6 +181,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
 
                             {!isMobile && (
                                 <Button
+                                    type="button"
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => setIsSidebarOpen(false)}
@@ -269,6 +260,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                 {/* Footer */}
                 <div className="mt-auto flex flex-col gap-2 border-t border-border pt-4">
                     <Button
+                        type="button"
                         variant="ghost"
                         className={cn(
                             'justify-start text-muted-foreground hover:bg-secondary hover:text-secondary-foreground',
@@ -299,6 +291,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
 
                     {isSidebarOpen ? (
                         <Button
+                            type="button"
                             variant="ghost"
                             className="w-full justify-start gap-3 border border-destructive/20 bg-destructive/5 text-destructive hover:bg-destructive hover:text-destructive-foreground"
                             onClick={handleLogout}
@@ -309,6 +302,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, isMobile }) => {
                     ) : (
                         <div className="flex justify-center">
                             <Button
+                                type="button"
                                 variant="ghost"
                                 size="icon"
                                 onClick={handleLogout}
