@@ -25,7 +25,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "fix: auto-fix React Doctor issues"
-          title: "🤖 Auto-fix React Doctor issues"
+          title: "Auto-fix React Doctor issues"
           body: |
             React Doctor found code improvements.
             Auto-fixed and ready for review.

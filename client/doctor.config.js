@@ -13,4 +13,7 @@ export default {
         'react-doctor/no-initialize-state': 'off',
         'react-doctor/unused-export': 'off',
     },
+    supplyChain: {
+        minScore: 20,
+    },
 };

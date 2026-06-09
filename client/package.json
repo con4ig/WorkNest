@@ -14,7 +14,6 @@
         "preview": "vite preview",
         "test": "vitest run",
         "test:watch": "vitest",
-        "lhci": "lhci autorun",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "doctor": "npx react-doctor@latest"
@@ -24,7 +23,7 @@
         "@dnd-kit/sortable": "^10.0.0",
         "@dnd-kit/utilities": "^3.2.2",
         "@hookform/resolvers": "^5.2.2",
-        "axios": "^1.12.2",
+        "axios": "^1.7.9",
         "clsx": "^2.1.1",
         "date-fns": "^4.2.1",
         "i18next": "^26.2.0",
@@ -38,7 +37,6 @@
         "react-hook-form": "^7.64.0",
         "react-hot-toast": "^2.6.0",
         "react-i18next": "^17.0.8",
-        "react-is": "^19.0.0",
         "react-router-dom": "^7.9.3",
         "recharts": "^3.5.1",
         "socket.io-client": "^4.8.1",
@@ -47,7 +45,6 @@
     },
     "devDependencies": {
         "@eslint/js": "9.39.4",
-        "@lhci/cli": "^0.15.1",
         "@storybook/addon-a11y": "^10.4.0",
         "@storybook/addon-docs": "^10.4.0",
         "@storybook/react-vite": "^10.4.0",
