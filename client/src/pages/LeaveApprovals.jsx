@@ -22,6 +22,7 @@ import {
 import LeaveStats from '../components/leaves/approvals/LeaveStats';
 import LeaveHeader from '../components/leaves/approvals/LeaveHeader';
 import LeaveList from '../components/leaves/approvals/LeaveList';
+import Toast from '../components/ui/Toast';
 
 export default function LeaveApprovals() {
     const { t, i18n } = useTranslation();
@@ -274,15 +275,11 @@ export default function LeaveApprovals() {
             </div>
 
             {notification && (
-                <div
-                    className={`fixed right-4 top-4 z-50 rounded-md p-4 shadow-md ${
-                        notification.type === 'success'
-                            ? 'bg-emerald-500 text-white'
-                            : 'bg-destructive text-white'
-                    }`}
-                >
-                    {notification.message}
-                </div>
+                <Toast
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
             )}
 
             <ApproveModal
