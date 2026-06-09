@@ -276,6 +276,8 @@
         "saving": "Zapisywanie...",
         "saveChanges": "Zapisz zmiany",
         "company": "Firma",
+        "project": "Projekt",
+        "members": "członków",
         "departments": {
             "IT": "IT",
             "HR": "HR",
@@ -720,6 +722,7 @@
                 "currentUsers": "Obecni Użytkownicy",
                 "noUsers": "Brak przypisanych użytkowników",
                 "addUserTitle": "Dodaj Użytkownika",
+                "addUser": "Dodaj użytkownika",
                 "allAssigned": "Wszyscy użytkownicy są już przypisani",
                 "othersCount": "...i {{count}} innych pracowników.",
                 "typeToSearch": "Wpisz nazwę, aby znaleźć.",

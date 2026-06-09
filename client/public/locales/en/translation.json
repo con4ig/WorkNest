@@ -276,6 +276,8 @@
         "saving": "Saving...",
         "saveChanges": "Save Changes",
         "company": "Company",
+        "project": "Project",
+        "members": "members",
         "departments": {
             "IT": "IT",
             "HR": "HR",
@@ -720,6 +722,7 @@
                 "currentUsers": "Current Users",
                 "noUsers": "No assigned users",
                 "addUserTitle": "Add User",
+                "addUser": "Add user",
                 "allAssigned": "All users are already assigned",
                 "othersCount": "...and {{count}} other employees.",
                 "typeToSearch": "Type a name to find.",
