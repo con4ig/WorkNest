@@ -35,15 +35,14 @@ const invitationSchema = new mongoose.Schema(
       default: "employee",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Generate a unique code before saving
-invitationSchema.pre("save", function (next) {
+invitationSchema.pre("save", function () {
   if (!this.code) {
     this.code = crypto.randomBytes(8).toString("hex");
   }
-  next();
 });
 
 // Automatic removal of expired invitations (TTL Index)
