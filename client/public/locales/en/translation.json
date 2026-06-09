@@ -458,6 +458,13 @@
         }
     },
     "leaves": {
+        "errors": {
+            "dateRange": "Select a date range.",
+            "reasonRequired": "A reason is required for this leave type.",
+            "noWorkingDays": "No working days in the selected range.",
+            "noCompany": "No company data for the current user.",
+            "submitError": "Error submitting request"
+        },
         "myLeaves": {
             "title": "My Leaves",
             "subtitle": "Manage your leave requests",
@@ -470,6 +477,19 @@
             "deleteConfirmMessage": "This operation is irreversible.",
             "deleteSuccess": "Request deleted",
             "deleteError": "Failed to delete request",
+            "modalSubtitle": "Fill out the form to submit a leave request",
+            "dateRangePlaceholder": "Select a date range",
+            "duration": "Duration",
+            "workingDay": "working day",
+            "workingDays": "working days",
+            "reasonRequiredPlaceholder": "Describe the reason (required)...",
+            "reasonOptionalPlaceholder": "Additional information (optional)...",
+            "submit": "Submit request",
+            "groups": {
+                "basic": "Basic",
+                "parental": "Parental",
+                "other": "Other"
+            },
             "stats": {
                 "usedDays": "Used days"
             }
@@ -784,6 +804,7 @@
         "expiresIn": "Expires",
         "revokeCode": "Revoke code",
         "revokeConfirm": "Are you sure you want to revoke this code?",
+        "revokeSuccess": "Code revoked",
         "revokeError": "Failed to delete invitation",
         "demoWarningTitle": "Test Environment (Demo)",
         "demoWarningDesc": "Remember that the Demo account is",

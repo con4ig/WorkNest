@@ -458,6 +458,13 @@
         }
     },
     "leaves": {
+        "errors": {
+            "dateRange": "Wybierz zakres dat.",
+            "reasonRequired": "Powód jest wymagany dla tego typu urlopu.",
+            "noWorkingDays": "Brak dni roboczych w wybranym zakresie.",
+            "noCompany": "Brak danych firmy dla bieżącego użytkownika.",
+            "submitError": "Błąd podczas wysyłania wniosku"
+        },
         "myLeaves": {
             "title": "Moje Urlopy",
             "subtitle": "Zarządzaj swoimi wnioskami urlopowymi",
@@ -470,6 +477,19 @@
             "deleteConfirmMessage": "Ta operacja jest nieodwracalna.",
             "deleteSuccess": "Wniosek usunięty",
             "deleteError": "Nie udało się usunąć wniosku",
+            "modalSubtitle": "Wypełnij formularz, aby złożyć wniosek urlopowy",
+            "dateRangePlaceholder": "Wybierz zakres dat",
+            "duration": "Czas trwania",
+            "workingDay": "dzień roboczy",
+            "workingDays": "dni robocze",
+            "reasonRequiredPlaceholder": "Opisz powód (wymagane)...",
+            "reasonOptionalPlaceholder": "Dodatkowe informacje (opcjonalnie)...",
+            "submit": "Wyślij wniosek",
+            "groups": {
+                "basic": "Podstawowe",
+                "parental": "Rodzicielskie",
+                "other": "Inne"
+            },
             "stats": {
                 "usedDays": "Wykorzystane dni"
             }
@@ -784,6 +804,7 @@
         "expiresIn": "Wygasa",
         "revokeCode": "Unieważnij kod",
         "revokeConfirm": "Czy na pewno chcesz unieważnić ten kod?",
+        "revokeSuccess": "Kod został unieważniony",
         "revokeError": "Nie udało się usunąć zaproszenia",
         "demoWarningTitle": "Środowisko Testowe (Demo)",
         "demoWarningDesc": "Pamiętaj, że konto Demo jest",
