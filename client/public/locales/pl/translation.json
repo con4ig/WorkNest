@@ -943,5 +943,27 @@
             "title": "V. Postanowienia Końcowe",
             "description": "Zastrzegamy sobie prawo do wprowadzania zmian w Polityce Prywatności. O wszelkich zmianach będziemy informować poprzez publikację nowej treści Polityki Prywatności na tej stronie. Zmiany wchodzą w życie z dniem ich publikacji."
         }
+    },
+    "seo": {
+        "login": {
+            "title": "Zaloguj się | WorkNest - Zarządzanie Projektami i Kadrami",
+            "description": "Zaloguj się do swojego konta WorkNest. Zarządzaj projektami, urlopami pracowników, zadaniami zespołu i firmą w jednym miejscu."
+        },
+        "register": {
+            "title": "Zarejestruj się | WorkNest - Nowoczesny System HR",
+            "description": "Utwórz darmowe konto firmowe w WorkNest. Zaproś swój zespół i zacznij zarządzać urlopami oraz tablicami Kanban już dziś."
+        },
+        "forgot": {
+            "title": "Resetuj Hasło | WorkNest",
+            "description": "Odzyskaj dostęp do swojego konta WorkNest. Bezpiecznie zresetuj hasło za pomocą weryfikacji kodu jednorazowego OTP."
+        },
+        "terms": {
+            "title": "Regulamin | WorkNest",
+            "description": "Przeczytaj regulamin serwisu i zasady korzystania z demonstracyjnej aplikacji portfolio WorkNest."
+        },
+        "privacy": {
+            "title": "Polityka Prywatności | WorkNest",
+            "description": "Dowiedz się, jak chronimy i przetwarzamy Twoje dane osobowe w aplikacji demonstracyjnej WorkNest."
+        }
     }
 }

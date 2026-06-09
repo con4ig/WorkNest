@@ -943,5 +943,27 @@
             "title": "V. Final Provisions",
             "description": "We reserve the right to make changes to the Privacy Policy. We will inform about any changes by publishing the new content of the Privacy Policy on this page. The changes come into force on the day of their publication."
         }
+    },
+    "seo": {
+        "login": {
+            "title": "Log In | WorkNest - Project & HR Management",
+            "description": "Log in to your WorkNest account. Manage your projects, employee leave, team tasks, and organization in one central hub."
+        },
+        "register": {
+            "title": "Register | WorkNest - Next-Gen HR System",
+            "description": "Create a free company account on WorkNest. Invite your team and start managing leaves and Kanban boards today."
+        },
+        "forgot": {
+            "title": "Reset Password | WorkNest",
+            "description": "Recover your WorkNest account access. Reset your password securely via OTP email verification."
+        },
+        "terms": {
+            "title": "Terms of Service | WorkNest",
+            "description": "Read the terms of service and usage regulations for the WorkNest portfolio application."
+        },
+        "privacy": {
+            "title": "Privacy Policy | WorkNest",
+            "description": "Understand how your personal data is handled and protected in the WorkNest portfolio application."
+        }
     }
 }
