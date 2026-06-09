@@ -9,7 +9,7 @@
     "scripts": {
         "test": "vitest run",
         "test:watch": "vitest",
-        "dev": "nodemon server.js",
+        "dev": "nodemon -L server.js",
         "start": "node server.js"
     },
     "keywords": [],
