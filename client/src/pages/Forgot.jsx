@@ -3,9 +3,11 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api.js';
+import useDocumentMetadata from '../hooks/useDocumentMetadata';
 
 function Forgot() {
     const { t } = useTranslation();
+    useDocumentMetadata(t('seo.forgot.title'), t('seo.forgot.description'));
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     // JEDEN hook dla JEDNEGO formularza
@@ -38,7 +40,9 @@ function Forgot() {
                 setStep(3);
             }
         } catch (err) {
-            alert(err.response?.data?.message || t('auth.forgot.errors.verify'));
+            alert(
+                err.response?.data?.message || t('auth.forgot.errors.verify'),
+            );
         }
     };
 
@@ -123,20 +127,29 @@ function Forgot() {
                         {step === 1 && (
                             <>
                                 <div>
-                                    <label htmlFor="forgot-email" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                    <label
+                                        htmlFor="forgot-email"
+                                        className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                    >
                                         {t('auth.login.emailLabel')}
                                     </label>
                                     <input
                                         id="forgot-email"
                                         {...register('email', {
-                                            required: t('auth.validation.emailRequired'),
+                                            required: t(
+                                                'auth.validation.emailRequired',
+                                            ),
                                             pattern: {
                                                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                                message: t('auth.validation.emailInvalid'),
+                                                message: t(
+                                                    'auth.validation.emailInvalid',
+                                                ),
                                             },
                                         })}
                                         className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
-                                        placeholder={t('auth.login.emailPlaceholder')}
+                                        placeholder={t(
+                                            'auth.login.emailPlaceholder',
+                                        )}
                                     />
                                     {errors.email && (
                                         <p className="mt-2 text-sm text-red-600">
@@ -170,16 +183,23 @@ function Forgot() {
                         {step === 2 && (
                             <>
                                 <div>
-                                    <label htmlFor="forgot-otp" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                    <label
+                                        htmlFor="forgot-otp"
+                                        className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                    >
                                         {t('auth.forgot.codeLabel')}
                                     </label>
                                     <input
                                         id="forgot-otp"
                                         {...register('otp', {
-                                            required: t('auth.validation.otpRequired'),
+                                            required: t(
+                                                'auth.validation.otpRequired',
+                                            ),
                                             pattern: {
                                                 value: /^\d{6}$/,
-                                                message: t('auth.validation.otpLength'),
+                                                message: t(
+                                                    'auth.validation.otpLength',
+                                                ),
                                             },
                                         })}
                                         maxLength={6}
@@ -221,17 +241,24 @@ function Forgot() {
                                 {/* Dodatkowy div dla zachowania space-y-6 z formularza */}
                                 <div className="space-y-5">
                                     <div>
-                                        <label htmlFor="forgot-new-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">
+                                        <label
+                                            htmlFor="forgot-new-password"
+                                            className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                        >
                                             {t('auth.forgot.newPasswordLabel')}
                                         </label>
                                         <input
                                             id="forgot-new-password"
                                             type="password"
                                             {...register('newPassword', {
-                                                required: t('auth.validation.passwordRequired'),
+                                                required: t(
+                                                    'auth.validation.passwordRequired',
+                                                ),
                                                 minLength: {
                                                     value: 8,
-                                                    message: t('auth.validation.passwordMin8'),
+                                                    message: t(
+                                                        'auth.validation.passwordMin8',
+                                                    ),
                                                 },
                                             })}
                                             className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
@@ -245,18 +272,27 @@ function Forgot() {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="forgot-confirm-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">
-                                            {t('auth.forgot.confirmPasswordLabel')}
+                                        <label
+                                            htmlFor="forgot-confirm-password"
+                                            className="mb-1.5 block text-sm font-medium text-muted-foreground"
+                                        >
+                                            {t(
+                                                'auth.forgot.confirmPasswordLabel',
+                                            )}
                                         </label>
                                         <input
                                             id="forgot-confirm-password"
                                             type="password"
                                             {...register('confirmPassword', {
-                                                required: t('auth.validation.confirmRequired'),
+                                                required: t(
+                                                    'auth.validation.confirmRequired',
+                                                ),
                                                 validate: (value) =>
                                                     value ===
                                                         watch('newPassword') ||
-                                                    t('auth.validation.passwordMismatch'),
+                                                    t(
+                                                        'auth.validation.passwordMismatch',
+                                                    ),
                                             })}
                                             className="block w-full rounded-xl border border-border bg-card px-4 py-3.5 text-foreground transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20"
                                             placeholder="********"

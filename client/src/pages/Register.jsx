@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select } from '../components/ui/Select';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
+import useDocumentMetadata from '../hooks/useDocumentMetadata';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -57,6 +58,7 @@ const createRegistrationSchema = (t) =>
 
 export default function Register() {
     const { t } = useTranslation();
+    useDocumentMetadata(t('seo.register.title'), t('seo.register.description'));
     const {
         register,
         handleSubmit,

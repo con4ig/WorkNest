@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
+import useDocumentMetadata from '../hooks/useDocumentMetadata';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -26,6 +27,7 @@ const LoginSchema = (t) =>
 
 export default function Login() {
     const { t } = useTranslation();
+    useDocumentMetadata(t('seo.login.title'), t('seo.login.description'));
     const {
         register,
         handleSubmit,
