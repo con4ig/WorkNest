@@ -138,7 +138,7 @@ export default function RequestLeaveModal({ onClose, onSuccess }) {
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div
-                className="animate-in fade-in absolute inset-0 bg-foreground/25 backdrop-blur-sm transition-opacity duration-300"
+                className="animate-in fade-in absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
                 aria-hidden="true"
                 onClick={onClose}
             />

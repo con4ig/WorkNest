@@ -124,7 +124,7 @@ const ImportModal = ({ isOpen, onClose, onImport, isLoading }) => {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="animate-in fade-in absolute inset-0 bg-foreground/25 backdrop-blur-sm transition-opacity duration-200"
+                className="animate-in fade-in fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-200"
                 aria-hidden="true"
                 onClick={onClose}
             />

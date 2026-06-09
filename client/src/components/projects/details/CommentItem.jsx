@@ -97,7 +97,7 @@ const CommentItem = ({
                     </div>
 
                     {isReplying && (
-                        <div className="mt-3 flex gap-2">
+                        <div className="mt-3 flex select-none gap-2">
                             <input
                                 type="text"
                                 value={replyText}
@@ -111,7 +111,7 @@ const CommentItem = ({
                                 placeholder={t(
                                     'projects.details.replyPlaceholder',
                                 )}
-                                className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                                className="flex-1 select-text rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                             />{' '}
                             <button
                                 type="button"

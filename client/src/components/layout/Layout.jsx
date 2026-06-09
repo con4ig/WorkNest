@@ -26,7 +26,7 @@ const Layout = () => {
             {/* Mobile Overlay */}
             {isMobile && isSidebarOpen && (
                 <div
-                    className="fixed inset-0 z-30 bg-foreground/30 backdrop-blur-sm transition-opacity"
+                    className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm transition-opacity"
                     aria-hidden="true"
                     onClick={() => setIsSidebarOpen(false)}
                 />

@@ -24,7 +24,7 @@ const ProjectComments = ({
             title={`${t('projects.details.commentsTitle')} (${comments.length})`}
         >
             <div className="mb-6">
-                <div className="flex gap-2">
+                <div className="flex select-none gap-2">
                     <input
                         type="text"
                         value={newComment}
@@ -36,7 +36,7 @@ const ProjectComments = ({
                         placeholder={t(
                             'projects.details.addCommentPlaceholder',
                         )}
-                        className="flex-1 rounded-lg border border-input bg-background px-4 py-2 focus:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                        className="flex-1 select-text rounded-lg border border-input bg-background px-4 py-2 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                     />
                     <button
                         type="button"

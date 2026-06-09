@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     X,
@@ -23,6 +23,7 @@ const RoleChangeModal = ({
     isChanging,
 }) => {
     const { t } = useTranslation();
+    const currentRole = initialRole;
     const [selectedRole, setSelectedRole] = useState(initialRole);
 
     if (!isOpen) return null;
@@ -70,7 +71,7 @@ const RoleChangeModal = ({
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             {/* Full-screen Backdrop */}
             <div
-                className="animate-in fade-in fixed inset-0 bg-foreground/30 backdrop-blur-sm transition-opacity duration-300"
+                className="animate-in fade-in fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
                 aria-hidden="true"
                 onClick={onClose}
             />
