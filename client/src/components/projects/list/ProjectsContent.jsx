@@ -29,9 +29,11 @@ const ProjectsContent = ({
         <Card
             className={`transition-opacity duration-300 ${
                 isFiltering ? 'opacity-60' : 'opacity-100'
-            } h-full border-border bg-card shadow-sm`}
+            } ${projects.length > 0 ? 'h-full' : ''} border-border bg-card shadow-sm`}
         >
-            <CardContent className="h-full p-0">
+            <CardContent
+                className={`${projects.length > 0 ? 'h-full' : ''} p-0`}
+            >
                 {currentUserRole !== 'employee' &&
                     selectedProjects.length > 0 && (
                         <div className="border-b border-border bg-muted/30 p-4">
@@ -46,7 +48,9 @@ const ProjectsContent = ({
                         </div>
                     )}
 
-                <div className="h-full p-4 md:p-6">
+                <div
+                    className={`${projects.length > 0 ? 'h-full' : ''} flex flex-col justify-center p-4 md:p-6`}
+                >
                     {projects.length === 0 ? (
                         <div className="py-16 text-center text-muted-foreground">
                             <div className="mb-4 flex justify-center">
