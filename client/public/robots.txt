@@ -1,0 +1,26 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+
+# Allow public pages
+Allow: /
+Allow: /login
+Allow: /register
+Allow: /regulamin
+Allow: /polityka-prywatnosci
+Allow: /locales/
+Allow: /assets/
+Allow: /logo.png
+Allow: /favicon.ico
+
+# Disallow private application routes
+Disallow: /dashboard
+Disallow: /employees
+Disallow: /projects
+Disallow: /myleaves
+Disallow: /leave-approvals
+Disallow: /upload
+Disallow: /generate-code
+Disallow: /force-password-change
+
+# Link to sitemap
+Sitemap: https://worknest-1.onrender.com/sitemap.xml

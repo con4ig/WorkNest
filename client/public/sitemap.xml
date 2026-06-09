@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Login / Home Page -->
+  <url>
+    <loc>https://worknest-1.onrender.com/login</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://worknest-1.onrender.com/login" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://worknest-1.onrender.com/login" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://worknest-1.onrender.com/login" />
+  </url>
+
+  <!-- Registration Page -->
+  <url>
+    <loc>https://worknest-1.onrender.com/register</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://worknest-1.onrender.com/register" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://worknest-1.onrender.com/register" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://worknest-1.onrender.com/register" />
+  </url>
+
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://worknest-1.onrender.com/regulamin</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://worknest-1.onrender.com/regulamin" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://worknest-1.onrender.com/regulamin" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://worknest-1.onrender.com/regulamin" />
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://worknest-1.onrender.com/polityka-prywatnosci</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="pl" href="https://worknest-1.onrender.com/polityka-prywatnosci" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://worknest-1.onrender.com/polityka-prywatnosci" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://worknest-1.onrender.com/polityka-prywatnosci" />
+  </url>
+</urlset>
