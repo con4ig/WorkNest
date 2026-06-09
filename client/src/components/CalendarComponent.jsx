@@ -98,7 +98,7 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
 };
 
 const CustomEvent = ({ event, continuesPrior }) => {
-    if (continuesPrior) return <div className="h-6" />;
+    if (continuesPrior) return <div className="h-8" />;
 
     const initials =
         event.resource.user?.username?.charAt(0).toUpperCase() || '?';
@@ -144,12 +144,12 @@ const eventStyleGetter = (event) => {
     return {
         style: {
             backgroundColor,
-            border: `1px solid ${borderColor}`,
+            border: `2px solid ${borderColor}`,
             borderRadius: '6px',
-            padding: '8px 2px',
+            padding: '10px 2px',
             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             backdropFilter: 'blur(8px)',
-            minHeight: '28px',
+            minHeight: '32px',
         },
     };
 };
@@ -171,7 +171,7 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
     }));
 
     return (
-        <div className="shadow-3xl h-[calc(100vh-280px)] min-h-[420px] w-full rounded-[2.5rem] border border-black/10 bg-white p-4 transition-colors duration-300 [--calendar-bg-today:rgb(var(--calendar-bg-today))] [--calendar-bg-view:rgb(var(--calendar-bg-view))] [--calendar-border:rgb(var(--calendar-border))] [--calendar-event-approved-bg:rgb(var(--calendar-event-approved-bg))] [--calendar-event-approved-border:rgb(var(--calendar-event-approved-border))] [--calendar-event-pending-bg:rgb(var(--calendar-event-pending-bg))] [--calendar-event-pending-border:rgb(var(--calendar-event-pending-border))] [--calendar-event-rejected-bg:rgb(var(--calendar-event-rejected-bg))] [--calendar-event-rejected-border:rgb(var(--calendar-event-rejected-border))] [--calendar-off-range:rgb(var(--calendar-off-range))] [--calendar-text-main:theme(colors.zinc.900)] [--calendar-text-muted:theme(colors.zinc.400)] dark:border-white/10 dark:bg-zinc-900/40 dark:[--calendar-text-main:theme(colors.white)] dark:[--calendar-text-muted:theme(colors.zinc.500)] sm:min-h-[500px] md:p-8 lg:min-h-[600px]">
+        <div className="shadow-3xl h-[calc(100vh-280px)] min-h-[420px] w-full rounded-[2.5rem] border border-black/10 bg-white p-4 transition-colors duration-300 [--calendar-text-main:theme(colors.zinc.900)] [--calendar-text-muted:theme(colors.zinc.400)] dark:border-white/10 dark:bg-zinc-900/40 dark:[--calendar-text-main:theme(colors.white)] dark:[--calendar-text-muted:theme(colors.zinc.500)] sm:min-h-[500px] md:p-8 lg:min-h-[600px]">
             <style>{`
                 .rbc-calendar { font-family: inherit; color: var(--calendar-text-main); }
                 .rbc-header {

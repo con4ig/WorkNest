@@ -61,16 +61,16 @@ body {
         --radius: 0.5rem;
 
         /* Calendar & Data Visualization Colors */
-        --calendar-bg-today: 0 0 0 / 0.03;
-        --calendar-bg-view: 0 0 0 / 0.02;
-        --calendar-border: 0 0 0 / 0.05;
-        --calendar-off-range: 0 0 0 / 0.02;
-        --calendar-event-pending-bg: 245 158 11 / 0.45;
-        --calendar-event-pending-border: 245 158 11 / 0.8;
-        --calendar-event-approved-bg: 16 185 129 / 0.45;
-        --calendar-event-approved-border: 16 185 129 / 0.8;
-        --calendar-event-rejected-bg: 244 63 94 / 0.45;
-        --calendar-event-rejected-border: 244 63 94 / 0.8;
+        --calendar-bg-today: rgb(0 0 0 / 0.03);
+        --calendar-bg-view: rgb(0 0 0 / 0.02);
+        --calendar-border: rgb(0 0 0 / 0.05);
+        --calendar-off-range: rgb(0 0 0 / 0.02);
+        --calendar-event-pending-bg: rgb(245 158 11 / 0.45);
+        --calendar-event-pending-border: rgb(245 158 11 / 0.8);
+        --calendar-event-approved-bg: rgb(16 185 129 / 0.45);
+        --calendar-event-approved-border: rgb(16 185 129 / 0.8);
+        --calendar-event-rejected-bg: rgb(244 63 94 / 0.45);
+        --calendar-event-rejected-border: rgb(244 63 94 / 0.8);
     }
 
     .dark {
@@ -101,16 +101,16 @@ body {
         --ring: 62 207 142;
 
         /* Calendar & Data Visualization Colors (Dark Mode) */
-        --calendar-bg-today: 255 255 255 / 0.03;
-        --calendar-bg-view: 0 0 0 / 0.2;
-        --calendar-border: 255 255 255 / 0.05;
-        --calendar-off-range: 255 255 255 / 0.02;
-        --calendar-event-pending-bg: 245 158 11 / 0.45;
-        --calendar-event-pending-border: 245 158 11 / 0.8;
-        --calendar-event-approved-bg: 16 185 129 / 0.45;
-        --calendar-event-approved-border: 16 185 129 / 0.8;
-        --calendar-event-rejected-bg: 244 63 94 / 0.45;
-        --calendar-event-rejected-border: 244 63 94 / 0.8;
+        --calendar-bg-today: rgb(255 255 255 / 0.03);
+        --calendar-bg-view: rgb(0 0 0 / 0.2);
+        --calendar-border: rgb(255 255 255 / 0.05);
+        --calendar-off-range: rgb(255 255 255 / 0.02);
+        --calendar-event-pending-bg: rgb(245 158 11 / 0.25);
+        --calendar-event-pending-border: rgb(245 158 11 / 1);
+        --calendar-event-approved-bg: rgb(62 207 142 / 0.25);
+        --calendar-event-approved-border: rgb(62 207 142 / 1);
+        --calendar-event-rejected-bg: rgb(244 63 94 / 0.25);
+        --calendar-event-rejected-border: rgb(244 63 94 / 1);
     }
 }
 
