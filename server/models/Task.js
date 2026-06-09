@@ -32,7 +32,7 @@ const taskSchema = new mongoose.Schema(
     },
     priority: {
       type: String,
-      enum: ["low", "medium", "high"],
+      enum: ["low", "medium", "high", "critical"],
       default: "medium",
     },
     dueDate: {
@@ -53,7 +53,7 @@ const taskSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Index for faster task lookup by project
