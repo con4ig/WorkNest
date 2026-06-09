@@ -5,14 +5,14 @@ import {
     CardDescription,
     CardContent,
     CardFooter,
-} from "./Card";
-import { Button } from "./Button";
+} from './Card';
+import { Button } from './Button';
 
 /** @type { import('@storybook/react').Meta<typeof Card> } */
 const meta = {
-    title: "Design system/Card",
+    title: 'Design system/Card',
     component: Card,
-    tags: ["autodocs"],
+    tags: ['autodocs'],
     decorators: [
         (Story) => (
             <div style={{ width: 360 }}>
@@ -38,7 +38,9 @@ export const Basic = {
                 </p>
             </CardContent>
             <CardFooter>
-                <Button size="sm">Open board</Button>
+                <Button type="button" size="sm">
+                    Open board
+                </Button>
             </CardFooter>
         </Card>
     ),

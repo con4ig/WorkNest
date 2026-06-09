@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { use } from 'react';
 import { AuthContext } from './AuthContext.jsx';
 
 // Hook to simplify access to the auth context.
@@ -6,5 +6,5 @@ import { AuthContext } from './AuthContext.jsx';
 // components (keeps Vite's fast-refresh happy — see
 // react-refresh/only-export-components).
 export const useAuth = () => {
-    return useContext(AuthContext);
+    return use(AuthContext);
 };

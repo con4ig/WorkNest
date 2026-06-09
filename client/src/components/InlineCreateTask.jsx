@@ -26,7 +26,9 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
             setIsCreating(false);
             onTaskCreated(); // Notify parent to refetch tasks
         } catch (err) {
-            alert(`${t('projects.details.kanban.errors.addError')}: ${err.message}`);
+            alert(
+                `${t('projects.details.kanban.errors.addError')}: ${err.message}`,
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -35,6 +37,7 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
     if (!isCreating) {
         return (
             <button
+                type="button"
                 onClick={() => setIsCreating(true)}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
             >
@@ -50,8 +53,8 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('projects.details.kanban.taskTitlePlaceholder')}
+                aria-label={t('projects.details.kanban.taskTitlePlaceholder')}
                 className="w-full resize-none border-none bg-transparent p-1 text-sm placeholder:text-muted-foreground focus:ring-0"
-                autoFocus
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -68,6 +71,7 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
                 <div></div>
                 <div className="flex items-center gap-2">
                     <button
+                        type="button"
                         onClick={() => {
                             setIsCreating(false);
                             setTitle('');
@@ -77,11 +81,14 @@ const InlineCreateTask = ({ projectId, onTaskCreated }) => {
                         <X size={18} />
                     </button>
                     <button
+                        type="button"
                         onClick={handleAddTask}
                         disabled={isSubmitting || !title.trim()}
                         className="rounded-md bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {isSubmitting ? t('projects.details.kanban.adding') : t('common.add')}
+                        {isSubmitting
+                            ? t('projects.details.kanban.adding')
+                            : t('common.add')}
                     </button>
                 </div>
             </div>

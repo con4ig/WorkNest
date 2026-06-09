@@ -102,40 +102,34 @@ const ProjectGridCard = ({
             <div className="mb-4 flex items-start justify-between">
                 <div className="flex w-full items-center gap-3">
                     {currentUserRole !== 'employee' && (
-                        <div
-                            className="-ml-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded transition-colors"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onToggleSelect(project._id);
-                            }}
-                        >
+                        <label className="-ml-1 flex h-6 w-6 flex-shrink-0 cursor-pointer items-center justify-center rounded transition-colors">
                             <input
                                 type="checkbox"
                                 checked={isSelected}
-                                onChange={() => {}}
+                                aria-label={
+                                    t('common.select') || 'Select project'
+                                }
+                                onChange={(e) => {
+                                    e.stopPropagation();
+                                    onToggleSelect(project._id);
+                                }}
+                                onClick={(e) => e.stopPropagation()}
                                 className="h-4 w-4 cursor-pointer rounded border-input bg-card text-primary transition-all focus:ring-primary"
                             />
-                        </div>
+                        </label>
                     )}
                     <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between">
-                            <h3
-                                role="button"
-                                tabIndex={0}
-                                className="truncate pr-2 text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary"
+                            <button
+                                type="button"
+                                className="m-0 truncate border-none bg-transparent p-0 pr-2 text-left text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     onCardClick(project._id);
                                 }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                        e.stopPropagation();
-                                        onCardClick(project._id);
-                                    }
-                                }}
                             >
                                 {project.name}
-                            </h3>
+                            </button>
                             <div className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                                 {(currentUserRole === 'admin' ||
                                     currentUserRole === 'owner' ||

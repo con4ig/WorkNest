@@ -20,7 +20,7 @@ const AssignedUsersAvatarGroup = ({ users }) => {
 
     if (!users || users.length === 0) {
         return (
-            <div className="text-[10px] font-medium text-muted-foreground/60 italic">
+            <div className="text-[10px] font-medium italic text-muted-foreground/60">
                 {t('projects.projectRow.none')}
             </div>
         );
@@ -105,8 +105,10 @@ const ProjectCard = ({
             ref={setNodeRef}
             style={style}
             className={clsx(
-                'group relative cursor-grab overflow-hidden p-4 ring-offset-background transition-all duration-200 active:cursor-grabbing hover:shadow-lg',
-                isDragging ? 'z-50 shadow-2xl ring-2 ring-primary border-primary ring-offset-4 rotate-3' : 'hover:border-primary/40',
+                'group relative cursor-grab overflow-hidden p-4 ring-offset-background transition-all duration-200 hover:shadow-lg active:cursor-grabbing',
+                isDragging
+                    ? 'z-50 rotate-3 border-primary shadow-2xl ring-2 ring-primary ring-offset-4'
+                    : 'hover:border-primary/40',
             )}
             onClick={() => onCardClick(project._id)}
             {...attributes}
@@ -117,11 +119,12 @@ const ProjectCard = ({
                     <h4 className="line-clamp-2 text-sm font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
                         {project.name}
                     </h4>
-                    
+
                     {(currentUserRole === 'admin' ||
                         currentUserRole === 'owner') && (
                         <div className="ml-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                             <button
+                                type="button"
                                 onPointerDown={(e) => {
                                     e.stopPropagation();
                                     onCardClick(project._id);
@@ -132,6 +135,7 @@ const ProjectCard = ({
                                 <Eye className="h-3.5 w-3.5" />
                             </button>
                             <button
+                                type="button"
                                 onPointerDown={(e) => {
                                     e.stopPropagation();
                                     onArchive(project._id);
@@ -142,6 +146,7 @@ const ProjectCard = ({
                                 <Archive className="h-3.5 w-3.5" />
                             </button>
                             <button
+                                type="button"
                                 onPointerDown={(e) => {
                                     e.stopPropagation();
                                     onPermanentDelete(project._id);
@@ -182,7 +187,7 @@ const ProjectCard = ({
                     </div>
                     <div className="h-1 w-full overflow-hidden rounded-full bg-secondary/50">
                         <div
-                            className="h-full bg-primary transition-all duration-1000 ease-out shadow-[0_0_4px_rgba(var(--primary),0.4)]"
+                            className="h-full bg-primary shadow-[0_0_4px_rgba(var(--primary),0.4)] transition-all duration-1000 ease-out"
                             style={{ width: `${project.progress || 0}%` }}
                         />
                     </div>

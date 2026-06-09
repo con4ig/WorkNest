@@ -5,20 +5,20 @@ import { connectRealtime, disconnectRealtime } from '../services/realtime';
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
+// Decode JWT payload without verification (only for expiry check — trust is still server-side)
+const isTokenExpired = (token) => {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        // Treat as expired if it expires within the next 30 s (avoids races near boundary)
+        return payload.exp * 1000 < Date.now() + 30_000;
+    } catch {
+        return true; // Malformed token — treat as expired
+    }
+};
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    // Decode JWT payload without verification (only for expiry check — trust is still server-side)
-    const isTokenExpired = (token) => {
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            // Treat as expired if it expires within the next 30 s (avoids races near boundary)
-            return payload.exp * 1000 < Date.now() + 30_000;
-        } catch {
-            return true; // Malformed token — treat as expired
-        }
-    };
 
     // Check login state on application start
     useEffect(() => {
@@ -34,13 +34,20 @@ export const AuthProvider = ({ children }) => {
             // to /auth/refresh. Saves one cold-start round trip on Render.
             if (isTokenExpired(token)) {
                 try {
-                    const { data: refreshData } = await api.post('/auth/refresh');
-                    localStorage.setItem('accessToken', refreshData.accessToken);
+                    const { data: refreshData } =
+                        await api.post('/auth/refresh');
+                    localStorage.setItem(
+                        'accessToken',
+                        refreshData.accessToken,
+                    );
                     const { data: userData } = await api.get('/users/me');
                     setUser(userData);
                     connectRealtime(refreshData.accessToken);
                 } catch (error) {
-                    console.error('Session expired, failed to refresh token', error);
+                    console.error(
+                        'Session expired, failed to refresh token',
+                        error,
+                    );
                     localStorage.removeItem('accessToken');
                 }
                 setLoading(false);

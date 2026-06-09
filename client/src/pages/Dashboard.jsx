@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api.js';
 import { ChevronRight, Key } from 'lucide-react';
@@ -128,7 +128,7 @@ const ProjectProgressChart = ({ stats }) => {
                                 >
                                     {chartData.map((entry, index) => (
                                         <Cell
-                                            key={`cell-${index}`}
+                                            key={entry.name}
                                             fill={entry.color}
                                             opacity={
                                                 hoveredSection === null ||
@@ -239,7 +239,7 @@ export default function Dashboard() {
         }
     };
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = useCallback(async () => {
         if (!user) return;
 
         setLoading(true);
@@ -351,16 +351,13 @@ export default function Dashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user]);
 
     useEffect(() => {
         if (user) {
             fetchDashboardData();
         }
-        // fetchDashboardData is intentionally omitted: it is defined as a plain
-        // async function and would change on every render, causing an infinite loop.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    }, [user, fetchDashboardData]);
 
     if (loading) {
         return <LoadingScreen message={t('dashboard.loading')} />;
@@ -383,6 +380,7 @@ export default function Dashboard() {
                 <div className="ml-3 flex shrink-0 flex-col items-end gap-2">
                     {(user?.role === 'admin' || user?.role === 'hr') && (
                         <Button
+                            type="button"
                             onClick={() => navigate('/generate-code')}
                             variant="outline"
                             size="sm"
@@ -395,7 +393,10 @@ export default function Dashboard() {
                             <span className="sm:hidden">Kod</span>
                         </Button>
                     )}
-                    <div className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+                    <div
+                        suppressHydrationWarning
+                        className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground"
+                    >
                         {format(new Date(), 'd MMM', {
                             locale: i18n.language === 'pl' ? pl : undefined,
                         })}
@@ -538,6 +539,7 @@ export default function Dashboard() {
                         </CardDescription>
                     </div>
                     <Button
+                        type="button"
                         variant="ghost"
                         className="text-primary hover:bg-primary/10 hover:text-primary"
                         onClick={() => navigate('/projects')}
@@ -550,9 +552,10 @@ export default function Dashboard() {
                     <div className="space-y-2 sm:space-y-4">
                         {projects.length > 0 ? (
                             projects.map((project) => (
-                                <div
+                                <button
+                                    type="button"
                                     key={project._id}
-                                    className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-3 transition-colors hover:bg-muted active:scale-[0.99] sm:p-4"
+                                    className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-border p-3 text-left transition-colors hover:bg-muted active:scale-[0.99] sm:p-4"
                                     onClick={() =>
                                         navigate(`/projects/${project._id}`)
                                     }
@@ -595,7 +598,7 @@ export default function Dashboard() {
                                             {t('common.tasks')}
                                         </p>
                                     </div>
-                                </div>
+                                </button>
                             ))
                         ) : (
                             <div className="py-8 text-center text-sm tracking-wide text-muted-foreground">
@@ -606,7 +609,10 @@ export default function Dashboard() {
                 </CardContent>
             </Card>
 
-            <footer className="mt-8 pb-6 text-center text-xs uppercase tracking-widest text-muted-foreground">
+            <footer
+                suppressHydrationWarning
+                className="mt-8 pb-6 text-center text-xs uppercase tracking-widest text-muted-foreground"
+            >
                 © {new Date().getFullYear()} WorkNest - {t('footer.Rights')}
             </footer>
         </div>

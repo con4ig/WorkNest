@@ -18,6 +18,12 @@ const localizer = dateFnsLocalizer({
     locales,
 });
 
+const viewButtons = {
+    month: 'Month',
+    week: 'Week',
+    agenda: 'Agenda',
+};
+
 const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
     const goToBack = () => {
         onNavigate('PREV');
@@ -35,30 +41,27 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
         return format(date, 'MMMM yyyy', { locale: pl });
     };
 
-    const viewButtons = {
-        month: 'Month',
-        week: 'Week',
-        agenda: 'Agenda',
-    };
-
     return (
         <div className="mb-8 flex flex-col gap-4 px-2 md:flex-row md:items-center md:justify-between">
             {/* Left: Navigation and Title */}
             <div className="flex items-center gap-6">
                 <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-black/5 p-1 shadow-inner dark:border-white/10 dark:bg-white/5">
                     <button
+                        type="button"
                         onClick={goToBack}
                         className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-black/10 hover:text-black active:scale-95 dark:hover:bg-white/10 dark:hover:text-white"
                     >
                         <ChevronLeft size={18} />
                     </button>
                     <button
+                        type="button"
                         onClick={goToCurrent}
                         className="rounded-lg px-4 py-1.5 text-xs font-black uppercase tracking-widest text-zinc-400 transition-all hover:bg-black/10 hover:text-black active:scale-95 dark:hover:bg-white/10 dark:hover:text-white"
                     >
                         Today
                     </button>
                     <button
+                        type="button"
                         onClick={goToNext}
                         className="rounded-lg p-2 text-zinc-400 transition-all hover:bg-black/10 hover:text-black active:scale-95 dark:hover:bg-white/10 dark:hover:text-white"
                     >
@@ -75,6 +78,7 @@ const CustomToolbar = ({ date, onNavigate, onView, view, views }) => {
                 <div className="flex items-center gap-1 rounded-xl border border-black/10 bg-black/5 p-1 shadow-inner dark:border-white/10 dark:bg-white/5">
                     {views.map((viewName) => (
                         <button
+                            type="button"
                             key={viewName}
                             onClick={() => onView(viewName)}
                             className={clsx(
@@ -121,8 +125,39 @@ const CustomEvent = ({ event, continuesPrior }) => {
     );
 };
 
+const eventStyleGetter = (event) => {
+    const status = event.resource.status;
+    let borderColor = 'rgba(255,255,255,0.1)';
+    let backgroundColor = 'rgba(255,255,255,0.05)';
+
+    if (status === 'pending') {
+        backgroundColor = 'var(--calendar-event-pending-bg)';
+        borderColor = 'var(--calendar-event-pending-border)';
+    } else if (status === 'approved') {
+        backgroundColor = 'var(--calendar-event-approved-bg)';
+        borderColor = 'var(--calendar-event-approved-border)';
+    } else if (status === 'rejected') {
+        backgroundColor = 'var(--calendar-event-rejected-bg)';
+        borderColor = 'var(--calendar-event-rejected-border)';
+    }
+
+    return {
+        style: {
+            backgroundColor,
+            border: `1px solid ${borderColor}`,
+            borderRadius: '6px',
+            padding: '8px 2px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            backdropFilter: 'blur(8px)',
+            minHeight: '28px',
+        },
+    };
+};
+
+const viewsArray = ['month'];
+
 const CalendarComponent = ({ leaves, onEventClick }) => {
-    const views = ['month'];
+    const views = viewsArray;
     const [date, setDate] = React.useState(new Date());
     const [view, setView] = React.useState(views[0] || 'month');
 
@@ -134,34 +169,6 @@ const CalendarComponent = ({ leaves, onEventClick }) => {
         allDay: true,
         resource: leave,
     }));
-
-    const eventStyleGetter = (event) => {
-        const status = event.resource.status;
-        let borderColor = 'rgba(255,255,255,0.1)';
-        let backgroundColor = 'rgba(255,255,255,0.05)';
-
-        if (status === 'pending') {
-            backgroundColor = 'var(--calendar-event-pending-bg)';
-            borderColor = 'var(--calendar-event-pending-border)';
-        } else if (status === 'approved') {
-            backgroundColor = 'var(--calendar-event-approved-bg)';
-            borderColor = 'var(--calendar-event-approved-border)';
-        } else if (status === 'rejected') {
-            backgroundColor = 'var(--calendar-event-rejected-bg)';
-            borderColor = 'var(--calendar-event-rejected-border)';
-        }
-
-        return {
-            style: {
-                backgroundColor,
-                border: `1px solid ${borderColor}`,
-                borderRadius: '6px',
-                padding: '8px 2px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                backdropFilter: 'blur(4px)',
-            },
-        };
-    };
 
     return (
         <div className="shadow-3xl h-[calc(100vh-280px)] min-h-[420px] w-full rounded-[2.5rem] border border-black/10 bg-white p-4 transition-colors duration-300 [--calendar-bg-today:rgb(var(--calendar-bg-today))] [--calendar-bg-view:rgb(var(--calendar-bg-view))] [--calendar-border:rgb(var(--calendar-border))] [--calendar-event-approved-bg:rgb(var(--calendar-event-approved-bg))] [--calendar-event-approved-border:rgb(var(--calendar-event-approved-border))] [--calendar-event-pending-bg:rgb(var(--calendar-event-pending-bg))] [--calendar-event-pending-border:rgb(var(--calendar-event-pending-border))] [--calendar-event-rejected-bg:rgb(var(--calendar-event-rejected-bg))] [--calendar-event-rejected-border:rgb(var(--calendar-event-rejected-border))] [--calendar-off-range:rgb(var(--calendar-off-range))] [--calendar-text-main:theme(colors.zinc.900)] [--calendar-text-muted:theme(colors.zinc.400)] dark:border-white/10 dark:bg-zinc-900/40 dark:[--calendar-text-main:theme(colors.white)] dark:[--calendar-text-muted:theme(colors.zinc.500)] sm:min-h-[500px] md:p-8 lg:min-h-[600px]">

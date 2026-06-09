@@ -97,7 +97,7 @@ export default function Login() {
                             {t('auth.login.noAccount')}{' '}
                             <Link
                                 to="/register"
-                                className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:underline"
+                                className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:underline focus-visible:outline-none"
                             >
                                 {t('auth.login.registerLink')}
                             </Link>
@@ -129,7 +129,10 @@ export default function Login() {
                     >
                         <div className="space-y-5">
                             <div>
-                                <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-foreground">
+                                <label
+                                    htmlFor="login-email"
+                                    className="mb-1.5 block text-sm font-medium text-foreground"
+                                >
                                     {t('auth.login.emailLabel')}
                                 </label>
                                 <div className="group relative">
@@ -160,7 +163,10 @@ export default function Login() {
                             </div>
 
                             <div>
-                                <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-foreground">
+                                <label
+                                    htmlFor="login-password"
+                                    className="mb-1.5 block text-sm font-medium text-foreground"
+                                >
                                     {t('auth.login.passwordLabel')}
                                 </label>
                                 <div className="group relative">
@@ -214,7 +220,10 @@ export default function Login() {
                     </form>
 
                     {/* Footer for production simplicity */}
-                    <footer className="pt-8 pb-10 text-center text-xs text-muted-foreground">
+                    <footer
+                        suppressHydrationWarning
+                        className="pb-10 pt-8 text-center text-xs text-muted-foreground"
+                    >
                         <div className="mb-2">
                             &copy; {new Date().getFullYear()} WorkNest.{' '}
                             {t('landing.footer.Rights')}

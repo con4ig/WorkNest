@@ -1,4 +1,10 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useEffect,
+    useState,
+    useMemo,
+    useCallback,
+} from 'react';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const ThemeContext = createContext();
@@ -30,13 +36,13 @@ export const ThemeProvider = ({ children }) => {
         localStorage.setItem('theme', theme);
     }, [theme]);
 
-    const toggleTheme = () => {
+    const toggleTheme = useCallback(() => {
         setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-    };
+    }, []);
+
+    const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
-            {children}
-        </ThemeContext.Provider>
+        <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
     );
 };

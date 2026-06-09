@@ -78,6 +78,7 @@ function ProfileImageUpload() {
                 <div>
                     <div className="flex items-center gap-2">
                         <Button
+                            type="button"
                             variant="ghost"
                             size="icon"
                             onClick={() => navigate('/dashboard')}
@@ -95,6 +96,7 @@ function ProfileImageUpload() {
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row md:items-center">
                     <Button
+                        type="button"
                         onClick={() => navigate('/dashboard')}
                         variant="outline"
                         className="gap-2"

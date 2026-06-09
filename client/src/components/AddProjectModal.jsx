@@ -38,10 +38,10 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
     }, [companyId]);
 
     useEffect(() => {
-        if (isOpen && companyId) {
+        if (companyId) {
             fetchUsers();
         }
-    }, [isOpen, companyId, fetchUsers]);
+    }, [companyId, fetchUsers]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -86,6 +86,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
             {/* Backdrop */}
             <div
                 className="animate-in fade-in fixed inset-0 bg-foreground/25 backdrop-blur-sm transition-opacity duration-200"
+                aria-hidden="true"
                 onClick={onClose}
             />
 
@@ -105,6 +106,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                         </p>
                     </div>
                     <button
+                        type="button"
                         onClick={onClose}
                         className="-mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
@@ -326,6 +328,7 @@ export default function AddProjectModal({ isOpen, onClose, onSuccess }) {
                             {users.map((user) => (
                                 <div
                                     key={user._id}
+                                    aria-hidden="true"
                                     onClick={() => handleUserToggle(user._id)}
                                     className={clsx(
                                         'flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all active:scale-95',

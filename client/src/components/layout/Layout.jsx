@@ -3,32 +3,31 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { Menu, X } from 'lucide-react';
 
+const getIsMobile = () =>
+    typeof window !== 'undefined' && window.innerWidth < 1024;
+
 const Layout = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(getIsMobile);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(!getIsMobile());
 
     useEffect(() => {
         const checkScreenSize = () => {
-            const mobile = window.innerWidth < 1024;
+            const mobile = getIsMobile();
             setIsMobile(mobile);
-            if (!mobile) {
-                setIsSidebarOpen(true);
-            } else {
-                setIsSidebarOpen(false);
-            }
+            setIsSidebarOpen(!mobile);
         };
 
-        checkScreenSize();
         window.addEventListener('resize', checkScreenSize);
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
 
     return (
-        <div className="flex h-screen max-w-full overflow-hidden bg-background font-sans text-foreground selection:bg-none select-none">
+        <div className="flex h-screen max-w-full select-none overflow-hidden bg-background font-sans text-foreground selection:bg-none">
             {/* Mobile Overlay */}
             {isMobile && isSidebarOpen && (
                 <div
                     className="fixed inset-0 z-30 bg-foreground/30 backdrop-blur-sm transition-opacity"
+                    aria-hidden="true"
                     onClick={() => setIsSidebarOpen(false)}
                 />
             )}
@@ -48,13 +47,18 @@ const Layout = () => {
             >
                 {/* Mobile Top Bar */}
                 {isMobile && (
-                    <header className="sticky top-0 z-20 flex h-14 w-full shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur-md shadow-sm">
+                    <header className="sticky top-0 z-20 flex h-14 w-full shrink-0 items-center justify-between border-b border-border bg-background/95 px-4 shadow-sm backdrop-blur-md">
                         <button
+                            type="button"
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                             className="flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
                             aria-label="Toggle navigation"
                         >
-                            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                            {isSidebarOpen ? (
+                                <X size={20} />
+                            ) : (
+                                <Menu size={20} />
+                            )}
                         </button>
 
                         <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground">
@@ -67,7 +71,7 @@ const Layout = () => {
                 )}
 
                 {/* Scrollable Content */}
-                <div className="relative w-full max-w-full min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
+                <div className="relative w-full min-w-0 max-w-full flex-1 overflow-y-auto overflow-x-hidden">
                     <Outlet context={{ isSidebarOpen, isMobile }} />
                 </div>
             </main>
@@ -76,4 +80,3 @@ const Layout = () => {
 };
 
 export default Layout;
- 

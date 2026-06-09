@@ -36,16 +36,20 @@ const ListView = ({
     return (
         <div className="space-y-6">
             <div className="hidden lg:block">
-                <div className="rounded-2xl border border-border/50 bg-secondary/5 transition-all duration-300 backdrop-blur-sm">
+                <div className="rounded-2xl border border-border/50 bg-secondary/5 backdrop-blur-sm transition-all duration-300">
                     <table className="min-w-full text-left text-sm text-muted-foreground">
-                        <thead className="bg-secondary/20 border-b border-border/50">
+                        <thead className="border-b border-border/50 bg-secondary/20">
                             <tr>
                                 {currentUserRole !== 'employee' && (
-                                    <th className="w-12 px-6 py-4 rounded-tl-2xl">
+                                    <th className="w-12 rounded-tl-2xl px-6 py-4">
                                         <input
                                             type="checkbox"
                                             checked={areAllSelected}
                                             onChange={onToggleSelectAll}
+                                            aria-label={
+                                                t('common.selectAll') ||
+                                                'Select all'
+                                            }
                                             className="h-4.5 w-4.5 cursor-pointer rounded-md border-input bg-card text-primary transition-all focus:ring-primary focus:ring-offset-2"
                                         />
                                     </th>
@@ -61,27 +65,27 @@ const ListView = ({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border/50 bg-transparent">
-                        {projects.map((project) => (
-                            <ProjectRow
-                                key={project._id}
-                                project={project}
-                                currentUserRole={currentUserRole}
-                                onArchive={onArchive}
-                                onRestore={onRestore}
-                                onPermanentDelete={onPermanentDelete}
-                                onRowClick={onRowClick}
-                                showArchived={showArchived}
-                                isSelected={selectedProjects.includes(
-                                    project._id,
-                                )}
-                                onToggleSelect={onToggleSelect}
-                            />
-                        ))}
+                            {projects.map((project) => (
+                                <ProjectRow
+                                    key={project._id}
+                                    project={project}
+                                    currentUserRole={currentUserRole}
+                                    onArchive={onArchive}
+                                    onRestore={onRestore}
+                                    onPermanentDelete={onPermanentDelete}
+                                    onRowClick={onRowClick}
+                                    showArchived={showArchived}
+                                    isSelected={selectedProjects.includes(
+                                        project._id,
+                                    )}
+                                    onToggleSelect={onToggleSelect}
+                                />
+                            ))}
                         </tbody>
                     </table>
                 </div>
             </div>
-            
+
             {/* Mobile View */}
             <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
                 {projects.map((project) => (

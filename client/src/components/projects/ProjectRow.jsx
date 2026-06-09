@@ -119,6 +119,7 @@ const ProjectRow = ({
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => onToggleSelect(project._id)}
+                        aria-label={t('common.select') || 'Select project'}
                         className="h-4.5 w-4.5 cursor-pointer rounded-md border-input bg-card text-primary transition-all focus:ring-primary focus:ring-offset-2"
                     />
                 </td>

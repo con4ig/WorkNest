@@ -32,6 +32,7 @@ const ViewSwitcher = ({
                     const isDisabled = disabledInArchive && showArchived;
                     return (
                         <button
+                            type="button"
                             key={id}
                             onClick={() => !isDisabled && onViewChange(id)}
                             disabled={isDisabled}

@@ -25,6 +25,7 @@ const Toast = ({ message, type = 'success', onClose }) => {
                 )}
                 <p className="text-sm font-medium">{message}</p>
                 <button
+                    type="button"
                     onClick={onClose}
                     className={cn(
                         'ml-2 rounded-full p-1 transition-colors',
