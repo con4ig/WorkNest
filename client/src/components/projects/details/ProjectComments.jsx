@@ -20,7 +20,7 @@ const ProjectComments = ({
 
     return (
         <ContentCard
-            icon={<Icon.Message />}
+            icon={<Icon.MessageSquare />}
             title={`${t('projects.details.commentsTitle')} (${comments.length})`}
         >
             <div className="mb-6">
