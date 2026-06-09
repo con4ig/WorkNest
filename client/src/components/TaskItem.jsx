@@ -4,6 +4,9 @@ import clsx from 'clsx';
 import api from '../../src/services/api.js';
 
 import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import '../styles/datepicker-overrides.css';
+
 import { format } from 'date-fns';
 import { pl } from 'date-fns/locale/pl';
 import { enGB } from 'date-fns/locale/en-GB';
@@ -21,22 +24,21 @@ import {
     TASK_STATUSES,
 } from './projects/ProjectTaskShared.jsx';
 
-// Custom Input for DatePicker - defined outside to avoid re-renders if possible,
-// but it needs t() so let's move it into the component or pass t as prop
-const CustomDateInput = ({ value, onClick, placeholder, ref }) => (
-    <button
-        type="button"
-        className="flex min-w-0 max-w-[160px] items-center gap-1.5 truncate rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary"
-        onClick={onClick}
-        ref={ref}
-    >
-        <Icon.Calendar size={12} className="shrink-0" />
-        <span className="truncate">{value || placeholder}</span>
-    </button>
+// Custom Input for DatePicker
+const CustomDateInput = React.forwardRef(
+    ({ value, onClick, placeholder }, ref) => (
+        <button
+            type="button"
+            className="flex min-w-0 max-w-[160px] items-center gap-1.5 truncate rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground hover:bg-secondary"
+            onClick={onClick}
+            ref={ref}
+        >
+            <Icon.Calendar size={12} className="shrink-0" />
+            <span className="truncate">{value || placeholder}</span>
+        </button>
+    ),
 );
 CustomDateInput.displayName = 'CustomDateInput';
-
-const CUSTOM_DATE_INPUT = <CustomDateInput />;
 
 const TaskItem = ({
     task,
@@ -259,8 +261,9 @@ const TaskItem = ({
                                     locale={i18n.language}
                                     isClearable
                                     placeholderText={t('common.selectDate')}
-                                    customInput={CUSTOM_DATE_INPUT}
-                                    popperPlacement="top-start"
+                                    customInput={<CustomDateInput />}
+                                    popperPlacement="bottom-start"
+                                    portalId="root"
                                 />
                             </div>
                         </>

@@ -109,8 +109,8 @@ const ProjectProgressChart = ({ stats }) => {
                         <ResponsiveContainer
                             width="100%"
                             height="100%"
-                            minWidth={0}
-                            minHeight={0}
+                            minWidth={1}
+                            minHeight={1}
                         >
                             <PieChart>
                                 <Pie
@@ -474,8 +474,8 @@ export default function Dashboard() {
                         <ResponsiveContainer
                             width="100%"
                             height="100%"
-                            minWidth={0}
-                            minHeight={0}
+                            minWidth={1}
+                            minHeight={1}
                         >
                             <BarChart
                                 data={weeklyActivity}

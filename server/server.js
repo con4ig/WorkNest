@@ -1,9 +1,12 @@
 import { createServer } from "http";
+import dns from "dns";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import app from "./app.js";
 import logger from "./lib/logger.js";
 import { initRealtime } from "./lib/realtime.js";
+
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 dotenv.config();
 
@@ -19,7 +22,7 @@ const startServer = async () => {
   httpServer.listen(PORT, () => {
     logger.info(
       { port: PORT, env: process.env.NODE_ENV || "development" },
-      `🚀 Server running on port ${PORT}`
+      `🚀 Server running on port ${PORT}`,
     );
   });
 
@@ -37,7 +40,10 @@ const startServer = async () => {
     });
     logger.info("✅ MongoDB connected");
   } catch (error) {
-    logger.error({ err: error }, `❌ MongoDB connection error: ${error.message}`);
+    logger.error(
+      { err: error },
+      `❌ MongoDB connection error: ${error.message}`,
+    );
     if (process.env.NODE_ENV === "production") {
       logger.fatal("FATAL: Unable to connect to the database in production.");
     }

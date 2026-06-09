@@ -32,6 +32,7 @@ const activitySchema = new mongoose.Schema(
         "task_completed",
         "task_deleted",
         "comment_added",
+        "comment_replied",
         "comment_deleted",
         "priority_changed",
         "dates_changed",
@@ -46,7 +47,7 @@ const activitySchema = new mongoose.Schema(
       default: {},
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 activitySchema.index({ project: 1, createdAt: -1 });

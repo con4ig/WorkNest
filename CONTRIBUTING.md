@@ -38,7 +38,11 @@ npm run dev                       # http://localhost:5173
 Docker stack (preferred when you don't want to install MongoDB):
 
 ```bash
-docker-compose -f docker-compose.dev.yml up
+# For development (with hot-reload/HMR):
+docker compose up
+
+# For production-like build:
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ## Tests

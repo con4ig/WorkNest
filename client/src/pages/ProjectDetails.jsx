@@ -60,6 +60,7 @@ import ProjectTeam from '../components/projects/details/ProjectTeam';
 import ProjectComments from '../components/projects/details/ProjectComments';
 import ProjectActivities from '../components/projects/details/ProjectActivities';
 import toast from 'react-hot-toast';
+
 export default function ProjectDetails() {
     const { t, i18n: i18nInstance } = useTranslation();
     const { id } = useParams();

@@ -21,20 +21,20 @@ per `Company`.
 The same vocabulary shows up in models, controllers, routes, components,
 and ADRs. Use these terms verbatim — do not invent synonyms.
 
-| Term              | Meaning                                                                                                       | Where it lives                                                       |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Company           | The tenant. Every other domain document references a `company` ObjectId. Unique by `name`.                    | `server/models/Company.js`                                            |
-| Demo Company      | A `Company` with `isDemo: true` and an `expiresAt` TTL. Auto-deleted by MongoDB after 24h.                    | `server/models/Company.js`, ADR-0004                                  |
-| User              | An authenticated principal. Roles: `admin`, `hr`, `employee`, `superadmin`. HR fields (PESEL, salary, etc.).   | `server/models/User.js`                                               |
-| Invitation        | A short code (`crypto.randomBytes(8).hex`) tying a future `User` to a `Company` and target role. TTL-indexed.  | `server/models/Invitation.js`                                         |
-| Project           | A unit of work. Has `status` (`pending`/`running`/`completed`/`on-hold`), `priority`, `isArchived`, `progress`, and `assignedUsers[]`. | `server/models/Project.js`, ADR-0008 |
-| Task              | A child of `Project`. Status `todo`/`in-progress`/`completed`, `order` for Kanban drag.                       | `server/models/Task.js`                                               |
-| Comment           | Attached to a `Project` or `Task`. Tracked in the activity log on create/delete.                              | `server/models/Comment.js`                                            |
-| Activity          | Audit log entry. Enum of 14 actions: `project_created`, `status_changed`, `task_completed`, etc.              | `server/models/Activity.js`                                           |
-| Leave             | Time-off request. 15 `leaveType` values (vacation, on_demand, maternity, paternity, parental, sick, …). Status `pending`/`approved`/`rejected`. | `server/models/Leave.js` |
-| Tenant isolation  | Every Mongo query must include a `company` predicate (or be explicitly `superadmin`). Missing predicate = data leak. | `server/controllers/*.js`, ADR-0002                       |
-| PII encryption    | `peselOrId` and identity fields go through AES-256-CBC encrypt/decrypt hooks on the User schema.              | `server/models/User.js`, ADR-0003                                     |
-| Realtime room     | A Socket.IO room named `company:<companyId>`. All emits are scoped to it.                                      | `server/lib/realtime.js`                                              |
+| Term             | Meaning                                                                                                                                         | Where it lives                       |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Company          | The tenant. Every other domain document references a `company` ObjectId. Unique by `name`.                                                      | `server/models/Company.js`           |
+| Demo Company     | A `Company` with `isDemo: true` and an `expiresAt` TTL. Auto-deleted by MongoDB after 24h.                                                      | `server/models/Company.js`, ADR-0004 |
+| User             | An authenticated principal. Roles: `admin`, `hr`, `employee`, `superadmin`. HR fields (PESEL, salary, etc.).                                    | `server/models/User.js`              |
+| Invitation       | A short code (`crypto.randomBytes(8).hex`) tying a future `User` to a `Company` and target role. TTL-indexed.                                   | `server/models/Invitation.js`        |
+| Project          | A unit of work. Has `status` (`pending`/`running`/`completed`/`on-hold`), `priority`, `isArchived`, `progress`, and `assignedUsers[]`.          | `server/models/Project.js`, ADR-0008 |
+| Task             | A child of `Project`. Status `todo`/`in-progress`/`completed`, `order` for Kanban drag.                                                         | `server/models/Task.js`              |
+| Comment          | Attached to a `Project` or `Task`. Tracked in the activity log on create/delete.                                                                | `server/models/Comment.js`           |
+| Activity         | Audit log entry. Enum of 14 actions: `project_created`, `status_changed`, `task_completed`, etc.                                                | `server/models/Activity.js`          |
+| Leave            | Time-off request. 15 `leaveType` values (vacation, on_demand, maternity, paternity, parental, sick, …). Status `pending`/`approved`/`rejected`. | `server/models/Leave.js`             |
+| Tenant isolation | Every Mongo query must include a `company` predicate (or be explicitly `superadmin`). Missing predicate = data leak.                            | `server/controllers/*.js`, ADR-0002  |
+| PII encryption   | `peselOrId` and identity fields go through AES-256-CBC encrypt/decrypt hooks on the User schema.                                                | `server/models/User.js`, ADR-0003    |
+| Realtime room    | A Socket.IO room named `company:<companyId>`. All emits are scoped to it.                                                                       | `server/lib/realtime.js`             |
 
 ## 3. High-level architecture
 
@@ -266,9 +266,9 @@ cd client && npm run dev
 # Lighthouse CI (perf + a11y + SEO budgets on landing page)
 cd client && npm run lhci                # requires built dist/
 
-# Whole-repo Docker (production-like)
-docker-compose up -d                     # http://localhost
-docker-compose -f docker-compose.dev.yml up   # hot reload
+# Whole-repo Docker
+docker compose up                        # hot reload (development)
+docker compose -f docker-compose.prod.yml up -d # production-like (http://localhost)
 
 # Pre-commit (runs automatically via Husky on `git commit`)
 npm run lint-staged                      # prettier on staged files
