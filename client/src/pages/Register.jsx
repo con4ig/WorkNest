@@ -1,13 +1,14 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api.js';
 import { ArrowRight, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select } from '../components/ui/Select';
+import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -61,6 +62,7 @@ export default function Register() {
         handleSubmit,
         formState: { errors },
         watch,
+        control,
     } = useForm({
         resolver: zodResolver(createRegistrationSchema(t)),
         defaultValues: {
@@ -73,6 +75,14 @@ export default function Register() {
         },
     });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (import.meta.env.PROD) {
+            toast.error('Rejestracja jest wyłączona w tej wersji');
+            navigate('/login');
+        }
+    }, [navigate]);
+
     const selectedRole = watch('role', 'admin');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -127,7 +137,10 @@ export default function Register() {
             </div>
 
             {/* Right Panel - Register Form */}
-            <div className="flex flex-1 items-center justify-center bg-background p-8 transition-colors duration-300">
+            <div className="relative flex flex-1 items-center justify-center bg-background p-8 transition-colors duration-300">
+                <div className="absolute right-6 top-6 z-10">
+                    <LanguageSwitcher />
+                </div>
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo & Header */}
                     <div className="text-center">
@@ -269,17 +282,28 @@ export default function Register() {
                                 >
                                     {t('auth.register.roleLabel')}
                                 </label>
-                                <Select
-                                    id="register-role"
-                                    {...register('role')}
-                                >
-                                    <option value="admin">
-                                        {t('auth.register.roleAdmin')}
-                                    </option>
-                                    <option value="employee">
-                                        {t('auth.register.roleEmployee')}
-                                    </option>
-                                </Select>
+                                <Controller
+                                    name="role"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            id="register-role"
+                                            value={field.value}
+                                            onChange={(e) =>
+                                                field.onChange(e.target.value)
+                                            }
+                                        >
+                                            <option value="admin">
+                                                {t('auth.register.roleAdmin')}
+                                            </option>
+                                            <option value="employee">
+                                                {t(
+                                                    'auth.register.roleEmployee',
+                                                )}
+                                            </option>
+                                        </Select>
+                                    )}
+                                />
                             </div>
 
                             {selectedRole === 'admin' ? (

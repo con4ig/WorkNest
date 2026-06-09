@@ -20,19 +20,23 @@ const generateAccessToken = (user) => {
       company: user.company ? user.company._id : null,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "15m" },
   );
 };
 
 const generateRefreshToken = (user) => {
-  return jwt.sign(
-    { _id: user._id },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" }
-  );
+  return jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: "7d",
+  });
 };
 
 export const register = async (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    return res
+      .status(403)
+      .json({ message: "Registration is disabled in this environment" });
+  }
+
   const { username, email, password, role, companyName, invitationCode } =
     req.body;
 
@@ -105,9 +109,7 @@ export const register = async (req, res) => {
       });
     } else if (role === "employee" || role === "hr") {
       if (!invitationCode) {
-        return res
-          .status(400)
-          .json({ message: "Invitation code is required" });
+        return res.status(400).json({ message: "Invitation code is required" });
       }
 
       const invitation = await Invitation.findOne({
@@ -122,7 +124,9 @@ export const register = async (req, res) => {
       }
 
       if (invitation.maxUses > 0 && invitation.uses >= invitation.maxUses) {
-        return res.status(400).json({ message: "Usage limit for this code has been exhausted" });
+        return res
+          .status(400)
+          .json({ message: "Usage limit for this code has been exhausted" });
       }
 
       companyId = invitation.company;
@@ -155,9 +159,7 @@ export const register = async (req, res) => {
         },
       });
     } else {
-      return res
-        .status(400)
-        .json({ message: "Invalid user role" });
+      return res.status(400).json({ message: "Invalid user role" });
     }
   } catch (err) {
     console.error("Registration error:", err);
@@ -170,7 +172,9 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
     }
 
     const user = await User.findOne({ email }).populate("company", "name");
@@ -188,8 +192,8 @@ export const login = async (req, res) => {
 
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     };
@@ -250,19 +254,21 @@ export const refresh = async (req, res) => {
     // Clear cookie if refresh token is bad
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
     });
-    return res.status(403).json({ message: "Invalid or expired refresh token" });
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired refresh token" });
   }
 };
 
 export const logout = async (req, res) => {
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
   };
 
@@ -299,7 +305,9 @@ export const changePassword = async (req, res) => {
     const userId = req.user._id;
 
     if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
     }
 
     const user = await User.findById(userId);
@@ -315,7 +323,6 @@ export const changePassword = async (req, res) => {
     await user.save();
 
     res.json({ message: "Password changed successfully" });
-
   } catch (err) {
     console.error("Change password error:", err);
     res.status(500).json({ message: "Server error during password change" });
@@ -340,26 +347,26 @@ export const demoLogin = async (req, res) => {
 
         // 2. Create Fresh Demo Environment & Users
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash('demo123', salt);
+        const hashedPassword = await bcrypt.hash("demo123", salt);
         const invitationCode = crypto.randomBytes(8).toString("hex");
 
         const newCompany = new Company({
           name: DEMO_COMPANY_NAME,
           invitationCode,
           isDemo: true,
-          expiresAt
+          expiresAt,
         });
 
         const demoAdmin = new User({
           username: `Demo Admin ${demoSuffix}`,
           email: DEMO_EMAIL,
           password: hashedPassword,
-          role: 'admin',
+          role: "admin",
           company: newCompany._id,
-          position: 'CEO',
-          department: 'Management',
+          position: "CEO",
+          department: "Management",
           isDemo: true,
-          expiresAt
+          expiresAt,
         });
 
         newCompany.owner = demoAdmin._id;
@@ -372,12 +379,12 @@ export const demoLogin = async (req, res) => {
           username: `Anna HR (Demo ${demoSuffix})`,
           email: `hr-${demoSuffix}@demo.com`,
           password: hashedPassword,
-          role: 'hr',
+          role: "hr",
           company: newCompany._id,
-          position: 'HR Manager',
-          department: 'HR',
+          position: "HR Manager",
+          department: "HR",
           isDemo: true,
-          expiresAt
+          expiresAt,
         });
         await demoHR.save({ session });
 
@@ -385,13 +392,13 @@ export const demoLogin = async (req, res) => {
           username: `John Employee (Demo ${demoSuffix})`,
           email: `employee-${demoSuffix}@demo.com`,
           password: hashedPassword,
-          role: 'employee',
+          role: "employee",
           company: newCompany._id,
-          position: 'Developer',
-          department: 'IT',
+          position: "Developer",
+          department: "IT",
           salary: 8000,
           isDemo: true,
-          expiresAt
+          expiresAt,
         });
         await demoEmp.save({ session });
 
@@ -401,42 +408,60 @@ export const demoLogin = async (req, res) => {
         const approvedLeave = new Leave({
           user: demoEmp._id,
           company: newCompany._id,
-          leaveType: 'vacation',
-          startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
-          endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5),
+          leaveType: "vacation",
+          startDate: new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() + 1,
+          ),
+          endDate: new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() + 5,
+          ),
           days: 5,
-          reason: 'Sandbox vacation',
-          status: 'approved',
+          reason: "Sandbox vacation",
+          status: "approved",
           reviewedBy: demoHR._id,
           reviewedAt: new Date(),
-          expiresAt
+          expiresAt,
         });
         await approvedLeave.save({ session });
 
         const projectWeb = new Project({
-          name: 'Portfolio Build',
-          description: 'Demo project successfully isolated in your own sandbox!',
-          status: 'running',
-          priority: 'high',
+          name: "Portfolio Build",
+          description:
+            "Demo project successfully isolated in your own sandbox!",
+          status: "running",
+          priority: "high",
           startDate: new Date(),
-          endDate: new Date(today.getFullYear(), today.getMonth() + 2, today.getDate()),
+          endDate: new Date(
+            today.getFullYear(),
+            today.getMonth() + 2,
+            today.getDate(),
+          ),
           createdBy: demoAdmin._id,
           company: newCompany._id,
           assignedUsers: [demoAdmin._id, demoEmp._id],
-          progress: 75
+          progress: 75,
         });
         await projectWeb.save({ session });
 
         const task1 = new Task({
-          title: 'Isolation Verification',
-          description: 'Check that your changes are not visible to other demo users.',
-          status: 'in-progress',
-          priority: 'high',
-          dueDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+          title: "Isolation Verification",
+          description:
+            "Check that your changes are not visible to other demo users.",
+          status: "in-progress",
+          priority: "high",
+          dueDate: new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() + 1,
+          ),
           project: projectWeb._id,
           assignedUser: demoEmp._id,
           createdBy: demoAdmin._id,
-          company: newCompany._id
+          company: newCompany._id,
         });
         await task1.save({ session });
       });
@@ -445,15 +470,18 @@ export const demoLogin = async (req, res) => {
     }
 
     // 4. Return Login Response
-    const user = await User.findOne({ email: DEMO_EMAIL }).populate("company", "name");
+    const user = await User.findOne({ email: DEMO_EMAIL }).populate(
+      "company",
+      "name",
+    );
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     };
@@ -464,7 +492,8 @@ export const demoLogin = async (req, res) => {
     console.log(`👤 Demo user data:`, { id: user._id, role: user.role });
 
     res.json({
-      message: "Your personal Demo sandbox is running. Data expires in 2 hours.",
+      message:
+        "Your personal Demo sandbox is running. Data expires in 2 hours.",
       accessToken,
       user: {
         id: user._id,
@@ -475,10 +504,9 @@ export const demoLogin = async (req, res) => {
         company: user.company,
         profileImage: user.profileImage || "",
         mustChangePassword: false,
-        isDemo: true
+        isDemo: true,
       },
     });
-
   } catch (err) {
     console.error("Demo login error:", err);
     res.status(500).json({ message: "Error generating demo version" });

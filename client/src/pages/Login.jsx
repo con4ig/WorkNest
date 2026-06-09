@@ -7,6 +7,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import LanguageSwitcher from '../components/common/LanguageSwitcher';
 
 const Icon = {
     ArrowRight: () => <ArrowRight className="h-5 w-5" />,
@@ -76,7 +77,10 @@ export default function Login() {
 
             {/* Right Panel - Login Form */}
 
-            <div className="flex flex-1 items-center justify-center bg-background p-8 transition-colors duration-300">
+            <div className="relative flex flex-1 items-center justify-center bg-background p-8 transition-colors duration-300">
+                <div className="absolute right-6 top-6 z-10">
+                    <LanguageSwitcher />
+                </div>
                 <div className="w-full max-w-md space-y-8">
                     {/* Logo & Header */}
                     <div className="text-center">
@@ -93,15 +97,17 @@ export default function Login() {
                         <h2 className="text-3xl font-bold tracking-tight text-foreground">
                             {t('auth.login.title')}
                         </h2>
-                        <p className="mt-3 text-base text-muted-foreground">
-                            {t('auth.login.noAccount')}{' '}
-                            <Link
-                                to="/register"
-                                className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:underline focus-visible:outline-none"
-                            >
-                                {t('auth.login.registerLink')}
-                            </Link>
-                        </p>
+                        {!import.meta.env.PROD && (
+                            <p className="mt-3 text-base text-muted-foreground">
+                                {t('auth.login.noAccount')}{' '}
+                                <Link
+                                    to="/register"
+                                    className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:underline focus-visible:outline-none"
+                                >
+                                    {t('auth.login.registerLink')}
+                                </Link>
+                            </p>
+                        )}
                     </div>
 
                     <button

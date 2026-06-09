@@ -84,16 +84,18 @@ export default function Navbar() {
                                     />
                                     {t('navbar.login')}
                                 </Link>
-                                <Link
-                                    to="/register"
-                                    className={`ml-3 ${buttonPrimaryClass}`}
-                                >
-                                    <UserPlus
-                                        className="h-4 w-4"
-                                        aria-hidden="true"
-                                    />
-                                    {t('navbar.register')}
-                                </Link>
+                                {!import.meta.env.PROD && (
+                                    <Link
+                                        to="/register"
+                                        className={`ml-3 ${buttonPrimaryClass}`}
+                                    >
+                                        <UserPlus
+                                            className="h-4 w-4"
+                                            aria-hidden="true"
+                                        />
+                                        {t('navbar.register')}
+                                    </Link>
+                                )}
                             </>
                         )}
                     </div>

@@ -8,15 +8,18 @@ const LanguageSwitcher = () => {
         i18n.changeLanguage(lng);
     };
 
+    const isPL = i18n.language?.startsWith('pl');
+    const isEN = i18n.language?.startsWith('en');
+
     return (
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 rounded-xl border border-border bg-card p-1 shadow-sm transition-colors duration-300">
             <button
                 type="button"
                 onClick={() => changeLanguage('pl')}
-                className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-                    i18n.language === 'pl'
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-white text-gray-600 hover:bg-gray-100'
+                className={`rounded-lg px-3 py-1 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
+                    isPL
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
             >
                 PL
@@ -24,10 +27,10 @@ const LanguageSwitcher = () => {
             <button
                 type="button"
                 onClick={() => changeLanguage('en')}
-                className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${
-                    i18n.language === 'en'
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-white text-gray-600 hover:bg-gray-100'
+                className={`rounded-lg px-3 py-1 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
+                    isEN
+                        ? 'bg-primary text-primary-foreground shadow-sm'
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
             >
                 EN
