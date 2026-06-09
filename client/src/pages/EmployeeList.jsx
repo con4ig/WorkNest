@@ -64,7 +64,7 @@ export default function EmployeeList() {
         }
 
         try {
-            if (currentUser.role !== 'admin') {
+            if (currentUser.role !== 'admin' && currentUser.role !== 'hr') {
                 setError(t('employees.list.noPermissions'));
                 setLoading(false);
                 return;

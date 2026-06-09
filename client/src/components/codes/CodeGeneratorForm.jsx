@@ -58,10 +58,16 @@ const CodeGeneratorForm = ({
                             <option value="employee">
                                 {t('common.roles.employee')}
                             </option>
-                            <option value="hr">{t('common.roles.hr')}</option>
-                            <option value="admin">
-                                {t('common.roles.admin')}
-                            </option>
+                            {currentUser?.role === 'admin' && (
+                                <>
+                                    <option value="hr">
+                                        {t('common.roles.hr')}
+                                    </option>
+                                    <option value="admin">
+                                        {t('common.roles.admin')}
+                                    </option>
+                                </>
+                            )}
                         </Select>
                     </div>
 

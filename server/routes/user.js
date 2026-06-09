@@ -202,12 +202,7 @@ router.patch("/:id", authenticate, updateUser);
  *       403: { $ref: '#/components/responses/Forbidden' }
  *       404: { $ref: '#/components/responses/NotFound' }
  */
-router.patch(
-  "/:id/role",
-  authenticate,
-  authorize("admin"),
-  updateUserRole
-);
+router.patch("/:id/role", authenticate, authorize("admin"), updateUserRole);
 
 /**
  * @openapi
@@ -256,8 +251,8 @@ router.patch(
 router.post(
   "/generate-invitation",
   authenticate,
-  authorize("admin"),
-  generateInvitation
+  authorize("admin", "hr"),
+  generateInvitation,
 );
 
 /**
@@ -285,8 +280,8 @@ router.post(
 router.get(
   "/invitations",
   authenticate,
-  authorize("admin"),
-  getInvitations
+  authorize("admin", "hr"),
+  getInvitations,
 );
 
 /**
@@ -313,8 +308,8 @@ router.get(
 router.delete(
   "/invitations/:id",
   authenticate,
-  authorize("admin"),
-  revokeInvitation
+  authorize("admin", "hr"),
+  revokeInvitation,
 );
 
 /**
@@ -369,7 +364,7 @@ router.post(
   authenticate,
   authorize("hr", "admin"),
   csvUpload.single("file"),
-  importUsersFromCSV
+  importUsersFromCSV,
 );
 
 /**
@@ -413,7 +408,7 @@ router.put(
   "/profile-image",
   authenticate,
   upload.single("image"),
-  uploadProfileImage
+  uploadProfileImage,
 );
 
 /**
@@ -450,8 +445,6 @@ router.get("/profile-image", authenticate, getProfileImage);
  *       404: { $ref: '#/components/responses/NotFound' }
  */
 router.delete("/profile-image", authenticate, deleteProfileImage);
-
-
 
 /**
  * @openapi

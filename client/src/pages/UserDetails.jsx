@@ -223,7 +223,12 @@ export default function UserDetails() {
 
     if (!user) return null;
 
-    const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'hr';
+    const isHR = currentUser?.role === 'hr';
+    const isSuperAdmin = currentUser?.role === 'superadmin';
+    const isAdmin =
+        currentUser?.role === 'admin' ||
+        isSuperAdmin ||
+        (isHR && user.role !== 'admin' && user.role !== 'superadmin');
     const fullName =
         `${editData.firstName} ${editData.lastName}`.trim() ||
         editData.username;

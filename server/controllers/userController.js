@@ -56,7 +56,7 @@ export const getUserById = async (req, res) => {
     // Check if authenticate middleware set req.user
     if (!req.user) {
       console.error(
-        "❌ req.user is undefined - authenticate middleware is not working"
+        "❌ req.user is undefined - authenticate middleware is not working",
       );
       return res.status(401).json({ message: "You are not logged in" });
     }
@@ -66,11 +66,9 @@ export const getUserById = async (req, res) => {
     // Company isolation: Only allow fetching users from the same company
     if (req.user.role !== "superadmin") {
       if (!req.user.company) {
-        return res
-          .status(403)
-          .json({
-            message: "No company assigned to the current user.",
-          });
+        return res.status(403).json({
+          message: "No company assigned to the current user.",
+        });
       }
       query.company = req.user.company._id;
     }
@@ -174,7 +172,7 @@ export const updateUser = async (req, res) => {
     if (
       contractType &&
       !["full-time", "part-time", "contract", "temporary"].includes(
-        contractType
+        contractType,
       )
     ) {
       return res.status(400).json({
@@ -199,10 +197,20 @@ export const updateUser = async (req, res) => {
     if (salary !== undefined && salary < 0) {
       return res.status(400).json({ message: "Salary cannot be negative" });
     }
-    
+
     const existingUser = await User.findById(userId);
     if (!existingUser) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    if (
+      req.user.role === "hr" &&
+      (existingUser.role === "admin" || existingUser.role === "superadmin") &&
+      req.user._id.toString() !== userId
+    ) {
+      return res.status(403).json({
+        message: "You do not have permission to edit this user's data",
+      });
     }
 
     // ✅ NOW CHECK COMPANY ISOLATION
@@ -235,12 +243,26 @@ export const updateUser = async (req, res) => {
     // Prepare update object dynamically
     const updateData = {};
     const allowedFields = [
-      "username", "email", "firstName", "lastName", "phoneNumber",
-      "position", "department", "hireDate", "salary", "status",
-      "contractType", "address", "city", "peselOrId", "notes", "employmentHistory", "documents"
+      "username",
+      "email",
+      "firstName",
+      "lastName",
+      "phoneNumber",
+      "position",
+      "department",
+      "hireDate",
+      "salary",
+      "status",
+      "contractType",
+      "address",
+      "city",
+      "peselOrId",
+      "notes",
+      "employmentHistory",
+      "documents",
     ];
 
-    allowedFields.forEach(field => {
+    allowedFields.forEach((field) => {
       if (req.body[field] !== undefined) {
         updateData[field] = req.body[field];
       }
@@ -408,12 +430,15 @@ export const generateInvitation = async (req, res) => {
       const timeValue = parseInt(expiresIn);
       const timeUnit = expiresIn.slice(-1);
 
-      if (timeUnit === 'm') expirationDate.setMinutes(expirationDate.getMinutes() + timeValue);
-      else if (timeUnit === 'h') expirationDate.setHours(expirationDate.getHours() + timeValue);
-      else if (timeUnit === 'd') expirationDate.setDate(expirationDate.getDate() + timeValue);
+      if (timeUnit === "m")
+        expirationDate.setMinutes(expirationDate.getMinutes() + timeValue);
+      else if (timeUnit === "h")
+        expirationDate.setHours(expirationDate.getHours() + timeValue);
+      else if (timeUnit === "d")
+        expirationDate.setDate(expirationDate.getDate() + timeValue);
       else expirationDate = new Date(Date.now() + 5 * 60 * 1000); // Default 5 min fallback
     } else {
-       expirationDate = new Date(Date.now() + 5 * 60 * 1000); // Default 5 min
+      expirationDate = new Date(Date.now() + 5 * 60 * 1000); // Default 5 min
     }
 
     const newInvitation = new Invitation({
@@ -421,7 +446,7 @@ export const generateInvitation = async (req, res) => {
       createdBy: req.user._id,
       expiresAt: expirationDate,
       maxUses: maxUses || 1,
-      role: role || 'employee',
+      role: role || "employee",
     });
 
     await newInvitation.save();
@@ -429,7 +454,7 @@ export const generateInvitation = async (req, res) => {
     res.status(201).json({
       message: "Invitation code generated successfully.",
       invitationCode: newInvitation.code,
-      invitation: newInvitation // Return the whole object
+      invitation: newInvitation, // Return the whole object
     });
   } catch (err) {
     console.error("Error generating invitation code:", err);
@@ -440,7 +465,7 @@ export const generateInvitation = async (req, res) => {
 export const getInvitations = async (req, res) => {
   try {
     const companyId = req.user.company?._id || req.user.company;
-     if (!companyId) return res.status(400).json({ message: "No company" });
+    if (!companyId) return res.status(400).json({ message: "No company" });
 
     // Lazy remove expired invitations
     await Invitation.deleteMany({ expiresAt: { $lt: new Date() } });
@@ -450,7 +475,7 @@ export const getInvitations = async (req, res) => {
     // But admin may want to see a list of active codes.
     const invitations = await Invitation.find({ company: companyId })
       .sort({ createdAt: -1 })
-      .populate('createdBy', 'username');
+      .populate("createdBy", "username");
 
     res.json(invitations);
   } catch (err) {
@@ -461,20 +486,21 @@ export const getInvitations = async (req, res) => {
 
 export const revokeInvitation = async (req, res) => {
   try {
-     const { id } = req.params;
-     // Check that this invitation belongs to the admin's company (security)
-     const invitation = await Invitation.findById(id);
+    const { id } = req.params;
+    // Check that this invitation belongs to the admin's company (security)
+    const invitation = await Invitation.findById(id);
 
-     if (!invitation) return res.status(404).json({ message: "Invitation not found" });
+    if (!invitation)
+      return res.status(404).json({ message: "Invitation not found" });
 
-     // Check company permissions
-     const userCompanyId = req.user.company?._id || req.user.company;
-     if (invitation.company.toString() !== userCompanyId.toString()) {
-        return res.status(403).json({ message: "No permission" });
-     }
+    // Check company permissions
+    const userCompanyId = req.user.company?._id || req.user.company;
+    if (invitation.company.toString() !== userCompanyId.toString()) {
+      return res.status(403).json({ message: "No permission" });
+    }
 
-     await Invitation.findByIdAndDelete(id);
-     res.json({ message: "Invitation removed" });
+    await Invitation.findByIdAndDelete(id);
+    res.json({ message: "Invitation removed" });
   } catch (err) {
     console.error("Error revoking invitation:", err);
     res.status(500).json({ message: "Server error" });
@@ -489,29 +515,36 @@ export const importUsersFromCSV = async (req, res) => {
 
     const companyId = req.user.company?._id || req.user.company;
     if (!companyId) {
-      return res.status(400).json({ message: "User is not assigned to a company." });
+      return res
+        .status(400)
+        .json({ message: "User is not assigned to a company." });
     }
 
     const { password: tempPassword } = req.body;
     const passwordToUse = tempPassword || "WorkNest123!";
 
     let fileContent = req.file.buffer.toString("utf-8");
-    if (fileContent.charCodeAt(0) === 0xFEFF) {
-        fileContent = fileContent.slice(1);
+    if (fileContent.charCodeAt(0) === 0xfeff) {
+      fileContent = fileContent.slice(1);
     }
 
     const rows = fileContent.split(/\r?\n/);
-    
+
     if (rows.length < 2) {
-      return res.status(400).json({ message: "CSV file is empty or missing headers" });
+      return res
+        .status(400)
+        .json({ message: "CSV file is empty or missing headers" });
     }
 
-    const headers = rows[0].split(",").map(h => h.trim());
-    
+    const headers = rows[0].split(",").map((h) => h.trim());
+
     const headerMap = {};
     headers.forEach((header, index) => {
-        const cleanHeader = header.replace(/^"|"$/g, '').replace(/^\uFEFF/, '').trim();
-        headerMap[index] = cleanHeader;
+      const cleanHeader = header
+        .replace(/^"|"$/g, "")
+        .replace(/^\uFEFF/, "")
+        .trim();
+      headerMap[index] = cleanHeader;
     });
 
     const failed = [];
@@ -519,66 +552,75 @@ export const importUsersFromCSV = async (req, res) => {
     let created = 0;
 
     for (let i = 1; i < rows.length; i++) {
-        const rowString = rows[i].trim();
-        if (!rowString) continue;
+      const rowString = rows[i].trim();
+      if (!rowString) continue;
 
-        const values = rowString.split(",");
-        
-        if (values.length < headers.length) {
-            continue; 
+      const values = rowString.split(",");
+
+      if (values.length < headers.length) {
+        continue;
+      }
+
+      const userData = {};
+
+      Object.keys(headerMap).forEach((colIndex) => {
+        const field = headerMap[colIndex];
+        if (values[colIndex]) {
+          userData[field] = values[colIndex].trim().replace(/^"|"$/g, "");
+        }
+      });
+
+      if (!userData.email || !userData.username) {
+        failed.push({
+          row: i + 1,
+          message: "Missing required fields (email, username)",
+        });
+        continue;
+      }
+
+      try {
+        const existingUser = await User.findOne({ email: userData.email });
+        if (existingUser) {
+          failed.push({
+            row: i + 1,
+            email: userData.email,
+            message: "A user with this email already exists",
+          });
+          continue;
         }
 
-        const userData = {};
-        
-        Object.keys(headerMap).forEach(colIndex => {
-            const field = headerMap[colIndex];
-             if (values[colIndex]) {
-                 userData[field] = values[colIndex].trim().replace(/^"|"$/g, '');
-             }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(passwordToUse, salt);
+
+        const newUser = new User({
+          ...userData,
+          password: hashedPassword,
+          company: companyId,
+          role: userData.role || "employee",
+          status: userData.status || "active",
+          mustChangePassword: true,
         });
 
-        if (!userData.email || !userData.username) {
-            failed.push({ row: i + 1, message: "Missing required fields (email, username)" });
-            continue;
-        }
-
-        try {
-            const existingUser = await User.findOne({ email: userData.email });
-            if (existingUser) {
-                 failed.push({ row: i + 1, email: userData.email, message: "A user with this email already exists" });
-                 continue;
-            }
-
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(passwordToUse, salt);
-
-            const newUser = new User({
-                ...userData,
-                password: hashedPassword,
-                company: companyId,
-                role: userData.role || 'employee',
-                status: userData.status || 'active',
-                mustChangePassword: true
-            });
-            
-            await newUser.save();
-            created++;
-
-        } catch (err) {
-            failed.push({ row: i + 1, email: userData.email, message: err.message });
-        }
-        processed++;
+        await newUser.save();
+        created++;
+      } catch (err) {
+        failed.push({
+          row: i + 1,
+          email: userData.email,
+          message: err.message,
+        });
+      }
+      processed++;
     }
 
     res.json({
-        message: "Import completed",
-        processed,
-        created,
-        failedCount: failed.length,
-        failedSamples: failed.slice(0, 10),
-        defaultPassword: passwordToUse
+      message: "Import completed",
+      processed,
+      created,
+      failedCount: failed.length,
+      failedSamples: failed.slice(0, 10),
+      defaultPassword: passwordToUse,
     });
-
   } catch (err) {
     console.error("CSV Import error:", err);
     res.status(500).json({ message: "Server error while processing CSV" });
