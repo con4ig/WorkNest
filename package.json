@@ -61,7 +61,7 @@
     "devDependencies": {
         "@commitlint/cli": "19.8.1",
         "@commitlint/config-conventional": "19.8.1",
-        "@playwright/test": "^1.49.1",
+        "@playwright/test": "^1.61.0",
         "husky": "^9.1.7",
         "lint-staged": "^17.0.7",
         "prettier": "^3.8.4",
